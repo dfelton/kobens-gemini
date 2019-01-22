@@ -7,6 +7,10 @@ require_once 'lib/cli.php';
 require_once ((bool) Cli::getArg('production')) ? 'env/production.php' : 'env/sandbox.php';
 require_once 'lib/cancelAll.php';
 
+if ((bool) Cli::getArg('production')) {
+    die("\n\tCannot cancel all orders in production.\n\n");
+}
+
 /** @var RestKey $restKey */
 global $restKey;
 
