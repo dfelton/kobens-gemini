@@ -4,7 +4,7 @@
  */
 
 require_once 'lib/cli.php';
-require_once ((bool) Cli::getArg('production')) ? 'env/production.php' : 'env/sandbox.php';
+require_once 'env/'.Cli::getArg('env').'.php';
 require_once 'lib/orderNew.php';
 
 
@@ -15,8 +15,8 @@ $buyBtc = '0.00001';
 
 $cashLimit = '20.00';
 
-$start       = '3350.00';
-$end         = '3530.60';
+$start       = '3423.85';
+$end         = '3439.60';
 
 $increment   =    '0.35';
 $feePercent  =    '0.01';
@@ -56,7 +56,7 @@ while (floatval($buyPrice) <= floatval($end)) {
     $sellFeeUsd = bcmul($sellSubtotalUsd, $feePercent, 14);
     $sellYieldUsd = bcsub($sellSubtotalUsd, $sellFeeUsd, 14);
 
-    $positionProfitUsd = bcsub($sellYieldUsd, bcsub($amountUsd, $fee, 14), 14);
+    $positionProfitUsd = bcsub($sellYieldUsd, bcadd($amountUsd, $fee, 14), 14);
     $positionProfitBtc = bcsub($buyBtc, $sellBtc, 8);
 
     $data = [
@@ -93,46 +93,46 @@ while (floatval($buyPrice) <= floatval($end)) {
     $buyPrice = bcadd($buyPrice, $increment, 2);
 }
 
-
-
-// foreach ($orders as $data) {
-//     usleep(150000);
-//     $order = new OrderNew($restKey, 'btcusd', $data['buy_price'], $data['buy_amount_btc'], 'buy');
-//     $order->makeRequest();
-//     Zend_Debug::dump(json_decode($order->getResponse()));
-// }
-
-// foreach ($orders as $data) {
-//     usleep(150000);
-//     $order = new OrderNew($restKey, 'btcusd', $data['sell_price'], $data['sell_amount_btc'], 'sell');
-//     $order->makeRequest();
-//     Zend_Debug::dump(json_decode($order->getResponse()));
-// }
-
 $totalPositionFees = bcadd($totalBuyFees, $totalSellFees, 14);
 
-Zend_Debug::dump([
-    'orders' => $orders,
-    'limit_start' => $start,
-    'limit_end' => $end,
-    'start_buy_price' => $orders[0]['buy_price'],
-    'start_sell_price' => $orders[0]['sell_price'],
-    'end_buy_price' => $buyPrice,
-    'end_sell_price' => $sellPrice,
-    'cash_limit' => $cashLimit,
-    'increment' => $increment,
-    'ending_price' => $buyPrice,
-    'total_orders' => $totalOrders,
-    'total_buy_usd' => $totalBuyUsd,
-    'total_buy_fees' => $totalBuyFees,
-    'total_buy_usd_with_fees' => bcadd($totalBuyUsd, $totalBuyFees, 14),
-    'total_buy_btc' => $totalBuyBtc,
-    'total_sell_usd' => $totalSellUsd,
-    'total_sell_btc' => $totalSellBtc,
-    'total_sell_fees' => $totalSellFees,
-    'total_position_fees' => $totalPositionFees,
-    'total_profit_usd' => $totalProfitUsd,
-    'total_profit_btc' => $totalProfitBtc,
-    'fees_to_profit_ratio' => bcmul(bcdiv($totalPositionFees, $totalProfitUsd, 4), '100', 2) . '%',
-]);
+if ((bool) Cli::getArg('debug')) {
+    Zend_Debug::dump([
+        'orders' => $orders,
+        'limit_start' => $start,
+        'limit_end' => $end,
+        'start_buy_price' => $orders[0]['buy_price'],
+        'start_sell_price' => $orders[0]['sell_price'],
+        'end_buy_price' => $buyPrice,
+        'end_sell_price' => $sellPrice,
+        'cash_limit' => $cashLimit,
+        'increment' => $increment,
+        'ending_price' => $buyPrice,
+        'total_orders' => $totalOrders,
+        'total_buy_usd' => $totalBuyUsd,
+        'total_buy_fees' => $totalBuyFees,
+        'total_buy_usd_with_fees' => bcadd($totalBuyUsd, $totalBuyFees, 14),
+        'total_buy_btc' => $totalBuyBtc,
+        'total_sell_usd' => $totalSellUsd,
+        'total_sell_btc' => $totalSellBtc,
+        'total_sell_fees' => $totalSellFees,
+        'total_position_fees' => $totalPositionFees,
+        'total_profit_usd' => $totalProfitUsd,
+        'total_profit_btc' => $totalProfitBtc,
+        'fees_to_profit_ratio' => bcmul(bcdiv($totalPositionFees, $totalProfitUsd, 4), '100', 2) . '%',
+    ]);
+}
+
+if ((bool) Cli::getArg('place')) {
+    $side = Cli::getArg('side');
+    if (!in_array($side, ['buy','sell'])) {
+        die("\n\tInvalid order book side.");
+    }
+    foreach ($orders as $data) {
+        usleep(150000);
+        $order = new OrderNew($restKey, 'btcusd', $data[$side.'_price'], $data[$side.'_amount_btc'], $side);
+        $order->makeRequest();
+        Zend_Debug::dump(json_decode($order->getResponse()));
+    }
+}
+
 
