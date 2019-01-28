@@ -1,7 +1,7 @@
 <?php
 
-require_once 'traderRequest.php';
-require_once 'restKeyInterface.php';
+require_once __DIR__.'/traderRequest.php';
+require_once __DIR__.'/restKeyInterface.php';
 
 class CancelAllOrders extends TraderRequest
 {
@@ -10,7 +10,7 @@ class CancelAllOrders extends TraderRequest
     protected function validatePayload()
     {
         if ($this->payload !== []) {
-            throw new Exception('Invalid Cancal All Orders Payload');
+            throw new Exception('Invalid cancel all orders payload');
         }
     }
 
