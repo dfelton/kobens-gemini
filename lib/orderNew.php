@@ -1,7 +1,7 @@
 <?php
 
-require_once 'traderRequest.php';
-require_once 'restKeyInterface.php';
+require_once __DIR__.'/traderRequest.php';
+require_once __DIR__.'/restKeyInterface.php';
 
 class OrderNew extends TraderRequest
 {
@@ -35,6 +35,7 @@ class OrderNew extends TraderRequest
 
     protected function validatePayload()
     {
+        // TODO
         return true;
     }
 

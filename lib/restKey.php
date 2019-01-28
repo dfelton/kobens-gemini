@@ -1,6 +1,6 @@
 <?php
 
-require_once 'restKeyInterface.php';
+require_once __DIR__.'/restKeyInterface.php';
 
 class RestKey implements RestKeyInterface
 {
