@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.DIRECTORY_SEPARATOR.'restKeyInterface.php';
+require_once __DIR__.'/restKeyInterface.php';
 
 abstract class TraderRequest
 {
@@ -17,8 +17,14 @@ abstract class TraderRequest
     const ENDPOINT_HEARTBEAT                 = '/v1/heartbeat';
     const ENDPOINT_GET_AVAILABLE_BALANCES    = '/v1/balances';
 
+    /**
+     * @var array
+     */
     protected $payload = [];
 
+    /**
+     * @var string
+     */
     protected $response;
 
     /**
@@ -80,5 +86,10 @@ abstract class TraderRequest
     final public function getResponse()
     {
         return $this->response;
+    }
+
+    public function getPayload()
+    {
+        return $this->payload;
     }
 }
