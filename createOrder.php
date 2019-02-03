@@ -23,7 +23,7 @@ $sellBtc = '0.00001';
 $start       = '3370.30';
 $end         = '3472.85';
 
-$cashLimit   =   '20.00';
+$cashLimit   =   false;
 
 $increment   =    '0.35';
 $feePercent  =    '0.01';
@@ -47,16 +47,36 @@ while (floatval($buyPrice) <= floatval($end)) {
     }
     $fee = bcmul($amountUsd, $feePercent, 14);
 
+    // TODO: What is this 9 doing here?
     $nextTotal = bcadd($totalBuyUsd, bcadd($totalBuyFees, bcadd($fee, $amountUsd, 14), 14), 14);
-    if (floatval(bcsub($cashLimit, $nextTotal, 9)) < 0) {
+    if (is_string($cashLimit) && floatval(bcsub($cashLimit, $nextTotal, 9)) < 0) {
         break;
     }
 
-    $sellPrice = bcmul($buyPrice, $sellAfterGain, 2);
-    $sellPrice = bcadd($sellPrice, $buyPrice, 2);
-    $sellPrice = bcadd($sellPrice, '0.01', 2);
+    /**
+     * Determine the sell price based off
+     *      - Gain goal
+     *      - Quote minimum price increment
+     *
+     * If the exact sell price for the desired "sell after gain" were to result in a value that does not
+     * comply with the minimum price increment of the quote asset, then round down the exact sell price for the quote
+     * asset to the nearest minimum increment amount, and then increment the quote price increment by the minimum
+     * allowed amount.
+     *
+     * TODO: Determine Base/Quote currency precisions, and calculate necessary scale
+     * values for bc* methods below dynamically based off base/quote currencies.
+     */
+    $precision = strlen(substr($sellAfterGain, strpos($sellAfterGain, '.') + 1)) * 2; // Length of gain precision * length of USD precision
 
-    $sellBtc = $buyBtc;
+    $sellPriceExact = bcmul($buyPrice, $sellAfterGain, $precision);
+    $sellPriceExact .= str_repeat('0',  $precision - strlen(substr($sellPriceExact, strpos($sellPriceExact, '.') + 1)));
+
+    $sellPriceRoundedDown = bcadd($sellPriceExact, '0', 2) . str_repeat('0', $precision - 2);
+
+    $sellPrice = $sellPriceExact === $sellPriceRoundedDown
+        ? bcadd($sellPriceRoundedDown, '.00', 2)
+        : bcadd($sellPriceRoundedDown, '.01', 2);
+    $sellPrice = bcadd($buyPrice, $sellPrice, 2);
 
     $sellSubtotalUsd = bcmul($sellPrice, $sellBtc, 14);
     $sellFeeUsd = bcmul($sellSubtotalUsd, $feePercent, 14);
@@ -70,6 +90,7 @@ while (floatval($buyPrice) <= floatval($end)) {
         'buy_amount_usd' => $amountUsd,
         'buy_amount_btc' => $buyBtc,
         'buy_fee' => $fee,
+        'bug_usd_with_fee' => bcadd($amountUsd, $fee, 14),
         'sell_price' => $sellPrice,
         'sell_amount_usd' => $sellSubtotalUsd,
         'sell_amount_btc' => $buyBtc,
@@ -104,27 +125,29 @@ $totalProfitExchangeAndMe = bcadd($totalPositionFees, $totalProfitUsd, 14);
 $feesRatio = bcdiv($totalPositionFees, $totalProfitExchangeAndMe, 4);
 $feesRatio = bcmul($feesRatio, '100', 2);
 
+if ((bool) Cli::getArg('dumpOrders')) {
+    Zend_Debug::dump($orders);
+}
+
 if ((bool) Cli::getArg('debug')) {
     Zend_Debug::dump([
-        'orders' => $orders,
+        'order_first' => $orders[0],
+        'order_last' => count($orders) > 1 ? end($orders) : null,
         'order_count' => count($orders),
-        'limit_start' => $start,
-        'limit_end' => $end,
-        'start_buy_price' => $orders[0]['buy_price'],
-        'start_sell_price' => $orders[0]['sell_price'],
-        'end_buy_price' => $buyPrice,
-        'end_sell_price' => $sellPrice,
-        'cash_limit' => $cashLimit,
         'increment' => $increment,
-        'ending_price' => $buyPrice,
-        'total_buy_usd' => $totalBuyUsd,
-        'total_buy_fees' => $totalBuyFees,
-        'total_buy_usd_with_fees' => bcadd($totalBuyUsd, $totalBuyFees, 14),
-        'total_buy_btc' => $totalBuyBtc,
-        'total_sell_usd' => $totalSellUsd,
-        'total_sell_btc' => $totalSellBtc,
-        'total_sell_fees' => $totalSellFees,
-        'total_position_fees' => $totalPositionFees,
+        'gain' => bcmul($sellAfterGain, '100', strlen(substr($sellAfterGain, strpos($sellAfterGain, '.') + 1)) - 2).'%',
+        'buy_price_start' => $orders[0]['buy_price'],
+        'buy_price_end' => $buyPrice,
+        'buy_usd' => $totalBuyUsd,
+        'buy_btc' => $totalBuyBtc,
+        'buy_fees' => $totalBuyFees,
+        'buy_usd_with_fees' => bcadd($totalBuyUsd, $totalBuyFees, 14),
+        'sell_price_start' => $orders[0]['sell_price'],
+        'sell_price_end' => $sellPrice,
+        'sell_usd' => $totalSellUsd,
+        'sell_btc' => $totalSellBtc,
+        'sell_fees' => $totalSellFees,
+        'total_fees' => $totalPositionFees,
         'total_profit_usd' => $totalProfitUsd,
         'total_profit_btc' => $totalProfitBtc,
         'fees_ate_profits' => $feesRatio . '%',
