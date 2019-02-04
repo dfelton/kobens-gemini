@@ -1,27 +1,16 @@
 <?php
 /**
- * Creates orders
+ * Logic for generating consistent order placement 
+ * points across a range of price points. 
  */
 
-require_once __DIR__.'/lib/cli.php';
-require_once __DIR__.'/lib/orderNew.php';
-require_once __DIR__.'/lib/Zend/Debug.php';
-
-if ((string) Cli::getArg('env') === 'production') {
-    require_once __DIR__.'/env/production.php';
-} else {
-    require_once __DIR__.'/env/sandbox.php';
-}
-
-
-/** @var RestKey $restKey */
-global $restKey;
+require __DIR__.'/vendor/autoload.php';
 
 $buyBtc  = '0.00001';
 $sellBtc = '0.00001';
 
-$start       = '3370.30';
-$end         = '3472.85';
+$start       = '3000.00';
+$end         = '4000.00';
 
 $cashLimit   =   false;
 
@@ -125,68 +114,62 @@ $totalProfitExchangeAndMe = bcadd($totalPositionFees, $totalProfitUsd, 14);
 $feesRatio = bcdiv($totalPositionFees, $totalProfitExchangeAndMe, 4);
 $feesRatio = bcmul($feesRatio, '100', 2);
 
-if ((bool) Cli::getArg('dumpOrders')) {
-    Zend_Debug::dump($orders);
-}
 
-if ((bool) Cli::getArg('debug')) {
-    Zend_Debug::dump([
-        'order_first' => $orders[0],
-        'order_last' => count($orders) > 1 ? end($orders) : null,
-        'order_count' => count($orders),
-        'increment' => $increment,
-        'gain' => bcmul($sellAfterGain, '100', strlen(substr($sellAfterGain, strpos($sellAfterGain, '.') + 1)) - 2).'%',
-        'buy_price_start' => $orders[0]['buy_price'],
-        'buy_price_end' => $buyPrice,
-        'buy_usd' => $totalBuyUsd,
-        'buy_btc' => $totalBuyBtc,
-        'buy_fees' => $totalBuyFees,
-        'buy_usd_with_fees' => bcadd($totalBuyUsd, $totalBuyFees, 14),
-        'sell_price_start' => $orders[0]['sell_price'],
-        'sell_price_end' => $sellPrice,
-        'sell_usd' => $totalSellUsd,
-        'sell_btc' => $totalSellBtc,
-        'sell_fees' => $totalSellFees,
-        'total_fees' => $totalPositionFees,
-        'total_profit_usd' => $totalProfitUsd,
-        'total_profit_btc' => $totalProfitBtc,
-        'fees_ate_profits' => $feesRatio . '%',
-    ]);
-}
+\Zend\Debug\Debug::dump([
+    'order_first' => $orders[0],
+    'order_last' => count($orders) > 1 ? end($orders) : null,
+    'order_count' => count($orders),
+    'increment' => $increment,
+    'gain' => bcmul($sellAfterGain, '100', strlen(substr($sellAfterGain, strpos($sellAfterGain, '.') + 1)) - 2).'%',
+    'buy_price_start' => $orders[0]['buy_price'],
+    'buy_price_end' => $buyPrice,
+    'buy_usd' => $totalBuyUsd,
+    'buy_btc' => $totalBuyBtc,
+    'buy_fees' => $totalBuyFees,
+    'buy_usd_with_fees' => bcadd($totalBuyUsd, $totalBuyFees, 14),
+    'sell_price_start' => $orders[0]['sell_price'],
+    'sell_price_end' => $sellPrice,
+    'sell_usd' => $totalSellUsd,
+    'sell_btc' => $totalSellBtc,
+    'sell_fees' => $totalSellFees,
+    'total_fees' => $totalPositionFees,
+    'total_profit_usd' => $totalProfitUsd,
+    'total_profit_btc' => $totalProfitBtc,
+    'fees_ate_profits' => $feesRatio . '%',
+]);
 
-if ((bool) Cli::getArg('place')) {
-    $side = (string) Cli::getArg('side');
-    if (!in_array($side, ['buy', 'sell'])) {
-        throw new Exception('Invalid order book side');
-    }
-    foreach ($orders as $data) {
-        usleep(150000);
-        $order = new OrderNew($restKey, 'btcusd', $data[$side.'_price'], $data[$side.'_amount_btc'], $side);
-        $order->makeRequest();
+// if ((bool) Cli::getArg('place')) {
+//     $side = (string) Cli::getArg('side');
+//     if (!in_array($side, ['buy', 'sell'])) {
+//         throw new Exception('Invalid order book side');
+//     }
+//     foreach ($orders as $data) {
+//         usleep(150000);
+//         $order = new OrderNew($restKey, 'btcusd', $data[$side.'_price'], $data[$side.'_amount_btc'], $side);
+//         $order->makeRequest();
 
-        $response = $order->getResponse();
-        $response = @json_decode($response);
-        if (!$response instanceOf stdClass) {
-            throw new Exception('No response from exchange server.');
-        }
+//         $response = $order->getResponse();
+//         $response = @json_decode($response);
+//         if (!$response instanceOf stdClass) {
+//             throw new Exception('No response from exchange server.');
+//         }
 
-        $orderId = (int) $response->order_id;
-        if ($orderId > 0) {
-            echo ucfirst($side)." order placed for {$data[$side.'_amount_btc']}. Exchange Order Id: {$orderId}\n";
-        } else {
+//         $orderId = (int) $response->order_id;
+//         if ($orderId > 0) {
+//             echo ucfirst($side)." order placed for {$data[$side.'_amount_btc']}. Exchange Order Id: {$orderId}\n";
+//         } else {
 
-            $filename = uniqid('err_'.$side.'_'.time().'_').'.log';
-            $handle = fopen($filename, 'w');
+//             $filename = uniqid('err_'.$side.'_'.time().'_').'.log';
+//             $handle = fopen($filename, 'w');
 
-            fwrite($handle, Zend_Debug::dump($order->getPayload(), 'payload', false));
-            fwrite($handle, PHP_EOL);
-            fwrite($handle, Zend_Debug::dump($response, 'response', false));
+//             fwrite($handle, Zend_Debug::dump($order->getPayload(), 'payload', false));
+//             fwrite($handle, PHP_EOL);
+//             fwrite($handle, Zend_Debug::dump($response, 'response', false));
 
-            throw new Exception(
-                "Unhandled response from exchange. Payload and response written to {$filename}"
-            );
-        }
-    }
-}
-
+//             throw new Exception(
+//                 "Unhandled response from exchange. Payload and response written to {$filename}"
+//             );
+//         }
+//     }
+// }
 

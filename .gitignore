@@ -3,3 +3,5 @@
 /.buildpath
 
 /env
+/vendor
+/composer.phar
