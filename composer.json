@@ -1,35 +1,37 @@
 {
-	"name" : "kobens/gemini",
-	"description" : "For facilitating trades on the Gemini exchange.",
-	"type" : "project",
-	"repositories" : [{
-			"type" : "git",
-			"url" : "https://github.com/dfelton/php-cli-args",
-			"name" : "PHP Cli Args"
-		}
-	],
-	"require" : {
-		"zendframework/zend-db" : "^2.9",
+    "name" : "kobens/gemini",
+    "description" : "For facilitating trades on the Gemini exchange.",
+    "type" : "project",
+    "authors" : [
+        {
+            "name" : "Darren Felton",
+            "email" : "darren_felton@hotmail.com"
+        }
+    ],
+    "repositories" : [
+        {
+            "type" : "git",
+            "url" : "https://github.com/dfelton/php-cli-args",
+            "name" : "PHP Cli Args"
+        }
+    ],
+    "require" : {
+        "zendframework/zend-db" : "^2.9",
         "zendframework/zend-config" : "^3.2.0",
-		"cheprasov/php-cli-args" : "~3.0"
-	},
-	"require-dev" : {
-		"zendframework/zend-debug" : "^2.6@dev"
-	},
-	"authors" : [{
-			"name" : "Darren Felton",
-			"email" : "darren_felton@hotmail.com"
-		}
-	],
-	"autoload" : {
-		"psr-4" : {
-			"Kobens\\" : "src/"
-		}
-	},
-	"minimum-stability" : "dev",
-	"config" : {
-		"platform" : {
-			"php" : "7.0.0"
-		}
-	}
+        "cheprasov/php-cli-args" : "~3.0"
+    },
+    "require-dev" : {
+        "zendframework/zend-debug" : "^2.6@dev"
+    },
+    "autoload" : {
+        "psr-4" : {
+            "Kobens\\" : "src/"
+        }
+    },
+    "minimum-stability" : "dev",
+    "config" : {
+        "platform" : {
+            "php" : "7.0.0"
+        }
+    }
 }
