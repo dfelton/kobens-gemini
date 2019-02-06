@@ -2,6 +2,8 @@
     "name" : "kobens/kobens-gemini",
     "description" : "For facilitating trades on the Gemini exchange.",
     "type" : "project",
+    "license" : "BSD-3-Clause",
+    "minimum-stability" : "dev",
     "authors" : [
         {
             "name" : "Darren Felton",
@@ -28,7 +30,6 @@
             "Kobens\\" : "src/"
         }
     },
-    "minimum-stability" : "dev",
     "config" : {
         "platform" : {
             "php" : "7.0.0"
