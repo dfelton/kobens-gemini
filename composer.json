@@ -18,6 +18,7 @@
         }
     ],
     "require" : {
+        "php" : ">=7.0.0",
         "zendframework/zend-db" : "^2.9",
         "zendframework/zend-config" : "^3.2.0",
         "cheprasov/php-cli-args" : "~3.0"
