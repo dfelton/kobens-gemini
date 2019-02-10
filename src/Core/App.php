@@ -13,39 +13,32 @@ final class App
         OrderNew::API_ACTION_KEY => OrderNew::class,
         OrderCancelAll::API_ACTION_KEY => OrderCancelAll::class,
     ];
-    
+
     /**
      * @var \Kobens\Core\ActionInterface
      */
     protected $action;
-    
+
     /**
      * @var \Kobens\Db\Adapter
      */
     protected $db;
-    
+
     /**
      * @var \Zend\Config\Config
      */
     protected $config;
-    
+
     /**
      * @var \CliArgs\CliArgs
      */
     protected $cli;
-    
+
     /**
      * @var \Kobens\Core\Output
      */
     protected $output;
-    
-    /**
-     * Active environment (sandbox|production) for current running thread
-     * 
-     * @var string
-     */
-    protected $environment;
-    
+
     /**
      * @var array
      */
@@ -63,14 +56,14 @@ final class App
             'help' => 'What config file to load environment settings from (production|sandbox)',
         ],
     ];
-    
+
     public function __construct()
     {
         $this->cli = new \CliArgs\CliArgs($this->cliArgs);
         $this->db = new \Kobens\Db\Adapter($this->getConfig()->database->toArray());
         $this->output = new \Kobens\Core\Output();
     }
-    
+
     final public function run()
     {
         if ($this->cli->isFlagExist('h')) {
@@ -90,8 +83,7 @@ final class App
             }
         }
     }
-    
-    
+
     /**
      * @throws Exception\ActionRequiredException
      * @throws Exception\ActionInvalidException
@@ -108,7 +100,7 @@ final class App
         }
         return new $this->actionClassMap[$action]($this);
     }
-    
+
     /**
      * @return \Zend\Config\Config
      */
@@ -117,13 +109,12 @@ final class App
         if (is_null($this->config)) {
             $reader = new \Zend\Config\Reader\Xml();
             $filename = (string) $this->cli->getArg('config');
-            $filename = $this->getRoot().'/env/'.trim($filename).'.xml';
             $array = $reader->fromFile($filename);
             $this->config = new \Zend\Config\Config($array);
         }
         return $this->config;
     }
-    
+
     /**
      * @return \Kobens\Core\Output
      */
@@ -131,15 +122,7 @@ final class App
     {
         return $this->output;
     }
-    
-    /**
-     * @return string
-     */
-    public function getRoot() : string
-    {
-        return dirname(dirname(__DIR__));
-    }
-    
+
     /**
      * @return \Kobens\Db\Adapter
      */
