@@ -22,7 +22,8 @@
         "zendframework/zend-db" : "^2.9",
         "zendframework/zend-config" : "^3.2.0",
         "ext-curl" : "*",
-        "cheprasov/php-cli-args" : "~3.0"
+        "cheprasov/php-cli-args" : "~3.0",
+        "cboden/ratchet": "^0.4.1"
     },
     "require-dev" : {
         "zendframework/zend-debug" : "^2.6@dev"
