@@ -3,7 +3,7 @@
     "description" : "For facilitating trades on the Gemini exchange.",
     "type" : "project",
     "license" : "BSD-3-Clause",
-    "minimum-stability" : "dev",
+    "minimum-stability" : "stable",
     "authors" : [
         {
             "name" : "Darren Felton",
@@ -21,6 +21,7 @@
         "php" : ">=7.0.0",
         "zendframework/zend-db" : "^2.9",
         "zendframework/zend-config" : "^3.2.0",
+        "ext-curl" : "*",
         "cheprasov/php-cli-args" : "~3.0"
     },
     "require-dev" : {

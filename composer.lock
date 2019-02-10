@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "f051f933c3a696794a34902bc295e143",
+    "content-hash": "cb9b3eda0859a1c751b9ae327c072d61",
     "packages": [
         {
             "name": "cheprasov/php-cli-args",
@@ -41,16 +41,16 @@
         },
         {
             "name": "psr/container",
-            "version": "dev-master",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/container.git",
-                "reference": "014d250daebff39eba15ba990eeb2a140798e77c"
+                "reference": "b7ce3b176482dbbc1245ebf52b181af44c2cf55f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/container/zipball/014d250daebff39eba15ba990eeb2a140798e77c",
-                "reference": "014d250daebff39eba15ba990eeb2a140798e77c",
+                "url": "https://api.github.com/repos/php-fig/container/zipball/b7ce3b176482dbbc1245ebf52b181af44c2cf55f",
+                "reference": "b7ce3b176482dbbc1245ebf52b181af44c2cf55f",
                 "shasum": ""
             },
             "require": {
@@ -86,20 +86,20 @@
                 "container-interop",
                 "psr"
             ],
-            "time": "2018-12-29T15:36:03+00:00"
+            "time": "2017-02-14T16:28:37+00:00"
         },
         {
             "name": "zendframework/zend-config",
-            "version": "dev-develop",
+            "version": "3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zend-config.git",
-                "reference": "cad20209d951f9f4f79fa32d8f4441b3931869ba"
+                "reference": "6796f5dcba52c84ef2501d7313618989b5ef3023"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-config/zipball/cad20209d951f9f4f79fa32d8f4441b3931869ba",
-                "reference": "cad20209d951f9f4f79fa32d8f4441b3931869ba",
+                "url": "https://api.github.com/repos/zendframework/zend-config/zipball/6796f5dcba52c84ef2501d7313618989b5ef3023",
+                "reference": "6796f5dcba52c84ef2501d7313618989b5ef3023",
                 "shasum": ""
             },
             "require": {
@@ -146,20 +146,20 @@
                 "config",
                 "zf"
             ],
-            "time": "2019-01-29T22:56:21+00:00"
+            "time": "2018-04-24T19:26:44+00:00"
         },
         {
             "name": "zendframework/zend-db",
-            "version": "dev-develop",
+            "version": "2.9.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zend-db.git",
-                "reference": "4fff35bdc267b5610601f7e16ccfbd93f8c41ca7"
+                "reference": "5b4f2c42f94c9f7f4b2f456a0ebe459fab12b3d9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-db/zipball/4fff35bdc267b5610601f7e16ccfbd93f8c41ca7",
-                "reference": "4fff35bdc267b5610601f7e16ccfbd93f8c41ca7",
+                "url": "https://api.github.com/repos/zendframework/zend-db/zipball/5b4f2c42f94c9f7f4b2f456a0ebe459fab12b3d9",
+                "reference": "5b4f2c42f94c9f7f4b2f456a0ebe459fab12b3d9",
                 "shasum": ""
             },
             "require": {
@@ -170,7 +170,7 @@
                 "phpunit/phpunit": "^5.7.25 || ^6.4.4",
                 "zendframework/zend-coding-standard": "~1.0.0",
                 "zendframework/zend-eventmanager": "^2.6.2 || ^3.0",
-                "zendframework/zend-hydrator": "^1.1 || ^2.1 || ^3.0",
+                "zendframework/zend-hydrator": "^1.1 || ^2.1",
                 "zendframework/zend-servicemanager": "^2.7.5 || ^3.0.3"
             },
             "suggest": {
@@ -204,20 +204,20 @@
                 "db",
                 "zf"
             ],
-            "time": "2018-12-11T19:29:36+00:00"
+            "time": "2018-04-09T13:21:36+00:00"
         },
         {
             "name": "zendframework/zend-stdlib",
-            "version": "dev-develop",
+            "version": "3.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zend-stdlib.git",
-                "reference": "89a6fb821c11ba790ea2e123559ba1432596be39"
+                "reference": "66536006722aff9e62d1b331025089b7ec71c065"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-stdlib/zipball/89a6fb821c11ba790ea2e123559ba1432596be39",
-                "reference": "89a6fb821c11ba790ea2e123559ba1432596be39",
+                "url": "https://api.github.com/repos/zendframework/zend-stdlib/zipball/66536006722aff9e62d1b331025089b7ec71c065",
+                "reference": "66536006722aff9e62d1b331025089b7ec71c065",
                 "shasum": ""
             },
             "require": {
@@ -250,7 +250,7 @@
                 "stdlib",
                 "zf"
             ],
-            "time": "2018-08-29T10:55:46+00:00"
+            "time": "2018-08-28T21:34:05+00:00"
         }
     ],
     "packages-dev": [
@@ -305,16 +305,16 @@
         },
         {
             "name": "zendframework/zend-escaper",
-            "version": "dev-develop",
+            "version": "2.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zend-escaper.git",
-                "reference": "c9e7e54dac46175e93cd08111dc5963bfb9f2f7e"
+                "reference": "31d8aafae982f9568287cb4dce987e6aff8fd074"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-escaper/zipball/c9e7e54dac46175e93cd08111dc5963bfb9f2f7e",
-                "reference": "c9e7e54dac46175e93cd08111dc5963bfb9f2f7e",
+                "url": "https://api.github.com/repos/zendframework/zend-escaper/zipball/31d8aafae982f9568287cb4dce987e6aff8fd074",
+                "reference": "31d8aafae982f9568287cb4dce987e6aff8fd074",
                 "shasum": ""
             },
             "require": {
@@ -346,17 +346,20 @@
                 "escaper",
                 "zf"
             ],
-            "time": "2018-04-25T15:50:09+00:00"
+            "time": "2018-04-25T15:48:53+00:00"
         }
     ],
     "aliases": [],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "stability-flags": {
         "zendframework/zend-debug": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": ">=7.0.0",
+        "ext-curl": "*"
+    },
     "platform-dev": [],
     "platform-overrides": {
         "php": "7.0.0"
