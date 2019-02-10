@@ -3,7 +3,7 @@
     "description" : "For facilitating trades on the Gemini exchange.",
     "type" : "project",
     "license" : "BSD-3-Clause",
-    "minimum-stability" : "stable",
+    "minimum-stability" : "dev",
     "authors" : [
         {
             "name" : "Darren Felton",
@@ -12,16 +12,26 @@
     ],
     "repositories" : [
         {
+            "type" : "vcs",
+            "url" : "https://github.com/dfelton/kobens-core"
+        },
+        {
             "type" : "git",
-            "url" : "https://github.com/dfelton/php-cli-args",
-            "name" : "PHP Cli Args"
+            "url" : "https://github.com/dfelton/kobens-currency"
+        },
+        {
+            "type" : "git",
+            "url" : "https://github.com/dfelton/kobens-exchange"
+        },
+        {
+            "type" : "git",
+            "url" : "https://github.com/dfelton/php-cli-args"
         }
     ],
     "require" : {
         "php" : ">=7.0.0",
-        "zendframework/zend-db" : "^2.9",
-        "zendframework/zend-config" : "^3.2.0",
         "ext-curl" : "*",
+        "kobens/kobens-core" : "dev-master",
         "cheprasov/php-cli-args" : "~3.0",
         "cboden/ratchet": "^0.4.1"
     },
@@ -30,7 +40,7 @@
     },
     "autoload" : {
         "psr-4" : {
-            "Kobens\\" : "src/"
+            "Kobens\\Gemini\\" : "src"
         }
     },
     "config" : {
