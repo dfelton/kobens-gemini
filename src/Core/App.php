@@ -53,7 +53,7 @@ final class App
         ],
         'config' => [
             'alias' => 'c',
-            'help' => 'What config file to load environment settings from (production|sandbox)',
+            'help' => 'What config file to load environment settings from',
         ],
     ];
 
