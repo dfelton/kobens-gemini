@@ -5,36 +5,36 @@ namespace Kobens\Gemini\Api\Rest;
 abstract class Request implements \Kobens\Core\Config\RuntimeInterface
 {
     const REQUEST_URI = '';
-    
+
     protected $app;
-    
+
     /**
      * @var array
      */
     protected $payload = [];
-    
+
     /**
      * @var \stdClass
      */
     protected $response;
-    
+
     /**
      * @var number
      */
     protected $responseCode;
-    
+
     /**
      * @var \Kobens\Gemini\Api\KeyInterface
      */
     protected $restKey;
-    
+
     /**
      * @var \Kobens\Gemini\Api\NonceInterface
      */
     protected $nonce;
-    
+
     protected $runtimeArgOptions = [];
-    
+
     /**
      * @param \Kobens\Gemini\Api\KeyInterface $restKey
      * @param array $payload
@@ -46,7 +46,7 @@ abstract class Request implements \Kobens\Core\Config\RuntimeInterface
         $this->restKey = new \Kobens\Gemini\Api\Key($app->getConfig()->get('gemini')->get('api'));
         $this->nonce = new \Kobens\Gemini\Api\Nonce($app->getDb());
     }
-    
+
     /**
      * @param array $payload
      * @return self
@@ -56,7 +56,7 @@ abstract class Request implements \Kobens\Core\Config\RuntimeInterface
         $this->payload = $payload;
         return $this;
     }
-    
+
     /**
      * {@inheritDoc}
      * @see \Kobens\Core\Config\RuntimeInterface::getRuntimeArgOptions()
@@ -65,7 +65,7 @@ abstract class Request implements \Kobens\Core\Config\RuntimeInterface
     {
         return $this->runtimeArgOptions;
     }
-    
+
     /**
      * {@inheritDoc}
      * @see \Kobens\Core\Config\RuntimeInterface::setRuntimeArgs()
@@ -75,7 +75,7 @@ abstract class Request implements \Kobens\Core\Config\RuntimeInterface
         $this->setPayload($args);
         return $this;
     }
-    
+
     /**
      * @return array
      */
@@ -95,7 +95,7 @@ abstract class Request implements \Kobens\Core\Config\RuntimeInterface
             'X-GEMINI-SIGNATURE: ' . \hash_hmac('sha384', $base64Payload, $this->restKey->getSecretKey())
         ];
     }
-    
+
     /**
      * @throws \Exception
      * @return self
@@ -105,19 +105,19 @@ abstract class Request implements \Kobens\Core\Config\RuntimeInterface
         if (!is_null($this->responseCode)) {
             throw new \Exception('Cannot place same request twice.');
         }
-        
+
         $ch = curl_init();
-        
+
         curl_setopt($ch, CURLOPT_URL, $this->getUrl());
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $this->getHeaders());
-        
+
         $response = (string) curl_exec($ch);
         $this->responseCode = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-        
+
         curl_close($ch);
-        
+
         if ($this->responseCode === 0) {
             throw new \Kobens\Gemini\Exception\ConnectionException(sprintf(
                 'Unable to establish a connection with "%s%"',
@@ -135,10 +135,10 @@ abstract class Request implements \Kobens\Core\Config\RuntimeInterface
                 ));
             }
         }
-        
+
         return $this;
     }
-    
+
     /**
      * @return string
      */
@@ -146,7 +146,7 @@ abstract class Request implements \Kobens\Core\Config\RuntimeInterface
     {
         return 'https://'.$this->restKey->getHost().static::REQUEST_URI;
     }
-    
+
     /**
      * @return \stdClass
      */
@@ -157,7 +157,7 @@ abstract class Request implements \Kobens\Core\Config\RuntimeInterface
         }
         return $this->response;
     }
-    
+
     /**
      * @return array
      */
