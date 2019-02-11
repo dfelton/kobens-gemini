@@ -3,12 +3,12 @@
 namespace Kobens\Gemini\Api\Rest\Request\Order\Placement;
 
 class NewOrder extends \Kobens\Gemini\Api\Rest\Request
-    implements  \Kobens\Core\ActionInterface
+    implements \Kobens\Core\ActionInterface
 {
     const API_ACTION_KEY = 'order:new';
-    
+
     const REQUEST_URI = '/v1/order/new';
-    
+
     /**
      * @var array
      */
@@ -39,12 +39,12 @@ class NewOrder extends \Kobens\Gemini\Api\Rest\Request
             'payload_key' => 'side'
         ],
     ];
-    
+
     protected $defaultPayload = [
         'type' => 'exchange limit',
         'options' => ['maker-or-cancel'],
     ];
-    
+
     public function setPayload(array $payload) : \Kobens\Gemini\Api\Rest\Request
     {
         $filtered = [];
@@ -61,7 +61,7 @@ class NewOrder extends \Kobens\Gemini\Api\Rest\Request
         }
         return parent::setPayload(\array_merge($this->defaultPayload, $filtered));
     }
-    
+
     /**
      * {@inheritDoc}
      * @see \Kobens\Core\ActionInterface::execute()
@@ -71,6 +71,5 @@ class NewOrder extends \Kobens\Gemini\Api\Rest\Request
         $this->makeRequest()->getResponse();
         return $this;
     }
-    
-    
+
 }

@@ -5,19 +5,19 @@ namespace Kobens\Gemini\Api;
 class Nonce implements NonceInterface
 {
     /**
-     * @var \Kobens\Db\Adapter
+     * @var \Kobens\Core\Db\Adapter
      */
     protected $db;
-    
+
     /**
-     * @param \Kobens\Db\Adapter $db
+     * @param \Kobens\Core\Db\Adapter $db
      */
     public function __construct(
-        \Kobens\Db\Adapter $db
+        \Kobens\Core\Db\Adapter $db
     ) {
         $this->db = $db;
     }
-    
+
     /**
      * {@inheritDoc}
      * @see \Kobens\Gemini\Api\NonceInterface::getNonce()
