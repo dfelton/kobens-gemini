@@ -32,7 +32,7 @@
         "php" : ">=7.0.0",
         "ext-curl" : "*",
         "kobens/kobens-core" : "dev-master",
-        "cheprasov/php-cli-args" : "~3.0",
+        "dfelton/php-cli-args" : "~3.0",
         "cboden/ratchet": "^0.4.1"
     },
     "require-dev" : {

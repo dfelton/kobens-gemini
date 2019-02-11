@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9da56ec565e699331acfa2e6b6160e2a",
+    "content-hash": "198eef186cc37d34e03790ddcb152700",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -61,6 +61,46 @@
         },
         {
             "name": "cheprasov/php-cli-args",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cheprasov/php-cli-args.git",
+                "reference": "f40272d6ca038023ce0f3fa927490f0c3dcfa652"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cheprasov/php-cli-args/zipball/f40272d6ca038023ce0f3fa927490f0c3dcfa652",
+                "reference": "f40272d6ca038023ce0f3fa927490f0c3dcfa652",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.8.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "CliArgs\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alexander Cheprasov",
+                    "email": "acheprasov84@gmail.com"
+                }
+            ],
+            "description": "Easy way to gets options from the command line argument list",
+            "homepage": "http://github.com/cheprasov/php-cli-args",
+            "time": "2019-02-02T19:40:45+00:00"
+        },
+        {
+            "name": "dfelton/php-cli-args",
             "version": "3.0.0",
             "source": {
                 "type": "git",
