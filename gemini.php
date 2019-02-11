@@ -2,5 +2,5 @@
 
 require __DIR__.'/vendor/autoload.php';
 
-$app = new \Kobens\Core\App();
+$app = new \Kobens\Gemini\App();
 $app->run();

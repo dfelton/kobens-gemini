@@ -6,7 +6,10 @@ abstract class Request implements \Kobens\Core\Config\RuntimeInterface
 {
     const REQUEST_URI = '';
 
-    protected $app;
+    /**
+     * @var \Kobens\Core\App\ResourcesInterface
+     */
+    protected $appResources;
 
     /**
      * @var array
@@ -40,11 +43,11 @@ abstract class Request implements \Kobens\Core\Config\RuntimeInterface
      * @param array $payload
      */
     public function __construct(
-        \Kobens\Core\App $app
+        \Kobens\Core\App\ResourcesInterface $appResources
     ) {
-        $this->app = $app;
-        $this->restKey = new \Kobens\Gemini\Api\Key($app->getConfig()->get('gemini')->get('api'));
-        $this->nonce = new \Kobens\Gemini\Api\Nonce($app->getDb());
+        $this->appResources = $appResources;
+        $this->restKey = new \Kobens\Gemini\Api\Key($appResources->getConfig()->get('gemini')->get('api'));
+        $this->nonce = new \Kobens\Gemini\Api\Nonce($appResources->getDb());
     }
 
     /**

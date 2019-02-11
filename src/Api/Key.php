@@ -15,12 +15,12 @@ class Key implements KeyInterface
      * @var string
      */
     private $keyPublic;
-    
+
     /**
      * @var string
      */
     private $keySecret;
-    
+
     /**
      * @param string $host
      * @param string $public
@@ -32,7 +32,7 @@ class Key implements KeyInterface
         $this->setPublicKey($config->public_key);
         $this->setSecretKey($config->secret_key);
     }
-    
+
     /**
      * @param string $host
      * @throws \Exception
@@ -46,7 +46,7 @@ class Key implements KeyInterface
         $this->host = $host;
         return $this;
     }
-    
+
     protected function setPublicKey(string $key) : self
     {
         $key = trim($key);
@@ -56,7 +56,7 @@ class Key implements KeyInterface
         $this->keyPublic = $key;
         return $this;
     }
-    
+
     protected function setSecretKey(string $secret) : self
     {
         $secret = trim($secret);
@@ -66,8 +66,8 @@ class Key implements KeyInterface
         $this->keySecret = $secret;
         return $this;
     }
-    
-    
+
+
     /**
      * {@inheritDoc}
      * @see \Kobens\Gemini\Api\KeyInterface::getHost()
@@ -76,7 +76,7 @@ class Key implements KeyInterface
     {
         return $this->host;
     }
-    
+
     /**
      * {@inheritDoc}
      * @see \Kobens\Gemini\Api\KeyInterface::getPublicKey()
@@ -85,13 +85,13 @@ class Key implements KeyInterface
     {
         return $this->keyPublic;
     }
-    
+
     /**
      * {@inheritDoc}
      * @see \Kobens\Gemini\Api\KeyInterface::getSecretKey()
      */
     final public function getSecretKey() : string
     {
-        return $this->keySecret;        
+        return $this->keySecret;
     }
 }

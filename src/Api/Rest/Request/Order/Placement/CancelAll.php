@@ -14,12 +14,12 @@ class CancelAll extends Request
     const REQUEST_URI = '/v1/order/cancel/all';
 
     public function __construct(
-        \Kobens\Gemini\App $app
+        \Kobens\Core\App\ResourcesInterface $appResources
     ) {
-        if ($app->getConfig()->gemini->api->host === \Kobens\Gemini\Api\Host::PRODUCTION) {
+        if ($appResources->getConfig()->gemini->api->host === \Kobens\Gemini\Api\Host::PRODUCTION) {
             throw new \Exception('Cancel All Active Orders is not allowed in production.');
         }
-        parent::__construct($app);
+        parent::__construct($appResources);
     }
 
     /**
@@ -42,10 +42,10 @@ class CancelAll extends Request
         $response = $this->makeRequest()->getResponse();
 
         if ($response->result === 'ok') {
-            $this->app->getOutput()->write(sprintf('Total of %d active orders cancelled', count($response->details->cancelledOrders)));
-            $this->app->getOutput()->write(sprintf('Total of %d active orders rejected for cancellation', count($response->details->cancelRejects)));
+            $this->appResources->getOutput()->write(sprintf('Total of %d active orders cancelled', count($response->details->cancelledOrders)));
+            $this->appResources->getOutput()->write(sprintf('Total of %d active orders rejected for cancellation', count($response->details->cancelRejects)));
         } else {
-            $this->app->getOutput()->write('There was a problem cancelling all active orders.');
+            $this->appResources->getOutput()->write('There was a problem cancelling all active orders.');
         }
 
         return $this;
