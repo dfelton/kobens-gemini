@@ -52,7 +52,7 @@ class NewOrder extends \Kobens\Gemini\Api\Rest\Request
             if (\array_key_exists($key, $payload)) {
                 $filtered[$config['payload_key']] = $payload[$key];
             } elseif ($config['required'] === true) {
-                throw new \Exception(\sprintf(
+                throw new \Kobens\Core\Exception\RuntimeArgsInvalidException(\sprintf(
                     '"%s" is missing required runtime parameter "%s"',
                     self::class,
                     $key
@@ -68,6 +68,7 @@ class NewOrder extends \Kobens\Gemini\Api\Rest\Request
      */
     public function execute() : \Kobens\Core\ActionInterface
     {
+        // TODO: examine response, throw exception if order didn't get placed
         $this->makeRequest()->getResponse();
         return $this;
     }
