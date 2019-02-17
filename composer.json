@@ -1,5 +1,6 @@
 {
     "name" : "kobens/kobens-gemini",
+    "version" : "0.0.1",
     "description" : "For facilitating trades on the Gemini exchange.",
     "type" : "project",
     "license" : "BSD-3-Clause",
