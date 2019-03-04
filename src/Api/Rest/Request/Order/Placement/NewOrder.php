@@ -13,27 +13,27 @@ class NewOrder extends \Kobens\Gemini\Api\Rest\Request
      * @var array
      */
     protected $runtimeArgOptions = [
-        'order_new_client_order_id' => [
+        'order_client_order_id' => [
             'required' => false,
             'help' => 'Client Order Id (Optional)',
             'payload_key' => 'client_order_id',
         ],
-        'order_new_symbol' => [
+        'order_symbol' => [
             'required' => true,
             'help' => 'Currency Pair Symbol',
             'payload_key' => 'symbol',
         ],
-        'order_new_amount' => [
+        'order_amount' => [
             'required' => true,
             'help' => 'Base Currency Order Amount',
             'payload_key' => 'amount',
         ],
-        'order_new_price' => [
+        'order_price' => [
             'required' => true,
             'help' => 'Quote Currency Price',
             'payload_key' => 'price',
         ],
-        'order_new_side' => [
+        'order_side' => [
             'required' => true,
             'help' => 'Order Book Side',
             'payload_key' => 'side'

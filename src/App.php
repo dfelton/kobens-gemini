@@ -3,6 +3,7 @@
 namespace Kobens\Gemini;
 
 use Kobens\Gemini\Api\Rest\Request\Order\Placement\{CancelAll as OrderCancelAll, NewOrder as OrderNew};
+use Kobens\Gemini\App\Actions\MarketData\BookKeeper;
 
 final class App extends \Kobens\Core\App
 {
@@ -17,6 +18,10 @@ final class App extends \Kobens\Core\App
                 'description' => 'Cancel all active orders.',
                 'class' => OrderCancelAll::class,
             ],
+            BookKeeper::API_ACTION_KEY => [
+                'description' => 'Maintains in local cache a copy of the exchange market\'s order book.',
+                'class' => BookKeeper::class
+            ]
         ];
     }
 }
