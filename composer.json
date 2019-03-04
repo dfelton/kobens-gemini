@@ -1,52 +1,59 @@
 {
-    "name" : "kobens/kobens-gemini",
-    "version" : "0.0.1",
-    "description" : "For facilitating trades on the Gemini exchange.",
-    "type" : "project",
-    "license" : "BSD-3-Clause",
-    "minimum-stability" : "dev",
-    "authors" : [
+    "name": "kobens/kobens-gemini",
+    "version": "0.0.1",
+    "description": "For facilitating trades on the Gemini exchange.",
+    "type": "project",
+    "license": "BSD-3-Clause",
+    "minimum-stability": "dev",
+    "authors": [
         {
-            "name" : "Darren Felton",
-            "email" : "darren_felton@hotmail.com"
+            "name": "Darren Felton",
+            "email": "darren_felton@hotmail.com"
         }
     ],
-    "repositories" : [
+    "repositories": [
         {
-            "type" : "vcs",
-            "url" : "https://github.com/dfelton/kobens-core"
+            "type": "vcs",
+            "url": "https://github.com/dfelton/kobens-core"
         },
         {
-            "type" : "git",
-            "url" : "https://github.com/dfelton/kobens-currency"
+            "type": "git",
+            "url": "https://github.com/dfelton/kobens-currency"
         },
         {
-            "type" : "git",
-            "url" : "https://github.com/dfelton/kobens-exchange"
+            "type": "git",
+            "url": "https://github.com/dfelton/kobens-exchange"
         },
         {
-            "type" : "git",
-            "url" : "https://github.com/dfelton/php-cli-args"
+            "type": "git",
+            "url": "https://github.com/dfelton/php-cli-args"
         }
     ],
-    "require" : {
-        "php" : ">=7.0.0",
-        "ext-curl" : "*",
-        "kobens/kobens-core" : "dev-master",
-        "dfelton/php-cli-args" : "~3.0",
+    "require": {
+        "php": "^7.3",
+        "ext-curl": "*",
+        "kobens/kobens-core": "dev-master",
+        "kobens/kobens-exchange": "dev-master",
+        "dfelton/php-cli-args": "~3.0"
+    },
+    "require-dev": {
+        "zendframework/zend-debug": "^2.6@dev",
+        "amphp/websocket-client": "0.2.4",
         "cboden/ratchet": "^0.4.1"
     },
-    "require-dev" : {
-        "zendframework/zend-debug" : "^2.6@dev"
-    },
-    "autoload" : {
-        "psr-4" : {
-            "Kobens\\Gemini\\" : "src"
+    "autoload": {
+        "psr-4": {
+            "Kobens\\Gemini\\": "src"
         }
     },
-    "config" : {
-        "platform" : {
-            "php" : "7.0.0"
+    "autoload-dev": {
+        "psr-4": {
+            "KobensTest\\Gemini\\": "test"
+        }
+    },
+    "config": {
+        "platform": {
+            "php": "7.3.2"
         }
     }
 }
