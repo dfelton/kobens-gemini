@@ -76,17 +76,17 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-core.git",
-                "reference": "255b1e2f7ebf22b130e1f767d012cfa2bb017bee"
+                "reference": "b9f534e34b23de7e6000e9a7259bebc6489395dc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dfelton/kobens-core/zipball/255b1e2f7ebf22b130e1f767d012cfa2bb017bee",
-                "reference": "255b1e2f7ebf22b130e1f767d012cfa2bb017bee",
+                "url": "https://api.github.com/repos/dfelton/kobens-core/zipball/b9f534e34b23de7e6000e9a7259bebc6489395dc",
+                "reference": "b9f534e34b23de7e6000e9a7259bebc6489395dc",
                 "shasum": ""
             },
             "require": {
                 "dfelton/php-cli-args": "~3.0",
-                "php": ">=7.0.0",
+                "php": "^7.3",
                 "zendframework/zend-config": "^3.2.0",
                 "zendframework/zend-db": "^2.9"
             },
@@ -110,7 +110,7 @@
                 "source": "https://github.com/dfelton/kobens-core/tree/master",
                 "issues": "https://github.com/dfelton/kobens-core/issues"
             },
-            "time": "2019-02-11T03:18:23+00:00"
+            "time": "2019-03-05T13:30:30+00:00"
         },
         {
             "name": "kobens/kobens-currency",

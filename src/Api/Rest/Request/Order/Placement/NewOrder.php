@@ -66,11 +66,10 @@ class NewOrder extends \Kobens\Gemini\Api\Rest\Request
      * {@inheritDoc}
      * @see \Kobens\Core\ActionInterface::execute()
      */
-    public function execute() : \Kobens\Core\ActionInterface
+    public function execute() : void
     {
-        // TODO: examine response, throw exception if order didn't get placed
+        // TODO: abstract this into Kobens\Gemini\App\Actions\Order\NewOrder
         $this->makeRequest()->getResponse();
-        return $this;
     }
 
 }
