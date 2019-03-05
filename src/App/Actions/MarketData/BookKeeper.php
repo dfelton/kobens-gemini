@@ -2,8 +2,12 @@
 
 namespace Kobens\Gemini\App\Actions\MarketData;
 
-use \Kobens\Core\Config\RuntimeInterface;
-use \Kobens\Core\ActionInterface;
+use Kobens\Core\ActionInterface;
+use Kobens\Core\App\ResourcesInterface;
+use Kobens\Core\Config\RuntimeInterface;
+use Kobens\Gemini\Exchange;
+use Zend\Cache\StorageFactory;
+use Zend\Cache\Storage\StorageInterface;
 
 class BookKeeper implements ActionInterface
 {
@@ -26,21 +30,25 @@ class BookKeeper implements ActionInterface
      */
     protected $runtimeArgs = [];
 
-    /**
-     * @param \Kobens\Core\App\ResourcesInterface $resourcesInterface
-     */
-    public function __construct(
-        \Kobens\Core\App\ResourcesInterface $resourcesInterface
-    ) {
+    public function __construct(ResourcesInterface $resourcesInterface)
+    {
         $this->app = $resourcesInterface;
     }
 
-    /**
-     * @return ActionInterface
-     */
-    public function execute() : ActionInterface
+    public function execute() : void
     {
+        $exchange = new Exchange(
+            $this->getCache(),
+            $this->app->getConfig()->gemini->api
+        );
+        $exchange->getBookKeeper($this->getSymbol())->openBook();
+    }
 
+    protected function getSymbol()
+    {
+        return isset($this->runtimeArgs['market_symbol'])
+            ? $this->runtimeArgs['market_symbol']
+            : '';
     }
 
     public function getRuntimeArgOptions() : array
@@ -57,4 +65,11 @@ class BookKeeper implements ActionInterface
         $this->runtimeArgs = $args;
         return $this;
     }
+
+    protected function getCache() : StorageInterface
+    {
+        $cfg = $this->app->getConfig()->get('cache')->toArray();
+        return StorageFactory::factory($cfg);
+    }
+
 }

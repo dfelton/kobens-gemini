@@ -37,18 +37,23 @@ class CancelAll extends Request
         return $this;
     }
 
-    public function execute() : ActionInterface
+    public function execute() : void
     {
         $response = $this->makeRequest()->getResponse();
-
         if ($response->result === 'ok') {
-            $this->appResources->getOutput()->write(sprintf('Total of %d active orders cancelled', count($response->details->cancelledOrders)));
-            $this->appResources->getOutput()->write(sprintf('Total of %d active orders rejected for cancellation', count($response->details->cancelRejects)));
+            $this->appResources->getOutput()->write(\sprintf(
+                'Total of %d active orders cancelled',
+                \count($response->details->cancelledOrders
+            )));
+            $this->appResources->getOutput()->write(\sprintf(
+                'Total of %d active orders rejected for cancellation',
+                \count($response->details->cancelRejects
+            )));
         } else {
-            $this->appResources->getOutput()->write('There was a problem cancelling all active orders.');
+            $this->appResources->getOutput()->write(
+                'There was a problem cancelling all active orders.'
+            );
         }
-
-        return $this;
     }
 
 }

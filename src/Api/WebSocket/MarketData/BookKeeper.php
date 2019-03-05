@@ -3,12 +3,21 @@
 namespace Kobens\Gemini\Api\WebSocket\MarketData;
 
 use Kobens\Exchange\Book\Keeper\AbstractKeeper;
-use Kobens\Gemini\Exception\Exception;
 use Kobens\Exchange\Exception\ClosedBookException;
+use Kobens\Exchange\ExchangeInterface;
+use Kobens\Gemini\Exception\Exception;
 
 class BookKeeper extends AbstractKeeper
 {
-    const WEBSOCKET_URL = 'wss://api.gemini.com/v1/marketdata/:pair';
+    /**
+     * @var string
+     */
+    protected $host;
+
+    /**
+     * @var string
+     */
+    protected $path = '/v1/marketdata/';
 
     /**
      * @var int
@@ -22,9 +31,18 @@ class BookKeeper extends AbstractKeeper
         'heartbeat'=> 'true',
         'trades'   => 'false',
         'auctions' => 'false',
-        'bids' => 'true',
-        'offers' => 'true'
+        'bids'     => 'true',
+        'offers'   => 'true'
     ];
+
+    public function __construct(
+        ExchangeInterface $exchange,
+        string $pairKey,
+        string $host
+    ) {
+        parent::__construct($exchange, $pairKey);
+        $this->host = $host;
+    }
 
     public function openBook(): void
     {
@@ -87,8 +105,7 @@ class BookKeeper extends AbstractKeeper
 
     protected function getWebSocketUrl() : string
     {
-        $str = \str_replace(':pair', $this->pair->getPairSymbol(), self::WEBSOCKET_URL);
-        $str .= '?';
+        $str = 'wss://'.$this->host.$this->path.$this->pair->getPairSymbol().'?';
         for ($i = 0, $j = \count($this->params); $i < $j; $i++) {
             $str .= \array_keys($this->params)[$i] . '=' . \array_values($this->params)[$i] . '&';
         }
