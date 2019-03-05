@@ -155,7 +155,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-exchange",
-                "reference": "f7c49ef76b44e44a0c8a07eb8d188c82e88f4679"
+                "reference": "5d1fed7176a82dd1d6f39032a92cec3f084827dc"
             },
             "require": {
                 "kobens/kobens-currency": "^1.0",
@@ -187,7 +187,7 @@
                 }
             ],
             "description": "Library for providing a common interface for interacting with Exchange accounts via API.",
-            "time": "2019-03-04T15:25:17+00:00"
+            "time": "2019-03-05T02:20:42+00:00"
         },
         {
             "name": "psr/cache",
