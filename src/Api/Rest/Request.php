@@ -2,7 +2,9 @@
 
 namespace Kobens\Gemini\Api\Rest;
 
-abstract class Request implements \Kobens\Core\Config\RuntimeInterface
+use Kobens\Core\Config\RuntimeInterface;
+
+abstract class Request implements RuntimeInterface
 {
     const REQUEST_URI = '';
 
@@ -38,10 +40,6 @@ abstract class Request implements \Kobens\Core\Config\RuntimeInterface
 
     protected $runtimeArgOptions = [];
 
-    /**
-     * @param \Kobens\Gemini\Api\KeyInterface $restKey
-     * @param array $payload
-     */
     public function __construct(
         \Kobens\Core\App\ResourcesInterface $appResources
     ) {
@@ -60,20 +58,12 @@ abstract class Request implements \Kobens\Core\Config\RuntimeInterface
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     * @see \Kobens\Core\Config\RuntimeInterface::getRuntimeArgOptions()
-     */
     public function getRuntimeArgOptions() : array
     {
         return $this->runtimeArgOptions;
     }
 
-    /**
-     * {@inheritDoc}
-     * @see \Kobens\Core\Config\RuntimeInterface::setRuntimeArgs()
-     */
-    public function setRuntimeArgs(array $args) : \Kobens\Core\Config\RuntimeInterface
+    public function setRuntimeArgs(array $args) : RuntimeInterface
     {
         $this->setPayload($args);
         return $this;
@@ -89,13 +79,14 @@ abstract class Request implements \Kobens\Core\Config\RuntimeInterface
             $this->getPayload()
         );
         $base64Payload = \base64_encode(\json_encode($payload));
+        $signature = \hash_hmac('sha384', $base64Payload, $this->restKey->getSecretKey());
         return [
             'Cache-Control: no-cache',
             'Content-Length: 0',
             'Content-Type: text/plain',
             'X-GEMINI-APIKEY: ' . $this->restKey->getPublicKey(),
             'X-GEMINI-PAYLOAD: ' . $base64Payload,
-            'X-GEMINI-SIGNATURE: ' . \hash_hmac('sha384', $base64Payload, $this->restKey->getSecretKey())
+            'X-GEMINI-SIGNATURE: ' . $signature
         ];
     }
 
@@ -105,21 +96,21 @@ abstract class Request implements \Kobens\Core\Config\RuntimeInterface
      */
     final public function makeRequest() : self
     {
-        if (!is_null($this->responseCode)) {
+        if (!\is_null($this->responseCode)) {
             throw new \Exception('Cannot place same request twice.');
         }
 
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, $this->getUrl());
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $this->getHeaders());
+        \curl_setopt($ch, CURLOPT_URL, $this->getUrl());
+        \curl_setopt($ch, CURLOPT_POST, true);
+        \curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        \curl_setopt($ch, CURLOPT_HTTPHEADER, $this->getHeaders());
 
-        $response = (string) curl_exec($ch);
-        $this->responseCode = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+        $response = (string) \curl_exec($ch);
+        $this->responseCode = (int) \curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
 
-        curl_close($ch);
+        \curl_close($ch);
 
         if ($this->responseCode === 0) {
             throw new \Kobens\Gemini\Exception\ConnectionException(sprintf(
@@ -128,11 +119,11 @@ abstract class Request implements \Kobens\Core\Config\RuntimeInterface
             ));
         } else {
             if ($this->responseCode >= 200 && $this->responseCode < 300) {
-                $this->response = json_decode($response);
+                $this->response = \json_decode($response);
             } elseif ($this->responseCode >= 300 && $this->responseCode < 400) {
                 throw new \Kobens\Gemini\Exception\ResourceMovedException('Resource has moved permanently');
             } elseif ($this->responseCode >= 400 && $this->responseCode < 500) {
-                $this->response = json_decode($response);
+                $this->response = \json_decode($response);
                 throw new \Kobens\Gemini\Exception\InvalidResponseException(sprintf(
                     $this->response->message
                 ));
@@ -142,17 +133,11 @@ abstract class Request implements \Kobens\Core\Config\RuntimeInterface
         return $this;
     }
 
-    /**
-     * @return string
-     */
     protected function getUrl() : string
     {
         return 'https://'.$this->restKey->getHost().static::REQUEST_URI;
     }
 
-    /**
-     * @return \stdClass
-     */
     public function getResponse() : \stdClass
     {
         if (!$this->response instanceof \stdClass) {
@@ -161,9 +146,6 @@ abstract class Request implements \Kobens\Core\Config\RuntimeInterface
         return $this->response;
     }
 
-    /**
-     * @return array
-     */
     public function getPayload() : array
     {
         return $this->payload;
