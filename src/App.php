@@ -2,8 +2,9 @@
 
 namespace Kobens\Gemini;
 
-use Kobens\Gemini\Api\Rest\Request\Order\Placement\{CancelAll as OrderCancelAll, NewOrder as OrderNew};
+use Kobens\Gemini\Api\Rest\Request\Order\Placement\CancelAll as OrderCancelAll;
 use Kobens\Gemini\App\Actions\MarketData\BookKeeper;
+use Kobens\Gemini\App\Actions\Order\NewOrder as OrderNew;
 
 final class App extends \Kobens\Core\App
 {

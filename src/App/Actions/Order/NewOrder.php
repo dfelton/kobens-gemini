@@ -1,10 +1,21 @@
 <?php
 
-namespace Kobens\Gemini\Api\Rest\Request\Order\Placement;
+namespace Kobens\Gemini\App\Actions\Order;
 
-class NewOrder extends \Kobens\Gemini\Api\Rest\Request
+use Kobens\Core\ActionInterface;
+use Kobens\Core\App\ResourcesInterface;
+use Kobens\Core\Config\RuntimeInterface;
+use Kobens\Core\Exception\RuntimeArgsInvalidException;
+use Kobens\Gemini\Api\Rest\Request;
+
+class NewOrder implements ActionInterface
 {
-    const REQUEST_URI = '/v1/order/new';
+    const API_ACTION_KEY = 'order:new';
+
+    /**
+     * @var ResourcesInterface
+     */
+    protected $app;
 
     /**
      * @var array
@@ -37,19 +48,21 @@ class NewOrder extends \Kobens\Gemini\Api\Rest\Request
         ],
     ];
 
-    protected $defaultPayload = [
-        'type' => 'exchange limit',
-        'options' => ['maker-or-cancel'],
-    ];
+    protected $runtimeArgs = [];
 
-    public function setPayload(array $payload) : \Kobens\Gemini\Api\Rest\Request
+    public function __construct(ResourcesInterface $resourcesInterface)
+    {
+        $this->app = $resourcesInterface;
+    }
+
+    public function setPayload(array $payload) : Request
     {
         $filtered = [];
         foreach ($this->runtimeArgOptions as $key => $config) {
             if (\array_key_exists($key, $payload)) {
                 $filtered[$config['payload_key']] = $payload[$key];
             } elseif ($config['required'] === true) {
-                throw new \Kobens\Core\Exception\RuntimeArgsInvalidException(\sprintf(
+                throw new RuntimeArgsInvalidException(\sprintf(
                     '"%s" is missing required runtime parameter "%s"',
                     self::class,
                     $key
@@ -57,6 +70,22 @@ class NewOrder extends \Kobens\Gemini\Api\Rest\Request
             }
         }
         return parent::setPayload(\array_merge($this->defaultPayload, $filtered));
+    }
+
+    public function execute() : void
+    {
+        throw new \Exception('not implemented');
+    }
+
+    public function setRuntimeArgs(array $args): RuntimeInterface
+    {
+        $this->runtimeArgs = $args;
+        return $this;
+    }
+
+    public function getRuntimeArgOptions(): array
+    {
+        return $this->runtimeArgOptions;
     }
 
 }
