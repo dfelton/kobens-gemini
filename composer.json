@@ -13,33 +13,25 @@
     ],
     "repositories": [
         {
-            "type": "vcs",
-            "url": "https://github.com/dfelton/kobens-core"
-        },
-        {
             "type": "git",
             "url": "https://github.com/dfelton/kobens-currency"
         },
         {
             "type": "git",
             "url": "https://github.com/dfelton/kobens-exchange"
-        },
-        {
-            "type": "git",
-            "url": "https://github.com/dfelton/php-cli-args"
         }
     ],
     "require": {
         "php": "^7.3",
         "ext-curl": "*",
-        "kobens/kobens-core": "dev-master",
         "kobens/kobens-exchange": "dev-master",
-        "dfelton/php-cli-args": "~3.0"
+        "zendframework/zend-config": "^3.2",
+        "amphp/websocket-client": "dev-master",
+        "symfony/console": "^4.2"
     },
     "require-dev": {
         "zendframework/zend-debug": "^2.6@dev",
-        "amphp/websocket-client": "0.2.4",
-        "cboden/ratchet": "^0.4.1"
+        "phpunit/phpunit": "^8"
     },
     "autoload": {
         "psr-4": {

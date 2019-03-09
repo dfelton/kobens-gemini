@@ -2,8 +2,17 @@
 
 namespace Kobens\Gemini\Api;
 
+use Kobens\Gemini\App\Config;
+
 class Host
 {
-    const PRODUCTION = 'api.gemini.com';
-    const SANDBOX = 'api.sandbox.gemini.com';
+    public function getHost() : string
+    {
+        return (new Config())->gemini->api->host;
+    }
+
+    public function __toString() : string
+    {
+        return $this->getHost();
+    }
 }

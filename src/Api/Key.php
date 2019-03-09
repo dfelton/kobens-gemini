@@ -2,15 +2,10 @@
 
 namespace Kobens\Gemini\Api;
 
-use Zend\Config\Config;
+use Kobens\Gemini\App\Config;
 
 class Key implements KeyInterface
 {
-    /**
-     * @var string
-     */
-    private $host;
-
     /**
      * @var string
      */
@@ -21,25 +16,13 @@ class Key implements KeyInterface
      */
     private $keySecret;
 
-    public function __construct(Config $config)
+    public function __construct()
     {
-        $this->setHost($config->host);
-        $this->setPublicKey($config->public_key);
-        $this->setSecretKey($config->secret_key);
-    }
-
-    /**
-     * @param string $host
-     * @throws \Exception
-     * @return self
-     */
-    protected function setHost(string $host) : self
-    {
-        if (!\in_array($host, [Host::PRODUCTION, Host::SANDBOX])) {
-            throw new \Exception(\sprintf('Invalid API Host "%s"', $host));
-        }
-        $this->host = $host;
-        return $this;
+        $config = (new Config())->gemini->api->key;
+        $this
+            ->setPublicKey($config->public_key)
+            ->setSecretKey($config->secret_key)
+        ;
     }
 
     protected function setPublicKey(string $key) : self
@@ -60,11 +43,6 @@ class Key implements KeyInterface
         }
         $this->keySecret = $secret;
         return $this;
-    }
-
-    public function getHost() : string
-    {
-        return $this->host;
     }
 
     public function getPublicKey() : string
