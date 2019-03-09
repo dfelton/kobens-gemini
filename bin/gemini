@@ -5,7 +5,7 @@ require dirname(__DIR__).'/vendor/autoload.php';
 
 use Kobens\Gemini\App\Config;
 use Kobens\Gemini\App\Command\Market\{BookKeeper, Watcher};
-use Kobens\Gemini\App\Command\Order\NewOrder;
+use Kobens\Gemini\App\Command\Order\{CancelAll, NewOrder};
 use Symfony\Component\Console\Application;
 use Zend\Config\Reader\Xml;
 use Zend\Config\Config as ZendConfig;
@@ -24,8 +24,8 @@ unset($filename);
 $application = new Application();
 
 $application->add(new BookKeeper());
-$application->add(new Watcher());
 $application->add(new NewOrder());
+$application->add(new CancelAll());
 $application->add(new Watcher());
 
 $application->run();

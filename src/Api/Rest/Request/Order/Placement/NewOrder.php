@@ -2,66 +2,107 @@
 
 namespace Kobens\Gemini\Api\Rest\Request\Order\Placement;
 
+use Kobens\Gemini\Api\Host;
+use Kobens\Gemini\Api\Param\{Side, Symbol, Amount, Price, ClientOrderId};
 use Kobens\Gemini\Api\Rest\Request;
+use Kobens\Gemini\Exchange;
+use Kobens\Exchange\PairInterface;
 
 class NewOrder extends Request
 {
     const REQUEST_URI = '/v1/order/new';
-
-    /**
-     * @todo refactor out of the class more array data
-     *
-     * @var array
-     */
-    protected $runtimeArgOptions = [
-        'order_client_order_id' => [
-            'required' => false,
-            'help' => 'Client Order Id (Optional)',
-            'payload_key' => 'client_order_id',
-        ],
-        'order_symbol' => [
-            'required' => true,
-            'help' => 'Currency Pair Symbol',
-            'payload_key' => 'symbol',
-        ],
-        'order_amount' => [
-            'required' => true,
-            'help' => 'Base Currency Order Amount',
-            'payload_key' => 'amount',
-        ],
-        'order_price' => [
-            'required' => true,
-            'help' => 'Quote Currency Price',
-            'payload_key' => 'price',
-        ],
-        'order_side' => [
-            'required' => true,
-            'help' => 'Order Book Side',
-            'payload_key' => 'side'
-        ],
-    ];
 
     protected $defaultPayload = [
         'type' => 'exchange limit',
         'options' => ['maker-or-cancel'],
     ];
 
-    public function setPayload(array $payload) : Request
+    public function __construct(
+        Side $side,
+        Symbol $symbol,
+        Amount $amount,
+        Price $price,
+        ClientOrderId $clientOrderId
+    )
     {
-        $filtered = [];
-        foreach ($this->runtimeArgOptions as $key => $config) {
-            if (\array_key_exists($key, $payload)) {
-                $filtered[$config['payload_key']] = $payload[$key];
-            } elseif ($config['required'] === true) {
-                // @todo more specific exception class
+        parent::__construct();
+
+        $pair = (new Exchange())->getPair($symbol->getValue());
+
+        $this->validateAmount($amount->getValue(), $pair);
+        $this->validatePrice($price->getValue(), $pair);
+
+        $params = [
+            'symbol' => $symbol->getValue(),
+            'amount' => $amount->getValue(),
+            'price'  => $price->getValue(),
+            'side'   => $side->getValue(),
+        ];
+        if ($clientOrderId->getValue()) {
+            $params['client_order_id'] = $clientOrderId->getValue();
+        }
+        $this->payload = \array_merge($this->defaultPayload, $params);
+    }
+
+    protected function validateAmount(string $amount, PairInterface $pair) : void
+    {
+        $min = $pair->getMinOrderSize();
+        if ($amount < $min) {
+            throw new \Exception(\sprintf(
+                'Invalid amount "%s", min allowed for the "%s" pair on "%s" is "%s".',
+                $amount,
+                $pair->getPairSymbol(),
+                (string) (new Host()),
+                $min
+            ));
+        }
+        unset($min);
+
+        $parts = \explode('.', $amount);
+        if (isset($parts[1])) {
+            $length = \strlen($parts[1]);
+            $min = $pair->getMinOrderIncrement();
+            $minParts = explode('.', $min);
+            if (isset($minParts[1])) {
+                $maxPrecision = \strlen($minParts[1]);
+                if ($length > $maxPrecision) {
+                    throw new \Exception(\sprintf(
+                        'Invalid amount precision "%s", min increment allowed is "%s"',
+                        $length,
+                        $pair->getMinOrderIncrement()
+                    ));
+                }
+            } else {
                 throw new \Exception(\sprintf(
-                    '"%s" is missing required runtime parameter "%s"',
-                    self::class,
-                    $key
+                    'Invalid amount precision "%s", min increment allowed is "%s"',
+                    $length,
+                    $pair->getMinOrderIncrement()
                 ));
             }
         }
-        return parent::setPayload(\array_merge($this->defaultPayload, $filtered));
     }
 
+    protected function validatePrice(string $price, PairInterface $pair) : void
+    {
+        $min = $pair->getMinPriceIncrement();
+        if ($price < $min) {
+            throw new \Exception(\sprintf(
+                'Invalid price "%s", min price is "%s".',
+                $price,
+                $min
+            ));
+        }
+        $parts = \explode('.', $price);
+        if (isset($parts[1])) {
+            $length = \strlen($parts[1]);
+            if ($length > $pair->getMinOrderIncrement()) {
+                throw new \Exception(\sprintf(
+                    'Invalid price precision "%s", min increment allowed is "%s"',
+                    $length,
+                    $pair->getMinOrderIncrement()
+                ));
+            }
+
+        }
+    }
 }

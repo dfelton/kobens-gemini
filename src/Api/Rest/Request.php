@@ -4,6 +4,7 @@ namespace Kobens\Gemini\Api\Rest;
 
 use Kobens\Gemini\Api\{Host, Key, Nonce};
 use Kobens\Gemini\Exception\{ConnectionException, InvalidResponseException, ResourceMovedException};
+use Kobens\Gemini\Exception\InsufficientFundsException;
 
 abstract class Request
 {
@@ -42,17 +43,11 @@ abstract class Request
         $this->nonce = new Nonce();
     }
 
-    public function setPayload(array $payload) : Request
-    {
-        $this->payload = $payload;
-        return $this;
-    }
-
     protected function getHeaders() : array
     {
         $payload = \array_merge(
             ['request' => static::REQUEST_URI, 'nonce' => $this->nonce->getNonce()],
-            $this->getPayload()
+            $this->payload
         );
         $base64Payload = \base64_encode(\json_encode($payload));
         $signature = \hash_hmac('sha384', $base64Payload, $this->restKey->getSecretKey());
@@ -76,7 +71,7 @@ abstract class Request
             throw new \Exception('Cannot place same request twice.');
         }
 
-        $ch = curl_init();
+        $ch = \curl_init();
 
         \curl_setopt($ch, CURLOPT_URL, $this->getUrl());
         \curl_setopt($ch, CURLOPT_POST, true);
@@ -94,19 +89,36 @@ abstract class Request
                 (new Host())
             ));
         } else {
+            $this->response = $response;
             if ($this->responseCode >= 200 && $this->responseCode < 300) {
-                $this->response = \json_decode($response);
+
             } elseif ($this->responseCode >= 300 && $this->responseCode < 400) {
-                throw new ResourceMovedException('Resource has moved permanently');
+                throw new ResourceMovedException($this->response);
             } elseif ($this->responseCode >= 400 && $this->responseCode < 500) {
-                $this->response = \json_decode($response);
-                throw new InvalidResponseException(\sprintf(
-                    $this->response->message
-                ));
+                $reason = \json_decode($response);
+                if ($reason->reason === 'InsufficientFunds') {
+                    throw new InsufficientFundsException($reason->message);
+                }
+                throw new InvalidResponseException($this->response);
+            } elseif ($this->responseCode >= 500) {
+                throw new InvalidResponseException($this->response);
             }
         }
 
         return $this;
+    }
+
+    public function getResponse() : string
+    {
+        if ($this->response === null) {
+            throw new \Exception('Response not set.');
+        }
+        return $this->response;
+    }
+
+    public function getResponseCode() : int
+    {
+        return $this->responseCode;
     }
 
     protected function getUrl() : string
@@ -114,16 +126,5 @@ abstract class Request
         return 'https://'.(new Host()).static::REQUEST_URI;
     }
 
-    public function getResponse() : \stdClass
-    {
-        if (!$this->response instanceof \stdClass) {
-            throw new \Exception('Response not set.');
-        }
-        return $this->response;
-    }
 
-    public function getPayload() : array
-    {
-        return $this->payload;
-    }
 }
