@@ -33,7 +33,7 @@ trait CommandTraits
 
     protected function debugAndSleep(\Exception $e, OutputInterface $output) : void
     {
-        $this->clearTerminal();
+        $this->clearTerminal($output);
         $output->writeln([
             $this->getNow(),
             'Host:'.$this->getHost(),
@@ -44,9 +44,9 @@ trait CommandTraits
         $this->sleep($output, 10);
     }
 
-    protected function clearTerminal() : void
+    protected function clearTerminal(OutputInterface $output) : void
     {
-        \system('clear');
+        $output->write(chr(27).chr(91).'H'.chr(27).chr(91).'J');
     }
 
     protected function getNow() : string

@@ -4,12 +4,12 @@ namespace Kobens\Gemini\App\Command\Argument;
 
 use Symfony\Component\Console\Input\InputArgument;
 
-class BaseAmount implements ArgumentInterface
+class ClientOrderId implements ArgumentInterface
 {
     const DEFAULT     = null;
-    const DESCRIPTION = 'Amount of Base Currency to interact with.';
-    const MODE        = InputArgument::REQUIRED;
-    const NAME        = 'base_amount';
+    const DESCRIPTION = 'Client Order Id';
+    const MODE        = InputArgument::OPTIONAL;
+    const NAME        = 'client_order_id';
 
     public function getDefault()
     {

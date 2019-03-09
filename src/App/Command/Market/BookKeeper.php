@@ -36,7 +36,7 @@ class BookKeeper extends Command
             try {
                 $book->openBook();
             } catch (ClosedBookException $e) {
-                $this->clearTerminal();
+                $this->clearTerminal($output);
                 $output->writeln(\sprintf('Opening book "%s" from "%s"', $symbol, $host));
             } catch (ConnectionException $e) {
                 if (   $e->getMessage() === 'Websocket connection attempt failed'
@@ -53,7 +53,7 @@ class BookKeeper extends Command
                 }
             } catch (\Amp\Dns\ConfigException $e) {
                 $loop = false;
-                $this->clearTerminal();
+                $this->clearTerminal($output);
                 $this->outputDebugAndSleep($e, $output);
             } catch (\Exception $e) {
                 $loop = false;

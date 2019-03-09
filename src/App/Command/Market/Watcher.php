@@ -3,9 +3,8 @@
 namespace Kobens\Gemini\App\Command\Market;
 
 use Kobens\Exchange\Exception\ClosedBookException;
-use Kobens\Gemini\App\Command\Argument\Symbol;
-use Kobens\Gemini\App\Command\Argument\RefreshRate;
-use Kobens\Gemini\App\Command\Traits\{CommandTraits, RefreshRate as RefreshRateTrait};
+use Kobens\Gemini\App\Command\Argument\{RefreshRate, Symbol};
+use Kobens\Gemini\App\Command\Traits\{CommandTraits, GetRefreshRate};
 use Kobens\Gemini\App\Config;
 use Kobens\Gemini\Exchange;
 use Symfony\Component\Console\Command\Command;
@@ -15,10 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Watcher extends Command
 {
     use CommandTraits;
-    use RefreshRateTrait;
-
-    const REFRESH_RATE_DEFAULT = 500000;
-    const REFRESH_RATE_MIN = 100000;
+    use GetRefreshRate;
 
     protected static $defaultName = 'market:watcher';
 
@@ -47,7 +43,7 @@ class Watcher extends Command
                 if ($bookIsOpen || $hasReportedClosedBook === false) {
                     $hasReportedClosedBook = true;
                     $bookIsOpen = false;
-                    $this->clearTerminal();
+                    $this->clearTerminal($output);
                     $output->write(\sprintf(
                         'Book "%s" on "%s" is closed.',
                         $book->getSymbol(),
@@ -63,7 +59,7 @@ class Watcher extends Command
                 $lastOutput = $time;
                 $lastAsk = $ask;
                 $lastBid = $bid;
-                $this->clearTerminal();
+                $this->clearTerminal($output);
                 $output->writeln([
                     "Date:\t".$this->getNow(),
                     "Host:\t".$host,
@@ -75,7 +71,7 @@ class Watcher extends Command
                 ]);
             }
             $bookIsOpen = true;
-            \usleep($refreshRate);
+            \usleep($refreshRate->getValue());
         }
     }
 
