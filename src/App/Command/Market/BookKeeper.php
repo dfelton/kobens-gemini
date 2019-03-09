@@ -3,14 +3,14 @@
 namespace Kobens\Gemini\App\Command\Market;
 
 use Amp\Websocket\Client\ConnectionException;
+use Kobens\Exchange\Exception\ClosedBookException;
+use Kobens\Gemini\App\Command\Argument\Symbol;
+use Kobens\Gemini\App\Command\Traits\CommandTraits;
 use Kobens\Gemini\App\Config;
-use Kobens\Gemini\App\Command\CommandTraits;
 use Kobens\Gemini\Exchange;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Exchange\Exception\ClosedBookException;
 
 class BookKeeper extends Command
 {
@@ -21,7 +21,8 @@ class BookKeeper extends Command
     protected function configure()
     {
         $this->setDescription('Opens a market book.');
-        $this->addArgument('symbol', InputArgument::REQUIRED, 'Trading pair symbol');
+        $arg = new Symbol();
+        $this->addArgument($arg->getName(), $arg->getMode(), $arg->getDescription(), $arg->getDefault());
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -43,7 +44,7 @@ class BookKeeper extends Command
                 ) {
                     // @todo
                 } else {
-                    // Amp\Websocket\Client\ConnectionException
+                    // @todo Amp\Websocket\Client\ConnectionException
                     //      'Websocket connection attempt failed'
 
                     // @todo Check GET https://{envHost}/ response, look for maintenance message
