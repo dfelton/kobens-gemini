@@ -1,11 +1,23 @@
 <?php
-namespace Kobens\Gemini\App\Command;
+namespace Kobens\Gemini\App\Command\Traits;
 
 use Symfony\Component\Console\Output\OutputInterface;
 use Kobens\Gemini\App\Config;
+use Kobens\Gemini\App\Command\Argument\ArgumentInterface;
+use Symfony\Component\Console\Command\Command;
 
 trait CommandTraits
 {
+    protected function addArgList(array $args, Command $command) : void
+    {
+        foreach ($args as $arg) {
+            if (!$arg instanceof ArgumentInterface) {
+                throw new \Exception('"%s" only accepts objects of the "%s" interface');
+            }
+            $command->addArgument($arg->getName(), $arg->getMode(), $arg->getDescription(), $arg->getDefault());
+        }
+    }
+
     protected function sleep(OutputInterface $output = null, int $seconds = 5) : void
     {
         if ($seconds <= 0) {

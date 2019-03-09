@@ -3,18 +3,19 @@
 namespace Kobens\Gemini\App\Command\Market;
 
 use Kobens\Exchange\Exception\ClosedBookException;
-use Kobens\Gemini\App\Command\CommandTraits;
+use Kobens\Gemini\App\Command\Argument\Symbol;
+use Kobens\Gemini\App\Command\Argument\RefreshRate;
+use Kobens\Gemini\App\Command\Traits\{CommandTraits, RefreshRate as RefreshRateTrait};
 use Kobens\Gemini\App\Config;
 use Kobens\Gemini\Exchange;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Gemini\Exchange\Pair\BTCUSD;
 
 class Watcher extends Command
 {
     use CommandTraits;
+    use RefreshRateTrait;
 
     const REFRESH_RATE_DEFAULT = 500000;
     const REFRESH_RATE_MIN = 100000;
@@ -24,18 +25,7 @@ class Watcher extends Command
     protected function configure()
     {
         $this->setDescription('Outputs details on a market book.');
-        $this->addArgument(
-            'symbol',
-            InputArgument::OPTIONAL,
-            'Trading pair symbol',
-            (new BTCUSD())->getPairSymbol()
-        );
-        $this->addArgument(
-            'refresh_rate',
-            InputArgument::OPTIONAL,
-            'Refresh rate in micro seconds',
-            static::REFRESH_RATE_DEFAULT
-        );
+        $this->addArgList([new Symbol(), new RefreshRate()], $this);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -87,20 +77,6 @@ class Watcher extends Command
             $bookIsOpen = true;
             \usleep($refreshRate);
         }
-    }
-
-    protected function getRefreshRate(InputInterface $input, OutputInterface $output) : int
-    {
-        $refreshRate = (int) $input->getArgument('refresh_rate');
-        if ($refreshRate < static::REFRESH_RATE_MIN) {
-            $output->writeln(\sprintf(
-                'Warning, minimum refresh rate is "%d". "%d" provided. Reverting to default refresh rate',
-                static::REFRESH_RATE_MIN,
-                static::REFRESH_RATE_DEFAULT
-            ));
-            $refreshRate = static::REFRESH_RATE_DEFAULT;
-        }
-        return $refreshRate;
     }
 
 }

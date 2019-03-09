@@ -5,9 +5,8 @@ namespace Kobens\Gemini;
 use Kobens\Exchange\AbstractExchange;
 use Kobens\Exchange\Book\Keeper\KeeperInterface;
 use Kobens\Gemini\Api\WebSocket\MarketData\BookKeeper;
-use Kobens\Gemini\Exchange\Pair\{BTCUSD, ETHBTC, ETHUSD, LTCBTC, LTCETH, LTCUSD, ZECBTC, ZECETH, ZECLTC, ZECUSD};
-use Zend\Cache\Storage\StorageInterface;
 use Kobens\Gemini\App\Cache;
+use Kobens\Gemini\Exchange\Pair\{BTCUSD, ETHBTC, ETHUSD, LTCBTC, LTCETH, LTCUSD, ZECBTC, ZECETH, ZECLTC, ZECUSD};
 
 class Exchange extends AbstractExchange
 {
