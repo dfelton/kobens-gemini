@@ -6,11 +6,18 @@ use Kobens\Exchange\Book\Keeper\AbstractKeeper;
 use Kobens\Exchange\Exception\ClosedBookException;
 use Kobens\Exchange\ExchangeInterface;
 use Kobens\Gemini\Exception\Exception;
-use Kobens\Gemini\App\Config;
 
 class BookKeeper extends AbstractKeeper
 {
-    const API_PATH = '/v1/marketdata/';
+    /**
+     * @var string
+     */
+    protected $host;
+
+    /**
+     * @var string
+     */
+    protected $path = '/v1/marketdata/';
 
     /**
      * @var int
@@ -30,15 +37,18 @@ class BookKeeper extends AbstractKeeper
 
     public function __construct(
         ExchangeInterface $exchange,
-        string $pairKey
+        string $pairKey,
+        string $host
     ) {
         parent::__construct($exchange, $pairKey);
+        $this->host = $host;
     }
 
     public function openBook(): void
     {
         $this->ensureIsClosed();
         \Amp\Loop::run($this->getRunClosure());
+        \Zend\Debug\Debug::dump('I AM FREEEE!'); // This does not execute as we are in the loop
     }
 
     private function ensureIsClosed()
@@ -54,15 +64,20 @@ class BookKeeper extends AbstractKeeper
         $websocketUrl = $this->getWebSocketUrl();
         return function () use ($websocketUrl)
         {
+            \Zend\Debug\Debug::dump('foo'); // executes once
+
             /** @var \Amp\Websocket\Connection $connection */
             /** @var \Amp\Websocket\Message $message */
-            $connection = yield \Amp\Websocket\Client\connect($websocketUrl);
+            $connection = yield \Amp\Websocket\connect($websocketUrl);
             while ($message = yield $connection->receive()) {
+
+                \Zend\Debug\Debug::dump($message === null);
                 $payload = yield $message->buffer();
                 $payload = \json_decode($payload);
                 $this->processMessage($payload);
                 $this->setPulse();
             }
+            \Zend\Debug\Debug::dump('bar'); // does not execute, even in event of network loss
         };
     }
 
@@ -76,7 +91,7 @@ class BookKeeper extends AbstractKeeper
             $this->populateBook($book);
         } else {
             if ($this->socketSequence !== $payload->socket_sequence - 1) {
-                throw new Exception('Out of sequence message');
+                throw new \Kobens\Gemini\Exception\Exception('Out of sequence message');
             }
             if ($payload->type === 'update') {
                 foreach ($payload->events as $e) {
@@ -87,14 +102,9 @@ class BookKeeper extends AbstractKeeper
         $this->socketSequence = $payload->socket_sequence;
     }
 
-    public function getWebSocketUrl() : string
+    protected function getWebSocketUrl() : string
     {
-        $str = \sprintf(
-            'wss://%s%s%s?',
-            (new Config())->gemini->api->host,
-            self::API_PATH,
-            $this->pair->getPairSymbol()
-        );
+        $str = 'wss://'.$this->host.$this->path.$this->pair->getPairSymbol().'?';
         for ($i = 0, $j = \count($this->params); $i < $j; $i++) {
             $str .= \array_keys($this->params)[$i] . '=' . \array_values($this->params)[$i] . '&';
         }

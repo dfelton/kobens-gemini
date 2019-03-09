@@ -2,11 +2,15 @@
 
 namespace Kobens\Gemini\Api\Rest\Request\Order\Placement;
 
-class NewOrder extends \Kobens\Gemini\Api\Rest\Request
+use Kobens\Gemini\Api\Rest\Request;
+
+class NewOrder extends Request
 {
     const REQUEST_URI = '/v1/order/new';
 
     /**
+     * @todo refactor out of the class more array data
+     *
      * @var array
      */
     protected $runtimeArgOptions = [
@@ -42,14 +46,15 @@ class NewOrder extends \Kobens\Gemini\Api\Rest\Request
         'options' => ['maker-or-cancel'],
     ];
 
-    public function setPayload(array $payload) : \Kobens\Gemini\Api\Rest\Request
+    public function setPayload(array $payload) : Request
     {
         $filtered = [];
         foreach ($this->runtimeArgOptions as $key => $config) {
             if (\array_key_exists($key, $payload)) {
                 $filtered[$config['payload_key']] = $payload[$key];
             } elseif ($config['required'] === true) {
-                throw new \Kobens\Core\Exception\RuntimeArgsInvalidException(\sprintf(
+                // @todo more specific exception class
+                throw new \Exception(\sprintf(
                     '"%s" is missing required runtime parameter "%s"',
                     self::class,
                     $key

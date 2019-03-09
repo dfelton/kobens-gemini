@@ -2,16 +2,12 @@
 
 namespace Kobens\Gemini\Api\Rest;
 
-use Kobens\Core\Config\RuntimeInterface;
+use Kobens\Gemini\Api\{Host, Key, Nonce};
+use Kobens\Gemini\Exception\{ConnectionException, InvalidResponseException, ResourceMovedException};
 
-abstract class Request implements RuntimeInterface
+abstract class Request
 {
     const REQUEST_URI = '';
-
-    /**
-     * @var \Kobens\Core\App\ResourcesInterface
-     */
-    protected $appResources;
 
     /**
      * @var array
@@ -40,38 +36,18 @@ abstract class Request implements RuntimeInterface
 
     protected $runtimeArgOptions = [];
 
-    public function __construct(
-        \Kobens\Core\App\ResourcesInterface $appResources
-    ) {
-        $this->appResources = $appResources;
-        $this->restKey = new \Kobens\Gemini\Api\Key($appResources->getConfig()->get('gemini')->get('api'));
-        $this->nonce = new \Kobens\Gemini\Api\Nonce($appResources->getDb());
+    public function __construct()
+    {
+        $this->restKey = new Key();
+        $this->nonce = new Nonce();
     }
 
-    /**
-     * @param array $payload
-     * @return self
-     */
     public function setPayload(array $payload) : Request
     {
         $this->payload = $payload;
         return $this;
     }
 
-    public function getRuntimeArgOptions() : array
-    {
-        return $this->runtimeArgOptions;
-    }
-
-    public function setRuntimeArgs(array $args) : RuntimeInterface
-    {
-        $this->setPayload($args);
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
     protected function getHeaders() : array
     {
         $payload = \array_merge(
@@ -113,18 +89,18 @@ abstract class Request implements RuntimeInterface
         \curl_close($ch);
 
         if ($this->responseCode === 0) {
-            throw new \Kobens\Gemini\Exception\ConnectionException(sprintf(
+            throw new ConnectionException(\sprintf(
                 'Unable to establish a connection with "%s%"',
-                $this->restKey->getHost()
+                (new Host())
             ));
         } else {
             if ($this->responseCode >= 200 && $this->responseCode < 300) {
                 $this->response = \json_decode($response);
             } elseif ($this->responseCode >= 300 && $this->responseCode < 400) {
-                throw new \Kobens\Gemini\Exception\ResourceMovedException('Resource has moved permanently');
+                throw new ResourceMovedException('Resource has moved permanently');
             } elseif ($this->responseCode >= 400 && $this->responseCode < 500) {
                 $this->response = \json_decode($response);
-                throw new \Kobens\Gemini\Exception\InvalidResponseException(sprintf(
+                throw new InvalidResponseException(\sprintf(
                     $this->response->message
                 ));
             }
@@ -135,7 +111,7 @@ abstract class Request implements RuntimeInterface
 
     protected function getUrl() : string
     {
-        return 'https://'.$this->restKey->getHost().static::REQUEST_URI;
+        return 'https://'.(new Host()).static::REQUEST_URI;
     }
 
     public function getResponse() : \stdClass
