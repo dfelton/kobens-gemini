@@ -31,13 +31,17 @@ class BookKeeper extends Command
         $book = (new Exchange())->getBookKeeper($symbol);
         $host = $this->getHost();
         $loop = true;
-        $output->writeln(\sprintf('Opening book "%s" from "%s"', $symbol, $host));
+        if (!$output->isQuiet()) {
+            $output->writeln(\sprintf('Opening book "%s" from "%s"', $symbol, $host));
+        }
         do {
             try {
                 $book->openBook();
             } catch (ClosedBookException $e) {
-                $this->clearTerminal($output);
-                $output->writeln(\sprintf('Opening book "%s" from "%s"', $symbol, $host));
+                if (!$output->isQuiet()) {
+                    $this->clearTerminal($output);
+                    $output->writeln(\sprintf('Opening book "%s" from "%s"', $symbol, $host));
+                }
             } catch (ConnectionException $e) {
                 if (   $e->getMessage() === 'Websocket connection attempt failed'
                     && $this->isMaintenance()
@@ -51,12 +55,12 @@ class BookKeeper extends Command
                     //      'Connection closed unexpectedly'
                     $this->debugAndSleep($e, $output);
                 }
-            } catch (\Amp\Dns\ConfigException $e) {
-                $loop = false;
-                $this->clearTerminal($output);
-                $this->outputDebugAndSleep($e, $output);
             } catch (\Exception $e) {
                 $loop = false;
+                if ($output->isQuiet()) {
+                    $output->setVerbosity(OutputInterface::VERBOSITY_NORMAL);
+                }
+                $this->clearTerminal($output);
                 $this->debugAndSleep($e, $output);
             }
         } while ($loop);

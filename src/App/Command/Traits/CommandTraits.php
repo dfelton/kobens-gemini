@@ -24,7 +24,7 @@ trait CommandTraits
             return;
         }
         for ($i = $seconds; $i > 0; $i--) {
-            if ($output) {
+            if ($output && !$output->isQuiet()) {
                 $output->write('.');
             }
            \sleep(1);
@@ -34,13 +34,15 @@ trait CommandTraits
     protected function debugAndSleep(\Exception $e, OutputInterface $output) : void
     {
         $this->clearTerminal($output);
-        $output->writeln([
-            $this->getNow(),
-            'Host:'.$this->getHost(),
-            'Error Class:'.\get_class($e),
-            'Error Message:'.$e->getMessage(),
-            'Error Code:'.$e->getCode(),
-        ]);
+        if (!$output->isQuiet()) {
+            $output->writeln([
+                $this->getNow(),
+                'Host:'.$this->getHost(),
+                'Error Class:'.\get_class($e),
+                'Error Message:'.$e->getMessage(),
+                'Error Code:'.$e->getCode(),
+            ]);
+        }
         $this->sleep($output, 10);
     }
 
