@@ -49,7 +49,9 @@ trait CommandTraits
 
     protected function clearTerminal(OutputInterface $output) : void
     {
-        $output->write(chr(27).chr(91).'H'.chr(27).chr(91).'J');
+        if (!$output->isQuiet()) {
+            $output->write(chr(27).chr(91).'H'.chr(27).chr(91).'J');
+        }
     }
 
     protected function getNow() : string
