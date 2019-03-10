@@ -1,9 +1,9 @@
 <?php
 
-namespace Kobens\Gemini\App\Command\Traits;
+namespace Kobens\Gemini\Command\Traits;
 
 use Kobens\Gemini\Api\Param\Side as Param;
-use Kobens\Gemini\App\Command\Argument\Side as Arg;
+use Kobens\Gemini\Command\Argument\Side as Arg;
 use Symfony\Component\Console\Input\InputInterface;
 
 trait GetSide

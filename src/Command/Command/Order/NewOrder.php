@@ -1,14 +1,14 @@
 <?php
 
-namespace Kobens\Gemini\App\Command\Command\Order;
+namespace Kobens\Gemini\Command\Command\Order;
 
-use Kobens\Gemini\App\Command\Argument\{
+use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder as PlaceNewOrder;
+use Kobens\Gemini\Command\Argument\{
     Amount, ClientOrderId, Price, Side, Symbol
 };
-use Kobens\Gemini\App\Command\Traits\{
+use Kobens\Gemini\Command\Traits\{
     CommandTraits, GetAmount, GetClientOrderId, GetPrice, GetSide, GetSymbol
 };
-use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder as PlaceNewOrder;
 use Kobens\Gemini\Exception\InsufficientFundsException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

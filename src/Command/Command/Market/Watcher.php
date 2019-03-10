@@ -1,11 +1,11 @@
 <?php
 
-namespace Kobens\Gemini\App\Command\Command\Market;
+namespace Kobens\Gemini\Command\Command\Market;
 
+use Kobens\Core\Config;
 use Kobens\Exchange\Exception\ClosedBookException;
-use Kobens\Gemini\App\Command\Argument\{RefreshRate, Symbol};
-use Kobens\Gemini\App\Command\Traits\{CommandTraits, GetRefreshRate};
-use Kobens\Gemini\App\Config;
+use Kobens\Gemini\Command\Argument\{RefreshRate, Symbol};
+use Kobens\Gemini\Command\Traits\{CommandTraits, GetRefreshRate};
 use Kobens\Gemini\Exchange;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

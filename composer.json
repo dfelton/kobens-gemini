@@ -14,6 +14,10 @@
     "repositories": [
         {
             "type": "git",
+            "url": "https://github.com/dfelton/kobens-core"
+        },
+        {
+            "type": "git",
             "url": "https://github.com/dfelton/kobens-currency"
         },
         {
@@ -24,13 +28,13 @@
     "require": {
         "php": "^7.3",
         "ext-curl": "*",
-        "kobens/kobens-exchange": "dev-master",
-        "zendframework/zend-config": "^3.2",
         "amphp/websocket-client": "dev-master",
-        "symfony/console": "^4.2"
+        "kobens/kobens-exchange": "dev-master",
+        "symfony/console": "^4.2",
+        "zendframework/zend-config": "^3.2"
     },
     "require-dev": {
-        "zendframework/zend-debug": "^2.6@dev",
+        "zendframework/zend-debug": "^2.6",
         "phpunit/phpunit": "^8"
     },
     "autoload": {

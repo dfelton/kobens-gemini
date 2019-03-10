@@ -1,15 +1,15 @@
 <?php
 
-namespace Kobens\Gemini\App\Command\Argument;
+namespace Kobens\Gemini\Command\Argument;
 
 use Symfony\Component\Console\Input\InputArgument;
 
-class Symbol implements ArgumentInterface
+class Side implements ArgumentInterface
 {
     const DEFAULT     = null;
-    const DESCRIPTION = 'Trading pair symbol';
+    const DESCRIPTION = 'Bid or Ask (Buy or Sell)';
     const MODE        = InputArgument::REQUIRED;
-    const NAME        = 'symbol';
+    const NAME        = 'side';
 
     public function getDefault()
     {

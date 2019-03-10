@@ -1,15 +1,17 @@
 <?php
 
-namespace Kobens\Gemini\App\Command\Argument;
+namespace Kobens\Gemini\Command\Argument;
 
 use Symfony\Component\Console\Input\InputArgument;
 
-class Side implements ArgumentInterface
+class RefreshRate implements ArgumentInterface
 {
-    const DEFAULT     = null;
-    const DESCRIPTION = 'Bid or Ask (Buy or Sell)';
-    const MODE        = InputArgument::REQUIRED;
-    const NAME        = 'side';
+    const DEFAULT     = 500000;
+    const DESCRIPTION = 'Refresh rate in micro seconds';
+    const MODE        = InputArgument::OPTIONAL;
+    const NAME        = 'refresh_rate';
+
+    const MIN_VALUE   = 100000; // responsibility lies on Command object to enforce
 
     public function getDefault()
     {

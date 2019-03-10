@@ -1,15 +1,15 @@
 <?php
 
-namespace Kobens\Gemini\App\Command\Argument;
+namespace Kobens\Gemini\Command\Argument;
 
 use Symfony\Component\Console\Input\InputArgument;
 
-class ClientOrderId implements ArgumentInterface
+class Symbol implements ArgumentInterface
 {
     const DEFAULT     = null;
-    const DESCRIPTION = 'Client Order Id';
-    const MODE        = InputArgument::OPTIONAL;
-    const NAME        = 'client_order_id';
+    const DESCRIPTION = 'Trading pair symbol';
+    const MODE        = InputArgument::REQUIRED;
+    const NAME        = 'symbol';
 
     public function getDefault()
     {

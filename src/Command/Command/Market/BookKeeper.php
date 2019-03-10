@@ -1,12 +1,12 @@
 <?php
 
-namespace Kobens\Gemini\App\Command\Command\Market;
+namespace Kobens\Gemini\Command\Command\Market;
 
 use Amp\Websocket\Client\ConnectionException;
+use Kobens\Core\Config;
 use Kobens\Exchange\Exception\ClosedBookException;
-use Kobens\Gemini\App\Command\Argument\Symbol;
-use Kobens\Gemini\App\Command\Traits\CommandTraits;
-use Kobens\Gemini\App\Config;
+use Kobens\Gemini\Command\Argument\Symbol;
+use Kobens\Gemini\Command\Traits\CommandTraits;
 use Kobens\Gemini\Exchange;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

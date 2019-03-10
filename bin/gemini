@@ -3,23 +3,16 @@
 
 require dirname(__DIR__).'/vendor/autoload.php';
 
-use Kobens\Gemini\App\Config;
-use Kobens\Gemini\App\Command\Command\Market\{BookKeeper, Watcher};
-use Kobens\Gemini\App\Command\Command\Order\{CancelAll, NewOrder};
+use Kobens\Core\Config;
+use Kobens\Gemini\Command\Command\Market\{BookKeeper, Watcher};
+use Kobens\Gemini\Command\Command\Order\{CancelAll, NewOrder};
 use Symfony\Component\Console\Application;
-use Zend\Config\Reader\Xml;
-use Zend\Config\Config as ZendConfig;
-use Zend\Debug\Debug;
-
-$filename = dirname(__DIR__).DIRECTORY_SEPARATOR.'env'.DIRECTORY_SEPARATOR.'config.xml';
 
 try {
-    new Config(new ZendConfig((new Xml())->fromFile($filename)));
+    new Config(dirname(__DIR__).DIRECTORY_SEPARATOR.'env'.DIRECTORY_SEPARATOR.'config.xml');
 } catch (Exception $e) {
-    exit(1);
+    exit('Config not initialized properly.');
 }
-
-unset($filename);
 
 $application = new Application();
 

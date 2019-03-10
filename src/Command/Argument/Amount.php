@@ -1,15 +1,15 @@
 <?php
 
-namespace Kobens\Gemini\App\Command\Argument;
+namespace Kobens\Gemini\Command\Argument;
 
 use Symfony\Component\Console\Input\InputArgument;
 
-class Price implements ArgumentInterface
+class Amount implements ArgumentInterface
 {
     const DEFAULT     = null;
-    const DESCRIPTION = 'Price to interact with.';
+    const DESCRIPTION = 'Amount to interact with.';
     const MODE        = InputArgument::REQUIRED;
-    const NAME        = 'price';
+    const NAME        = 'amount';
 
     public function getDefault()
     {
