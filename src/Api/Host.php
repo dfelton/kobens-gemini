@@ -2,7 +2,7 @@
 
 namespace Kobens\Gemini\Api;
 
-use Kobens\Gemini\App\Config;
+use Kobens\Core\Config;
 
 class Host
 {
