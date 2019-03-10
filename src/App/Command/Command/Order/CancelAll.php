@@ -1,6 +1,6 @@
 <?php
 
-namespace Kobens\Gemini\App\Command\Order;
+namespace Kobens\Gemini\App\Command\Command\Order;
 
 use Kobens\Gemini\App\Command\Traits\CommandTraits;
 use Kobens\Gemini\Api\Rest\Request\Order\Placement\CancelAll as CancelAllOrders;

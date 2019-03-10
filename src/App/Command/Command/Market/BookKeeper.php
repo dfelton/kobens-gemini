@@ -1,6 +1,6 @@
 <?php
 
-namespace Kobens\Gemini\App\Command\Market;
+namespace Kobens\Gemini\App\Command\Command\Market;
 
 use Amp\Websocket\Client\ConnectionException;
 use Kobens\Exchange\Exception\ClosedBookException;
