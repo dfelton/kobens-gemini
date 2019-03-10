@@ -5,7 +5,6 @@ namespace Kobens\Gemini;
 use Kobens\Exchange\AbstractExchange;
 use Kobens\Exchange\Book\Keeper\KeeperInterface;
 use Kobens\Gemini\Api\WebSocket\MarketData\BookKeeper;
-use Kobens\Gemini\App\Cache;
 use Kobens\Gemini\Exchange\Pair\{BTCUSD, ETHBTC, ETHUSD, LTCBTC, LTCETH, LTCUSD, ZECBTC, ZECETH, ZECLTC, ZECUSD};
 
 class Exchange extends AbstractExchange
@@ -15,7 +14,6 @@ class Exchange extends AbstractExchange
     public function __construct()
     {
         parent::__construct(
-            (new Cache())->getCache(),
             [
                 new BTCUSD(),
                 new ETHBTC(),

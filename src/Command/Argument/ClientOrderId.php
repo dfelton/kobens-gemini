@@ -1,17 +1,15 @@
 <?php
 
-namespace Kobens\Gemini\App\Command\Argument;
+namespace Kobens\Gemini\Command\Argument;
 
 use Symfony\Component\Console\Input\InputArgument;
 
-class RefreshRate implements ArgumentInterface
+class ClientOrderId implements ArgumentInterface
 {
-    const DEFAULT     = 500000;
-    const DESCRIPTION = 'Refresh rate in micro seconds';
+    const DEFAULT     = null;
+    const DESCRIPTION = 'Client Order Id';
     const MODE        = InputArgument::OPTIONAL;
-    const NAME        = 'refresh_rate';
-
-    const MIN_VALUE   = 100000; // responsibility lies on Command object to enforce
+    const NAME        = 'client_order_id';
 
     public function getDefault()
     {

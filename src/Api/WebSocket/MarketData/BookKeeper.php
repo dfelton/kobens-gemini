@@ -2,11 +2,11 @@
 
 namespace Kobens\Gemini\Api\WebSocket\MarketData;
 
+use Kobens\Core\Config;
 use Kobens\Exchange\Book\Keeper\AbstractKeeper;
 use Kobens\Exchange\Exception\ClosedBookException;
 use Kobens\Exchange\ExchangeInterface;
 use Kobens\Gemini\Exception\Exception;
-use Kobens\Gemini\App\Config;
 
 class BookKeeper extends AbstractKeeper
 {

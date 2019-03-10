@@ -1,9 +1,9 @@
 <?php
 
-namespace Kobens\Gemini\App\Command\Traits;
+namespace Kobens\Gemini\Command\Traits;
 
 use Kobens\Gemini\Api\Param\ClientOrderId as Param;
-use Kobens\Gemini\App\Command\Argument\ClientOrderId as Arg;
+use Kobens\Gemini\Command\Argument\ClientOrderId as Arg;
 use Symfony\Component\Console\Input\InputInterface;
 
 trait GetClientOrderId

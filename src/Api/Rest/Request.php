@@ -3,8 +3,9 @@
 namespace Kobens\Gemini\Api\Rest;
 
 use Kobens\Gemini\Api\{Host, Key, Nonce};
-use Kobens\Gemini\Exception\{ConnectionException, InvalidResponseException, ResourceMovedException};
-use Kobens\Gemini\Exception\InsufficientFundsException;
+use Kobens\Gemini\Exception\{
+    ConnectionException, InsufficientFundsException, InvalidResponseException, ResourceMovedException
+};
 
 abstract class Request
 {

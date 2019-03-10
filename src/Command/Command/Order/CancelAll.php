@@ -1,9 +1,9 @@
 <?php
 
-namespace Kobens\Gemini\App\Command\Command\Order;
+namespace Kobens\Gemini\Command\Command\Order;
 
-use Kobens\Gemini\App\Command\Traits\CommandTraits;
 use Kobens\Gemini\Api\Rest\Request\Order\Placement\CancelAll as CancelAllOrders;
+use Kobens\Gemini\Command\Traits\CommandTraits;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

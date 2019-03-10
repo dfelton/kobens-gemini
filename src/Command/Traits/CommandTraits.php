@@ -1,10 +1,11 @@
 <?php
-namespace Kobens\Gemini\App\Command\Traits;
 
-use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Gemini\App\Config;
-use Kobens\Gemini\App\Command\Argument\ArgumentInterface;
+namespace Kobens\Gemini\Command\Traits;
+
+use Kobens\Core\Config;
+use Kobens\Gemini\Command\Argument\ArgumentInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Output\OutputInterface;
 
 trait CommandTraits
 {

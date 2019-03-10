@@ -1,9 +1,9 @@
 <?php
 
-namespace Kobens\Gemini\App\Command\Traits;
+namespace Kobens\Gemini\Command\Traits;
 
 use Kobens\Gemini\Api\Param\Symbol as Param;
-use Kobens\Gemini\App\Command\Argument\Symbol as Arg;
+use Kobens\Gemini\Command\Argument\Symbol as Arg;
 use Kobens\Gemini\Exchange;
 use Symfony\Component\Console\Input\InputInterface;
 

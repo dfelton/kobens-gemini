@@ -1,9 +1,9 @@
 <?php
 
-namespace Kobens\Gemini\App\Command\Traits;
+namespace Kobens\Gemini\Command\Traits;
 
 use Kobens\Gemini\Api\Param\RefreshRate as Param;
-use Kobens\Gemini\App\Command\Argument\RefreshRate as Arg;
+use Kobens\Gemini\Command\Argument\RefreshRate as Arg;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 

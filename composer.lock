@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2b9e3096f48e505ddb0a3e0f94e4df09",
+    "content-hash": "986b315fb3b7e93dc6d52cdc1639a79c",
     "packages": [
         {
             "name": "amphp/amp",
@@ -810,6 +810,42 @@
             "time": "2018-01-10T15:56:17+00:00"
         },
         {
+            "name": "kobens/kobens-core",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dfelton/kobens-core",
+                "reference": "9e3063bf560bad8e78cc9bdb4513de1ba8ab9571"
+            },
+            "require": {
+                "php": "^7.3",
+                "zendframework/zend-cache": "^2.8",
+                "zendframework/zend-config": "^3.2",
+                "zendframework/zend-db": "^2.9"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8",
+                "zendframework/zend-debug": "^2.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Kobens\\Core\\": "src"
+                }
+            },
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Darren Felton",
+                    "email": "darren_felton@hotmail.com"
+                }
+            ],
+            "description": "Core framework for facilitating trades on an exchange.",
+            "time": "2019-03-10T18:21:33+00:00"
+        },
+        {
             "name": "kobens/kobens-currency",
             "version": "1.0.0",
             "source": {
@@ -852,9 +888,10 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-exchange",
-                "reference": "44ae85bae72a94b8c46cfa15805547bacb5336f3"
+                "reference": "1ba75af29b472d3d072ff41951879cf1bb638e9d"
             },
             "require": {
+                "kobens/kobens-core": "dev-master",
                 "kobens/kobens-currency": "^1.0",
                 "php": "^7.3",
                 "zendframework/zend-cache": "^2.8"
@@ -884,7 +921,7 @@
                 }
             ],
             "description": "Library for providing a common interface for interacting with Exchange accounts via API.",
-            "time": "2019-03-09T01:09:25+00:00"
+            "time": "2019-03-10T17:05:52+00:00"
         },
         {
             "name": "league/uri-interfaces",
@@ -1673,6 +1710,64 @@
                 "zf"
             ],
             "time": "2019-01-29T22:56:21+00:00"
+        },
+        {
+            "name": "zendframework/zend-db",
+            "version": "dev-develop",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zendframework/zend-db.git",
+                "reference": "05e25e45fe61e7f085150b5e755e0f95c075d6ee"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zendframework/zend-db/zipball/05e25e45fe61e7f085150b5e755e0f95c075d6ee",
+                "reference": "05e25e45fe61e7f085150b5e755e0f95c075d6ee",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.6 || ^7.0",
+                "zendframework/zend-stdlib": "^2.7 || ^3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.7.25 || ^6.4.4",
+                "zendframework/zend-coding-standard": "~1.0.0",
+                "zendframework/zend-eventmanager": "^2.6.2 || ^3.0",
+                "zendframework/zend-hydrator": "^1.1 || ^2.1 || ^3.0",
+                "zendframework/zend-servicemanager": "^2.7.5 || ^3.0.3"
+            },
+            "suggest": {
+                "zendframework/zend-eventmanager": "Zend\\EventManager component",
+                "zendframework/zend-hydrator": "Zend\\Hydrator component for using HydratingResultSets",
+                "zendframework/zend-servicemanager": "Zend\\ServiceManager component"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.9-dev",
+                    "dev-develop": "2.10-dev"
+                },
+                "zf": {
+                    "component": "Zend\\Db",
+                    "config-provider": "Zend\\Db\\ConfigProvider"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Zend\\Db\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "Database abstraction layer, SQL abstraction, result set abstraction, and RowDataGateway and TableDataGateway implementations",
+            "keywords": [
+                "ZendFramework",
+                "db",
+                "zf"
+            ],
+            "time": "2019-02-25T12:07:35+00:00"
         },
         {
             "name": "zendframework/zend-eventmanager",
@@ -3414,9 +3509,8 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "kobens/kobens-exchange": 20,
         "amphp/websocket-client": 20,
-        "zendframework/zend-debug": 20
+        "kobens/kobens-exchange": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

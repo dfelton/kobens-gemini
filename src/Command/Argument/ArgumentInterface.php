@@ -1,6 +1,6 @@
 <?php
 
-namespace Kobens\Gemini\App\Command\Argument;
+namespace Kobens\Gemini\Command\Argument;
 
 interface ArgumentInterface
 {
