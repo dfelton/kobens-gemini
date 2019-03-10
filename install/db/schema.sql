@@ -4,9 +4,11 @@
 --   BUY_FILLED
 --   SELL_PLACED
 --   COMPLETE
+--   CANCELLED
 
 CREATE TABLE `trade_repeater` (
   `trade_repeater_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Trade Repeater Id',
+  `exchange` varchar(25) NOT NULL COMMENT 'Exchange',
   `symbol` varchar(12) NOT NULL COMMENT 'Symbol',
   `status` varchar(24) NOT NULL DEFAULT 'NEW' COMMENT 'Status',
   `auto_buy` tinyint(1)  NOT NULL DEFAULT 0 COMMENT 'Auto Buy',

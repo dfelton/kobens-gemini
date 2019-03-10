@@ -39,6 +39,7 @@ class Watcher extends Command
             try {
                 $ask = $book->getAskPrice();
                 $bid = $book->getBidPrice();
+                $spread = $book->getSpread();
             } catch (ClosedBookException $e) {
                 if ($bookIsOpen || $hasReportedClosedBook === false) {
                     $hasReportedClosedBook = true;
@@ -66,7 +67,7 @@ class Watcher extends Command
                     "Symbol:\t".$book->getSymbol(),
                     "Bid:\t".$bid,
                     "Ask:\t".$ask,
-                    "Spread:\t".$book->getSpread(),
+                    "Spread:\t".$spread,
                     PHP_EOL,
                 ]);
             }
