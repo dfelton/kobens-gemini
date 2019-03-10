@@ -1,6 +1,6 @@
 <?php
 
-namespace Kobens\Gemini\App\Command\Market;
+namespace Kobens\Gemini\App\Command\Command\Market;
 
 use Kobens\Exchange\Exception\ClosedBookException;
 use Kobens\Gemini\App\Command\Argument\{RefreshRate, Symbol};

@@ -1,6 +1,6 @@
 <?php
 
-namespace Kobens\Gemini\App\Command\Order;
+namespace Kobens\Gemini\App\Command\Command\Order;
 
 use Kobens\Gemini\App\Command\Argument\{
     Amount, ClientOrderId, Price, Side, Symbol
