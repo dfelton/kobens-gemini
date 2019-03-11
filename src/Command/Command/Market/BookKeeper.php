@@ -16,10 +16,9 @@ class BookKeeper extends Command
 {
     use Traits;
 
-    protected static $defaultName = 'market:book-keeper';
-
     protected function configure()
     {
+        $this->setName('market:book-keeper');
         $this->setDescription('Opens a market book.');
         $arg = new Symbol();
         $this->addArgument($arg->getName(), $arg->getMode(), $arg->getDescription(), $arg->getDefault());

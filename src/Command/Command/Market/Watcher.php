@@ -16,11 +16,6 @@ class Watcher extends Command
 {
     use GetRefreshRate, GetSymbol, Traits;
 
-    /**
-     * @var string
-     */
-    protected static $defaultName = 'market:watcher';
-
     protected $isInitialized = false;
 
     /**
@@ -75,6 +70,7 @@ class Watcher extends Command
 
     protected function configure()
     {
+        $this->setName('market:watcher');
         $this->setDescription('Outputs details on a market book.');
         $this->addArgList([new Symbol(), new RefreshRate()], $this);
         $this->addArgument('tab_length', InputArgument::OPTIONAL, 'Terminal Tab Length', 8);

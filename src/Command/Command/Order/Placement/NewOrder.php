@@ -19,10 +19,9 @@ class NewOrder extends Command
     use Traits;
     use GetAmount, GetClientOrderId, GetPrice, GetSide, GetSymbol;
 
-    protected static $defaultName = 'order:placement:new';
-
     protected function configure()
     {
+        $this->setName('order:placement:new');
         $this->setDescription('Places a new order on the exchange.');
         $this->addArgList(
             [

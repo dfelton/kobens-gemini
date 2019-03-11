@@ -10,10 +10,9 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class Cancel extends Command
 {
-    protected static $defaultName = 'order:placement:cancel';
-
     protected function configure()
     {
+        $this->setName('order:placement:cancel');
         $this->setDescription('Cancel all open orders on the exchange.');
         $this->addArgument('order_id', InputArgument::REQUIRED, 'Order id on exchange.');
     }
