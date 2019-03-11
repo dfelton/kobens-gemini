@@ -2,4 +2,7 @@
 
 namespace Kobens\Gemini\Exception;
 
-class InvalidResponseException extends Exception { }
+class InvalidResponseException extends Exception
+{
+
+}
