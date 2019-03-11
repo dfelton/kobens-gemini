@@ -12,10 +12,9 @@ class CancelAll extends Command
 {
     use Traits;
 
-    protected static $defaultName = 'order:placement:cancel-all';
-
     protected function configure()
     {
+        $this->setName('order:placement:cancel-all');
         $this->setDescription('Cancel all open orders on the exchange.');
     }
 
