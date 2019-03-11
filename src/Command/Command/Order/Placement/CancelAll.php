@@ -1,6 +1,6 @@
 <?php
 
-namespace Kobens\Gemini\Command\Command\Order;
+namespace Kobens\Gemini\Command\Command\Order\Placement;
 
 use Kobens\Gemini\Api\Rest\Request\Order\Placement\CancelAll as CancelAllOrders;
 use Kobens\Gemini\Command\Traits\Traits;
@@ -12,7 +12,7 @@ class CancelAll extends Command
 {
     use Traits;
 
-    protected static $defaultName = 'order:cancel-all';
+    protected static $defaultName = 'order:placement:cancel-all';
 
     protected function configure()
     {

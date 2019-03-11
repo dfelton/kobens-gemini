@@ -1,6 +1,6 @@
 <?php
 
-namespace Kobens\Gemini\Command\Command\Order;
+namespace Kobens\Gemini\Command\Command\Order\Placement;
 
 use Kobens\Gemini\Api\Rest\Request\Order\Placement\Cancel as CancelOrder;
 use Symfony\Component\Console\Command\Command;
@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class Cancel extends Command
 {
-    protected static $defaultName = 'order:cancel';
+    protected static $defaultName = 'order:placement:cancel';
 
     protected function configure()
     {
