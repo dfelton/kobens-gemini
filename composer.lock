@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "986b315fb3b7e93dc6d52cdc1639a79c",
+    "content-hash": "e9b293478d794f01d3b37c84f6614f71",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1260,6 +1260,53 @@
                 "response"
             ],
             "time": "2016-08-06T14:39:51+00:00"
+        },
+        {
+            "name": "psr/log",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/log.git",
+                "reference": "c4421fcac1edd5a324fda73e589a5cf96e52ffd0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/c4421fcac1edd5a324fda73e589a5cf96e52ffd0",
+                "reference": "c4421fcac1edd5a324fda73e589a5cf96e52ffd0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Log\\": "Psr/Log/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for logging libraries",
+            "homepage": "https://github.com/php-fig/log",
+            "keywords": [
+                "log",
+                "psr",
+                "psr-3"
+            ],
+            "time": "2018-11-21T13:42:00+00:00"
         },
         {
             "name": "psr/simple-cache",
@@ -2618,12 +2665,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "7c21ed32f0272c177db380dbcd21b7ca978a1c37"
+                "reference": "6620f1a0ea8dc0152cf4d1efe7f91831cff33fce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/7c21ed32f0272c177db380dbcd21b7ca978a1c37",
-                "reference": "7c21ed32f0272c177db380dbcd21b7ca978a1c37",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/6620f1a0ea8dc0152cf4d1efe7f91831cff33fce",
+                "reference": "6620f1a0ea8dc0152cf4d1efe7f91831cff33fce",
                 "shasum": ""
             },
             "require": {
@@ -2692,7 +2739,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-03-06T05:54:29+00:00"
+            "time": "2019-03-11T09:52:47+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
