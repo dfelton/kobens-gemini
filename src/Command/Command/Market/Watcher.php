@@ -2,86 +2,158 @@
 
 namespace Kobens\Gemini\Command\Command\Market;
 
-use Kobens\Core\Config;
+use Kobens\Exchange\Book\BookInterface;
 use Kobens\Exchange\Exception\ClosedBookException;
 use Kobens\Gemini\Command\Argument\{RefreshRate, Symbol};
-use Kobens\Gemini\Command\Traits\{CommandTraits, GetRefreshRate, GetSymbol};
+use Kobens\Gemini\Command\Traits\{GetRefreshRate, GetSymbol, Traits};
 use Kobens\Gemini\Exchange;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Gemini\Api\Host;
+use Symfony\Component\Console\Input\InputArgument;
 
 class Watcher extends Command
 {
-    use CommandTraits;
-    use GetRefreshRate, GetSymbol;
+    use GetRefreshRate, GetSymbol, Traits;
 
+    /**
+     * @var string
+     */
     protected static $defaultName = 'market:watcher';
+
+    protected $isInitialized = false;
+
+    /**
+     * @var string
+     */
+    protected $symbol;
+
+    /**
+     * @var bool
+     */
+    protected $hasReportedClosedBook = false;
+
+    /**
+     * @var bool
+     */
+    protected $bookIsOpen = false;
+
+    /**
+     * @var string
+     */
+    protected $ask;
+
+    /**
+     * @var string
+     */
+    protected $bid;
+
+    /**
+     * @var string
+     */
+    protected $spread;
+
+    /**
+     * @var int
+     */
+    protected $lastOutput = 0;
+
+    /**
+     * @var int
+     */
+    protected $tabLength = 8;
+
+    /**
+     * @var int
+     */
+    protected $refreshRate = RefreshRate::DEFAULT;
+
+    /**
+     * @var BookInterface
+     */
+    protected $book;
 
     protected function configure()
     {
         $this->setDescription('Outputs details on a market book.');
         $this->addArgList([new Symbol(), new RefreshRate()], $this);
+        $this->addArgument('tab_length', InputArgument::OPTIONAL, 'Terminal Tab Length', 8);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $symbol = $this->getSymbol($input)->getValue();
-        $book = (new Exchange())->getBook($symbol);
-        $refreshRate = $this->getRefreshRate($input, $output)->getValue();
-        $lastAsk = null;
-        $lastBid = null;
-        $lastOutput = 0;
-        $bookIsOpen = false;
-        $hasReportedClosedBook = false;
+        $this->init($input, $output);
 
         while (true) {
+
+            $time = \time();
+
             try {
-                $ask = $book->getAskPrice();
-                $bid = $book->getBidPrice();
-                $spread = $book->getSpread();
+                $ask = $this->book->getAskPrice();
+                $bid = $this->book->getBidPrice();
+                $spread = $this->book->getSpread();
             } catch (ClosedBookException $e) {
-                if ($bookIsOpen || $hasReportedClosedBook === false) {
-                    $hasReportedClosedBook = true;
-                    $bookIsOpen = false;
+                if (   $this->bookIsOpen === true
+                    || $this->hasReportedClosedBook === false
+                    || $time % 30 === 0
+                ) {
+                    $this->hasReportedClosedBook = true;
+                    $this->bookIsOpen = false;
                     $this->clearTerminal($output);
                     $output->write(\sprintf(
                         '<fg=red>Book "%s" on "%s" is closed.</>',
-                        $book->getSymbol(),
+                        $this->symbol,
                         $this->getHost()
                     ));
                 }
-                $this->sleep($output, 1);
+                $output->write('<fg=red>.</>');
+                \sleep(1);
                 continue;
             }
 
-            $time = \time();
-            if ($lastAsk !== $ask || $lastBid !== $bid || $time - $lastOutput > 0) {
-                $lastOutput = $time;
-                $lastAsk = $ask;
-                $lastBid = $bid;
-                $this->outputUpdate($output, $symbol, $bid, $ask, $spread);
+            if (   $this->ask !== $ask
+                || $this->bid !== $bid
+                || $this->spread !== $spread
+                || $time - $this->lastOutput > 0) {
+                $this->lastOutput = $time;
+                $this->ask = $ask;
+                $this->bid = $bid;
+                $this->spread = $spread;
+                $this->outputUpdate($output);
             }
-            $bookIsOpen = true;
-            \usleep($refreshRate);
+            $this->bookIsOpen = true;
+            \usleep($this->refreshRate);
         }
     }
 
-    protected function outputUpdate(OutputInterface $output, string $symbol, string $bid, string $ask, string $spread)
+    protected function init(InputInterface $input, OutputInterface $output) : void
     {
+        if ($this->isInitialized) {
+            throw new \Exception(\sprintf('Cannot initialize "%" more than once', __CLASS__));
+        }
+        $this->symbol = $this->getSymbol($input)->getValue();
+        $this->refreshRate = $this->getRefreshRate($input, $output)->getValue();
+        $tabLength = (int) $input->getArgument('tab_length');
+        if ($tabLength <= 0) {
+            $tabLength = 0;
+        }
+        $this->tabLength = $tabLength;
+        $this->book = (new Exchange())->getBook($this->symbol);
+    }
 
-        $tabsBid = 3 - \floor(\strlen($bid)/8);
+    protected function outputUpdate(OutputInterface $output) : void
+    {
+        $tabsBid = 3 - \floor(\strlen($this->bid) / $this->tabLength);
         if ($tabsBid < 0) {
             $tabsBid = 0;
         }
 
-        $tabsAsk = 3 - \floor(\strlen($ask)/8);
+        $tabsAsk = 3 - \floor(\strlen($this->ask) / $this->tabLength);
         if ($tabsAsk < 0) {
             $tabsAsk = 0;
         }
 
-        $tabsSpread = 3 - \floor(\strlen($spread)/8);
+        $tabsSpread = 3 - \floor(\strlen($this->spread) / $this->tabLength);
         if ($tabsSpread < 0) {
             $tabsSpread = 0;
         }
@@ -91,11 +163,11 @@ class Watcher extends Command
             \str_repeat('-', 41),
             \sprintf("- Date:\t\t%s\t-", $this->getNow()),
             \sprintf("- Host:\t\t%s\t-", $this->getHost()),
-            \sprintf("- Symbol:\t%s\t\t\t-", $symbol),
+            \sprintf("- Symbol:\t%s\t\t\t-", \strtoupper($this->symbol)),
             "-\t\t\t\t\t-",
-            \sprintf("- Ask:\t\t<fg=red>%s</>%s-", $ask, \str_repeat("\t", $tabsAsk)),
-            \sprintf("- Bid:\t\t<fg=green>%s</>%s-", $bid, \str_repeat("\t", $tabsBid)),
-            \sprintf("- Spread:\t%s%s-", $spread, \str_repeat("\t", $tabsSpread)),
+            \sprintf("- Ask:\t\t<fg=red>%s</>%s-", $this->ask, \str_repeat("\t", $tabsAsk)),
+            \sprintf("- Bid:\t\t<fg=green>%s</>%s-", $this->bid, \str_repeat("\t", $tabsBid)),
+            \sprintf("- Spread:\t%s%s-", $this->spread, \str_repeat("\t", $tabsSpread)),
             \str_repeat('-', 41),
         ]);
     }
