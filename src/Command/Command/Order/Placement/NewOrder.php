@@ -1,6 +1,6 @@
 <?php
 
-namespace Kobens\Gemini\Command\Command\Order;
+namespace Kobens\Gemini\Command\Command\Order\Placement;
 
 use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder as PlaceNewOrder;
 use Kobens\Gemini\Command\Argument\{
@@ -9,7 +9,7 @@ use Kobens\Gemini\Command\Argument\{
 use Kobens\Gemini\Command\Traits\{
     Traits, GetAmount, GetClientOrderId, GetPrice, GetSide, GetSymbol
 };
-use Kobens\Gemini\Exception\InsufficientFundsException;
+use Kobens\Gemini\Exception\Api\InsufficientFundsException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,7 +19,7 @@ class NewOrder extends Command
     use Traits;
     use GetAmount, GetClientOrderId, GetPrice, GetSide, GetSymbol;
 
-    protected static $defaultName = 'order:new';
+    protected static $defaultName = 'order:placement:new';
 
     protected function configure()
     {
