@@ -6,7 +6,7 @@ use Amp\Websocket\Client\ConnectionException;
 use Kobens\Core\Config;
 use Kobens\Exchange\Exception\ClosedBookException;
 use Kobens\Gemini\Command\Argument\Symbol;
-use Kobens\Gemini\Command\Traits\CommandTraits;
+use Kobens\Gemini\Command\Traits\Traits;
 use Kobens\Gemini\Exchange;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class BookKeeper extends Command
 {
-    use CommandTraits;
+    use Traits;
 
     protected static $defaultName = 'market:book-keeper';
 

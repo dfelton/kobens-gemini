@@ -3,6 +3,7 @@
 namespace Kobens\Gemini\Command\Argument;
 
 use Symfony\Component\Console\Input\InputArgument;
+use Kobens\Core\Command\Argument\ArgumentInterface;
 
 class Symbol implements ArgumentInterface
 {

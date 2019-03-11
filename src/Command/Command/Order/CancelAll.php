@@ -3,14 +3,14 @@
 namespace Kobens\Gemini\Command\Command\Order;
 
 use Kobens\Gemini\Api\Rest\Request\Order\Placement\CancelAll as CancelAllOrders;
-use Kobens\Gemini\Command\Traits\CommandTraits;
+use Kobens\Gemini\Command\Traits\Traits;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class CancelAll extends Command
 {
-    use CommandTraits;
+    use Traits;
 
     protected static $defaultName = 'order:cancel-all';
 

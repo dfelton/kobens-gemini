@@ -2,6 +2,7 @@
 
 namespace Kobens\Gemini\Command\Argument;
 
+use Kobens\Core\Command\Argument\ArgumentInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
 class Price implements ArgumentInterface

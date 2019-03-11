@@ -7,7 +7,7 @@ use Kobens\Gemini\Command\Argument\{
     Amount, ClientOrderId, Price, Side, Symbol
 };
 use Kobens\Gemini\Command\Traits\{
-    CommandTraits, GetAmount, GetClientOrderId, GetPrice, GetSide, GetSymbol
+    Traits, GetAmount, GetClientOrderId, GetPrice, GetSide, GetSymbol
 };
 use Kobens\Gemini\Exception\InsufficientFundsException;
 use Symfony\Component\Console\Command\Command;
@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class NewOrder extends Command
 {
-    use CommandTraits;
+    use Traits;
     use GetAmount, GetClientOrderId, GetPrice, GetSide, GetSymbol;
 
     protected static $defaultName = 'order:new';

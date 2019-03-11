@@ -815,10 +815,11 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-core",
-                "reference": "9e3063bf560bad8e78cc9bdb4513de1ba8ab9571"
+                "reference": "739680c7aedb60d6dd5e00bf4f52be84e419a15f"
             },
             "require": {
                 "php": "^7.3",
+                "symfony/console": "^4.2",
                 "zendframework/zend-cache": "^2.8",
                 "zendframework/zend-config": "^3.2",
                 "zendframework/zend-db": "^2.9"
@@ -843,7 +844,7 @@
                 }
             ],
             "description": "Core framework for facilitating trades on an exchange.",
-            "time": "2019-03-10T18:21:33+00:00"
+            "time": "2019-03-11T01:21:21+00:00"
         },
         {
             "name": "kobens/kobens-currency",
