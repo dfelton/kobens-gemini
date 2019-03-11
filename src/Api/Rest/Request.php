@@ -4,9 +4,19 @@ namespace Kobens\Gemini\Api\Rest;
 
 use Kobens\Gemini\Api\{Host, Key, Nonce};
 use Kobens\Gemini\Exception\{
-    ConnectionException, InsufficientFundsException, InvalidResponseException, ResourceMovedException
+    ConnectionException,
+    InvalidResponseException,
+    ResourceMovedException
+};
+use Kobens\Gemini\Exception\Api\{
+    InsufficientFundsException,
+    InvalidSignatureException
 };
 
+/**
+ * @todo going to want portions of this in kobens/kobens-core somehow; at a minimum inside kobens/kobens-exchange
+ * @todo further abstract out flexibility for GET|POST|PUT|DELETE
+ */
 abstract class Request
 {
     const REQUEST_URI = '';
@@ -17,7 +27,7 @@ abstract class Request
     protected $payload = [];
 
     /**
-     * @var \stdClass
+     * @var string
      */
     protected $response;
 
@@ -96,13 +106,20 @@ abstract class Request
             } elseif ($this->responseCode >= 300 && $this->responseCode < 400) {
                 throw new ResourceMovedException($this->response);
             } elseif ($this->responseCode >= 400 && $this->responseCode < 500) {
-                $reason = \json_decode($response);
-                if ($reason->reason === 'InsufficientFunds') {
-                    throw new InsufficientFundsException($reason->message);
+                $message = \json_decode($response);
+                switch ($message->reason) {
+                    case InsufficientFundsException::REASON:
+                        throw new InsufficientFundsException($message->message, $this->responseCode);
+                        break;
+                    case InvalidSignatureException::REASON:
+                        throw new InvalidSignatureException($message->message, $this->responseCode);
+                        break;
+                    default:
+                        throw new InvalidResponseException($this->response, $this->responseCode);
+                        break;
                 }
-                throw new InvalidResponseException($this->response);
             } elseif ($this->responseCode >= 500) {
-                throw new InvalidResponseException($this->response);
+                throw new InvalidResponseException($this->response, $this->responseCode);
             }
         }
 

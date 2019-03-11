@@ -2,4 +2,7 @@
 
 namespace Kobens\Gemini\Exception;
 
-class ConnectionException extends Exception { }
+class ConnectionException extends Exception
+{
+
+}

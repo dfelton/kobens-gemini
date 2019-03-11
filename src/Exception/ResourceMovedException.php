@@ -2,4 +2,7 @@
 
 namespace Kobens\Gemini\Exception;
 
-class ResourceMovedException extends Exception { }
+class ResourceMovedException extends Exception
+{
+
+}

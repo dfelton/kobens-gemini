@@ -2,4 +2,7 @@
 
 namespace Kobens\Gemini\Exception;
 
-class InvalidPayloadException extends Exception { }
+class InvalidPayloadException extends Exception
+{
+
+}

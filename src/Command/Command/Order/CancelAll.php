@@ -26,12 +26,13 @@ class CancelAll extends Command
         if (\strlen($json)) {
             $response = \json_decode($json);
             if ($response->result === 'ok') {
+                $output->writeln('<fg=green>All orders cancelled.</>');
                 \Zend\Debug\Debug::dump($json);
             } elseif ($response->result === 'error') {
                 $output->writeln([
-                    'Response Code: '.$model->getResponseCode(),
-                    'Error: '.$response->reason,
-                    'Message: '.$response->message,
+                    \sprintf("<fg=white;bg=red>Response Code:\t%s</>", $model->getResponseCode()),
+                    \sprintf("<fg=white;bg=red>Error:\t%s</>", $response->reason),
+                    \sprintf("<fg=white;bg=red>Message:\t%s</>", $response->message),
                 ]);
             }
         }
