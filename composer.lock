@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e9b293478d794f01d3b37c84f6614f71",
+    "content-hash": "986b315fb3b7e93dc6d52cdc1639a79c",
     "packages": [
         {
             "name": "amphp/amp",
@@ -415,12 +415,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/socket.git",
-                "reference": "2cb9d0ef823cfd1de4cfbd0e680c58841367f727"
+                "reference": "7d380c9ddcea159c25e54fe4fcbd545152a07633"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/socket/zipball/2cb9d0ef823cfd1de4cfbd0e680c58841367f727",
-                "reference": "2cb9d0ef823cfd1de4cfbd0e680c58841367f727",
+                "url": "https://api.github.com/repos/amphp/socket/zipball/7d380c9ddcea159c25e54fe4fcbd545152a07633",
+                "reference": "7d380c9ddcea159c25e54fe4fcbd545152a07633",
                 "shasum": ""
             },
             "require": {
@@ -474,7 +474,7 @@
                 "tcp",
                 "tls"
             ],
-            "time": "2018-10-17T16:53:02+00:00"
+            "time": "2018-12-31T15:46:19+00:00"
         },
         {
             "name": "amphp/uri",
@@ -815,9 +815,10 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-core",
-                "reference": "739680c7aedb60d6dd5e00bf4f52be84e419a15f"
+                "reference": "4bec3ad6411d03138ebaa1ade37568ea295c0569"
             },
             "require": {
+                "monolog/monolog": "2.0.0-beta1",
                 "php": "^7.3",
                 "symfony/console": "^4.2",
                 "zendframework/zend-cache": "^2.8",
@@ -844,7 +845,7 @@
                 }
             ],
             "description": "Core framework for facilitating trades on an exchange.",
-            "time": "2019-03-11T01:21:21+00:00"
+            "time": "2019-03-12T00:54:47+00:00"
         },
         {
             "name": "kobens/kobens-currency",
@@ -1115,6 +1116,88 @@
                 "wss"
             ],
             "time": "2018-11-26T08:09:30+00:00"
+        },
+        {
+            "name": "monolog/monolog",
+            "version": "2.0.0-beta1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Seldaek/monolog.git",
+                "reference": "0ad73a526f4b5e67312e94fb7f60c1bdefc284b9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/0ad73a526f4b5e67312e94fb7f60c1bdefc284b9",
+                "reference": "0ad73a526f4b5e67312e94fb7f60c1bdefc284b9",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1",
+                "psr/log": "^1.0.1"
+            },
+            "provide": {
+                "psr/log-implementation": "1.0.0"
+            },
+            "require-dev": {
+                "aws/aws-sdk-php": "^2.4.9 || ^3.0",
+                "doctrine/couchdb": "~1.0@dev",
+                "elasticsearch/elasticsearch": "^6.0",
+                "graylog2/gelf-php": "^1.4.2",
+                "jakub-onderka/php-parallel-lint": "^0.9",
+                "php-amqplib/php-amqplib": "~2.4",
+                "php-console/php-console": "^3.1.3",
+                "phpspec/prophecy": "^1.6.1",
+                "phpunit/phpunit": "^7.3",
+                "predis/predis": "^1.1",
+                "rollbar/rollbar": "^1.3",
+                "ruflin/elastica": ">=0.90 <3.0",
+                "sentry/sentry": "^1.9",
+                "swiftmailer/swiftmailer": "^5.3|^6.0"
+            },
+            "suggest": {
+                "aws/aws-sdk-php": "Allow sending log messages to AWS services like DynamoDB",
+                "doctrine/couchdb": "Allow sending log messages to a CouchDB server",
+                "elasticsearch/elasticsearch": "Allow sending log messages to an Elasticsearch server via official client",
+                "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
+                "ext-mongodb": "Allow sending log messages to a MongoDB server (via driver)",
+                "graylog2/gelf-php": "Allow sending log messages to a GrayLog2 server",
+                "mongodb/mongodb": "Allow sending log messages to a MongoDB server (via library)",
+                "php-amqplib/php-amqplib": "Allow sending log messages to an AMQP server using php-amqplib",
+                "php-console/php-console": "Allow sending log messages to Google Chrome",
+                "rollbar/rollbar": "Allow sending log messages to Rollbar",
+                "ruflin/elastica": "Allow sending log messages to an Elastic Search server",
+                "sentry/sentry": "Allow sending log messages to a Sentry server"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Monolog\\": "src/Monolog"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be",
+                    "homepage": "http://seld.be"
+                }
+            ],
+            "description": "Sends your logs to files, sockets, inboxes, databases and various web services",
+            "homepage": "http://github.com/Seldaek/monolog",
+            "keywords": [
+                "log",
+                "logging",
+                "psr-3"
+            ],
+            "time": "2018-12-08T17:16:32+00:00"
         },
         {
             "name": "psr/cache",
@@ -2665,12 +2748,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "6620f1a0ea8dc0152cf4d1efe7f91831cff33fce"
+                "reference": "676b9ff1f0129b26a33c570773d6ef6ec50082c0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/6620f1a0ea8dc0152cf4d1efe7f91831cff33fce",
-                "reference": "6620f1a0ea8dc0152cf4d1efe7f91831cff33fce",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/676b9ff1f0129b26a33c570773d6ef6ec50082c0",
+                "reference": "676b9ff1f0129b26a33c570773d6ef6ec50082c0",
                 "shasum": ""
             },
             "require": {
@@ -2739,7 +2822,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-03-11T09:52:47+00:00"
+            "time": "2019-03-11T15:12:56+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",

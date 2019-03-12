@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-require dirname(__DIR__).'/vendor/autoload.php';
+require \dirname(__DIR__).'/vendor/autoload.php';
 
 use Kobens\Core\Config;
 use Kobens\Gemini\Command\Command\Market\{BookKeeper, Watcher};
@@ -10,7 +10,10 @@ use Kobens\Gemini\Command\Command\Order\Status\ActiveOrders;
 use Symfony\Component\Console\Application;
 
 try {
-    new Config(dirname(__DIR__).DIRECTORY_SEPARATOR.'env'.DIRECTORY_SEPARATOR.'config.xml');
+    new Config(
+        \dirname(__DIR__).'/env/config.xml',
+        \dirname(__DIR__)
+    );
 } catch (Exception $e) {
     exit('Config not initialized properly.');
 }

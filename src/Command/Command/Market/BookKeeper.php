@@ -6,64 +6,98 @@ use Amp\Websocket\Client\ConnectionException;
 use Kobens\Core\Config;
 use Kobens\Exchange\Exception\ClosedBookException;
 use Kobens\Gemini\Command\Argument\Symbol;
-use Kobens\Gemini\Command\Traits\Traits;
+use Kobens\Gemini\Command\Traits\{Traits, GetSymbol};
 use Kobens\Gemini\Exchange;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class BookKeeper extends Command
 {
-    use Traits;
+    use Traits, GetSymbol;
+
+    /**
+     * @var \Kobens\Gemini\Api\Param\Symbol
+     */
+    protected $symbol;
+
+    /**
+     * @var \Kobens\Gemini\Api\WebSocket\MarketData\BookKeeper
+     */
+    protected $book;
+
+    /**
+     * @var \Monolog\Logger
+     */
+    protected $log;
+
+    /**
+     * @var string
+     */
+    protected $lastExceptionMessage;
+
+    public function __construct()
+    {
+        parent::__construct('market:book-keeper');
+    }
 
     protected function configure()
     {
-        $this->setName('market:book-keeper');
         $this->setDescription('Opens a market book.');
-        $arg = new Symbol();
-        $this->addArgument($arg->getName(), $arg->getMode(), $arg->getDescription(), $arg->getDefault());
+        $this->addArgList([new Symbol()], $this);
+    }
+
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        $this->symbol = $this->getSymbol($input)->getValue();
+        $this->book = (new Exchange())->getBookKeeper($this->symbol);
+        $this->log = new Logger($this->symbol);
+        $this->log->pushHandler(new StreamHandler(
+            \sprintf(
+                '%s/var/log/gemini_market_book_%d.log',
+                (new Config())->getRoot(),
+                \getmypid()
+            ),
+            Logger::INFO
+        ));
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $symbol = $input->getArgument('symbol');
-        $book = (new Exchange())->getBookKeeper($symbol);
-        $host = $this->getHost();
         $loop = true;
-        if (!$output->isQuiet()) {
-            $output->writeln(\sprintf('Opening book "%s" from "%s"', $symbol, $host));
-        }
+        $this->log->info(\sprintf('Opening "%s" on "%s"', $this->symbol, $this->getHost()));
         do {
             try {
-                $book->openBook();
+                $this->book->openBook();
             } catch (ClosedBookException $e) {
-                if (!$output->isQuiet()) {
-                    $this->clearTerminal($output);
-                    $output->writeln(\sprintf('Opening book "%s" from "%s"', $symbol, $host));
-                }
+                $this->logException($e);
+                \sleep(\rand(9, 12));
             } catch (ConnectionException $e) {
-                if (   $e->getMessage() === 'Websocket connection attempt failed'
-                    && $this->isMaintenance()
-                ) {
-                    // @todo
-                } else {
-                    // @todo Amp\Websocket\Client\ConnectionException
-                    //      'Websocket connection attempt failed'
-
-                    // @todo Check GET https://{envHost}/ response, look for maintenance message
-                    //      'Connection closed unexpectedly'
-                    $this->debugAndSleep($e, $output);
-                }
+                $this->logException($e);
+                \sleep(\rand(9, 12));
             } catch (\Exception $e) {
                 $loop = false;
-                if ($output->isQuiet()) {
-                    $output->setVerbosity(OutputInterface::VERBOSITY_NORMAL);
-                }
-                $this->clearTerminal($output);
-                $this->debugAndSleep($e, $output);
+                $this->logException($e);
             }
         } while ($loop);
     }
+
+    protected function logException(\Exception $e) : void
+    {
+        $this->log->warning(\json_encode([
+            'symbol' => $this->symbol,
+            'errClass' => \get_class($e),
+            'errCode' => $e->getCode(),
+            'errMessage' => $e->getMessage(),
+        ]));
+        if ($this->lastExceptionMessage !== $e->getMessage()) {
+            $this->lastExceptionMessage = $e->getMessage();
+            $this->log->warning($e->getTraceAsString());
+        }
+    }
+
 
     /**
      * @todo finish me

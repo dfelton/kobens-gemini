@@ -30,7 +30,6 @@
         "ext-curl": "*",
         "amphp/websocket-client": "dev-master",
         "kobens/kobens-exchange": "dev-master",
-        "psr/log": "^1",
         "symfony/console": "^4.2",
         "zendframework/zend-config": "^3.2"
     },
