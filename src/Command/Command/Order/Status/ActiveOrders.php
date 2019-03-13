@@ -14,7 +14,7 @@ class ActiveOrders extends Command
 
     protected function configure()
     {
-        $this->setDescription('Cancel all open orders on the exchange.');
+        $this->setDescription('List all active orders.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
