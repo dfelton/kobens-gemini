@@ -72,7 +72,7 @@ class BookKeeper extends Command
             try {
                 $this->book->openBook();
             } catch (ClosedBookException $e) {
-                $this->logException($e);
+                $this->logException($e, false);
                 \sleep(\rand(9, 12));
             } catch (ConnectionException $e) {
                 $this->logException($e);
@@ -84,7 +84,7 @@ class BookKeeper extends Command
         } while ($loop);
     }
 
-    protected function logException(\Exception $e) : void
+    protected function logException(\Exception $e, $logNewTrace = true) : void
     {
         $this->log->warning(\json_encode([
             'symbol' => $this->symbol,
@@ -92,7 +92,7 @@ class BookKeeper extends Command
             'errCode' => $e->getCode(),
             'errMessage' => $e->getMessage(),
         ]));
-        if ($this->lastExceptionMessage !== $e->getMessage()) {
+        if ($logNewTrace && $this->lastExceptionMessage !== $e->getMessage()) {
             $this->lastExceptionMessage = $e->getMessage();
             $this->log->warning($e->getTraceAsString());
         }
