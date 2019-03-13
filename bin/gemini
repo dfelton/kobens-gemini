@@ -4,7 +4,8 @@
 require \dirname(__DIR__).'/vendor/autoload.php';
 
 use Kobens\Core\Config;
-use Kobens\Gemini\Command\Command\Market\{BookKeeper, Watcher};
+use Kobens\Gemini\Command\Command\Market\{BookKeeper as MarketBookKeeper, Watcher};
+use Kobens\Gemini\Command\Command\Order\BookKeeper as OrderBookKeeper;
 use Kobens\Gemini\Command\Command\Order\Placement\{Cancel, CancelAll, NewOrder};
 use Kobens\Gemini\Command\Command\Order\Status\ActiveOrders;
 use Symfony\Component\Console\Application;
@@ -21,10 +22,11 @@ try {
 $application = new Application();
 
 $application->add(new ActiveOrders());
-$application->add(new BookKeeper());
 $application->add(new Cancel());
 $application->add(new CancelAll());
+$application->add(new MarketBookKeeper());
 $application->add(new NewOrder());
+$application->add(new OrderBookKeeper());
 $application->add(new Watcher());
 
 $application->run();
