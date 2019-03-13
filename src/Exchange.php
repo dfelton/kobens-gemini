@@ -36,7 +36,7 @@ class Exchange extends AbstractExchange
 
     public function getBookKeeper(string $pairKey): KeeperInterface
     {
-        return new BookKeeper($this, $pairKey);
+        return new BookKeeper($pairKey);
     }
 
 }
