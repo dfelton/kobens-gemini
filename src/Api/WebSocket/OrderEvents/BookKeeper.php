@@ -34,7 +34,7 @@ class BookKeeper
     {
         Loop::run(function ()
         {
-            /** @var \Amp\Websocket\Connection $connection */
+            /** @var \Amp\Websocket\Client\Connection $connection */
             /** @var \Amp\Websocket\Message $message */
             $connection = yield \Amp\Websocket\Client\connect(
                 new Handshake(
