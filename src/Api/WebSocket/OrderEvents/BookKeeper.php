@@ -2,14 +2,13 @@
 
 namespace Kobens\Gemini\Api\Websocket\OrderEvents;
 
+use Amp\Loop;
+use Amp\Websocket\Client\Handshake;
 use Kobens\Core\Cache;
 use Kobens\Gemini\Exchange;
 use Kobens\Gemini\Api\Host;
-use Amp\Loop;
-use Amp\Websocket\Client\Handshake;
 use Kobens\Gemini\Api\Nonce;
 use Kobens\Gemini\Api\Key;
-use Amp\Websocket\Options;
 
 class BookKeeper
 {
@@ -35,16 +34,15 @@ class BookKeeper
     {
         Loop::run(function ()
         {
-            $options = (new Options())->withHeartbeatPeriod(3);
-            $handshake = new Handshake(
-                $this->getUrl(),
-                $options,
-                $this->getHeaders()
-            );
-
             /** @var \Amp\Websocket\Connection $connection */
             /** @var \Amp\Websocket\Message $message */
-            $connection = yield \Amp\Websocket\Client\connect($handshake);
+            $connection = yield \Amp\Websocket\Client\connect(
+                new Handshake(
+                    $this->getUrl(),
+                    null, // @todo any useful Options to set here?
+                    $this->getHeaders()
+                )
+            );
             while ($message = yield $connection->receive()) {
                 $payload = yield $message->buffer();
                 \Zend\Debug\Debug::dump($payload);
