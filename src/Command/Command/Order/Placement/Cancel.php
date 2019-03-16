@@ -12,7 +12,7 @@ class Cancel extends Command
 {
     protected function configure()
     {
-        $this->setName('order:placement:cancel');
+        $this->setName('order:place:cancel');
         $this->setDescription('Cancel all open orders on the exchange.');
         $this->addArgument('order_id', InputArgument::REQUIRED, 'Order id on exchange.');
     }
