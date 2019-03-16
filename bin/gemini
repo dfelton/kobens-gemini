@@ -9,19 +9,29 @@ use Kobens\Gemini\Command\Command\Order\BookKeeper as OrderBookKeeper;
 use Kobens\Gemini\Command\Command\Order\Placement\{Cancel, CancelAll, NewOrder};
 use Kobens\Gemini\Command\Command\Order\Status\ActiveOrders;
 use Symfony\Component\Console\Application;
+use Kobens\Exchange\Exchange\Mapper;
+use Kobens\Gemini\Exchange;
+use Kobens\Exchange\Command\Command\SimpleTrader\Buyer;
 
 try {
     new Config(
         \dirname(__DIR__).'/env/config.xml',
         \dirname(__DIR__)
     );
+    new Mapper([
+        'gemini' => Exchange::class
+    ]);
 } catch (Exception $e) {
-    exit('Config not initialized properly.');
+    exit(\sprintf(
+        'Initialization Error: %s',
+        $e->getMessage()
+    ));
 }
 
 $application = new Application();
 
 $application->add(new ActiveOrders());
+$application->add(new Buyer());
 $application->add(new Cancel());
 $application->add(new CancelAll());
 $application->add(new MarketBookKeeper());
