@@ -21,7 +21,7 @@ class NewOrder extends Command
 
     protected function configure()
     {
-        $this->setName('order:placement:new');
+        $this->setName('order:place:new');
         $this->setDescription('Places a new order on the exchange.');
         $this->addArgList(
             [

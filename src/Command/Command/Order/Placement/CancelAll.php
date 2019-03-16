@@ -14,7 +14,7 @@ class CancelAll extends Command
 
     protected function configure()
     {
-        $this->setName('order:placement:cancel-all');
+        $this->setName('order:place:cancel-all');
         $this->setDescription('Cancel all open orders on the exchange.');
     }
 
