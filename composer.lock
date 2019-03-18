@@ -193,12 +193,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/dns.git",
-                "reference": "135c6164ec3731e3a42f9ff5bcd3d6efd4f95125"
+                "reference": "585acfaf7794e68e843295573bf4c8c5730ada61"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/dns/zipball/135c6164ec3731e3a42f9ff5bcd3d6efd4f95125",
-                "reference": "135c6164ec3731e3a42f9ff5bcd3d6efd4f95125",
+                "url": "https://api.github.com/repos/amphp/dns/zipball/585acfaf7794e68e843295573bf4c8c5730ada61",
+                "reference": "585acfaf7794e68e843295573bf4c8c5730ada61",
                 "shasum": ""
             },
             "require": {
@@ -261,7 +261,7 @@
                 "dns",
                 "resolve"
             ],
-            "time": "2019-03-03T15:05:43+00:00"
+            "time": "2019-03-12T14:39:04+00:00"
         },
         {
             "name": "amphp/http",
@@ -593,12 +593,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/websocket-client.git",
-                "reference": "e73fa757e9afdc77b61261805a70aa3de08e4ca5"
+                "reference": "9dfca49b8c84f4f1879710acf048a68f140fee12"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/websocket-client/zipball/e73fa757e9afdc77b61261805a70aa3de08e4ca5",
-                "reference": "e73fa757e9afdc77b61261805a70aa3de08e4ca5",
+                "url": "https://api.github.com/repos/amphp/websocket-client/zipball/9dfca49b8c84f4f1879710acf048a68f140fee12",
+                "reference": "9dfca49b8c84f4f1879710acf048a68f140fee12",
                 "shasum": ""
             },
             "require": {
@@ -654,7 +654,7 @@
                 "non-blocking",
                 "websocket"
             ],
-            "time": "2019-03-08T00:44:56+00:00"
+            "time": "2019-03-13T15:46:33+00:00"
         },
         {
             "name": "amphp/windows-registry",
@@ -815,7 +815,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-core",
-                "reference": "4bec3ad6411d03138ebaa1ade37568ea295c0569"
+                "reference": "770e88000cbf4b34f8390629f95712a75b48069c"
             },
             "require": {
                 "monolog/monolog": "2.0.0-beta1",
@@ -845,7 +845,7 @@
                 }
             ],
             "description": "Core framework for facilitating trades on an exchange.",
-            "time": "2019-03-12T00:54:47+00:00"
+            "time": "2019-03-16T02:19:03+00:00"
         },
         {
             "name": "kobens/kobens-currency",
@@ -890,12 +890,14 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-exchange",
-                "reference": "1ba75af29b472d3d072ff41951879cf1bb638e9d"
+                "reference": "63087a9deb660a482e9b84489e8cf07e84d0746d"
             },
             "require": {
                 "kobens/kobens-core": "dev-master",
                 "kobens/kobens-currency": "^1.0",
+                "monolog/monolog": "2.0.0-beta1",
                 "php": "^7.3",
+                "symfony/console": "^4.2",
                 "zendframework/zend-cache": "^2.8"
             },
             "require-dev": {
@@ -923,7 +925,7 @@
                 }
             ],
             "description": "Library for providing a common interface for interacting with Exchange accounts via API.",
-            "time": "2019-03-10T17:05:52+00:00"
+            "time": "2019-03-18T03:36:56+00:00"
         },
         {
             "name": "league/uri-interfaces",
@@ -1518,12 +1520,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/contracts.git",
-                "reference": "c0827ad2f3e7e4c8d7d40eba9fcc9c79a13fb759"
+                "reference": "fb450641fd0e43647ddc5415f3132276545933ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/contracts/zipball/c0827ad2f3e7e4c8d7d40eba9fcc9c79a13fb759",
-                "reference": "c0827ad2f3e7e4c8d7d40eba9fcc9c79a13fb759",
+                "url": "https://api.github.com/repos/symfony/contracts/zipball/fb450641fd0e43647ddc5415f3132276545933ec",
+                "reference": "fb450641fd0e43647ddc5415f3132276545933ec",
                 "shasum": ""
             },
             "require": {
@@ -1580,7 +1582,7 @@
                 "interoperability",
                 "standards"
             ],
-            "time": "2019-03-07T16:16:38+00:00"
+            "time": "2019-03-14T07:32:36+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -2076,12 +2078,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/instantiator.git",
-                "reference": "16ca33ecc67a625de250f476531dfe5de4c32ff2"
+                "reference": "2145e8cd1f6f6a7cef8d4f8c8c4b4e08529e8a8d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/instantiator/zipball/16ca33ecc67a625de250f476531dfe5de4c32ff2",
-                "reference": "16ca33ecc67a625de250f476531dfe5de4c32ff2",
+                "url": "https://api.github.com/repos/doctrine/instantiator/zipball/2145e8cd1f6f6a7cef8d4f8c8c4b4e08529e8a8d",
+                "reference": "2145e8cd1f6f6a7cef8d4f8c8c4b4e08529e8a8d",
                 "shasum": ""
             },
             "require": {
@@ -2092,7 +2094,8 @@
                 "ext-pdo": "*",
                 "ext-phar": "*",
                 "phpbench/phpbench": "^0.13",
-                "phpstan/phpstan-shim": "^0.9.2",
+                "phpstan/phpstan-phpunit": "^0.11",
+                "phpstan/phpstan-shim": "^0.11",
                 "phpunit/phpunit": "^7.0"
             },
             "type": "library",
@@ -2123,7 +2126,7 @@
                 "constructor",
                 "instantiate"
             ],
-            "time": "2019-02-20T06:21:04+00:00"
+            "time": "2019-03-12T22:46:11+00:00"
         },
         {
             "name": "myclabs/deep-copy",
@@ -2748,12 +2751,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "676b9ff1f0129b26a33c570773d6ef6ec50082c0"
+                "reference": "430c22f032f4561a608180e04f356acd273c7411"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/676b9ff1f0129b26a33c570773d6ef6ec50082c0",
-                "reference": "676b9ff1f0129b26a33c570773d6ef6ec50082c0",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/430c22f032f4561a608180e04f356acd273c7411",
+                "reference": "430c22f032f4561a608180e04f356acd273c7411",
                 "shasum": ""
             },
             "require": {
@@ -2822,7 +2825,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-03-11T15:12:56+00:00"
+            "time": "2019-03-15T07:48:09+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
