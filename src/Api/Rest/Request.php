@@ -96,7 +96,7 @@ abstract class Request
 
         if ($this->responseCode === 0) {
             throw new ConnectionException(\sprintf(
-                'Unable to establish a connection with "%s%"',
+                'Unable to establish a connection with "%s"',
                 (new Host())
             ));
         } else {
