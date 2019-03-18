@@ -94,13 +94,15 @@ class NewOrder extends Request
         }
         $parts = \explode('.', $price);
         if (isset($parts[1])) {
-            $orderIncrement = '0.' .$parts[1];
-            if ($orderIncrement < $pair->getMinOrderIncrement()) {
-                throw new \Exception(\sprintf(
-                    'Invalid price precision "%s", min increment allowed is "%s"',
-                    $orderIncrement,
-                    $pair->getMinOrderIncrement()
-                ));
+            if (trim($parts[1], 0) !== '') {
+                $orderIncrement = '0.' .$parts[1];
+                if ($orderIncrement < $pair->getMinOrderIncrement()) {
+                    throw new \Exception(\sprintf(
+                        'Invalid price precision "%s", min increment allowed is "%s"',
+                        $orderIncrement,
+                        $pair->getMinOrderIncrement()
+                    ));
+                }
             }
         }
     }
