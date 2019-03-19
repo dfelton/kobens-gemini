@@ -2,11 +2,13 @@
 
 namespace Kobens\Gemini\Api\Rest\Request\Order\Placement;
 
+use Kobens\Exchange\PairInterface;
 use Kobens\Gemini\Api\Host;
 use Kobens\Gemini\Api\Param\{Side, Symbol, Amount, Price, ClientOrderId};
 use Kobens\Gemini\Api\Rest\Request;
+use Kobens\Gemini\Exception\Api\InsufficientFundsException;
 use Kobens\Gemini\Exchange;
-use Kobens\Exchange\PairInterface;
+use Kobens\Exchange\Exception\Order\MakerOrCancelWouldTakeException;
 
 class NewOrder extends Request
 {
@@ -23,8 +25,7 @@ class NewOrder extends Request
         Amount $amount,
         Price $price,
         ClientOrderId $clientOrderId
-    )
-    {
+    ) {
         parent::__construct();
 
         $pair = (new Exchange())->getPair($symbol->getValue());
@@ -103,6 +104,22 @@ class NewOrder extends Request
                         $pair->getMinOrderIncrement()
                     ));
                 }
+            }
+        }
+    }
+
+    protected function throwResponseException($response, $responseCode) : void
+    {
+        parent::throwResponseException($response, $responseCode);
+        $obj = \json_decode($response);
+        // @todo narrow this down to a single ==== comparison
+        if ($responseCode >= 400 && $responseCode < 500) {
+            if ($obj->reason === InsufficientFundsException::REASON) {
+                throw new InsufficientFundsException($obj->message, $responseCode);
+            }
+        } elseif ($obj->is_cancelled) {
+            if ($obj->reason === 'MakerOrCancelWouldTake') {
+                throw new MakerOrCancelWouldTakeException($response, $responseCode);
             }
         }
     }

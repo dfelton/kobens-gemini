@@ -13,6 +13,7 @@ use Kobens\Gemini\Exception\Api\InsufficientFundsException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Kobens\Exchange\Exception\Order\MakerOrCancelWouldTakeException;
 
 class NewOrder extends Command
 {
@@ -46,15 +47,15 @@ class NewOrder extends Command
         );
 
         try {
-            $order->makeRequest();
             $output->writeln($order->getResponse());
         } catch (InsufficientFundsException $e) {
             $output->writeln($e->getMessage());
+        } catch (MakerOrCancelWouldTakeException $e) {
+            $output->writeln('<fg=white;bg=red>Unable to place order. Maker or cancel rule applied.</>');
         } catch (\Exception $e) {
             $output->writeln([
-                'Response Code: '.$order->getResponseCode(),
-                'Error: '.$order->reason,
-                'Message: '.$order->message,
+                \sprintf('<fg=white;bg=red>Error Code: %s</>', $e->getCode()),
+                \sprintf('<fg=white;bg=red>Message: %s</>', $e->getMessage()),
             ]);
         }
     }
