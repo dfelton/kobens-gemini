@@ -35,12 +35,12 @@ abstract class Request
     /**
      * @var \Kobens\Gemini\Api\KeyInterface
      */
-    protected $restKey;
+    private $restKey;
 
     /**
      * @var \Kobens\Gemini\Api\NonceInterface
      */
-    protected $nonce;
+    private $nonce;
 
     public function __construct()
     {
