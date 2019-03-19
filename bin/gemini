@@ -14,18 +14,10 @@ use Kobens\Gemini\Command\Command\Order\Status\{ActiveOrders, OrderStatus};
 use Symfony\Component\Console\Application;
 
 try {
-    new Config(
-        \dirname(__DIR__).'/env/config.xml',
-        \dirname(__DIR__)
-    );
-    new Mapper([
-        'gemini' => Exchange::class
-    ]);
+    new Config(\dirname(__DIR__).'/env/config.xml', \dirname(__DIR__));
+    new Mapper(['gemini' => Exchange::class]);
 } catch (Exception $e) {
-    exit(\sprintf(
-        'Initialization Error: %s',
-        $e->getMessage()
-    ));
+    exit(\sprintf('Initialization Error: %s', $e->getMessage()));
 }
 
 $application = new Application();
