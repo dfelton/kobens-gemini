@@ -10,7 +10,7 @@ use Kobens\Gemini\Exchange;
 use Kobens\Gemini\Command\Command\Market\{BookKeeper as MarketBookKeeper, Watcher};
 use Kobens\Gemini\Command\Command\Order\BookKeeper as OrderBookKeeper;
 use Kobens\Gemini\Command\Command\Order\Placement\{Cancel, CancelAll, NewOrder};
-use Kobens\Gemini\Command\Command\Order\Status\ActiveOrders;
+use Kobens\Gemini\Command\Command\Order\Status\{ActiveOrders, OrderStatus};
 use Symfony\Component\Console\Application;
 
 try {
@@ -36,6 +36,7 @@ $application->add(new CancelAll());
 $application->add(new MarketBookKeeper());
 $application->add(new NewOrder());
 $application->add(new OrderBookKeeper());
+$application->add(new OrderStatus());
 $application->add(new SimpleTraderOrderPlacer());
 $application->add(new Watcher());
 
