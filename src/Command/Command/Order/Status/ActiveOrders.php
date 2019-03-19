@@ -19,16 +19,16 @@ class ActiveOrders extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $model = new ModelActiveOrders();
-        $json = $model->makeRequest()->getResponse();
+        $response = (new ModelActiveOrders())->getResponse();
 
-        if ($json === '[]') {
+        if ($response['body'] === '[]') {
             $output->writeln(\sprintf(
                 '<fg=red>There are currently no active orders on "%s."</>',
                 (string) (new Host())
             ));
         } else {
-            \Zend\Debug\Debug::dump(\json_decode($json, true));
+            // @todo cleanup output
+            \Zend\Debug\Debug::dump(\json_decode($response['body'], true));
         }
     }
 

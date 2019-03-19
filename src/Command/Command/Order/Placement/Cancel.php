@@ -19,8 +19,8 @@ class Cancel extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $cancel = new CancelOrder($input->getArgument('order_id'));
-        $cancel->makeRequest();
-        \Zend\Debug\Debug::dump($cancel->getResponse());
+        $response = (new CancelOrder($input->getArgument('order_id')))->getResponse();
+        // @todo cleanup output
+        $output->writeln($response['body']);
     }
 }
