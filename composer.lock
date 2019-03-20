@@ -890,7 +890,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-exchange",
-                "reference": "c3ac6940bbccff7bd54fe0e17cda0373f7d58381"
+                "reference": "7c51c80712e5e469d36695c41ced20f88d97f66f"
             },
             "require": {
                 "kobens/kobens-core": "dev-master",
@@ -925,7 +925,7 @@
                 }
             ],
             "description": "Library for providing a common interface for interacting with Exchange accounts via API.",
-            "time": "2019-03-19T04:24:31+00:00"
+            "time": "2019-03-20T00:44:08+00:00"
         },
         {
             "name": "league/uri-interfaces",
