@@ -19,8 +19,48 @@ class OrderStatus extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $data = (new GetOrderStatus($input->getArgument('order_id')))->getResponse();
-        // @todo better output formatting
-        \Zend\Debug\Debug::dump($data);
+        $data = \json_decode(
+            (new GetOrderStatus($input->getArgument('order_id')))->getResponse()['body'],
+            true
+        );
+        $keyLength = 0;
+        foreach (\array_keys($data) as $key) {
+            if (\strlen($key) > $keyLength) {
+                $keyLength = \strlen($key);
+            }
+        }
+        foreach ($data as $key => $val) {
+            $key = \ucwords(\str_replace('_', ' ', $key));
+            $key = str_pad($key, $keyLength, ' ', STR_PAD_RIGHT);
+            if ($val !== []) {
+                $output->writeln("$key\t{$this->getFormattedVal($val)}");
+            }
+        }
+    }
+
+    protected function getFormattedVal($val) : string
+    {
+        switch (true) {
+            case $val === true:
+                $str = "<fg=green>true</>";
+                break;
+            case $val === false;
+                $str = "<fg=red>false</>";
+                break;
+            case \is_numeric($val);
+                $str = "<fg=yellow>$val</>";
+                break;
+            case \is_array($val):
+                $str = PHP_EOL;
+                foreach ($val as $key => $value) {
+                    $key = \ucwords(\str_replace('_', ' ', $key));
+                    $str .= "\t$key: $value";
+                }
+                break;
+            default:
+                $str = "<fg=white>$val</>";
+                break;
+        }
+        return $str;
     }
 }
