@@ -16,7 +16,7 @@ class NewOrder extends Request
 
     protected $defaultPayload = [
         'type' => 'exchange limit',
-        'options' => ['maker-or-cancel'],
+//         'options' => ['maker-or-cancel'],
     ];
 
     public function __construct(
