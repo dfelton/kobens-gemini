@@ -2,17 +2,18 @@
 
 namespace Kobens\Gemini\Api\Rest;
 
+use Kobens\Core\Config;
+use Kobens\Core\Exception\ConnectionException;
+use Kobens\Core\Http\Request\Throttler;
 use Kobens\Gemini\Api\{Host, Key, Nonce};
 use Kobens\Gemini\Exception\{
-    ConnectionException,
+    Exception,
     InvalidResponseException,
     ResourceMovedException
 };
 use Kobens\Gemini\Exception\Api\InvalidSignatureException;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
-use Kobens\Core\Config;
-use Kobens\Gemini\Exception\Exception;
 
 /**
  * @todo going to want portions of this in kobens/kobens-core somehow; at a minimum inside kobens/kobens-exchange
@@ -21,6 +22,7 @@ use Kobens\Gemini\Exception\Exception;
 abstract class Request
 {
     const REQUEST_URI = '';
+    const RATE_LIMIT = 6;
 
     /**
      * @var Logger
@@ -42,6 +44,11 @@ abstract class Request
      */
     private $nonce;
 
+    /**
+     * @var Throttler
+     */
+    private $throttler;
+
     public function __construct()
     {
         $this->restKey = new Key();
@@ -54,15 +61,47 @@ abstract class Request
             ),
             Logger::INFO
         ));
+        $this->throttler = new Throttler(self::class);
+        if ($this->throttler->getLimit(self::class) === null) {
+            $this->throttler->addThrottle(self::class, self::RATE_LIMIT);
+        }
     }
 
     public function getResponse() : array
     {
-        return $this->makeRequest();
+        $response = $this->_getResponse();
+        $this->throwResponseException($response['body'], $response['code']);
+        return $response;
     }
 
+    final private function _getResponse() : array
+    {
+        $this->throttler->throttle();
 
-    final private function getHeaders() : array
+        $ch = \curl_init();
+
+        \curl_setopt($ch, CURLOPT_URL, 'https://'.(new Host()).static::REQUEST_URI);
+        \curl_setopt($ch, CURLOPT_POST, true);
+        \curl_setopt($ch, CURLOPT_HTTPHEADER, $this->getRequestHeaders());
+        \curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $timer = -\microtime(true);
+        $response = (string) \curl_exec($ch);
+        $timer += \microtime(true);
+        $this->logTimer->info($timer);
+        unset($timer);
+
+        $responseCode = (int) \curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+
+        \curl_close($ch);
+
+        return [
+            'code' => $responseCode,
+            'body' => $response,
+        ];
+    }
+
+    final private function getRequestHeaders() : array
     {
         $base64Payload = \base64_encode(\json_encode(\array_merge(
             ['request' => static::REQUEST_URI, 'nonce' => $this->nonce->getNonce()],
@@ -78,53 +117,26 @@ abstract class Request
         ];
     }
 
-    final private function makeRequest() : array
-    {
-        $ch = \curl_init();
-
-        \curl_setopt($ch, CURLOPT_URL, 'https://'.(new Host()).static::REQUEST_URI);
-        \curl_setopt($ch, CURLOPT_POST, true);
-        \curl_setopt($ch, CURLOPT_HTTPHEADER, $this->getHeaders());
-        \curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        $timer = -microtime(true);
-        $response = (string) \curl_exec($ch);
-        $timer += microtime(true);
-        $this->logTimer->info($timer);
-        unset($timer);
-
-        $responseCode = (int) \curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-
-        \curl_close($ch);
-
-        $this->throwResponseException($response, $responseCode);
-
-        return [
-            'code' => $responseCode,
-            'body' => $response,
-        ];
-    }
-
-    protected function throwResponseException(string $response, int $responseCode) : void
+    protected function throwResponseException(string $body, int $code) : void
     {
         switch (true) {
-            case $responseCode === 0:
+            case $code === 0:
                 throw new ConnectionException(\sprintf('Unable to establish a connection with "%s"', (new Host())));
-            case $responseCode >= 300 && $responseCode < 400:
-                throw new ResourceMovedException($response, $responseCode);
-            case $responseCode >= 400 && $responseCode < 500:
-                if ($responseCode === 408) {
+            case $code >= 300 && $code < 400:
+                throw new ResourceMovedException($body, $code);
+            case $code >= 400 && $code < 500:
+                if ($code === 408) {
                     throw new Exception('408 Request Time-out', 408);
                 }
-                $message = \json_decode($response);
+                $message = \json_decode($body);
                 switch ($message->reason) {
                     case InvalidSignatureException::REASON:
-                        throw new InvalidSignatureException($message->message, $responseCode);
+                        throw new InvalidSignatureException($message->message, $code);
                     default:
                         break;
                 }
-            case $responseCode >= 500:
-                throw new InvalidResponseException($response, $responseCode);
+            case $code >= 500:
+                throw new InvalidResponseException($body, $code);
             default:
                 break;
         }
