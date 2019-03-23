@@ -4,12 +4,13 @@ namespace Kobens\Gemini;
 
 use Kobens\Exchange\AbstractExchange;
 use Kobens\Exchange\Book\Keeper\KeeperInterface;
+use Kobens\Exchange\Order\StatusInterface;
 use Kobens\Gemini\Api\WebSocket\MarketData\BookKeeper;
 use Kobens\Gemini\Api\Param\{Amount, ClientOrderId, Price, Side, Symbol};
 use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder;
 use Kobens\Gemini\Api\Rest\Request\Order\Status\{ActiveOrders, OrderStatus};
-use Kobens\Gemini\Exception\Exception;
 use Kobens\Gemini\Exchange\Pair\{BTCUSD, ETHBTC, ETHUSD, LTCBTC, LTCETH, LTCUSD, ZECBTC, ZECETH, ZECLTC, ZECUSD};
+use Kobens\Gemini\Exchange\Order\Status;
 
 class Exchange extends AbstractExchange
 {
@@ -57,14 +58,6 @@ class Exchange extends AbstractExchange
         return $result->order_id;
     }
 
-    public function isOrderCancelled(array $metaData): bool
-    {
-        if (!isset($metaData['is_cancelled'])) {
-            throw new Exception('Metadata array missing "is_cancelled" information');
-        }
-        return $metaData['is_cancelled'] === true;
-    }
-
     public function getActiveOrderIds(): array
     {
         $orders = \json_decode((new ActiveOrders())->getResponse()['body'], true);
@@ -81,12 +74,9 @@ class Exchange extends AbstractExchange
         return \json_decode($json['body'], true);
     }
 
-    public function isOrderFilled(array $metaData): bool
+    public function getStatusInterface(): StatusInterface
     {
-        if (!isset($metaData['is_live']) || !isset($metaData['remaining_amount'])) {
-            throw new Exception('Metadata missing required keys.');
-        }
-        return $metaData['is_live'] === false && $metaData['remaining_amount'] === '0';
+        return new Status();
     }
 
 }
