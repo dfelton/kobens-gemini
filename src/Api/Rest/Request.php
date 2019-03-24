@@ -14,6 +14,7 @@ use Kobens\Gemini\Exception\{
 use Kobens\Gemini\Exception\Api\InvalidSignatureException;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
+use Kobens\Gemini\Exception\LogicException;
 
 /**
  * @todo going to want portions of this in kobens/kobens-core somehow; at a minimum inside kobens/kobens-exchange
@@ -23,6 +24,10 @@ abstract class Request
 {
     const REQUEST_URI = '';
     const RATE_LIMIT = 6;
+
+    const CURLOPT_CONNECTTIMEOUT = 10;
+    const CURLOPT_RETURNTRANSFER = true;
+    const CURLOPT_POST = true;
 
     /**
      * @var Logger
@@ -71,6 +76,12 @@ abstract class Request
     {
         $response = $this->_getResponse();
         $this->throwResponseException($response['body'], $response['code']);
+        if ($response['code'] !== 200) {
+            throw new LogicException(\sprintf(
+                'Response code 200 expected, "%d" received.',
+                $response['code']
+            ));
+        }
         return $response;
     }
 
@@ -80,10 +91,11 @@ abstract class Request
 
         $ch = \curl_init();
 
-        \curl_setopt($ch, CURLOPT_URL, 'https://'.(new Host()).static::REQUEST_URI);
-        \curl_setopt($ch, CURLOPT_POST, true);
-        \curl_setopt($ch, CURLOPT_HTTPHEADER, $this->getRequestHeaders());
-        \curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        \curl_setopt($ch, CURLOPT_URL,            'https://'.(new Host()).static::REQUEST_URI);
+        \curl_setopt($ch, CURLOPT_HTTPHEADER,     $this->getRequestHeaders());
+        \curl_setopt($ch, CURLOPT_POST,           static::CURLOPT_POST);
+        \curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, static::CURLOPT_CONNECTTIMEOUT);
+        \curl_setopt($ch, CURLOPT_RETURNTRANSFER, static::CURLOPT_RETURNTRANSFER);
 
         $timer = -\microtime(true);
         $response = (string) \curl_exec($ch);
@@ -108,12 +120,12 @@ abstract class Request
             $this->payload
         )));
         return [
-            'Cache-Control: no-cache',
-            'Content-Length: 0',
-            'Content-Type: text/plain',
-            'X-GEMINI-APIKEY: ' . $this->restKey->getPublicKey(),
-            'X-GEMINI-PAYLOAD: ' . $base64Payload,
-            'X-GEMINI-SIGNATURE: ' . \hash_hmac('sha384', $base64Payload, $this->restKey->getSecretKey()),
+            'cache-control:no-cache',
+            'content-length:0',
+            'content-type:text/plain',
+            'x-gemini-apikey:' . $this->restKey->getPublicKey(),
+            'x-gemini-payload:' . $base64Payload,
+            'x-gemini-signature:' . \hash_hmac('sha384', $base64Payload, $this->restKey->getSecretKey()),
         ];
     }
 
