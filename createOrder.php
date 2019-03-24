@@ -1,22 +1,42 @@
 <?php
 /**
- * Logic for generating consistent order placement 
- * points across a range of price points. 
+ * Logic for generating consistent order placement
+ * points across a range of price points.
  */
 
 require __DIR__.'/vendor/autoload.php';
 
+use Kobens\Core\{Config, Db};
+use Kobens\Exchange\Exchange\Mapper;
+use Kobens\Gemini\Exchange;
+use Zend\Db\TableGateway\TableGateway;
+
+try {
+    new Config(
+        __DIR__.'/env/config.xml',
+        __DIR__
+    );
+    new Mapper([
+        'gemini' => Exchange::class
+    ]);
+} catch (Exception $e) {
+    exit(\sprintf(
+        'Initialization Error: %s',
+        $e->getMessage()
+    ));
+}
+
 $buyBtc  = '0.00001';
 $sellBtc = '0.00001';
 
-$start       = '3000.00';
+$start       = '3900.00';
 $end         = '4000.00';
 
 $cashLimit   =   false;
 
-$increment   =    '0.35';
+$increment   =    '0.01';
 $feePercent  =    '0.01';
-$sellAfterGain =  '0.05';
+$sellAfterGain =  '0.023';
 $totalBuyFees  =  '0.00';
 $totalBuyUsd   =  '0.00';
 $totalBuyBtc   =  '0.00000000';
@@ -28,6 +48,9 @@ $totalProfitBtc = '0';
 $orders = [];
 
 $buyPrice = $start;
+
+$table = new TableGateway('trader_simple_repeater', (new Db())->getAdapter());
+
 while (floatval($buyPrice) <= floatval($end)) {
 
     $amountUsd = bcmul($buyBtc, (string) $buyPrice, 10);
@@ -79,7 +102,7 @@ while (floatval($buyPrice) <= floatval($end)) {
         'buy_amount_usd' => $amountUsd,
         'buy_amount_btc' => $buyBtc,
         'buy_fee' => $fee,
-        'bug_usd_with_fee' => bcadd($amountUsd, $fee, 14),
+        'buy_usd_with_fee' => bcadd($amountUsd, $fee, 14),
         'sell_price' => $sellPrice,
         'sell_amount_usd' => $sellSubtotalUsd,
         'sell_amount_btc' => $buyBtc,
@@ -107,7 +130,21 @@ while (floatval($buyPrice) <= floatval($end)) {
     }
     $buyPrice = bcadd($buyPrice, $increment, 2);
 
+//     $table->insert([
+//         'exchange' => 'gemini',
+//         'symbol' => 'btcusd',
+//         'status' => 'new',
+//         'auto_buy' => 1,
+//         'auto_sell' => 1,
+//         'buy_price' => $buyPrice,
+//         'buy_amount' => $buyBtc,
+//         'sell_price' => $sellPrice,
+//         'sell_amount' => $buyBtc,
+//     ]);
+
 }
+
+exit;
 
 $totalPositionFees = bcadd($totalBuyFees, $totalSellFees, 14);
 $totalProfitExchangeAndMe = bcadd($totalPositionFees, $totalProfitUsd, 14);
