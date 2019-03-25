@@ -815,7 +815,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-core",
-                "reference": "bcf39942b002297ca09dfc8499684964d8964c22"
+                "reference": "65c4119ad039b9fcc47f190b2012f65b537ef28c"
             },
             "require": {
                 "monolog/monolog": "2.0.0-beta1",
@@ -845,7 +845,7 @@
                 }
             ],
             "description": "Core framework for facilitating trades on an exchange.",
-            "time": "2019-03-21T04:32:03+00:00"
+            "time": "2019-03-24T18:23:34+00:00"
         },
         {
             "name": "kobens/kobens-currency",
