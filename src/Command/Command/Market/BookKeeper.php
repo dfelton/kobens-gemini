@@ -7,6 +7,7 @@ use Kobens\Core\Config;
 use Kobens\Exchange\Exception\ClosedBookException;
 use Kobens\Gemini\Command\Argument\Symbol;
 use Kobens\Gemini\Command\Traits\{Traits, GetSymbol};
+use Kobens\Gemini\Exception\Api\WebSocket\SocketSequenceException;
 use Kobens\Gemini\Exchange;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
@@ -73,15 +74,40 @@ class BookKeeper extends Command
                 $this->book->openBook();
             } catch (ClosedBookException $e) {
                 $this->logException($e, false);
-                \sleep(\rand(9, 12));
+                $this->outputErrorAndSleep($output, $e->getMessage());
+            } catch (SocketSequenceException $e) {
+                $this->logException($e);
+                $this->outputErrorAndSleep($output, $e->getMessage());
             } catch (ConnectionException $e) {
                 $this->logException($e);
-                \sleep(\rand(9, 12));
+                $this->outputErrorAndSleep($output, $e->getMessage());
             } catch (\Exception $e) {
                 $loop = false;
                 $this->logException($e);
             }
         } while ($loop);
+    }
+
+    protected function outputErrorAndSleep(OutputInterface $output, string $message, int $seconds = 10)
+    {
+        if ($seconds < 1) {
+            $seconds = 10;
+        }
+        if (!$output->isQuiet()) {
+            $output->write(PHP_EOL);
+            $output->writeln("ERROR: $message");
+            $output->write("Sleeping $seconds seconds");
+        }
+        for ($i = 1; $i <= $seconds; $i++) {
+            if (!$output->isQuiet()) {
+                $output->write('.');
+            }
+            \sleep(1);
+        }
+        if (!$output->isQuiet()) {
+            $output->write(PHP_EOL);
+            $output->writeln('Resuming operations');
+        }
     }
 
     protected function logException(\Exception $e, $logNewTrace = true) : void

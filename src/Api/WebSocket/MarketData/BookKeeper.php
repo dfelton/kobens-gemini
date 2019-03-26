@@ -5,6 +5,7 @@ namespace Kobens\Gemini\Api\WebSocket\MarketData;
 use Kobens\Core\Config;
 use Kobens\Exchange\Book\Keeper\AbstractKeeper;
 use Kobens\Exchange\Exception\ClosedBookException;
+use Kobens\Gemini\Exception\Api\WebSocket\SocketSequenceException;
 use Kobens\Gemini\Exception\Exception;
 use Kobens\Gemini\Exchange;
 
@@ -74,7 +75,11 @@ class BookKeeper extends AbstractKeeper
             $this->populateBook($book);
         } else {
             if ($this->socketSequence !== $payload->socket_sequence - 1) {
-                throw new Exception('Out of sequence message');
+                throw new SocketSequenceException(\sprintf(
+                    'Expected sequence number "%s", received "%s".',
+                    $this->socketSequence + 1,
+                    $payload->socket_sequence
+                ));
             }
             if ($payload->type === 'update') {
                 foreach ($payload->events as $e) {
