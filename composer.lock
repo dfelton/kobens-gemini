@@ -1521,12 +1521,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/contracts.git",
-                "reference": "5c73fbfcbabb1722084cd95b819ce18389a7e5ea"
+                "reference": "a4b5e697e24544ddeaf9f9255cdda6e4c2c32659"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/contracts/zipball/5c73fbfcbabb1722084cd95b819ce18389a7e5ea",
-                "reference": "5c73fbfcbabb1722084cd95b819ce18389a7e5ea",
+                "url": "https://api.github.com/repos/symfony/contracts/zipball/a4b5e697e24544ddeaf9f9255cdda6e4c2c32659",
+                "reference": "a4b5e697e24544ddeaf9f9255cdda6e4c2c32659",
                 "shasum": ""
             },
             "require": {
@@ -1584,7 +1584,7 @@
                 "interoperability",
                 "standards"
             ],
-            "time": "2019-04-02T10:06:39+00:00"
+            "time": "2019-04-03T09:22:57+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
