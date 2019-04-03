@@ -24,11 +24,21 @@ try {
     // while slipping in a manual request here or there.
     // Embracing websockets and local cache more will be future goals.
     (new Throttler())->addThrottle('gemini', 3);
-} catch (Exception $e) {
-    exit(\sprintf('Initialization Error: %s', $e->getMessage()));
+
+    $json = @\file_get_contents(dirname(__DIR__).'/composer.json');
+    if ($json === false) {
+        throw new \Exception('Unable to read application\'s composer.json file.');
+    }
+    $composer = @\json_decode($json);
+    if ($composer  === false) {
+        throw new \Exception('Unable to parse application\'s composer.json file.');
+    }
+    unset($json);
+} catch (\Exception $e) {
+    exit("Initialization Error: {$e->getMessage()}");
 }
 
-$application = new Application();
+$application = new Application($composer->name, $composer->version);
 
 $application->add(new ActiveOrders());
 $application->add(new Cancel());
