@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "20f99d218ceefe9de0a663003014433d",
+    "content-hash": "b151c94afff8134fe92f849f3ea142a3",
     "packages": [
         {
             "name": "amphp/amp",
@@ -848,11 +848,11 @@
         },
         {
             "name": "kobens/kobens-currency",
-            "version": "2.0.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-currency",
-                "reference": "358f0bcca3b43554baaf1f525adfcd6424bec2ad"
+                "reference": "d2bcf385fddd65ddd352f128e86d602dd1c72866"
             },
             "require": {
                 "php": "^7.3"
@@ -881,7 +881,7 @@
                 }
             ],
             "description": "Library for providing a common interface for interacting with currencies both digital and fiat.",
-            "time": "2019-04-01T03:15:42+00:00"
+            "time": "2019-04-03T04:42:43+00:00"
         },
         {
             "name": "kobens/kobens-exchange",
@@ -889,11 +889,11 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-exchange",
-                "reference": "caa7fd78b3e9b43606873cd3e0823c5891e155c5"
+                "reference": "215d8bae2dace21bcb6da59306b8d1895c80b8a9"
             },
             "require": {
                 "kobens/kobens-core": "dev-master",
-                "kobens/kobens-currency": "^2.0",
+                "kobens/kobens-currency": "dev-master",
                 "monolog/monolog": "2.0.0-beta1",
                 "php": "^7.3",
                 "symfony/console": "^4.2",
@@ -924,7 +924,7 @@
                 }
             ],
             "description": "Library for providing a common interface for interacting with Exchange accounts via API.",
-            "time": "2019-04-03T03:54:07+00:00"
+            "time": "2019-04-03T04:49:50+00:00"
         },
         {
             "name": "league/uri-interfaces",
@@ -1521,12 +1521,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/contracts.git",
-                "reference": "99c07379e2ad7b4df43acfe6c7bcd4b6a1ec9bea"
+                "reference": "5c73fbfcbabb1722084cd95b819ce18389a7e5ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/contracts/zipball/99c07379e2ad7b4df43acfe6c7bcd4b6a1ec9bea",
-                "reference": "99c07379e2ad7b4df43acfe6c7bcd4b6a1ec9bea",
+                "url": "https://api.github.com/repos/symfony/contracts/zipball/5c73fbfcbabb1722084cd95b819ce18389a7e5ea",
+                "reference": "5c73fbfcbabb1722084cd95b819ce18389a7e5ea",
                 "shasum": ""
             },
             "require": {
@@ -1584,7 +1584,7 @@
                 "interoperability",
                 "standards"
             ],
-            "time": "2019-03-31T13:49:16+00:00"
+            "time": "2019-04-02T10:06:39+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -3647,6 +3647,7 @@
     "stability-flags": {
         "amphp/websocket-client": 20,
         "kobens/kobens-core": 20,
+        "kobens/kobens-currency": 20,
         "kobens/kobens-exchange": 20
     },
     "prefer-stable": false,
