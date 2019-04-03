@@ -9,6 +9,7 @@ use Kobens\Gemini\Api\Rest\Request;
 use Kobens\Gemini\Exception\Api\InsufficientFundsException;
 use Kobens\Gemini\Exchange;
 use Kobens\Exchange\Exception\Order\MakerOrCancelWouldTakeException;
+use Kobens\Gemini\Exception\Exception;
 
 class NewOrder extends Request
 {
@@ -47,37 +48,34 @@ class NewOrder extends Request
 
     protected function validateAmount(string $amount, PairInterface $pair) : void
     {
-        $min = $pair->getMinOrderSize();
-        if ($amount < $min) {
-            throw new \Exception(\sprintf(
+        if ($amount < $pair->minOrderSize) {
+            throw new Exception(\sprintf(
                 'Invalid amount "%s", min allowed for the "%s" pair on "%s" is "%s".',
                 $amount,
-                $pair->getPairSymbol(),
+                $pair->symbol,
                 (string) (new Host()),
-                $min
+                $pair->minOrderSize
             ));
         }
-        unset($min);
 
         $parts = \explode('.', $amount);
         if (isset($parts[1])) {
             $length = \strlen($parts[1]);
-            $min = $pair->getMinOrderIncrement();
-            $minParts = explode('.', $min);
+            $minParts = explode('.', $pair->minOrderIncrement);
             if (isset($minParts[1])) {
                 $maxPrecision = \strlen($minParts[1]);
                 if ($length > $maxPrecision) {
                     throw new \Exception(\sprintf(
                         'Invalid amount precision "%s", min increment allowed is "%s"',
                         $length,
-                        $pair->getMinOrderIncrement()
+                        $pair->minOrderIncrement
                     ));
                 }
             } else {
                 throw new \Exception(\sprintf(
                     'Invalid amount precision "%s", min increment allowed is "%s"',
                     $length,
-                    $pair->getMinOrderIncrement()
+                    $pair->minOrderIncrement
                 ));
             }
         }
@@ -85,25 +83,22 @@ class NewOrder extends Request
 
     protected function validatePrice(string $price, PairInterface $pair) : void
     {
-        $min = $pair->getMinPriceIncrement();
-        if ($price < $min) {
+        if ($price < $pair->minPriceIncrement) {
             throw new \Exception(\sprintf(
                 'Invalid price "%s", min price is "%s".',
                 $price,
-                $min
+                $pair->minPriceIncrement
             ));
         }
         $parts = \explode('.', $price);
-        if (isset($parts[1])) {
-            if (trim($parts[1], 0) !== '') {
-                $orderIncrement = '0.' .$parts[1];
-                if ($orderIncrement < $pair->getMinOrderIncrement()) {
-                    throw new \Exception(\sprintf(
-                        'Invalid price precision "%s", min increment allowed is "%s"',
-                        $orderIncrement,
-                        $pair->getMinOrderIncrement()
-                    ));
-                }
+        if (isset($parts[1]) && trim($parts[1], 0) !== '') {
+            $priceIncrement = '0.' .$parts[1];
+            if ($priceIncrement < $pair->minPriceIncrement) {
+                throw new \Exception(\sprintf(
+                    'Invalid price precision "%s", min increment allowed is "%s"',
+                    $priceIncrement,
+                    $pair->minPriceIncrement
+                ));
             }
         }
     }

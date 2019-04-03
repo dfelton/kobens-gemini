@@ -29,6 +29,8 @@
         "php": "^7.3",
         "ext-curl": "*",
         "amphp/websocket-client": "dev-master",
+        "kobens/kobens-core": "dev-master",
+        "kobens/kobens-currency": "^2.0",
         "kobens/kobens-exchange": "dev-master",
         "symfony/console": "^4.2",
         "zendframework/zend-config": "^3.2"

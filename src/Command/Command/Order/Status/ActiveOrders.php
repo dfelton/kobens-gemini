@@ -8,12 +8,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Kobens\Gemini\Api\Rest\Request\Order\Status\ActiveOrders as ModelActiveOrders;
 use Kobens\Gemini\Api\Host;
 
-class ActiveOrders extends Command
+final class ActiveOrders extends Command
 {
-    protected static $defaultName = 'order:status:active';
-
     protected function configure()
     {
+        $this->setName('order:status:active');
         $this->setDescription('List all active orders.');
     }
 

@@ -23,7 +23,7 @@ use Kobens\Gemini\Exception\LogicException;
 abstract class Request
 {
     const REQUEST_URI = '';
-    const RATE_LIMIT = 6;
+    private const RATE_LIMIT = 6;
 
     const CURLOPT_CONNECTTIMEOUT = 10;
     const CURLOPT_RETURNTRANSFER = true;

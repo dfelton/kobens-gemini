@@ -15,7 +15,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Kobens\Exchange\Exception\Order\MakerOrCancelWouldTakeException;
 
-class NewOrder extends Command
+final class NewOrder extends Command
 {
     use Traits;
     use GetAmount, GetClientOrderId, GetPrice, GetSide, GetSymbol;

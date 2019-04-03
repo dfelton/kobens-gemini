@@ -1,4 +1,5 @@
 <?php
+
 namespace Kobens\Gemini\Api\Param;
 
 class Side extends AbstractParam

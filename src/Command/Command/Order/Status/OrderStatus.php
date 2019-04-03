@@ -8,7 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Kobens\Gemini\Api\Rest\Request\Order\Status\OrderStatus as GetOrderStatus;
 
-class OrderStatus extends Command
+final class OrderStatus extends Command
 {
     protected function configure()
     {
@@ -38,7 +38,7 @@ class OrderStatus extends Command
         }
     }
 
-    protected function getFormattedVal($val) : string
+    private function getFormattedVal($val) : string
     {
         switch (true) {
             case $val === true:

@@ -5,31 +5,31 @@ namespace Kobens\Gemini\Command\Argument;
 use Kobens\Core\Command\Argument\ArgumentInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
-class Price implements ArgumentInterface
+final class Price implements ArgumentInterface
 {
-    const DEFAULT     = null;
-    const DESCRIPTION = 'Price to interact with.';
-    const MODE        = InputArgument::REQUIRED;
-    const NAME        = 'price';
+    private const DEFAULT     = null;
+    private const DESCRIPTION = 'Price to interact with.';
+    private const MODE        = InputArgument::REQUIRED;
+    private const NAME        = 'price';
 
     public function getDefault()
     {
-        return static::DEFAULT;
+        return self::DEFAULT;
     }
 
     public function getDescription(): string
     {
-        return static::DESCRIPTION;
+        return self::DESCRIPTION;
     }
 
     public function getMode(): int
     {
-        return static::MODE;
+        return self::MODE;
     }
 
     public function getName(): string
     {
-        return static::NAME;
+        return self::NAME;
     }
 
 }

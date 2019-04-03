@@ -9,29 +9,16 @@ use Kobens\Gemini\Api\WebSocket\MarketData\BookKeeper;
 use Kobens\Gemini\Api\Param\{Amount, ClientOrderId, Price, Side, Symbol};
 use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder;
 use Kobens\Gemini\Api\Rest\Request\Order\Status\{ActiveOrders, OrderStatus};
-use Kobens\Gemini\Exchange\Pair\{BTCUSD, ETHBTC, ETHUSD, LTCBTC, LTCETH, LTCUSD, ZECBTC, ZECETH, ZECLTC, ZECUSD};
+use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\Exchange\Order\Status;
 
-class Exchange extends AbstractExchange
+final class Exchange extends AbstractExchange
 {
-    const CACHE_KEY = 'gemini';
+    private const CACHE_KEY = 'gemini';
 
     public function __construct()
     {
-        parent::__construct(
-            [
-                new BTCUSD(),
-                new ETHBTC(),
-                new ETHUSD(),
-                new LTCBTC(),
-                new LTCETH(),
-                new LTCUSD(),
-                new ZECBTC(),
-                new ZECETH(),
-                new ZECLTC(),
-                new ZECUSD(),
-            ]
-        );
+        parent::__construct(Pair::getAllInstances());
     }
 
     public function getCacheKey(): string
@@ -78,6 +65,4 @@ class Exchange extends AbstractExchange
     {
         return new Status();
     }
-
 }
-

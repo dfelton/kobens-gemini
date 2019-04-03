@@ -12,61 +12,61 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
-class Watcher extends Command
+final class Watcher extends Command
 {
     use GetRefreshRate, GetSymbol, Traits;
 
-    protected $isInitialized = false;
+    private $isInitialized = false;
 
     /**
      * @var string
      */
-    protected $symbol;
+    private $symbol;
 
     /**
      * @var bool
      */
-    protected $hasReportedClosedBook = false;
+    private $hasReportedClosedBook = false;
 
     /**
      * @var bool
      */
-    protected $bookIsOpen = false;
+    private $bookIsOpen = false;
 
     /**
      * @var string
      */
-    protected $ask;
+    private $ask;
 
     /**
      * @var string
      */
-    protected $bid;
+    private $bid;
 
     /**
      * @var string
      */
-    protected $spread;
+    private $spread;
 
     /**
      * @var int
      */
-    protected $lastOutput = 0;
+    private $lastOutput = 0;
 
     /**
      * @var int
      */
-    protected $tabLength = 8;
+    private $tabLength = 8;
 
     /**
      * @var int
      */
-    protected $refreshRate = RefreshRate::DEFAULT;
+    private $refreshRate = RefreshRate::DEFAULT;
 
     /**
      * @var BookInterface
      */
-    protected $book;
+    private $book;
 
     protected function configure()
     {
@@ -122,7 +122,7 @@ class Watcher extends Command
         }
     }
 
-    protected function init(InputInterface $input, OutputInterface $output) : void
+    private function init(InputInterface $input, OutputInterface $output) : void
     {
         if ($this->isInitialized) {
             throw new \Exception(\sprintf('Cannot initialize "%" more than once', __CLASS__));
@@ -137,7 +137,7 @@ class Watcher extends Command
         $this->book = (new Exchange())->getBook($this->symbol);
     }
 
-    protected function outputUpdate(OutputInterface $output) : void
+    private function outputUpdate(OutputInterface $output) : void
     {
         $tabsBid = 3 - \floor(\strlen($this->bid) / $this->tabLength);
         if ($tabsBid < 0) {
@@ -167,5 +167,4 @@ class Watcher extends Command
             \str_repeat('-', 41),
         ]);
     }
-
 }

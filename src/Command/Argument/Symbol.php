@@ -5,31 +5,30 @@ namespace Kobens\Gemini\Command\Argument;
 use Symfony\Component\Console\Input\InputArgument;
 use Kobens\Core\Command\Argument\ArgumentInterface;
 
-class Symbol implements ArgumentInterface
+final class Symbol implements ArgumentInterface
 {
-    const DEFAULT     = null;
-    const DESCRIPTION = 'Trading pair symbol';
-    const MODE        = InputArgument::REQUIRED;
-    const NAME        = 'symbol';
+    private const DEFAULT     = null;
+    private const DESCRIPTION = 'Trading pair symbol';
+    private const MODE        = InputArgument::REQUIRED;
+    private const NAME        = 'symbol';
 
     public function getDefault()
     {
-        return static::DEFAULT;
+        return self::DEFAULT;
     }
 
     public function getDescription(): string
     {
-        return static::DESCRIPTION;
+        return self::DESCRIPTION;
     }
 
     public function getMode(): int
     {
-        return static::MODE;
+        return self::MODE;
     }
 
     public function getName(): string
     {
-        return static::NAME;
+        return self::NAME;
     }
-
 }

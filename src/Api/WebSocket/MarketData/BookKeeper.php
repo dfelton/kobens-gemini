@@ -9,7 +9,7 @@ use Kobens\Gemini\Exception\Api\WebSocket\SocketSequenceException;
 use Kobens\Gemini\Exception\Exception;
 use Kobens\Gemini\Exchange;
 
-class BookKeeper extends AbstractKeeper
+final class BookKeeper extends AbstractKeeper
 {
     const API_PATH = '/v1/marketdata/';
 

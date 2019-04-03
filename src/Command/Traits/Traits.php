@@ -2,8 +2,8 @@
 
 namespace Kobens\Gemini\Command\Traits;
 
-use Kobens\Core\Config;
 use Kobens\Core\Command\Traits\Traits as CoreTraits;
+use Kobens\Gemini\Api\Host;
 use Symfony\Component\Console\Output\OutputInterface;
 
 trait Traits
@@ -25,9 +25,8 @@ trait Traits
         $this->sleep($output, 10);
     }
 
-    protected function getHost()
+    protected function getHost() : string
     {
-        return (new Config())->gemini->api->host;
+        return (string) (new Host());
     }
 }
-

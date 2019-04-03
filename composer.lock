@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "986b315fb3b7e93dc6d52cdc1639a79c",
+    "content-hash": "20f99d218ceefe9de0a663003014433d",
     "packages": [
         {
             "name": "amphp/amp",
@@ -848,11 +848,11 @@
         },
         {
             "name": "kobens/kobens-currency",
-            "version": "1.0.0",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-currency",
-                "reference": "76c8d80225e690b62ee12e386c1ab7a570617970"
+                "reference": "358f0bcca3b43554baaf1f525adfcd6424bec2ad"
             },
             "require": {
                 "php": "^7.3"
@@ -881,7 +881,7 @@
                 }
             ],
             "description": "Library for providing a common interface for interacting with currencies both digital and fiat.",
-            "time": "2019-02-25T01:31:38+00:00"
+            "time": "2019-04-01T03:15:42+00:00"
         },
         {
             "name": "kobens/kobens-exchange",
@@ -889,11 +889,11 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-exchange",
-                "reference": "28751611046b6ed73fa735f25157aea2308d79cc"
+                "reference": "caa7fd78b3e9b43606873cd3e0823c5891e155c5"
             },
             "require": {
                 "kobens/kobens-core": "dev-master",
-                "kobens/kobens-currency": "^1.0",
+                "kobens/kobens-currency": "^2.0",
                 "monolog/monolog": "2.0.0-beta1",
                 "php": "^7.3",
                 "symfony/console": "^4.2",
@@ -924,7 +924,7 @@
                 }
             ],
             "description": "Library for providing a common interface for interacting with Exchange accounts via API.",
-            "time": "2019-03-24T14:45:47+00:00"
+            "time": "2019-04-03T03:54:07+00:00"
         },
         {
             "name": "league/uri-interfaces",
@@ -3646,6 +3646,7 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "amphp/websocket-client": 20,
+        "kobens/kobens-core": 20,
         "kobens/kobens-exchange": 20
     },
     "prefer-stable": false,

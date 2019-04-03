@@ -5,31 +5,30 @@ namespace Kobens\Gemini\Command\Argument;
 use Kobens\Core\Command\Argument\ArgumentInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
-class ClientOrderId implements ArgumentInterface
+final class ClientOrderId implements ArgumentInterface
 {
-    const DEFAULT     = null;
-    const DESCRIPTION = 'Client Order Id';
-    const MODE        = InputArgument::OPTIONAL;
-    const NAME        = 'client_order_id';
+    private const DEFAULT     = null;
+    private const DESCRIPTION = 'Client Order Id';
+    private const MODE        = InputArgument::OPTIONAL;
+    private const NAME        = 'client_order_id';
 
     public function getDefault()
     {
-        return static::DEFAULT;
+        return self::DEFAULT;
     }
 
     public function getDescription(): string
     {
-        return static::DESCRIPTION;
+        return self::DESCRIPTION;
     }
 
     public function getMode(): int
     {
-        return static::MODE;
+        return self::MODE;
     }
 
     public function getName(): string
     {
-        return static::NAME;
+        return self::NAME;
     }
-
 }

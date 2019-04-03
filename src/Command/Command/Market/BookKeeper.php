@@ -15,29 +15,29 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class BookKeeper extends Command
+final class BookKeeper extends Command
 {
     use Traits, GetSymbol;
 
     /**
      * @var \Kobens\Gemini\Api\Param\Symbol
      */
-    protected $symbol;
+    private $symbol;
 
     /**
      * @var \Kobens\Gemini\Api\WebSocket\MarketData\BookKeeper
      */
-    protected $book;
+    private $book;
 
     /**
      * @var \Monolog\Logger
      */
-    protected $log;
+    private $log;
 
     /**
      * @var string
      */
-    protected $lastExceptionMessage;
+    private $lastExceptionMessage;
 
     public function __construct()
     {
@@ -123,7 +123,6 @@ class BookKeeper extends Command
             $this->log->warning($e->getTraceAsString());
         }
     }
-
 
     /**
      * @todo finish me

@@ -7,15 +7,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Kobens\Gemini\Api\Websocket\OrderEvents\BookKeeper as OrderBookKeeper;
 
-class BookKeeper extends Command
+final class BookKeeper extends Command
 {
-    public function configure()
+    protected function configure()
     {
         $this->setName('order:book-keeper');
         $this->setDescription('Keeps a copy of private order book data in cache');
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $book = new OrderBookKeeper();
         try {
