@@ -7,10 +7,10 @@ use Symfony\Component\Console\Input\InputArgument;
 
 final class RefreshRate implements ArgumentInterface
 {
-    private const DEFAULT     = 500000;
-    private const DESCRIPTION = 'Refresh rate in micro seconds';
-    private const MODE        = InputArgument::OPTIONAL;
-    private const NAME        = 'refresh_rate';
+    const DEFAULT     = 500000;
+    const DESCRIPTION = 'Refresh rate in micro seconds';
+    const MODE        = InputArgument::OPTIONAL;
+    const NAME        = 'refresh_rate';
 
     const MIN_VALUE   = 100000; // responsibility lies on Command object to enforce
 
