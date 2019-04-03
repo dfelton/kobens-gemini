@@ -45,7 +45,7 @@ final class Pair extends CurrencyPair implements PairInterface
 
     public static function getInstance(string $symbol) : PairInterface
     {
-        if (!self::$instances[$symbol]) {
+        if (!\array_key_exists($symbol, self::$instances)) {
             self::$instances[$symbol] = new self($symbol);
         }
         return self::$instances[$symbol];
