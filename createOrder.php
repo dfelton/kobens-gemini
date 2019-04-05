@@ -26,17 +26,17 @@ try {
     ));
 }
 
-$buyBtc  = '0.00001';
-$sellBtc = '0.00001';
+$buyBtc  = '0.00002';
+$sellBtc = '0.00001950';
 
-$start       = '3900.00';
-$end         = '4000.00';
+$start       = '4000.00';
+$end         = '5200.00';
 
 $cashLimit   =   false;
 
-$increment   =    '0.01';
+$increment   =    '0.25';
 $feePercent  =    '0.01';
-$sellAfterGain =  '0.023';
+$sellAfterGain =  '0.05';
 $totalBuyFees  =  '0.00';
 $totalBuyUsd   =  '0.00';
 $totalBuyBtc   =  '0.00000000';
@@ -99,15 +99,15 @@ while (floatval($buyPrice) <= floatval($end)) {
 
     $data = [
         'buy_price' => $buyPrice,
-        'buy_amount_usd' => $amountUsd,
-        'buy_amount_btc' => $buyBtc,
-        'buy_fee' => $fee,
-        'buy_usd_with_fee' => bcadd($amountUsd, $fee, 14),
+//         'buy_amount_usd' => $amountUsd,
+//         'buy_amount_btc' => $buyBtc,
+//         'buy_fee' => $fee,
+//         'buy_usd_with_fee' => bcadd($amountUsd, $fee, 14),
         'sell_price' => $sellPrice,
-        'sell_amount_usd' => $sellSubtotalUsd,
-        'sell_amount_btc' => $buyBtc,
-        'sell_fee' => $sellFeeUsd,
-        'sell_yield' => $sellYieldUsd,
+//         'sell_amount_usd' => $sellSubtotalUsd,
+//         'sell_amount_btc' => $buyBtc,
+//         'sell_fee' => $sellFeeUsd,
+//         'sell_yield' => $sellYieldUsd,
         'position_profits_usd' => $positionProfitUsd,
         'position_profits_btc' => $positionProfitBtc,
     ];
@@ -139,74 +139,36 @@ while (floatval($buyPrice) <= floatval($end)) {
 //         'buy_price' => $buyPrice,
 //         'buy_amount' => $buyBtc,
 //         'sell_price' => $sellPrice,
-//         'sell_amount' => $buyBtc,
+//         'sell_amount' => $sellBtc,
 //     ]);
 
 }
-
-exit;
 
 $totalPositionFees = bcadd($totalBuyFees, $totalSellFees, 14);
 $totalProfitExchangeAndMe = bcadd($totalPositionFees, $totalProfitUsd, 14);
 $feesRatio = bcdiv($totalPositionFees, $totalProfitExchangeAndMe, 4);
 $feesRatio = bcmul($feesRatio, '100', 2);
 
-
 \Zend\Debug\Debug::dump([
     'order_first' => $orders[0],
     'order_last' => count($orders) > 1 ? end($orders) : null,
     'order_count' => count($orders),
-    'increment' => $increment,
-    'gain' => bcmul($sellAfterGain, '100', strlen(substr($sellAfterGain, strpos($sellAfterGain, '.') + 1)) - 2).'%',
-    'buy_price_start' => $orders[0]['buy_price'],
-    'buy_price_end' => $buyPrice,
-    'buy_usd' => $totalBuyUsd,
-    'buy_btc' => $totalBuyBtc,
-    'buy_fees' => $totalBuyFees,
+//     'increment' => $increment,
+//     'gain' => bcmul($sellAfterGain, '100', strlen(substr($sellAfterGain, strpos($sellAfterGain, '.') + 1)) - 2).'%',
+//     'buy_price_start' => $orders[0]['buy_price'],
+//     'buy_price_end' => $buyPrice,
+//     'buy_usd' => $totalBuyUsd,
+//     'buy_btc' => $totalBuyBtc,
+//     'buy_fees' => $totalBuyFees,
     'buy_usd_with_fees' => bcadd($totalBuyUsd, $totalBuyFees, 14),
-    'sell_price_start' => $orders[0]['sell_price'],
-    'sell_price_end' => $sellPrice,
-    'sell_usd' => $totalSellUsd,
-    'sell_btc' => $totalSellBtc,
-    'sell_fees' => $totalSellFees,
-    'total_fees' => $totalPositionFees,
+//     'sell_price_start' => $orders[0]['sell_price'],
+//     'sell_price_end' => $sellPrice,
+//     'sell_usd' => $totalSellUsd,
+//     'sell_btc' => $totalSellBtc,
+//     'sell_fees' => $totalSellFees,
+//     'total_fees' => $totalPositionFees,
     'total_profit_usd' => $totalProfitUsd,
     'total_profit_btc' => $totalProfitBtc,
-    'fees_ate_profits' => $feesRatio . '%',
+//     'fees_ate_profits' => $feesRatio . '%',
 ]);
-
-// if ((bool) Cli::getArg('place')) {
-//     $side = (string) Cli::getArg('side');
-//     if (!in_array($side, ['buy', 'sell'])) {
-//         throw new Exception('Invalid order book side');
-//     }
-//     foreach ($orders as $data) {
-//         usleep(150000);
-//         $order = new OrderNew($restKey, 'btcusd', $data[$side.'_price'], $data[$side.'_amount_btc'], $side);
-//         $order->makeRequest();
-
-//         $response = $order->getResponse();
-//         $response = @json_decode($response);
-//         if (!$response instanceOf stdClass) {
-//             throw new Exception('No response from exchange server.');
-//         }
-
-//         $orderId = (int) $response->order_id;
-//         if ($orderId > 0) {
-//             echo ucfirst($side)." order placed for {$data[$side.'_amount_btc']}. Exchange Order Id: {$orderId}\n";
-//         } else {
-
-//             $filename = uniqid('err_'.$side.'_'.time().'_').'.log';
-//             $handle = fopen($filename, 'w');
-
-//             fwrite($handle, Zend_Debug::dump($order->getPayload(), 'payload', false));
-//             fwrite($handle, PHP_EOL);
-//             fwrite($handle, Zend_Debug::dump($response, 'response', false));
-
-//             throw new Exception(
-//                 "Unhandled response from exchange. Payload and response written to {$filename}"
-//             );
-//         }
-//     }
-// }
 
