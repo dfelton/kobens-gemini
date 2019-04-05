@@ -814,7 +814,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-core",
-                "reference": "28f7c3f9ef9f84170b843e75638ca6d1da639bcb"
+                "reference": "f14415ac88ab1723068d767573eb512723629dca"
             },
             "require": {
                 "monolog/monolog": "2.0.0-beta1",
@@ -844,7 +844,7 @@
                 }
             ],
             "description": "Core framework for facilitating trades on an exchange.",
-            "time": "2019-03-29T13:30:28+00:00"
+            "time": "2019-04-04T02:03:03+00:00"
         },
         {
             "name": "kobens/kobens-currency",
@@ -889,7 +889,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-exchange",
-                "reference": "215d8bae2dace21bcb6da59306b8d1895c80b8a9"
+                "reference": "e7c154066d1c681e836b0fdeeb1640dc1aff1be8"
             },
             "require": {
                 "kobens/kobens-core": "dev-master",
@@ -924,7 +924,7 @@
                 }
             ],
             "description": "Library for providing a common interface for interacting with Exchange accounts via API.",
-            "time": "2019-04-03T04:49:50+00:00"
+            "time": "2019-04-05T03:38:27+00:00"
         },
         {
             "name": "league/uri-interfaces",
@@ -3458,16 +3458,16 @@
         },
         {
             "name": "theseer/tokenizer",
-            "version": "1.1.0",
+            "version": "1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/theseer/tokenizer.git",
-                "reference": "cb2f008f3f05af2893a87208fe6a6c4985483f8b"
+                "reference": "1c42705be2b6c1de5904f8afacef5895cab44bf8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/theseer/tokenizer/zipball/cb2f008f3f05af2893a87208fe6a6c4985483f8b",
-                "reference": "cb2f008f3f05af2893a87208fe6a6c4985483f8b",
+                "url": "https://api.github.com/repos/theseer/tokenizer/zipball/1c42705be2b6c1de5904f8afacef5895cab44bf8",
+                "reference": "1c42705be2b6c1de5904f8afacef5895cab44bf8",
                 "shasum": ""
             },
             "require": {
@@ -3494,7 +3494,7 @@
                 }
             ],
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",
-            "time": "2017-04-07T12:08:54+00:00"
+            "time": "2019-04-04T09:56:43+00:00"
         },
         {
             "name": "webmozart/assert",
