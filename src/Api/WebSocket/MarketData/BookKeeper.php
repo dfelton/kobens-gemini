@@ -65,7 +65,7 @@ final class BookKeeper extends AbstractKeeper
         };
     }
 
-    protected function processMessage(\stdClass $payload)
+    private function processMessage(\stdClass $payload)
     {
         if ($payload->socket_sequence === 0) {
             $book = [];
