@@ -33,7 +33,8 @@
         "kobens/kobens-currency": "dev-master",
         "kobens/kobens-exchange": "dev-master",
         "symfony/console": "^4.2",
-        "zendframework/zend-config": "^3.2"
+        "zendframework/zend-config": "^3.2",
+        "zendframework/zend-db": "^2.9"
     },
     "require-dev": {
         "zendframework/zend-debug": "^2.6",
