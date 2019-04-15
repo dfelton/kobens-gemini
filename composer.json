@@ -13,15 +13,15 @@
     ],
     "repositories": [
         {
-            "type": "git",
+            "type": "vcs",
             "url": "https://github.com/dfelton/kobens-core"
         },
         {
-            "type": "git",
+            "type": "vcs",
             "url": "https://github.com/dfelton/kobens-currency"
         },
         {
-            "type": "git",
+            "type": "vcs",
             "url": "https://github.com/dfelton/kobens-exchange"
         }
     ],
