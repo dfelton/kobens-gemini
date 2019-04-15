@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "09b2010ceda3f398b44d7f7d841b327e",
+    "content-hash": "dd639ef2b8388bae9829ce2a8698a5f8",
     "packages": [
         {
             "name": "amphp/amp",
@@ -813,8 +813,14 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/dfelton/kobens-core",
+                "url": "https://github.com/dfelton/kobens-core.git",
                 "reference": "6337e99a4d51f51e73be5a7027bdf8aad84e5e08"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dfelton/kobens-core/zipball/6337e99a4d51f51e73be5a7027bdf8aad84e5e08",
+                "reference": "6337e99a4d51f51e73be5a7027bdf8aad84e5e08",
+                "shasum": ""
             },
             "require": {
                 "monolog/monolog": "2.0.0-beta1",
@@ -844,6 +850,10 @@
                 }
             ],
             "description": "Core framework for facilitating trades on an exchange.",
+            "support": {
+                "source": "https://github.com/dfelton/kobens-core/tree/master",
+                "issues": "https://github.com/dfelton/kobens-core/issues"
+            },
             "time": "2019-04-07T18:33:36+00:00"
         },
         {
@@ -851,8 +861,14 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/dfelton/kobens-currency",
+                "url": "https://github.com/dfelton/kobens-currency.git",
                 "reference": "d2bcf385fddd65ddd352f128e86d602dd1c72866"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dfelton/kobens-currency/zipball/d2bcf385fddd65ddd352f128e86d602dd1c72866",
+                "reference": "d2bcf385fddd65ddd352f128e86d602dd1c72866",
+                "shasum": ""
             },
             "require": {
                 "php": "^7.3"
@@ -881,6 +897,10 @@
                 }
             ],
             "description": "Library for providing a common interface for interacting with currencies both digital and fiat.",
+            "support": {
+                "source": "https://github.com/dfelton/kobens-currency/tree/master",
+                "issues": "https://github.com/dfelton/kobens-currency/issues"
+            },
             "time": "2019-04-03T04:42:43+00:00"
         },
         {
@@ -888,8 +908,14 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/dfelton/kobens-exchange",
+                "url": "https://github.com/dfelton/kobens-exchange.git",
                 "reference": "7e9089613ded7497735d9c9cd944628a6bde60b7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dfelton/kobens-exchange/zipball/7e9089613ded7497735d9c9cd944628a6bde60b7",
+                "reference": "7e9089613ded7497735d9c9cd944628a6bde60b7",
+                "shasum": ""
             },
             "require": {
                 "kobens/kobens-core": "dev-master",
@@ -925,6 +951,10 @@
                 }
             ],
             "description": "Library for providing a common interface for interacting with Exchange accounts via API.",
+            "support": {
+                "source": "https://github.com/dfelton/kobens-exchange/tree/master",
+                "issues": "https://github.com/dfelton/kobens-exchange/issues"
+            },
             "time": "2019-04-08T00:32:58+00:00"
         },
         {
@@ -1447,12 +1477,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "93d8bd2aa30c6f0614e155dec377c3503b9cba7b"
+                "reference": "47b78954bea981abeccfed88eef3a9a57c15ca4d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/93d8bd2aa30c6f0614e155dec377c3503b9cba7b",
-                "reference": "93d8bd2aa30c6f0614e155dec377c3503b9cba7b",
+                "url": "https://api.github.com/repos/symfony/console/zipball/47b78954bea981abeccfed88eef3a9a57c15ca4d",
+                "reference": "47b78954bea981abeccfed88eef3a9a57c15ca4d",
                 "shasum": ""
             },
             "require": {
@@ -1514,7 +1544,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2019-04-06T16:39:17+00:00"
+            "time": "2019-04-09T18:49:00+00:00"
         },
         {
             "name": "symfony/contracts",
@@ -1911,12 +1941,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zend-eventmanager.git",
-                "reference": "27eb1489df583456fac8c77c95059dde09ff38d8"
+                "reference": "627f3e821fbfd6cebf9cccaa017b7fe7ae13c05b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-eventmanager/zipball/27eb1489df583456fac8c77c95059dde09ff38d8",
-                "reference": "27eb1489df583456fac8c77c95059dde09ff38d8",
+                "url": "https://api.github.com/repos/zendframework/zend-eventmanager/zipball/627f3e821fbfd6cebf9cccaa017b7fe7ae13c05b",
+                "reference": "627f3e821fbfd6cebf9cccaa017b7fe7ae13c05b",
                 "shasum": ""
             },
             "require": {
@@ -1957,7 +1987,7 @@
                 "events",
                 "zf2"
             ],
-            "time": "2018-04-25T15:35:22+00:00"
+            "time": "2019-04-10T14:21:50+00:00"
         },
         {
             "name": "zendframework/zend-servicemanager",
@@ -2754,12 +2784,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "42f63b2c42b59053ce7de1848da09d7c79ec7e63"
+                "reference": "893a342763f454e029579b6a5175cd8c4a408168"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/42f63b2c42b59053ce7de1848da09d7c79ec7e63",
-                "reference": "42f63b2c42b59053ce7de1848da09d7c79ec7e63",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/893a342763f454e029579b6a5175cd8c4a408168",
+                "reference": "893a342763f454e029579b6a5175cd8c4a408168",
                 "shasum": ""
             },
             "require": {
@@ -2828,7 +2858,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-04-05T10:27:58+00:00"
+            "time": "2019-04-08T16:09:04+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
