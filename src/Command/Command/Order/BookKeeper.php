@@ -9,10 +9,11 @@ use Kobens\Gemini\Api\Websocket\OrderEvents\BookKeeper as OrderBookKeeper;
 
 final class BookKeeper extends Command
 {
+    protected static $defaultName = 'kobens:gemini:order:book-keeper';
+
     protected function configure()
     {
-        $this->setName('order:book-keeper');
-        $this->setDescription('Keeps a copy of private order book data in cache');
+        $this->setDescription('Maintains cache of private order book data.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

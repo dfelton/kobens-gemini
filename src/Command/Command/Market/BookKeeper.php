@@ -19,6 +19,8 @@ final class BookKeeper extends Command
 {
     use Traits, GetSymbol;
 
+    protected static $defaultName = 'kobens:gemini:market:book-keeper';
+
     /**
      * @var \Kobens\Gemini\Api\Param\Symbol
      */
@@ -38,11 +40,6 @@ final class BookKeeper extends Command
      * @var string
      */
     private $lastExceptionMessage;
-
-    public function __construct()
-    {
-        parent::__construct('market:book-keeper');
-    }
 
     protected function configure()
     {

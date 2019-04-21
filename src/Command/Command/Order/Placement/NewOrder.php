@@ -20,9 +20,10 @@ final class NewOrder extends Command
     use Traits;
     use GetAmount, GetClientOrderId, GetPrice, GetSide, GetSymbol;
 
+    protected static $defaultName = 'kobens:gemini:order:new';
+
     protected function configure()
     {
-        $this->setName('order:place:new');
         $this->setDescription('Places a new order on the exchange.');
         $this->addArgList(
             [

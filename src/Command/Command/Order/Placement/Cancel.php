@@ -10,10 +10,11 @@ use Symfony\Component\Console\Input\InputArgument;
 
 final class Cancel extends Command
 {
+    protected static $defaultName = 'kobens:gemini:order:cancel';
+
     protected function configure()
     {
-        $this->setName('order:place:cancel');
-        $this->setDescription('Cancel all open orders on the exchange.');
+        $this->setDescription('Cancel all open orders on the Gemini exchange.');
         $this->addArgument('order_id', InputArgument::REQUIRED, 'Order id on exchange.');
     }
 

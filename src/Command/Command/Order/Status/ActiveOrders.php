@@ -10,9 +10,10 @@ use Kobens\Gemini\Api\Host;
 
 final class ActiveOrders extends Command
 {
+    protected static $defaultName = 'kobens:gemini:order:list-active';
+
     protected function configure()
     {
-        $this->setName('order:status:active');
         $this->setDescription('List all active orders.');
     }
 

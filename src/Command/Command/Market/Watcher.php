@@ -16,6 +16,8 @@ final class Watcher extends Command
 {
     use GetRefreshRate, GetSymbol, Traits;
 
+    protected static $defaultName = 'kobens:gemini:market:watcher';
+
     private $isInitialized = false;
 
     /**
@@ -70,7 +72,6 @@ final class Watcher extends Command
 
     protected function configure()
     {
-        $this->setName('market:watcher');
         $this->setDescription('Outputs details on a market book.');
         $this->addArgList([new Symbol(), new RefreshRate()], $this);
         $this->addArgument('tab_length', InputArgument::OPTIONAL, 'Terminal Tab Length', 8);

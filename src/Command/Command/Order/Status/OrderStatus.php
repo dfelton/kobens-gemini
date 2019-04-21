@@ -10,9 +10,10 @@ use Kobens\Gemini\Api\Rest\Request\Order\Status\OrderStatus as GetOrderStatus;
 
 final class OrderStatus extends Command
 {
+    protected static $defaultName = 'kobens:gemini:order:status';
+
     protected function configure()
     {
-        $this->setName('order:status:order-status');
         $this->setDescription('Fetch the status for an individual order');
         $this->addArgument('order_id', InputArgument::REQUIRED, 'Exchange order id to fetch data for');
     }

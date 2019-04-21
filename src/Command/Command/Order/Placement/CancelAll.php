@@ -9,10 +9,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class CancelAll extends Command
 {
+    protected static $defaultName = 'kobens:gemini:order:cancel-all';
+
     protected function configure()
     {
-        $this->setName('order:place:cancel-all');
-        $this->setDescription('Cancel all open orders on the exchange.');
+        $this->setDescription('Cancel all open orders on the Gemini exchange.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
