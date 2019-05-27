@@ -2,7 +2,7 @@
 /.project
 /.buildpath
 
-/env
+/env/config.xml
 /var
 /vendor
 /composer.phar

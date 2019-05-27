@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<config>
+    <gemini>
+        <api>
+            <host>api.sandbox.gemini.com</host>
+            <key>
+                <public_key>00000000000000000000</public_key>
+                <secret_key>0000000000000000000000000000</secret_key>
+            </key>
+        </api>
+    </gemini>
+    <database>
+        <driver>pdo_mysql</driver>
+        <hostname>127.0.0.1</hostname>
+        <username>foo</username>
+        <password>bar</password>
+        <database>foobar</database>
+    </database>
+    <cache>
+        <adapter>
+            <name>filesystem</name>
+            <options>
+                <cache_dir>/tmp/foobar</cache_dir>
+            </options>
+        </adapter>
+    </cache>
+</config>
