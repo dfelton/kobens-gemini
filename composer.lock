@@ -909,12 +909,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-exchange.git",
-                "reference": "7e9089613ded7497735d9c9cd944628a6bde60b7"
+                "reference": "3afbf7fc55f69a4e07b9dfc1318da786584678a6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dfelton/kobens-exchange/zipball/7e9089613ded7497735d9c9cd944628a6bde60b7",
-                "reference": "7e9089613ded7497735d9c9cd944628a6bde60b7",
+                "url": "https://api.github.com/repos/dfelton/kobens-exchange/zipball/3afbf7fc55f69a4e07b9dfc1318da786584678a6",
+                "reference": "3afbf7fc55f69a4e07b9dfc1318da786584678a6",
                 "shasum": ""
             },
             "require": {
@@ -955,7 +955,7 @@
                 "source": "https://github.com/dfelton/kobens-exchange/tree/master",
                 "issues": "https://github.com/dfelton/kobens-exchange/issues"
             },
-            "time": "2019-04-08T00:32:58+00:00"
+            "time": "2019-05-27T23:50:24+00:00"
         },
         {
             "name": "league/uri-interfaces",
