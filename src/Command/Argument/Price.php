@@ -10,7 +10,7 @@ final class Price implements ArgumentInterface
     private const DEFAULT     = null;
     private const DESCRIPTION = 'Price to interact with.';
     private const MODE        = InputArgument::REQUIRED;
-    private const NAME        = 'price';
+    const NAME        = 'price';
 
     public function getDefault()
     {

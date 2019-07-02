@@ -10,7 +10,7 @@ final class Symbol implements ArgumentInterface
     private const DEFAULT     = null;
     private const DESCRIPTION = 'Trading pair symbol';
     private const MODE        = InputArgument::REQUIRED;
-    private const NAME        = 'symbol';
+    const NAME        = 'symbol';
 
     public function getDefault()
     {

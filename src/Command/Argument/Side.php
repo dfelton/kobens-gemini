@@ -10,7 +10,7 @@ final class Side implements ArgumentInterface
     private const DEFAULT     = null;
     private const DESCRIPTION = 'Bid or Ask (Buy or Sell)';
     private const MODE        = InputArgument::REQUIRED;
-    private const NAME        = 'side';
+    const NAME        = 'side';
 
     public function getDefault()
     {

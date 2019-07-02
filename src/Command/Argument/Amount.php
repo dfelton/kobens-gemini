@@ -10,7 +10,7 @@ final class Amount implements ArgumentInterface
     private const DEFAULT     = null;
     private const DESCRIPTION = 'Amount to interact with.';
     private const MODE        = InputArgument::REQUIRED;
-    private const NAME        = 'amount';
+    const NAME        = 'amount';
 
     public function getDefault()
     {
