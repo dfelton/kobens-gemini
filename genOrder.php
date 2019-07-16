@@ -20,7 +20,7 @@ use Kobens\Gemini\Api\Param\ClientOrderId;
 try {
     new Config(__DIR__.'/env/config.xml', __DIR__);
     new Mapper(['gemini' => Exchange::class]);
-    (new Throttler())->addThrottle('gemini', 3);
+    (new Throttler())->addThrottle('gemini', 5);
 } catch (Exception $e) {
     exit(\sprintf(
         'Initialization Error: %s',
@@ -28,19 +28,42 @@ try {
     ));
 }
 
+
+// $i = 0;
+// while ($i < 105) {
+//     $i++;
+//     echo "\n\tPLACING ORDER $i\n";
+//     $order = new NewOrder(
+//         new Side('sell'),
+//         new Symbol((new Exchange())->getPair('btcusd')),
+//         new Amount('0.00001975'),
+//         new Price('11367'),
+//         new ClientOrderId()
+//     );
+//     $response = $order->getResponse();
+//     $response['body'] = json_decode($response['body']);
+//     \Zend\Debug\Debug::dump($response);
+//     if ($response['code'] !== 200) {
+//         break;
+//     }
+// }
+// exit;
+
+
+
 $buyBtc  = '0.00002';
 $sellBtc = '0.00001975';
 
-$start       = '10550.00';
-$end         = '10880.00';
+$start       = '10657.50';
+$end         = '10680.00';
 
-$action = ''; // 'buy' | 'sell'
+$action = 'buy'; // 'buy' | 'sell'
 
-$cashLimit   =   false;
+$cashLimit   =   '52.84';
 
 $increment   =    '2.50';
 $feePercent  =    '0.001';
-$sellAfterGain =  '0.02';
+$sellAfterGain =  '0.025';
 $totalBuyFees  =  '0.00';
 $totalBuyUsd   =  '0.00';
 $totalBuyBtc   =  '0.00000000';
