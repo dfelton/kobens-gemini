@@ -29,37 +29,16 @@ try {
 }
 
 
-// $i = 0;
-// while ($i < 105) {
-//     $i++;
-//     echo "\n\tPLACING ORDER $i\n";
-//     $order = new NewOrder(
-//         new Side('sell'),
-//         new Symbol((new Exchange())->getPair('btcusd')),
-//         new Amount('0.00001975'),
-//         new Price('11367'),
-//         new ClientOrderId()
-//     );
-//     $response = $order->getResponse();
-//     $response['body'] = json_decode($response['body']);
-//     \Zend\Debug\Debug::dump($response);
-//     if ($response['code'] !== 200) {
-//         break;
-//     }
-// }
-// exit;
-
-
 
 $buyBtc  = '0.00002';
 $sellBtc = '0.00001975';
 
-$start       = '10657.50';
-$end         = '10680.00';
+$start       = '10317.5';
+$end         = '10467.5';
 
 $action = 'buy'; // 'buy' | 'sell'
 
-$cashLimit   =   '52.84';
+$cashLimit   =   null;
 
 $increment   =    '2.50';
 $feePercent  =    '0.001';
