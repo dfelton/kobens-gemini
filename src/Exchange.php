@@ -31,6 +31,15 @@ final class Exchange extends AbstractExchange
         return new BookKeeper($pairKey);
     }
 
+    /**
+     * @param string $side
+     * @param string $symbol
+     * @param string $amount
+     * @param string $price
+     * @return string
+     * @throws \Kobens\Exchange\Exception\Exception
+     * @throws \Exception
+     */
     public function placeOrder(string $side, string $symbol, string $amount, string $price): string
     {
         // @todo error handling
@@ -41,8 +50,7 @@ final class Exchange extends AbstractExchange
             new Price($price),
             new ClientOrderId()
         );
-        $result = \json_decode($order->getResponse()['body']);
-        return $result->order_id;
+        return \json_decode($order->getResponse()['body'], false)->order_id;
     }
 
     public function getActiveOrderIds(): array
