@@ -28,6 +28,8 @@
     "require": {
         "php": "^7.3",
         "ext-curl": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
         "amphp/websocket-client": "dev-master",
         "kobens/kobens-core": "dev-master",
         "kobens/kobens-currency": "dev-master",
