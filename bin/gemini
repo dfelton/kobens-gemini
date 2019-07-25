@@ -3,14 +3,18 @@
 
 require \dirname(__DIR__).'/vendor/autoload.php';
 
+
 use Kobens\Core\Config;
 use Kobens\Core\Http\Request\Throttler;
-use Kobens\Exchange\Command\Command\TradeRepeater\{
-    OrderPlacer as TradeRepeaterPlacer,
-    Monitor     as TradeRepeaterMonitor
-};
 use Kobens\Exchange\Exchange\Mapper;
 use Kobens\Gemini\Exchange;
+use Kobens\Gemini\Command\Command\TradeRepeater\{
+    Buyer as TradeRepeaterBuyer,
+    FillMonitor as TradeRepeaterFillMonitor,
+    Seller as TradeRepeaterSeller,
+    Archiver as TradeRepeaterArchiver,
+    Repairer as TradeRepeaterRepairer
+};
 use Kobens\Gemini\Command\Command\Market\{
     BookKeeper as MarketBookKeeper,
     Watcher    as MarketWatcher
@@ -26,6 +30,7 @@ use Kobens\Gemini\Command\Command\Order\Status\{
     OrderStatus
 };
 use Symfony\Component\Console\Application;
+
 
 try {
     new Config(\dirname(__DIR__).'/env/config.xml', \dirname(__DIR__));
@@ -57,6 +62,9 @@ $app->add(new OrderCancelAll());
 $app->add(new OrderListActive());
 $app->add(new OrderNew());
 $app->add(new OrderStatus());
-$app->add(new TradeRepeaterMonitor());
-$app->add(new TradeRepeaterPlacer());
+$app->add(new TradeRepeaterBuyer());
+$app->add(new TradeRepeaterFillMonitor());
+$app->add(new TradeRepeaterSeller());
+$app->add(new TradeRepeaterArchiver());
+$app->add(new TradeRepeaterRepairer());
 $app->run();
