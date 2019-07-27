@@ -14,7 +14,7 @@ final class Archive
 
     public function __construct()
     {
-        $this->table = new TableGateway('gemini_trade_repeater_archive', (new Db())->getAdapter());
+        $this->table = new TableGateway('gemini_trade_repeater_archive', Db::getAdapter());
     }
 
     public function addArchive(string $symbol, string $buyClientOrderId, string $buyOrderId, string $buyAmount, string $buyPrice, string $sellClientOrderId, string $sellOrderId, string $sellAmount, string $sellPrice): void

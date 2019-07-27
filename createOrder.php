@@ -49,7 +49,7 @@ $orders = [];
 
 $buyPrice = $start;
 
-$table = new TableGateway('trader_simple_repeater', (new Db())->getAdapter());
+$table = new TableGateway('trader_simple_repeater', Db::getAdapter());
 
 while (floatval($buyPrice) <= floatval($end)) {
 

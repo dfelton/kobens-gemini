@@ -22,7 +22,7 @@ final class Archiver extends Command
     {
         $sellFilled = new SellFilled();
         $archiver = new Archive();
-        $conn = (new Db())->getAdapter()->getDriver()->getConnection();
+        $conn = Db::getAdapter()->getDriver()->getConnection();
         $inTransaction = false;
 
         $loop = true;
@@ -44,7 +44,6 @@ final class Archiver extends Command
                         $row->sell_price
                     );
 
-                    // TODO: Copy data to archive table
                     $sellFilled->setNextState($row->id);
                     $output->writeln((new \DateTime())->format('Y-m-d H:i:s')."\tTrade Repeater Record {$row->id} moved to BUY_READY state.");
 

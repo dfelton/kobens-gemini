@@ -18,7 +18,7 @@ abstract class AbstractDataResource implements StateStepperInterface
 
     public function __construct()
     {
-        $this->table = new TableGateway('gemini_trade_repeater', (new Db())->getAdapter());
+        $this->table = new TableGateway('gemini_trade_repeater', Db::getAdapter());
     }
 
     abstract protected function isHealthy(\ArrayObject $record) : bool;
