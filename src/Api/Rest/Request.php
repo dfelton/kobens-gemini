@@ -25,9 +25,11 @@ abstract class Request
     const REQUEST_URI = '';
     private const RATE_LIMIT = 6;
 
-    const CURLOPT_CONNECTTIMEOUT = 10;
-    const CURLOPT_RETURNTRANSFER = true;
-    const CURLOPT_POST = true;
+    // renamed to avoid confusion with PHP constants (regardless of static)
+    // these should probably be private, but they're public for now just in case
+    public const TIMEOUT         = 10;
+    public const RETURN_TRANSFER = true;
+    public const POST            = true;
 
     /**
      * @var Logger
@@ -60,10 +62,7 @@ abstract class Request
         $this->nonce = new Nonce();
         $this->logTimer = new Logger(static::REQUEST_URI);
         $this->logTimer->pushHandler(new StreamHandler(
-            \sprintf(
-                '%s/var/log/curl_timers.log',
-                Config::getInstance()->getRootDir()
-            ),
+            \sprintf('%s/var/log/curl_timers.log', Config::getInstance()->getRootDir()),
             Logger::INFO
         ));
         $this->throttler = new Throttler(self::class);
@@ -72,30 +71,35 @@ abstract class Request
         }
     }
 
-    public function getResponse() : array
+    /**
+     * @return array
+     * @throws ConnectionException
+     * @throws Exception
+     * @throws InvalidResponseException
+     * @throws InvalidSignatureException
+     * @throws ResourceMovedException
+     */
+    public function getResponse(): array
     {
         $response = $this->_getResponse();
         $this->throwResponseException($response['body'], $response['code']);
         if ($response['code'] !== 200) {
-            throw new LogicException(\sprintf(
-                'Response code 200 expected, "%d" received.',
-                $response['code']
-            ));
+            throw new LogicException(\sprintf('Response code 200 expected, "%d" received.', $response['code']));
         }
         return $response;
     }
 
-    final private function _getResponse() : array
+    private function _getResponse(): array
     {
         $this->throttler->throttle();
 
         $ch = \curl_init();
 
-        \curl_setopt($ch, CURLOPT_URL,            'https://'.(new Host()).static::REQUEST_URI);
+        \curl_setopt($ch, CURLOPT_URL,            'https://'. new Host() .static::REQUEST_URI);
         \curl_setopt($ch, CURLOPT_HTTPHEADER,     $this->getRequestHeaders());
-        \curl_setopt($ch, CURLOPT_POST,           static::CURLOPT_POST);
-        \curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, static::CURLOPT_CONNECTTIMEOUT);
-        \curl_setopt($ch, CURLOPT_RETURNTRANSFER, static::CURLOPT_RETURNTRANSFER);
+        \curl_setopt($ch, CURLOPT_POST,           static::POST);
+        \curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, static::TIMEOUT);
+        \curl_setopt($ch, CURLOPT_RETURNTRANSFER, static::RETURN_TRANSFER);
 
         $timer = -\microtime(true);
         $response = (string) \curl_exec($ch);
@@ -113,7 +117,11 @@ abstract class Request
         ];
     }
 
-    final private function getRequestHeaders() : array
+    /**
+     * Removed "final" since private methods can't be overridden anyway
+     * @return array
+     */
+    private function getRequestHeaders(): array
     {
         $base64Payload = \base64_encode(\json_encode(\array_merge(
             ['request' => static::REQUEST_URI, 'nonce' => $this->nonce->getNonce()],
@@ -129,18 +137,28 @@ abstract class Request
         ];
     }
 
-    protected function throwResponseException(string $body, int $code) : void
+    /**
+     * @param string $body
+     * @param int $code
+     * @throws ConnectionException
+     * @throws Exception
+     * @throws InvalidResponseException
+     * @throws InvalidSignatureException
+     * @throws ResourceMovedException
+     */
+    protected function throwResponseException(string $body, int $code): void
     {
         switch (true) {
             case $code === 0:
-                throw new ConnectionException(\sprintf('Unable to establish a connection with "%s"', (new Host())));
+                throw new ConnectionException(\sprintf('Unable to establish a connection with "%s"', new Host()));
             case $code >= 300 && $code < 400:
                 throw new ResourceMovedException($body, $code);
             case $code >= 400 && $code < 500:
                 if ($code === 408) {
                     throw new Exception('408 Request Time-out', 408);
                 }
-                $message = \json_decode($body);
+                $message = \json_decode($body, false);
+                /** @noinspection DegradedSwitchInspection */
                 switch ($message->reason) {
                     case InvalidSignatureException::REASON:
                         throw new InvalidSignatureException($message->message, $code);
