@@ -4,6 +4,7 @@
 require \dirname(__DIR__).'/vendor/autoload.php';
 
 use Kobens\Core\Config;
+use Kobens\Core\Db;
 use Kobens\Core\Http\Request\Throttler;
 use Kobens\Exchange\Exchange\Mapper;
 use Kobens\Gemini\Exchange;
@@ -46,6 +47,11 @@ try {
         throw new \UnexpectedValueException('Unable to parse application\'s composer.json file.');
     }
     unset($json);
+
+    // I see lots of new
+    $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
+    $container->register(Db::class, Db::class);
+    $container->setAlias('kobens.db', Db::class);
 } catch (\Exception $e) {
     exit("Initialization Error: {$e->getMessage()}" . PHP_EOL);
 }
@@ -62,6 +68,6 @@ $app->add(new OrderStatus());
 $app->add(new TradeRepeaterBuyer());
 $app->add(new TradeRepeaterFillMonitor());
 $app->add(new TradeRepeaterSeller());
-$app->add(new TradeRepeaterArchiver());
-$app->add(new TradeRepeaterRepairer());
+$app->add(new TradeRepeaterArchiver($container));
+$app->add(new TradeRepeaterRepairer($container));
 $app->run();

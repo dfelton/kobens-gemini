@@ -2,27 +2,37 @@
 
 namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
-use Symfony\Component\Console\Command\Command;
+use Kobens\Gemini\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Kobens\Core\Db;
 use Kobens\Gemini\TradeRepeater\DataResource\SellFilled;
 use Kobens\Gemini\TradeRepeater\DataResource\Archive;
 
-final class Archiver extends Command
+/**
+ * Class Archiver
+ * @package Kobens\Gemini\Command\Command\TradeRepeater
+ */
+final class Archiver extends ContainerAwareCommand
 {
     protected static $defaultName = 'kobens:gemini:trade-repeater:archiver';
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Archives completed sell orders and marks record for next buy.');
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int|void|null
+     * @throws \Exception
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $sellFilled = new SellFilled();
-        $archiver = new Archive();
-        $conn = (new Db())->getAdapter()->getDriver()->getConnection();
+        $sellFilled    = new SellFilled();
+        $archiver      = new Archive();
+        $conn          = $this->find('kobens.db')->getAdapter()->getDriver()->getConnection();
         $inTransaction = false;
 
         $loop = true;
@@ -55,15 +65,13 @@ final class Archiver extends Command
                 if ($inTransaction) {
                     $conn->rollback();
                 }
-                \Zend\Debug\Debug::dump(
-                    [
-                        'message' => $e->getMessage(),
-                        'code' => $e->getCode(),
-                        'class' => \get_class($e),
-                        'trace' => $e->getTraceAsString()
-                    ],
-                    (new \DateTime())->format('Y-m-d H:i:s')."\tUnhandled Exception"
-                );
+                echo (new \DateTime())->format('Y-m-d H:i:s') . "\tUnhandled Exception", PHP_EOL;
+                dump([
+                    'message' => $e->getMessage(),
+                    'code'    => $e->getCode(),
+                    'class'   => get_class($e),
+                    'trace'   => $e->getTraceAsString()
+                ]);
                 $loop = false;
             }
             \sleep(1);

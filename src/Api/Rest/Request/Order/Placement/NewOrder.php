@@ -53,7 +53,7 @@ class NewOrder extends Request
                 'Invalid amount "%s", min allowed for the "%s" pair on "%s" is "%s".',
                 $amount,
                 $pair->symbol,
-                (string) (new Host()),
+                (string) new Host(),
                 $pair->minOrderSize
             ));
         }
