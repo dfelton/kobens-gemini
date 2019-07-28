@@ -8,5 +8,5 @@ interface StateStepperInterface
 
     public function getUnhealthyRecords() : \Generator;
 
-    public function setNextState(int $id, array $args = []) : bool;
+    public function setNextState(int $id, array $args = []): bool;
 }

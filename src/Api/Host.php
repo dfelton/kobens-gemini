@@ -8,7 +8,7 @@ class Host
 {
     public function getHost() : string
     {
-        return (new Config())->gemini->api->host;
+        return Config::getInstance()->get('gemini')->api->host;
     }
 
     public function __toString() : string

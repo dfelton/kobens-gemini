@@ -15,10 +15,17 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Class BookKeeper
+ * @package Kobens\Gemini\Command\Command\Market
+ */
 final class BookKeeper extends Command
 {
     use Traits, GetSymbol;
 
+    /**
+     * @var string
+     */
     protected static $defaultName = 'kobens:gemini:market:book-keeper';
 
     /**
@@ -41,13 +48,23 @@ final class BookKeeper extends Command
      */
     private $lastExceptionMessage;
 
-    protected function configure()
+    private static $maintenance = false;
+
+    /**
+     * @throws \Exception
+     */
+    protected function configure(): void
     {
         $this->setDescription('Opens a market book.');
         $this->addArgList([new Symbol()], $this);
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @throws \Exception
+     */
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->symbol = $this->getSymbol($input)->getValue();
         $this->book = (new Exchange())->getBookKeeper($this->symbol);
@@ -55,14 +72,14 @@ final class BookKeeper extends Command
         $this->log->pushHandler(new StreamHandler(
             \sprintf(
                 '%s/var/log/gemini_market_book_%d.log',
-                (new Config())->getRoot(),
+                Config::getInstance()->getRootDir(),
                 \getmypid()
             ),
             Logger::INFO
         ));
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $loop = true;
         $this->log->info(\sprintf('Opening "%s" on "%s"', $this->symbol, $this->getHost()));
@@ -85,7 +102,7 @@ final class BookKeeper extends Command
         } while ($loop);
     }
 
-    protected function outputErrorAndSleep(OutputInterface $output, string $message, int $seconds = 10)
+    protected function outputErrorAndSleep(OutputInterface $output, string $message, int $seconds = 10): void
     {
         if ($seconds < 1) {
             $seconds = 10;
@@ -107,7 +124,7 @@ final class BookKeeper extends Command
         }
     }
 
-    protected function logException(\Exception $e, $logNewTrace = true) : void
+    protected function logException(\Exception $e, $logNewTrace = true): void
     {
         $this->log->warning(\json_encode([
             'symbol' => $this->symbol,
@@ -127,21 +144,22 @@ final class BookKeeper extends Command
      *
      * @return bool
      */
-    protected function isMaintenance() : bool
+    protected function isMaintenance(): bool
     {
-        return false;
-        $ch = \curl_init(\sprintf('https://%s', (new Config())->gemini->api->host));
+        if (!self::$maintenance) { // mostly for IDE to not yell
+            return false;
+        }
+        $ch = \curl_init(\sprintf('https://%s', Config::getInstance()->get('gemini')->api->host));
         \curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,   // return web page
             CURLOPT_HEADER         => false,  // don't return headers
             CURLOPT_FOLLOWLOCATION => false,  // follow redirects
             CURLOPT_MAXREDIRS      => 10,     // stop after 10 redirects
-            CURLOPT_ENCODING       => "",     // handle compressed
-            CURLOPT_USERAGENT      => "test", // name of client
+            CURLOPT_ENCODING       => '',     // handle compressed
+            CURLOPT_USERAGENT      => 'test', // name of client
             CURLOPT_AUTOREFERER    => true,   // set referrer on redirect
             CURLOPT_CONNECTTIMEOUT => 120,    // time-out on connect
             CURLOPT_TIMEOUT        => 120,    // time-out on response
         ]);
     }
-
 }

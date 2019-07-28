@@ -33,7 +33,9 @@ use Symfony\Component\Console\Application;
 
 
 try {
-    new Config(\dirname(__DIR__).'/env/config.xml', \dirname(__DIR__));
+    $dir = \dirname(__DIR__);
+    //new Config(\dirname(__DIR__).'/env/config.xml', \dirname(__DIR__));
+    Config::getInstance()->initialize($dir . '/env/config.xml', $dir);
     new Mapper(['gemini' => Exchange::class]);
     // Limit is actually 6. So up to 2 concurrent REST loop threads running,
     // while slipping in a manual request here or there.
@@ -50,7 +52,7 @@ try {
     }
     unset($json);
 } catch (\Exception $e) {
-    exit("Initialization Error: {$e->getMessage()}");
+    exit("Initialization Error: {$e->getMessage()}" . PHP_EOL);
 }
 
 $app = new Application($composer->name, $composer->version);

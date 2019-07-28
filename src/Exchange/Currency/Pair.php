@@ -5,12 +5,19 @@ namespace Kobens\Gemini\Exchange\Currency;
 use Kobens\Currency\{Currency, Pair as CurrencyPair};
 use Kobens\Exchange\PairInterface;
 
+/**
+ * Class Pair
+ * @package Kobens\Gemini\Exchange\Currency
+ */
 final class Pair extends CurrencyPair implements PairInterface
 {
     private $minOrderIncrement;
     private $minOrderSize;
     private $minPriceIncrement;
 
+    /**
+     * @var array
+     */
     private static $pairs = [
         'btcusd' => ['base' => 'btc', 'quote' => 'usd', 'minOrderSize' => '0.00001', 'minOrderIncrement' => '0.00000001', 'minPriceIncrement' => '0.01'],
         'ethbtc' => ['base' => 'eth', 'quote' => 'btc', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
@@ -29,6 +36,10 @@ final class Pair extends CurrencyPair implements PairInterface
      */
     private static $instances = [];
 
+    /**
+     * Pair constructor.
+     * @param string $symbol
+     */
     private function __construct(string $symbol)
     {
         if (!\array_key_exists($symbol, self::$pairs)) {
@@ -38,11 +49,15 @@ final class Pair extends CurrencyPair implements PairInterface
             Currency::getInstance(self::$pairs[$symbol]['base']),
             Currency::getInstance(self::$pairs[$symbol]['quote'])
         );
-        $this->minOrderSize = self::$pairs[$symbol]['minOrderSize'];
+        $this->minOrderSize      = self::$pairs[$symbol]['minOrderSize'];
         $this->minOrderIncrement = self::$pairs[$symbol]['minOrderIncrement'];
         $this->minPriceIncrement = self::$pairs[$symbol]['minPriceIncrement'];
     }
 
+    /**
+     * @param string $symbol
+     * @return PairInterface
+     */
     public static function getInstance(string $symbol) : PairInterface
     {
         if (!\array_key_exists($symbol, self::$instances)) {
@@ -54,7 +69,7 @@ final class Pair extends CurrencyPair implements PairInterface
     /**
      * @return PairInterface[]
      */
-    public static function getAllInstances() : array
+    public static function getAllInstances(): array
     {
         foreach (\array_diff(\array_keys(self::$pairs), \array_keys(self::$instances)) as $symbol) {
             self::getInstance($symbol);
