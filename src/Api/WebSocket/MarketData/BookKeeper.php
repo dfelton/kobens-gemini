@@ -11,17 +11,22 @@ use Kobens\Gemini\Exchange;
 
 final class BookKeeper extends AbstractKeeper
 {
-    const API_PATH = '/v1/marketdata/';
+    private const API_PATH = '/v1/marketdata/';
 
     /**
      * @var int
      */
     private $socketSequence;
 
-    /**
-     * @var array
-     */
-    protected $params = [
+    /*protected $params = [
+        'heartbeat'=> 'true',
+        'trades'   => 'false',
+        'auctions' => 'false',
+        'bids'     => 'true',
+        'offers'   => 'true'
+    ];*/
+
+    private const PARAMS = [
         'heartbeat'=> 'true',
         'trades'   => 'false',
         'auctions' => 'false',
@@ -31,16 +36,19 @@ final class BookKeeper extends AbstractKeeper
 
     public function __construct(string $pairKey)
     {
-        parent::__construct((new Exchange()), $pairKey);
+        parent::__construct(new Exchange(), $pairKey);
     }
 
+    /**
+     * @throws Exception
+     */
     public function openBook(): void
     {
         $this->ensureIsClosed();
         \Amp\Loop::run($this->getRunClosure());
     }
 
-    private function ensureIsClosed()
+    private function ensureIsClosed(): void
     {
         try {
             $this->util->checkPulse();
@@ -48,7 +56,10 @@ final class BookKeeper extends AbstractKeeper
         } catch (ClosedBookException $e) { }
     }
 
-    private function getRunClosure() : \Closure
+    /**
+     * @return \Closure
+     */
+    private function getRunClosure(): \Closure
     {
         $websocketUrl = $this->getWebSocketUrl();
         return function () use ($websocketUrl)
@@ -65,7 +76,11 @@ final class BookKeeper extends AbstractKeeper
         };
     }
 
-    private function processMessage(\stdClass $payload)
+    /**
+     * @param \stdClass $payload
+     * @throws SocketSequenceException
+     */
+    private function processMessage(\stdClass $payload): void
     {
         if ($payload->socket_sequence === 0) {
             $book = [];
@@ -90,16 +105,16 @@ final class BookKeeper extends AbstractKeeper
         $this->socketSequence = $payload->socket_sequence;
     }
 
-    public function getWebSocketUrl() : string
+    public function getWebSocketUrl(): string
     {
         $str = \sprintf(
             'wss://%s%s%s?',
-            (new Config())->gemini->api->host,
+            Config::getInstance()->get('gemini')->api->host,
             self::API_PATH,
             $this->pair->getPairSymbol()
         );
-        for ($i = 0, $j = \count($this->params); $i < $j; $i++) {
-            $str .= \array_keys($this->params)[$i] . '=' . \array_values($this->params)[$i] . '&';
+        for ($i = 0, $j = \count(self::PARAMS); $i < $j; $i++) {
+            $str .= \array_keys(self::PARAMS)[$i] . '=' . \array_values(self::PARAMS)[$i] . '&';
         }
         return \rtrim($str, '&');
     }

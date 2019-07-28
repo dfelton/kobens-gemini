@@ -62,7 +62,7 @@ abstract class Request
         $this->logTimer->pushHandler(new StreamHandler(
             \sprintf(
                 '%s/var/log/curl_timers.log',
-                (new Config())->getRoot()
+                Config::getInstance()->getRootDir()
             ),
             Logger::INFO
         ));

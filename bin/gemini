@@ -3,7 +3,6 @@
 
 require \dirname(__DIR__).'/vendor/autoload.php';
 
-
 use Kobens\Core\Config;
 use Kobens\Core\Http\Request\Throttler;
 use Kobens\Exchange\Exchange\Mapper;
@@ -31,26 +30,24 @@ use Kobens\Gemini\Command\Command\Order\Status\{
 };
 use Symfony\Component\Console\Application;
 
-
 try {
-    new Config(\dirname(__DIR__).'/env/config.xml', \dirname(__DIR__));
+    $dir = \dirname(__DIR__);
+    Config::getInstance()->initialize($dir . '/env/config.xml', $dir);
     new Mapper(['gemini' => Exchange::class]);
     // Limit is actually 6. So up to 2 concurrent REST loop threads running,
     // while slipping in a manual request here or there.
     // Embracing websockets and local cache more will be future goals.
     (new Throttler())->addThrottle('gemini', 3);
 
-    $json = @\file_get_contents(\dirname(__DIR__).'/composer.json');
-    if ($json === false) {
-        throw new \Exception('Unable to read application\'s composer.json file.');
+    if (false === $json = @\file_get_contents($dir.'/composer.json')) {
+        throw new \RuntimeException('Unable to read application\'s composer.json file.');
     }
-    $composer = @\json_decode($json);
-    if ($composer  === false) {
-        throw new \Exception('Unable to parse application\'s composer.json file.');
+    if (false === $composer = \json_decode($json, false)) {
+        throw new \UnexpectedValueException('Unable to parse application\'s composer.json file.');
     }
     unset($json);
 } catch (\Exception $e) {
-    exit("Initialization Error: {$e->getMessage()}");
+    exit("Initialization Error: {$e->getMessage()}" . PHP_EOL);
 }
 
 $app = new Application($composer->name, $composer->version);
