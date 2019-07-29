@@ -21,9 +21,10 @@ use Kobens\Gemini\Command\Command\Market\{
 };
 use Kobens\Gemini\Command\Command\Order\BookKeeper as OrderBookKeeper;
 use Kobens\Gemini\Command\Command\Order\Placement\{
-    Cancel    as OrderCancel,
-    CancelAll as OrderCancelAll,
-    NewOrder  as OrderNew
+    Cancel     as OrderCancel,
+    CancelAll  as OrderCancelAll,
+    NewOrder   as OrderNew,
+    ForceMaker as OrderForceMaker
 };
 use Kobens\Gemini\Command\Command\Order\Status\{
     ActiveOrders as OrderListActive,
@@ -56,6 +57,7 @@ $app->add(new OrderBookKeeper());
 $app->add(new OrderCancel());
 $app->add(new OrderCancelAll());
 $app->add(new OrderListActive());
+$app->add(new OrderForceMaker());
 $app->add(new OrderNew());
 $app->add(new OrderStatus());
 $app->add(new TradeRepeaterBuyer());
