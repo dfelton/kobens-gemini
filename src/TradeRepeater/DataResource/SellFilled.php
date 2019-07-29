@@ -30,7 +30,9 @@ final class SellFilled extends AbstractDataResource
                 'buy_client_order_id' => null,
                 'buy_order_id' => null,
                 'sell_client_order_id' => null,
-                'sell_order_id' => null
+                'sell_order_id' => null,
+                'note' => null,
+                'meta' => null,
             ],
             ['id' => $id]
         );

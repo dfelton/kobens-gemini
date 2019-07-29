@@ -43,7 +43,10 @@ final class Buyer extends Command
                     $msg = \json_decode($response['body']);
 
                     if ($response['code'] === 200 && $msg->order_id) {
-                        $buySent->setNextState($row->id, ['buy_order_id' => $msg->order_id, 'response' => $response['body']]);
+                        $buySent->setNextState(
+                            $row->id,
+                            ['buy_order_id' => $msg->order_id, 'buy_json' => $response['body']]
+                        );
                         $output->writeln(\sprintf(
                             "%s\tBuy Order ID %s placed on %s pair for amount of %s at rate of %s",
                             (new \DateTime())->format('Y-m-d H:i:s'),
@@ -52,6 +55,13 @@ final class Buyer extends Command
                             $msg->original_amount,
                             $msg->price
                         ));
+                        if ($msg->price !== $row->buy_price) {
+                            $output->writeln(\sprintf(
+                                "%s\t\t<fg=yellow>(original buy price: %s)</>",
+                                (new \DateTime())->format('Y-m-d H:i:s'),
+                                $row->buy_price
+                            ));
+                        }
                     }
                 }
             } catch (\Exception $e) {

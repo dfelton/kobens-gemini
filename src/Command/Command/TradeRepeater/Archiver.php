@@ -32,17 +32,7 @@ final class Archiver extends Command
                     $conn->beginTransaction();
                     $inTransaction = true;
 
-                    $archiver->addArchive(
-                        $row->symbol,
-                        $row->buy_client_order_id,
-                        $row->buy_order_id,
-                        $row->buy_amount,
-                        $row->buy_price,
-                        $row->sell_client_order_id,
-                        $row->sell_order_id,
-                        $row->sell_amount,
-                        $row->sell_price
-                    );
+                    $archiver->addArchive((array) $row);
 
                     $sellFilled->setNextState($row->id);
                     $output->writeln((new \DateTime())->format('Y-m-d H:i:s')."\tTrade Repeater Record {$row->id} moved to BUY_READY state.");

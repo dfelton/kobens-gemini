@@ -22,7 +22,7 @@ final class SellSent extends AbstractDataResource
             throw new \Exception("'sell_order_id' is required.");
         }
         if (empty($args['sell_json'])) {
-            throw new \Exception("'buy_json' is required.");
+            throw new \Exception("'sell_json' is required.");
         }
         $record = $this->getRecord($id);
         if (!$this->isHealthy($record)) {

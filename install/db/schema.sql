@@ -41,8 +41,8 @@ CREATE TABLE `gemini_trade_repeater` (
     `sell_order_id` VARCHAR(30) NULL COMMENT 'Sell Order ID',
     `sell_amount` VARCHAR (50) NOT NULL COMMENT 'Sell Amount',
     `sell_price` VARCHAR (50) NOT NULL COMMENT 'Sell Price',
-    `note` text NULL COMMENT 'Note',
-    `meta` text NULL COMMENT 'Meta Data',
+    `note` TEXT NULL COMMENT 'Note',
+    `meta` TEXT NULL COMMENT 'Meta Data',
     `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `IDX_STATUS` (`status`),
@@ -61,6 +61,7 @@ CREATE TABLE `gemini_trade_repeater_archive` (
     `sell_order_id` VARCHAR(30) NULL COMMENT 'Sell Order ID',
     `sell_amount` VARCHAR (50) NOT NULL COMMENT 'Sell Amount',
     `sell_price` VARCHAR (50) NOT NULL COMMENT 'Sell Price',
+    `meta` TEXT NULL COMMENT 'Meta Data',
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Gemini Trade Repeater Archive';

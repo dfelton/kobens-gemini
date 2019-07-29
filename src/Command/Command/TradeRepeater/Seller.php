@@ -7,8 +7,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Kobens\Gemini\TradeRepeater\DataResource\{BuyFilled, SellSent};
 use Kobens\Gemini\Api\Param\{Side, Symbol, Amount, Price, ClientOrderId};
-use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder;
 use Kobens\Gemini\Exchange\Currency\Pair;
+use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder\ForceMaker;
 
 final class Seller extends Command
 {
@@ -31,7 +31,7 @@ final class Seller extends Command
                     $sellClientOrderId = 'repeater_'.$row->id.'_sell_'.\time();
                     $buyFilled->setNextState($row->id, ['sell_client_order_id' => $sellClientOrderId]);
 
-                    $order = new NewOrder(
+                    $order = new ForceMaker(
                         new Side('sell'),
                         new Symbol(Pair::getInstance($row->symbol)),
                         new Amount($row->sell_amount),
@@ -42,7 +42,7 @@ final class Seller extends Command
                     $response = $order->getResponse();
                     $msg = \json_decode($response['body']);
                     if ($response['code'] === 200 && $msg->order_id) {
-                        $sellSent->setNextState($row->id, ['sell_order_id' => $msg->order_id]);
+                        $sellSent->setNextState($row->id, ['sell_order_id' => $msg->order_id, 'sell_json' => $response['body']]);
                         $output->writeln(\sprintf(
                             "%s\tSell Order ID %s placed on %s pair for amount of %s at rate of %s",
                             (new \DateTime())->format('Y-m-d H:i:s'),
@@ -53,8 +53,6 @@ final class Seller extends Command
                         ));
                     }
                 }
-            } catch (\Kobens\Exchange\Exception\Order\MakerOrCancelWouldTakeException $e) {
-                $sellSent->setNote($row->id, 'MakerOrCancelWouldTake');
             } catch (\Exception $e) {
                 \Zend\Debug\Debug::dump(
                     [
