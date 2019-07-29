@@ -47,7 +47,7 @@ final class BookKeeper extends Command
         $this->addArgList([new Symbol()], $this);
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->symbol = $this->getSymbol($input)->getValue();
         $this->book = (new Exchange())->getBookKeeper($this->symbol);
@@ -60,10 +60,7 @@ final class BookKeeper extends Command
             ),
             Logger::INFO
         ));
-    }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
         $loop = true;
         $this->log->info(\sprintf('Opening "%s" on "%s"', $this->symbol, $this->getHost()));
         do {

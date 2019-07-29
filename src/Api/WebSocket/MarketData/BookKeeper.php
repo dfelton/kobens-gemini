@@ -96,7 +96,7 @@ final class BookKeeper extends AbstractKeeper
             'wss://%s%s%s?',
             (new Config())->gemini->api->host,
             self::API_PATH,
-            $this->pair->getPairSymbol()
+            $this->pair->getSymbol()
         );
         for ($i = 0, $j = \count($this->params); $i < $j; $i++) {
             $str .= \array_keys($this->params)[$i] . '=' . \array_values($this->params)[$i] . '&';
