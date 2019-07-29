@@ -42,6 +42,7 @@ CREATE TABLE `gemini_trade_repeater` (
     `sell_amount` VARCHAR (50) NOT NULL COMMENT 'Sell Amount',
     `sell_price` VARCHAR (50) NOT NULL COMMENT 'Sell Price',
     `note` text NULL COMMENT 'Note',
+    `meta` text NULL COMMENT 'Meta Data',
     `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `IDX_STATUS` (`status`),

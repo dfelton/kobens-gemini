@@ -21,12 +21,24 @@ final class SellSent extends AbstractDataResource
         if (empty($args['sell_order_id'])) {
             throw new \Exception("'sell_order_id' is required.");
         }
+        if (empty($args['sell_json'])) {
+            throw new \Exception("'buy_json' is required.");
+        }
         $record = $this->getRecord($id);
         if (!$this->isHealthy($record)) {
             throw new \Exception("Order '$id' is not in a healthy state for ".\get_class($this));
         }
+        $meta = @\json_decode($record['meta'], true);
+        if ($meta === null) {
+            $meta = [];
+        }
+        $meta['sell_json'] = $args['sell_json'];
         $affectedRows = $this->table->update(
-            ['sell_order_id' => $args['sell_order_id'], 'status' => self::STATUS_NEXT],
+            [
+                'sell_order_id' => $args['sell_order_id'],
+                'status' => self::STATUS_NEXT,
+                'meta' => \json_encode($meta)
+            ],
             ['id' => $id]
         );
         if ($affectedRows !== 1) {

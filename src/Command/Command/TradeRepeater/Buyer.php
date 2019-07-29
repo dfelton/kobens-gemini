@@ -9,6 +9,7 @@ use Kobens\Gemini\TradeRepeater\DataResource\{BuyReady, BuySent};
 use Kobens\Gemini\Api\Param\{Side, Symbol, Amount, Price, ClientOrderId};
 use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder;
 use Kobens\Gemini\Exchange\Currency\Pair;
+use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder\ForceMaker;
 
 final class Buyer extends Command
 {
@@ -31,7 +32,7 @@ final class Buyer extends Command
                     $buyClientOrderId = 'repeater_'.$row->id.'_buy_'.\time();
                     $buyReady->setNextState($row->id, ['buy_client_order_id' => $buyClientOrderId]);
 
-                    $order = new NewOrder(
+                    $order = new ForceMaker(
                         new Side('buy'),
                         new Symbol(Pair::getInstance($row->symbol)),
                         new Amount($row->buy_amount),
@@ -41,8 +42,9 @@ final class Buyer extends Command
 
                     $response = $order->getResponse();
                     $msg = \json_decode($response['body']);
+
                     if ($response['code'] === 200 && $msg->order_id) {
-                        $buySent->setNextState($row->id, ['buy_order_id' => $msg->order_id]);
+                        $buySent->setNextState($row->id, ['buy_order_id' => $msg->order_id, 'response' => $response['body']]);
                         $output->writeln(\sprintf(
                             "%s\tBuy Order ID %s placed on %s pair for amount of %s at rate of %s",
                             (new \DateTime())->format('Y-m-d H:i:s'),
@@ -53,8 +55,6 @@ final class Buyer extends Command
                         ));
                     }
                 }
-            } catch (\Kobens\Exchange\Exception\Order\MakerOrCancelWouldTakeException $e) {
-                $buySent->setNote($row->id, 'MakerOrCancelWouldTake');
             } catch (\Exception $e) {
                 \Zend\Debug\Debug::dump(
                     [
