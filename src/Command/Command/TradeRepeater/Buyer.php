@@ -7,7 +7,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Kobens\Gemini\TradeRepeater\DataResource\{BuyReady, BuySent};
 use Kobens\Gemini\Api\Param\{Side, Symbol, Amount, Price, ClientOrderId};
-use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder\ForceMaker;
 
