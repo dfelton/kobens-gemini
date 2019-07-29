@@ -23,7 +23,6 @@ use Kobens\Gemini\Exception\LogicException;
 abstract class Request
 {
     const REQUEST_URI = '';
-    private const RATE_LIMIT = 6;
 
     const CURLOPT_CONNECTTIMEOUT = 10;
     const CURLOPT_RETURNTRANSFER = true;
@@ -56,20 +55,18 @@ abstract class Request
 
     public function __construct()
     {
+        $config = new Config();
         $this->restKey = new Key();
         $this->nonce = new Nonce();
         $this->logTimer = new Logger(static::REQUEST_URI);
         $this->logTimer->pushHandler(new StreamHandler(
             \sprintf(
                 '%s/var/log/curl_timers.log',
-                (new Config())->getRoot()
+                $config->getRoot()
             ),
             Logger::INFO
         ));
-        $this->throttler = new Throttler(self::class);
-        if ($this->throttler->getLimit(self::class) === null) {
-            $this->throttler->addThrottle(self::class, self::RATE_LIMIT);
-        }
+        $this->throttler = new Throttler($config->gemini->api->host);
     }
 
     public function getResponse() : array
@@ -85,13 +82,18 @@ abstract class Request
         return $response;
     }
 
+    protected function getUrlPath()
+    {
+        return static::REQUEST_URI;
+    }
+
     final private function _getResponse() : array
     {
         $this->throttler->throttle();
 
         $ch = \curl_init();
 
-        \curl_setopt($ch, CURLOPT_URL,            'https://'.(new Host()).static::REQUEST_URI);
+        \curl_setopt($ch, CURLOPT_URL,            'https://'.(new Host()).$this->getUrlPath());
         \curl_setopt($ch, CURLOPT_HTTPHEADER,     $this->getRequestHeaders());
         \curl_setopt($ch, CURLOPT_POST,           static::CURLOPT_POST);
         \curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, static::CURLOPT_CONNECTTIMEOUT);
@@ -113,6 +115,11 @@ abstract class Request
         ];
     }
 
+    /**
+     * @todo Don't need to supply x-gemini-* headers for public market data requests
+     *
+     * @return array
+     */
     final private function getRequestHeaders() : array
     {
         $base64Payload = \base64_encode(\json_encode(\array_merge(
