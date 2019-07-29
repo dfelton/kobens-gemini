@@ -20,6 +20,11 @@ class NewOrder extends Request
 //         'options' => ['maker-or-cancel'],
     ];
 
+    /**
+     * @var PairInterface
+     */
+    private $pair;
+
     public function __construct(
         Side $side,
         Symbol $symbol,
@@ -29,10 +34,10 @@ class NewOrder extends Request
     ) {
         parent::__construct();
 
-        $pair = (new Exchange())->getPair($symbol->getValue());
+        $this->pair = (new Exchange())->getPair($symbol->getValue());
 
-        $this->validateAmount($amount->getValue(), $pair);
-        $this->validatePrice($price->getValue(), $pair);
+        $this->validateAmount($amount->getValue());
+        $this->validatePrice($price->getValue());
 
         $params = [
             'symbol' => $symbol->getValue(),
@@ -46,58 +51,76 @@ class NewOrder extends Request
         $this->payload = \array_merge($this->defaultPayload, $params);
     }
 
-    protected function validateAmount(string $amount, PairInterface $pair) : void
+    // @todo the approach to these setters are kinda gross. lets maybe slim down the constructor and rethink things in the setters
+
+    public function setClientOrderId(ClientOrderId $clientOrderId): void
     {
-        if ($amount < $pair->minOrderSize) {
+        $this->payload = \array_merge($this->payload, ['client_order_id' => $clientOrderId->getValue()]);
+    }
+
+    public function setPrice(Price $price): void
+    {
+        $this->payload = \array_merge($this->payload, ['price' => $price->getValue()]);
+    }
+
+    public function setAmount(Amount $amount): void
+    {
+        $this->validateAmount($amount);
+        $this->payload = \array_merge($this->payload, ['amount' => $amount->getValue()]);
+    }
+
+    protected function validateAmount(string $amount) : void
+    {
+        if ($amount < $this->pair->minOrderSize) {
             throw new Exception(\sprintf(
                 'Invalid amount "%s", min allowed for the "%s" pair on "%s" is "%s".',
                 $amount,
-                $pair->symbol,
+                $this->pair->symbol,
                 (string) (new Host()),
-                $pair->minOrderSize
+                $this->pair->minOrderSize
             ));
         }
 
         $parts = \explode('.', $amount);
         if (isset($parts[1])) {
             $length = \strlen($parts[1]);
-            $minParts = explode('.', $pair->minOrderIncrement);
+            $minParts = explode('.', $this->pair->minOrderIncrement);
             if (isset($minParts[1])) {
                 $maxPrecision = \strlen($minParts[1]);
                 if ($length > $maxPrecision) {
                     throw new \Exception(\sprintf(
                         'Invalid amount precision "%s", min increment allowed is "%s"',
                         $length,
-                        $pair->minOrderIncrement
+                        $this->pair->minOrderIncrement
                     ));
                 }
             } else {
                 throw new \Exception(\sprintf(
                     'Invalid amount precision "%s", min increment allowed is "%s"',
                     $length,
-                    $pair->minOrderIncrement
+                    $this->pair->minOrderIncrement
                 ));
             }
         }
     }
 
-    protected function validatePrice(string $price, PairInterface $pair) : void
+    protected function validatePrice(string $price) : void
     {
-        if ($price < $pair->minPriceIncrement) {
+        if ($price < $this->pair->minPriceIncrement) {
             throw new \Exception(\sprintf(
                 'Invalid price "%s", min price is "%s".',
                 $price,
-                $pair->minPriceIncrement
+                $this->pair->minPriceIncrement
             ));
         }
         $parts = \explode('.', $price);
         if (isset($parts[1]) && trim($parts[1], 0) !== '') {
             $priceIncrement = '0.' .$parts[1];
-            if ($priceIncrement < $pair->minPriceIncrement) {
+            if ($priceIncrement < $this->pair->minPriceIncrement) {
                 throw new \Exception(\sprintf(
                     'Invalid price precision "%s", min increment allowed is "%s"',
                     $priceIncrement,
-                    $pair->minPriceIncrement
+                    $this->pair->minPriceIncrement
                 ));
             }
         }
