@@ -16,6 +16,7 @@ use Kobens\Gemini\Command\Command\TradeRepeater\{
 };
 use Kobens\Gemini\Command\Command\Market\{
     BookKeeper as MarketBookKeeper,
+    Ticker     as MarketTicker,
     Watcher    as MarketWatcher
 };
 use Kobens\Gemini\Command\Command\Order\BookKeeper as OrderBookKeeper;
@@ -49,6 +50,7 @@ try {
 
 $app = new Application($composer->name, $composer->version);
 $app->add(new MarketBookKeeper());
+$app->add(new MarketTicker());
 $app->add(new MarketWatcher());
 $app->add(new OrderBookKeeper());
 $app->add(new OrderCancel());
