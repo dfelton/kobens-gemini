@@ -34,8 +34,19 @@ use Symfony\Component\Console\Application;
 
 
 try {
-    new Config(\dirname(__DIR__).'/env/config.xml', \dirname(__DIR__));
+    // Init config
+    $config = new Config(\dirname(__DIR__).'/env/config.xml', \dirname(__DIR__));
+
+    // Init Exchange Mapper (todo: may not be necessary if we're scrapping kobens-exchange's trade-repeater)
     new Mapper(['gemini' => Exchange::class]);
+
+    $phpSettings = $config->get('php');
+    if ($phpSettings) {
+        if ($phpSettings->get('timezone')) {
+            \date_default_timezone_set((string) $phpSettings->get('timezone'));
+        }
+    }
+
     $json = @\file_get_contents(\dirname(__DIR__).'/composer.json');
     if ($json === false) {
         throw new \Exception('Unable to read application\'s composer.json file.');
@@ -45,6 +56,7 @@ try {
         throw new \Exception('Unable to parse application\'s composer.json file.');
     }
     unset($json);
+
 } catch (\Exception $e) {
     exit("Initialization Error: {$e->getMessage()}");
 }
