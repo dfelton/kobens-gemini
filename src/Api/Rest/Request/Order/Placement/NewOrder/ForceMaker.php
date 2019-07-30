@@ -16,7 +16,7 @@ use Kobens\Exchange\PairInterface;
  */
 final class ForceMaker extends NewOrder
 {
-    private const MAX_ITERATIONS = 10;
+    private const MAX_ITERATIONS = 50;
 
     protected $defaultPayload = [
         'type' => 'exchange limit',

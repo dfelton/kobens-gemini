@@ -9,6 +9,7 @@ use Kobens\Gemini\TradeRepeater\DataResource\{BuyFilled, SellSent};
 use Kobens\Gemini\Api\Param\{Side, Symbol, Amount, Price, ClientOrderId};
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder\ForceMaker;
+use Kobens\Gemini\Exception\MaxIterationsException;
 
 final class Seller extends Command
 {
@@ -39,7 +40,26 @@ final class Seller extends Command
                         new ClientOrderId($sellClientOrderId)
                     );
 
-                    $response = $order->getResponse();
+                    try {
+                        $response = $order->getResponse();
+                    } catch (MaxIterationsException $e) {
+                        // there must be a lot of buying going on right this moment
+                        $output->writeln(\sprintf(
+                            "<fg=red>%s\tMax iterations reached for attempting ForceMaker on %s pair for price of %s.</>",
+                            (new \DateTime())->format('Y-m-d H:i:s'),
+                            $row->symbol,
+                            $row->sell_price
+                        ));
+                        $output->writeln(\sprintf(
+                            "<fg=red>%s\tSleeping 5 seconds...</>"
+                            (new \DateTime())->format('Y-m-d H:i:s')
+                        ));
+                        \sleep(5);
+
+                        // we'll pick it up again the next iteration
+                        $buyFilled->resetState($row->id);
+                        continue;
+                    }
                     $msg = \json_decode($response['body']);
                     if ($response['code'] === 200 && $msg->order_id) {
                         $sellSent->setNextState($row->id, ['sell_order_id' => $msg->order_id, 'sell_json' => $response['body']]);
@@ -51,6 +71,13 @@ final class Seller extends Command
                             $msg->original_amount,
                             $msg->price
                         ));
+                        if ($msg->price !== $row->sell_price) {
+                            $output->writeln(\sprintf(
+                                "%s\t\t<fg=yellow>(original sell price: %s)</>",
+                                (new \DateTime())->format('Y-m-d H:i:s'),
+                                $row->sell_price
+                            ));
+                        }
                     }
                 }
             } catch (\Exception $e) {

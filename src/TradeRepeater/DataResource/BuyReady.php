@@ -16,7 +16,7 @@ final class BuyReady extends AbstractDataResource
             && $record->sell_order_id === NULL;
     }
 
-    public function setNextState(int $id, array $args = []) : bool
+    public function setNextState(int $id, array $args = []): bool
     {
         if (empty($args['buy_client_order_id'])) {
             throw new \Exception("'buy_client_order_id' is required.");
@@ -31,6 +31,18 @@ final class BuyReady extends AbstractDataResource
         );
         if ($affectedRows !== 1) {
             throw new \Exception ("Order $id not marked '".self::STATUS_NEXT."'");
+        }
+        return true;
+    }
+
+    public function resetState(int $id): bool
+    {
+        $affectedRows = $this->table->update(
+            ['buy_client_order_id' => null, 'status' => self::STATUS_CURRENT],
+            ['id' => $id]
+        );
+        if ($affectedRows !== 1) {
+            throw new \Exception ("Order $id not marked '".self::STATUS_CURRENT."'");
         }
         return true;
     }

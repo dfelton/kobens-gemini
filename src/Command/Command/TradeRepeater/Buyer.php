@@ -9,6 +9,7 @@ use Kobens\Gemini\TradeRepeater\DataResource\{BuyReady, BuySent};
 use Kobens\Gemini\Api\Param\{Side, Symbol, Amount, Price, ClientOrderId};
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder\ForceMaker;
+use Kobens\Gemini\Exception\MaxIterationsException;
 
 final class Buyer extends Command
 {
@@ -39,7 +40,26 @@ final class Buyer extends Command
                         new ClientOrderId($buyClientOrderId)
                     );
 
-                    $response = $order->getResponse();
+                    try {
+                        $response = $order->getResponse();
+                    } catch (MaxIterationsException $e) {
+                        // there must be a lot of selling going on right this moment
+                        $output->writeln(\sprintf(
+                            "<fg=red>%s\tMax iterations reached for attempting ForceMaker on %s pair for price of %s.</>",
+                            (new \DateTime())->format('Y-m-d H:i:s'),
+                            $row->symbol,
+                            $row->buy_price
+                        ));
+                        $output->writeln(\sprintf(
+                            "<fg=red>%s\tSleeping 5 seconds...</>"
+                            (new \DateTime())->format('Y-m-d H:i:s')
+                        ));
+                        \sleep(5);
+
+                        // we'll pick it up again the next iteration
+                        $buyReady->resetState($row->id);
+                        continue;
+                    }
                     $msg = \json_decode($response['body']);
 
                     if ($response['code'] === 200 && $msg->order_id) {

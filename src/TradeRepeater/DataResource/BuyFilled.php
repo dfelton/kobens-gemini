@@ -34,4 +34,16 @@ final class BuyFilled extends AbstractDataResource
         }
         return true;
     }
+
+    public function resetState(int $id): bool
+    {
+        $affectedRows = $this->table->update(
+            ['sell_client_order_id' => null, 'status' => self::STATUS_CURRENT],
+            ['id' => $id]
+        );
+        if ($affectedRows !== 1) {
+            throw new \Exception ("Order $id not marked '".self::STATUS_CURRENT."'");
+        }
+        return true;
+    }
 }

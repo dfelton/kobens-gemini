@@ -51,7 +51,7 @@ CREATE TABLE `gemini_trade_repeater` (
 
 DROP TABLE IF EXISTS `gemini_trade_repeater_archive`;
 CREATE TABLE `gemini_trade_repeater_archive` (
-    `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Gemini Trade Repeater ID',
+    `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Gemini Trade Repeater Archive ID',
     `symbol` VARCHAR(12) NOT NULL COMMENT 'Symbol',
     `buy_client_order_id` VARCHAR(30) NULL COMMENT 'Buy Client Order ID',
     `buy_order_id` VARCHAR(30) NULL COMMENT 'Buy Order Id',
@@ -65,3 +65,16 @@ CREATE TABLE `gemini_trade_repeater_archive` (
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Gemini Trade Repeater Archive';
+
+
+DROP TABLE IF EXISTS `gemini_trade_repeater_profit_summary`;
+CREATE TABLE `gemini_trade_repeater_profit_summary` (
+    `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Summary Id',
+    `symbol` VARCHAR(12) NOT NULL COMMENT 'Symbol',
+    `total_sell_fills` INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total Sell Fills',
+    `profit_base` VARCHAR(50) NOT NULL COMMENT 'Profit (Base Currency)',
+    `profit_quote` VARCHAR(50) NOT NULL COMMENT 'Profit (Quote Currency)',
+    `summary_date` TIMESTAMP NOT NULL COMMENT 'Summary Date',
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Gemini Trade Repeater Profit Summary';
