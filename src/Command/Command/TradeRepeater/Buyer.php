@@ -42,6 +42,9 @@ final class Buyer extends Command
 
                     try {
                         $response = $order->getResponse();
+
+                    // TODO Kobens\Core\Exception\ConnectionException
+                    // TODO Lots of other exception types.
                     } catch (MaxIterationsException $e) {
                         // there must be a lot of selling going on right this moment
                         $output->writeln(\sprintf(
