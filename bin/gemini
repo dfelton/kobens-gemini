@@ -20,6 +20,7 @@ use Kobens\Gemini\Command\Command\Market\{
     Watcher    as MarketWatcher
 };
 use Kobens\Gemini\Command\Command\Order\BookKeeper as OrderBookKeeper;
+use Kobens\Gemini\Command\Command\Order\Logger\TradeHistory as LoggerTradeHistory;
 use Kobens\Gemini\Command\Command\Order\Placement\{
     Cancel     as OrderCancel,
     CancelAll  as OrderCancelAll,
@@ -28,7 +29,8 @@ use Kobens\Gemini\Command\Command\Order\Placement\{
 };
 use Kobens\Gemini\Command\Command\Order\Status\{
     ActiveOrders as OrderListActive,
-    OrderStatus
+    OrderStatus,
+    PastTrades as OrderPastTrades
 };
 use Symfony\Component\Console\Application;
 
@@ -62,6 +64,7 @@ try {
 }
 
 $app = new Application($composer->name, $composer->version);
+$app->add(new LoggerTradeHistory());
 $app->add(new MarketBookKeeper());
 $app->add(new MarketTicker());
 $app->add(new MarketWatcher());
@@ -72,6 +75,7 @@ $app->add(new OrderListActive());
 $app->add(new OrderForceMaker());
 $app->add(new OrderNew());
 $app->add(new OrderStatus());
+$app->add(new OrderPastTrades());
 $app->add(new TradeRepeaterBuyer());
 $app->add(new TradeRepeaterFillMonitor());
 $app->add(new TradeRepeaterSeller());
