@@ -72,6 +72,7 @@ final class TradeHistory extends Command
                     $timestampms++;
                     if (count($page) === PastTrades::LIMIT_MAX) {
                         // TODO: Support ticket # 1385118
+                        $this->logPageLimitError($pageFirstTimestampms);
                         $output->writeln(\sprintf(
                             "%s\t<fg=red>%s</>",
                             (new \DateTime())->format('Y-m-d H:i:s'),
@@ -112,6 +113,14 @@ final class TradeHistory extends Command
             "<fg=yellow>{$trade['fee_amount']}</>",
             "<fg=yellow>{$trade['fee_currency']}</>"
         ));
+    }
+
+    private function logPageLimitError(int $timestampms): void
+    {
+        (new TableGateway('gemini_trade_history_pageLimitError', Db::getAdapter()))->insert([
+            'symbol' => $this->symbol,
+            'timestampms' => $timestampms,
+        ]);
     }
 
     private function logTrade(array $trade)
