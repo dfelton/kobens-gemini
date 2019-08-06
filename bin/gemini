@@ -82,4 +82,5 @@ $app->add(new TradeRepeaterSeller());
 $app->add(new TradeRepeaterArchiver());
 $app->add(new TradeRepeaterRepairer());
 $app->add(new \Kobens\Gemini\Command\Command\Taxes\Calculator\CostBasisLogger());
+$app->add(new \Kobens\Gemini\Command\Command\Taxes\Calculator\Form8949());
 $app->run();

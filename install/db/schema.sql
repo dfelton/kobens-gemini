@@ -85,6 +85,7 @@ CREATE TABLE `gemini_taxes_cost_basis` (
 	`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
 	`transaction_id` INT(10) UNSIGNED NOT NULL COMMENT 'Transaction ID',
 	`cost_basis_per_subunit` VARCHAR(50) NOT NULL COMMENT 'Cost Basis Per Subunit',
+	`amount_sold` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT 'Amount Sold',
 	`is_fully_sold` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Is Fully Sold',
     `created_at` TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'Created At',
     PRIMARY KEY (`id`)
