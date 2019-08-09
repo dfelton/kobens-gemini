@@ -3,44 +3,15 @@
 
 require \dirname(__DIR__).'/vendor/autoload.php';
 
-
 use Kobens\Core\Config;
 use Kobens\Exchange\Exchange\Mapper;
 use Kobens\Gemini\Exchange;
-use Kobens\Gemini\Command\Command\TradeRepeater\{
-    Buyer as TradeRepeaterBuyer,
-    FillMonitor as TradeRepeaterFillMonitor,
-    Seller as TradeRepeaterSeller,
-    Archiver as TradeRepeaterArchiver,
-    Repairer as TradeRepeaterRepairer
-};
-use Kobens\Gemini\Command\Command\Market\{
-    BookKeeper as MarketBookKeeper,
-    Ticker     as MarketTicker,
-    Watcher    as MarketWatcher
-};
-use Kobens\Gemini\Command\Command\Order\BookKeeper as OrderBookKeeper;
-use Kobens\Gemini\Command\Command\Order\Logger\TradeHistory as LoggerTradeHistory;
-use Kobens\Gemini\Command\Command\Order\Placement\{
-    Cancel     as OrderCancel,
-    CancelAll  as OrderCancelAll,
-    NewOrder   as OrderNew,
-    ForceMaker as OrderForceMaker
-};
-use Kobens\Gemini\Command\Command\Order\Status\{
-    ActiveOrders as OrderListActive,
-    OrderStatus,
-    PastTrades as OrderPastTrades
-};
 use Symfony\Component\Console\Application;
 
-
 try {
-    // Init config
-    $config = new Config(\dirname(__DIR__).'/env/config.xml', \dirname(__DIR__));
-
-    // Init Exchange Mapper (todo: may not be necessary if we're scrapping kobens-exchange's trade-repeater)
-    new Mapper(['gemini' => Exchange::class]);
+    $config = Config::getInstance();
+    $config->setConfig(\dirname(__DIR__).'/env/config.xml');
+    $config->setRootDir(\dirname(__DIR__));
 
     $phpSettings = $config->get('php');
     if ($phpSettings) {
@@ -48,6 +19,10 @@ try {
             \date_default_timezone_set((string) $phpSettings->get('timezone'));
         }
     }
+    unset ($config);
+
+    // Init Exchange Mapper (todo: may not be necessary if we're scrapping kobens-exchange's trade-repeater)
+    new Mapper(['gemini' => Exchange::class]);
 
     $json = @\file_get_contents(\dirname(__DIR__).'/composer.json');
     if ($json === false) {
@@ -64,23 +39,23 @@ try {
 }
 
 $app = new Application($composer->name, $composer->version);
-$app->add(new LoggerTradeHistory());
-$app->add(new MarketBookKeeper());
-$app->add(new MarketTicker());
-$app->add(new MarketWatcher());
-$app->add(new OrderBookKeeper());
-$app->add(new OrderCancel());
-$app->add(new OrderCancelAll());
-$app->add(new OrderListActive());
-$app->add(new OrderForceMaker());
-$app->add(new OrderNew());
-$app->add(new OrderStatus());
-$app->add(new OrderPastTrades());
-$app->add(new TradeRepeaterBuyer());
-$app->add(new TradeRepeaterFillMonitor());
-$app->add(new TradeRepeaterSeller());
-$app->add(new TradeRepeaterArchiver());
-$app->add(new TradeRepeaterRepairer());
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Buyer());
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor());
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Seller());
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Archiver());
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Repairer());
 $app->add(new \Kobens\Gemini\Command\Command\Taxes\Calculator\CostBasisLogger());
 $app->add(new \Kobens\Gemini\Command\Command\Taxes\Calculator\Form8949());
+$app->add(new \Kobens\Gemini\Command\Command\Market\BookKeeper());
+$app->add(new \Kobens\Gemini\Command\Command\Market\Ticker());
+$app->add(new \Kobens\Gemini\Command\Command\Market\Watcher());
+$app->add(new \Kobens\Gemini\Command\Command\Order\BookKeeper());
+$app->add(new \Kobens\Gemini\Command\Command\Order\Logger\TradeHistory());
+$app->add(new \Kobens\Gemini\Command\Command\Order\Placement\Cancel());
+$app->add(new \Kobens\Gemini\Command\Command\Order\Placement\CancelAll());
+$app->add(new \Kobens\Gemini\Command\Command\Order\Placement\NewOrder());
+$app->add(new \Kobens\Gemini\Command\Command\Order\Placement\ForceMaker());
+$app->add(new \Kobens\Gemini\Command\Command\Order\Status\ActiveOrders());
+$app->add(new \Kobens\Gemini\Command\Command\Order\Status\OrderStatus());
+$app->add(new \Kobens\Gemini\Command\Command\Order\Status\PastTrades());
 $app->run();
