@@ -55,18 +55,18 @@ abstract class Request
 
     public function __construct()
     {
-        $config = new Config();
+        $config = Config::getInstance();
         $this->restKey = new Key();
         $this->nonce = new Nonce();
         $this->logTimer = new Logger(static::REQUEST_URI);
         $this->logTimer->pushHandler(new StreamHandler(
             \sprintf(
                 '%s/var/log/curl_timers.log',
-                $config->getRoot()
+                $config->getRootDir()
             ),
             Logger::INFO
         ));
-        $this->throttler = new Throttler($config->gemini->api->host);
+        $this->throttler = new Throttler($config->get('gemini')->api->host);
     }
 
     public function getResponse() : array

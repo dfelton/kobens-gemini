@@ -4,7 +4,6 @@ namespace Kobens\Gemini\Api;
 
 use Kobens\Core\Config;
 
-
 class Key implements KeyInterface
 {
     /**
@@ -19,14 +18,14 @@ class Key implements KeyInterface
 
     public function __construct()
     {
-        $config = (new Config())->gemini->api->key;
+        $config = Config::getInstance()->get('gemini')->api->key;
         $this
             ->setPublicKey($config->public_key)
             ->setSecretKey($config->secret_key)
         ;
     }
 
-    protected function setPublicKey(string $key) : self
+    protected function setPublicKey(string $key): self
     {
         $key = \trim($key);
         if (\strlen($key) === 0) {
@@ -36,7 +35,7 @@ class Key implements KeyInterface
         return $this;
     }
 
-    protected function setSecretKey(string $secret) : self
+    protected function setSecretKey(string $secret): self
     {
         $secret = \trim($secret);
         if (\strlen($secret) === 0) {
@@ -46,12 +45,12 @@ class Key implements KeyInterface
         return $this;
     }
 
-    public function getPublicKey() : string
+    public function getPublicKey(): string
     {
         return $this->keyPublic;
     }
 
-    public function getSecretKey() : string
+    public function getSecretKey(): string
     {
         return $this->keySecret;
     }

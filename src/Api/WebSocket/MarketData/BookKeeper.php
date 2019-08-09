@@ -48,7 +48,7 @@ final class BookKeeper extends AbstractKeeper
         } catch (ClosedBookException $e) { }
     }
 
-    private function getRunClosure() : \Closure
+    private function getRunClosure(): \Closure
     {
         $websocketUrl = $this->getWebSocketUrl();
         return function () use ($websocketUrl)
@@ -90,11 +90,11 @@ final class BookKeeper extends AbstractKeeper
         $this->socketSequence = $payload->socket_sequence;
     }
 
-    public function getWebSocketUrl() : string
+    public function getWebSocketUrl(): string
     {
         $str = \sprintf(
             'wss://%s%s%s?',
-            (new Config())->gemini->api->host,
+            Config::getInstance()->get('gemini')->api->host,
             self::API_PATH,
             $this->pair->getSymbol()
         );

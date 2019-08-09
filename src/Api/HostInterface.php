@@ -4,5 +4,5 @@ namespace Kobens\Gemini\Api;
 
 interface HostInterface
 {
-    public function getHost() : string;
+    public function getHost(): string;
 }

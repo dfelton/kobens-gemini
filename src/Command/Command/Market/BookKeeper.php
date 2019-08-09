@@ -55,7 +55,7 @@ final class BookKeeper extends Command
         $this->log->pushHandler(new StreamHandler(
             \sprintf(
                 '%s/var/log/gemini_market_book_%d.log',
-                (new Config())->getRoot(),
+                Config::getInstance()->getRootDir(),
                 \getmypid()
             ),
             Logger::INFO
@@ -127,7 +127,7 @@ final class BookKeeper extends Command
     protected function isMaintenance() : bool
     {
         return false;
-        $ch = \curl_init(\sprintf('https://%s', (new Config())->gemini->api->host));
+        $ch = \curl_init(\sprintf('https://%s', Config::getInstance()->get('gemini')->api->host));
         \curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,   // return web page
             CURLOPT_HEADER         => false,  // don't return headers

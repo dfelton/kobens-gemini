@@ -6,8 +6,8 @@ interface NonceInterface
 {
     /**
      * Return a nonce for the API request
-     * 
+     *
      * @return string
      */
-    public function getNonce() : string;
+    public function getNonce(): string;
 }

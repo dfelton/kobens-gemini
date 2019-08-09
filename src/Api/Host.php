@@ -6,12 +6,12 @@ use Kobens\Core\Config;
 
 class Host
 {
-    public function getHost() : string
+    public function getHost(): string
     {
-        return (new Config())->gemini->api->host;
+        return Config::getInstance()->get('gemini')->api->host;
     }
 
-    public function __toString() : string
+    public function __toString(): string
     {
         return $this->getHost();
     }

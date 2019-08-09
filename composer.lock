@@ -818,12 +818,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-core.git",
-                "reference": "f972a6839ba94295a33e71b9c8ad2679b45c629e"
+                "reference": "47e2af3e1ec227fbf5db026c35d01e4daa39845b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dfelton/kobens-core/zipball/f972a6839ba94295a33e71b9c8ad2679b45c629e",
-                "reference": "f972a6839ba94295a33e71b9c8ad2679b45c629e",
+                "url": "https://api.github.com/repos/dfelton/kobens-core/zipball/47e2af3e1ec227fbf5db026c35d01e4daa39845b",
+                "reference": "47e2af3e1ec227fbf5db026c35d01e4daa39845b",
                 "shasum": ""
             },
             "require": {
@@ -855,10 +855,10 @@
             ],
             "description": "Core framework for facilitating trades on an exchange.",
             "support": {
-                "source": "https://github.com/dfelton/kobens-core/tree/master",
+                "source": "https://github.com/dfelton/kobens-core/tree/feature/config_singleton",
                 "issues": "https://github.com/dfelton/kobens-core/issues"
             },
-            "time": "2019-07-29T02:05:22+00:00"
+            "time": "2019-08-07T04:26:42+00:00"
         },
         {
             "name": "kobens/kobens-currency",
