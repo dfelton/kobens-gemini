@@ -99,7 +99,7 @@ CREATE TABLE `gemini_taxes_form8949` (
 	`date_acquired` TIMESTAMP NOT NULL COMMENT 'Date Acquired',
 	`date_sold` TIMESTAMP NOT NULL COMMENT 'Date Sold',
 	`proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
-	`cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis'
+	`cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
 	`gain_or_loss` VARCHAR(50) NOT NULL COMMENT 'Gain or (loss)',
     `created_at` TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'Created At',
     PRIMARY KEY (`id`)
