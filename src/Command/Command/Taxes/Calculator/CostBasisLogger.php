@@ -53,6 +53,7 @@ final class CostBasisLogger extends Command
                     $subunits = \ltrim($subunits, '0');
 
                     // TODO: How do we know what the required precision is here?
+                    // Answer: By not performing division. multiple the price of the whole unit by 0.00000001
                     $costBasisPerSubunit = \bcdiv($costBasis, $subunits, 100);
                     $costBasisPerSubunit = \rtrim($costBasisPerSubunit, '0');
 
