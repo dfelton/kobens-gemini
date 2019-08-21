@@ -18,9 +18,10 @@ use Kobens\Core\Http\Request\Throttler;
 use Kobens\Gemini\Api\Param\ClientOrderId;
 
 try {
-    new Config(__DIR__.'/env/config.xml', __DIR__);
+    $config = Config::getInstance();
+    $config->setRootDir(__DIR__);
+    $config->setConfig(__DIR__.'/env/config.xml');
     new Mapper(['gemini' => Exchange::class]);
-    (new Throttler())->addThrottle('gemini', 3);
 } catch (Exception $e) {
     exit(\sprintf(
         'Initialization Error: %s',
@@ -28,11 +29,14 @@ try {
     ));
 }
 
-$buyBtc  = '0.00002';
-$sellBtc = '0.00001975';
 
-$start       = '10550.00';
-$end         = '10880.00';
+$buyBtc  = '0.00004';
+$sellBtc = '0.00003975';
+
+
+$start       = '';
+$end         = '';
+
 
 $action = ''; // 'buy' | 'sell'
 
@@ -40,7 +44,7 @@ $cashLimit   =   false;
 
 $increment   =    '2.50';
 $feePercent  =    '0.001';
-$sellAfterGain =  '0.02';
+$sellAfterGain =  '0.025';
 $totalBuyFees  =  '0.00';
 $totalBuyUsd   =  '0.00';
 $totalBuyBtc   =  '0.00000000';
