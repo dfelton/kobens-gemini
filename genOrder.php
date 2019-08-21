@@ -18,9 +18,10 @@ use Kobens\Core\Http\Request\Throttler;
 use Kobens\Gemini\Api\Param\ClientOrderId;
 
 try {
-    new Config(__DIR__.'/env/config.xml', __DIR__);
+    $config = Config::getInstance();
+    $config->setRootDir(__DIR__);
+    $config->setConfig(__DIR__.'/env/config.xml');
     new Mapper(['gemini' => Exchange::class]);
-    (new Throttler())->addThrottle('gemini', 3);
 } catch (Exception $e) {
     exit(\sprintf(
         'Initialization Error: %s',
@@ -28,11 +29,14 @@ try {
     ));
 }
 
-$buyBtc  = '0.00002';
-$sellBtc = '0.00001975';
 
-$start       = '10550.00';
-$end         = '10880.00';
+$buyBtc  = '0.00004250';
+$sellBtc = '0.00004225';
+
+
+$start       = '';
+$end         = '';
+
 
 $action = ''; // 'buy' | 'sell'
 
@@ -40,7 +44,7 @@ $cashLimit   =   false;
 
 $increment   =    '2.50';
 $feePercent  =    '0.001';
-$sellAfterGain =  '0.02';
+$sellAfterGain =  '0.025';
 $totalBuyFees  =  '0.00';
 $totalBuyUsd   =  '0.00';
 $totalBuyBtc   =  '0.00000000';
@@ -107,7 +111,7 @@ while (floatval($buyPrice) <= floatval($end)) {
         'buy_usd_with_fee' => bcadd($amountUsd, $fee, 14),
         'sell_price' => $sellPrice,
         'sell_amount_usd' => $sellSubtotalUsd,
-        'sell_amount_btc' => $buyBtc,
+        'sell_amount_btc' => $sellBtc,
         'sell_fee' => $sellFeeUsd,
         'sell_yield' => $sellYieldUsd,
         'position_profits_usd' => $positionProfitUsd,
@@ -175,7 +179,7 @@ $feesRatio = bcmul($feesRatio, '100', 2);
 //     'buy_price_start' => $orders[0]['buy_price'],
 //     'buy_price_end' => $buyPrice,
 //     'buy_usd' => $totalBuyUsd,
-//     'buy_btc' => $totalBuyBtc,
+    'buy_btc' => $totalBuyBtc,
 //     'buy_fees' => $totalBuyFees,
     'buy_usd_with_fees' => bcadd($totalBuyUsd, $totalBuyFees, 14),
 //     'sell_price_start' => $orders[0]['sell_price'],
