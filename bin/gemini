@@ -34,7 +34,6 @@ use Symfony\Component\Console\Application;
 
 try {
     $dir = \dirname(__DIR__);
-    //new Config(\dirname(__DIR__).'/env/config.xml', \dirname(__DIR__));
     Config::getInstance()->initialize($dir . '/env/config.xml', $dir);
     new Mapper(['gemini' => Exchange::class]);
     // Limit is actually 6. So up to 2 concurrent REST loop threads running,
