@@ -16,9 +16,9 @@ final class FillMonitor extends Command
 {
     protected static $defaultName = 'kobens:gemini:trade-repeater:fill-monitor';
 
-    protected $buyFilled;
+    private $buyFilled;
 
-    protected $sellFilled;
+    private $sellFilled;
 
     protected function configure()
     {
@@ -64,6 +64,17 @@ final class FillMonitor extends Command
             case $msg['type'] === 'heartbeat':
                 $output->writeln((new \DateTime())->format('Y-m-d H:i:s')."\tHeartbeat Received");
                 break;
+            case $msg['type'] === 'fill' && $msg['remaining_amount'] !== '0':
+                $output->writeln(\sprintf(
+                    "%s\t<fg=yellow>Partial</> fill of <fg=%s>%s</> order %s. Executed <fg=yellow>%s</>. Remaining amount: <fg=yellow>%s</>",
+                    (new \DateTime())->format('Y-m-d H:i:s'),
+                    $msg['side']==='buy'?'green':'red',
+                    $msg['side'],
+                    $msg['order_id'],
+                    $msg['executed_amount'],
+                    $msg['remaining_amount']
+                ));
+                break;
             case $msg['type'] === 'fill' && $msg['remaining_amount'] === '0' && \array_key_exists('client_order_id', $msg):
                 $repeaterId = $this->getRecordId($msg['client_order_id']);
                 if ($repeaterId) {
@@ -79,7 +90,8 @@ final class FillMonitor extends Command
                 }
                 break;
             default:
-                 throw new \Exception('Unhandled Message');
+                \Zend\Debug\Debug::dump($msg);
+                throw new \Exception('Unhandled Message');
         }
     }
 
@@ -98,7 +110,7 @@ final class FillMonitor extends Command
         return 'wss://'.(new Host())->getHost().'/v1/order/events?eventTypeFilter=fill';
     }
 
-    private function getHeaders() : array
+    private function getHeaders(): array
     {
         $key = new Key();
         $payload = [

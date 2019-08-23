@@ -28,7 +28,7 @@ final class Repairer extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $db = (new Db())->getAdapter();
+        $db = Db::getAdapter();
         $table = new TableGateway('gemini_trade_repeater', $db);
 
         $loop = true;

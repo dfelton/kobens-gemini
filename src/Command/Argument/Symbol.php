@@ -7,10 +7,10 @@ use Kobens\Core\Command\Argument\ArgumentInterface;
 
 final class Symbol implements ArgumentInterface
 {
-    private const DEFAULT     = null;
-    private const DESCRIPTION = 'Trading pair symbol';
-    private const MODE        = InputArgument::REQUIRED;
-    const NAME        = 'symbol';
+    private const DEFAULT       = null;
+    private const DESCRIPTION   = 'Trading pair symbol';
+    private const MODE          = InputArgument::REQUIRED;
+    const NAME                  = 'symbol';
 
     public function getDefault()
     {

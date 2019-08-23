@@ -16,6 +16,9 @@
         <password>bar</password>
         <database>foobar</database>
     </database>
+    <php>
+        <timezone>America/Chicago</timezone>
+    </php>
     <cache>
         <adapter>
             <name>filesystem</name>

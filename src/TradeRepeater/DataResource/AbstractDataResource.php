@@ -18,7 +18,7 @@ abstract class AbstractDataResource implements StateStepperInterface
 
     public function __construct()
     {
-        $this->table = new TableGateway('gemini_trade_repeater', (new Db())->getAdapter());
+        $this->table = new TableGateway('gemini_trade_repeater', Db::getAdapter());
     }
 
     abstract protected function isHealthy(\ArrayObject $record) : bool;
@@ -65,15 +65,14 @@ abstract class AbstractDataResource implements StateStepperInterface
      */
     public function getRecord(int $id) : \ArrayObject
     {
+        /** @var \Zend\Db\ResultSet\ResultSet $rows */
         $rows = $this->table->select(function(Select $select) use ($id) {
             $select->where->equalTo('id', $id);
         });
         if ($rows->count() !== 1) {
             throw new \Exception ("Order ID Not Found");
         }
-        foreach ($rows as $row) {
-            return $row;
-        }
+        return $rows->current();
     }
 
 }

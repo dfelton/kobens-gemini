@@ -3,45 +3,26 @@
 
 require \dirname(__DIR__).'/vendor/autoload.php';
 
-
 use Kobens\Core\Config;
-use Kobens\Core\Http\Request\Throttler;
 use Kobens\Exchange\Exchange\Mapper;
 use Kobens\Gemini\Exchange;
-use Kobens\Gemini\Command\Command\TradeRepeater\{
-    Buyer as TradeRepeaterBuyer,
-    FillMonitor as TradeRepeaterFillMonitor,
-    Seller as TradeRepeaterSeller,
-    Archiver as TradeRepeaterArchiver,
-    Repairer as TradeRepeaterRepairer
-};
-use Kobens\Gemini\Command\Command\Market\{
-    BookKeeper as MarketBookKeeper,
-    Watcher    as MarketWatcher
-};
-use Kobens\Gemini\Command\Command\Order\BookKeeper as OrderBookKeeper;
-use Kobens\Gemini\Command\Command\Order\Placement\{
-    Cancel    as OrderCancel,
-    CancelAll as OrderCancelAll,
-    NewOrder  as OrderNew
-};
-use Kobens\Gemini\Command\Command\Order\Status\{
-    ActiveOrders as OrderListActive,
-    OrderStatus
-};
 use Symfony\Component\Console\Application;
 
-
 try {
-    $dir = \dirname(__DIR__);
     $config = Config::getInstance();
-    $config->setRootDir(\dirname(__DIR__));
     $config->setConfig(\dirname(__DIR__).'/env/config.xml');
+    $config->setRootDir(\dirname(__DIR__));
+
+    $phpSettings = $config->get('php');
+    if ($phpSettings) {
+        if ($phpSettings->get('timezone')) {
+            \date_default_timezone_set((string) $phpSettings->get('timezone'));
+        }
+    }
+    unset($config);
+
+    // Init Exchange Mapper (todo: may not be necessary if we're scrapping kobens-exchange's trade-repeater)
     new Mapper(['gemini' => Exchange::class]);
-    // Limit is actually 6. So up to 2 concurrent REST loop threads running,
-    // while slipping in a manual request here or there.
-    // Embracing websockets and local cache more will be future goals.
-    (new Throttler())->addThrottle('gemini', 3);
 
     $json = @\file_get_contents(\dirname(__DIR__).'/composer.json');
     if ($json === false) {
@@ -52,22 +33,29 @@ try {
         throw new \Exception('Unable to parse application\'s composer.json file.');
     }
     unset($json);
+
 } catch (\Exception $e) {
     exit("Initialization Error: {$e->getMessage()}" . PHP_EOL);
 }
 
 $app = new Application($composer->name, $composer->version);
-$app->add(new MarketBookKeeper());
-$app->add(new MarketWatcher());
-$app->add(new OrderBookKeeper());
-$app->add(new OrderCancel());
-$app->add(new OrderCancelAll());
-$app->add(new OrderListActive());
-$app->add(new OrderNew());
-$app->add(new OrderStatus());
-$app->add(new TradeRepeaterBuyer());
-$app->add(new TradeRepeaterFillMonitor());
-$app->add(new TradeRepeaterSeller());
-$app->add(new TradeRepeaterArchiver());
-$app->add(new TradeRepeaterRepairer());
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Buyer());
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor());
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Seller());
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Archiver());
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Repairer());
+$app->add(new \Kobens\Gemini\Command\Command\Taxes\Calculator\CostBasisLogger());
+$app->add(new \Kobens\Gemini\Command\Command\Taxes\Calculator\Form8949());
+$app->add(new \Kobens\Gemini\Command\Command\Market\BookKeeper());
+$app->add(new \Kobens\Gemini\Command\Command\Market\Ticker());
+$app->add(new \Kobens\Gemini\Command\Command\Market\Watcher());
+$app->add(new \Kobens\Gemini\Command\Command\Order\BookKeeper());
+$app->add(new \Kobens\Gemini\Command\Command\Order\Logger\TradeHistory());
+$app->add(new \Kobens\Gemini\Command\Command\Order\Placement\Cancel());
+$app->add(new \Kobens\Gemini\Command\Command\Order\Placement\CancelAll());
+$app->add(new \Kobens\Gemini\Command\Command\Order\Placement\NewOrder());
+$app->add(new \Kobens\Gemini\Command\Command\Order\Placement\ForceMaker());
+$app->add(new \Kobens\Gemini\Command\Command\Order\Status\ActiveOrders());
+$app->add(new \Kobens\Gemini\Command\Command\Order\Status\OrderStatus());
+$app->add(new \Kobens\Gemini\Command\Command\Order\Status\PastTrades());
 $app->run();

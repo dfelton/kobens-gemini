@@ -149,6 +149,7 @@ final class BookKeeper extends Command
         if (!self::$maintenance) { // mostly for IDE to not yell
             return false;
         }
+
         $ch = \curl_init(\sprintf('https://%s', Config::getInstance()->get('gemini')->api->host));
         \curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,   // return web page
