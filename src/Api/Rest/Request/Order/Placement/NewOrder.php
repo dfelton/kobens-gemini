@@ -17,7 +17,7 @@ class NewOrder extends Request
 
     protected $defaultPayload = [
         'type' => 'exchange limit',
-//         'options' => ['maker-or-cancel'],
+        'options' => ['maker-or-cancel'],
     ];
 
     /**
@@ -69,7 +69,7 @@ class NewOrder extends Request
         $this->payload = \array_merge($this->payload, ['amount' => $amount->getValue()]);
     }
 
-    protected function validateAmount(string $amount) : void
+    protected function validateAmount(string $amount): void
     {
         if ($amount < $this->pair->minOrderSize) {
             throw new Exception(\sprintf(
@@ -104,7 +104,7 @@ class NewOrder extends Request
         }
     }
 
-    protected function validatePrice(string $price) : void
+    protected function validatePrice(string $price): void
     {
         if ($price < $this->pair->minPriceIncrement) {
             throw new \Exception(\sprintf(
@@ -126,7 +126,7 @@ class NewOrder extends Request
         }
     }
 
-    protected function throwResponseException($response, $responseCode) : void
+    protected function throwResponseException($response, $responseCode): void
     {
         parent::throwResponseException($response, $responseCode);
         $obj = \json_decode($response);
