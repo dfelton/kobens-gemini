@@ -2,19 +2,20 @@
 
 namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Gemini\TradeRepeater\DataResource\{BuyPlaced, SellPlaced};
-use Kobens\Gemini\Api\Key;
-use Kobens\Gemini\Api\Nonce;
 use Amp\Loop;
 use Amp\Websocket\Client\Handshake;
 use Kobens\Gemini\Api\Host;
+use Kobens\Gemini\Api\Key;
+use Kobens\Gemini\Api\Nonce;
+use Kobens\Gemini\TradeRepeater\DataResource\BuyPlaced;
+use Kobens\Gemini\TradeRepeater\DataResource\SellPlaced;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 final class FillMonitor extends Command
 {
-    protected static $defaultName = 'kobens:gemini:trade-repeater:fill-monitor';
+    protected static $defaultName = 'gemini:trade-repeater:fill-monitor';
 
     private $buyFilled;
 

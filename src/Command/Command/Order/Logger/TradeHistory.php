@@ -6,19 +6,20 @@
 
 namespace Kobens\Gemini\Command\Command\Order\Logger;
 
+use Kobens\Core\Db;
+use Kobens\Gemini\Api\Rest\DataModel\Trade;
+use Kobens\Gemini\Api\Rest\Request\Order\Status\PastTrades;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
+use Zend\Db\Adapter\Exception\InvalidQueryException;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
-use Kobens\Core\Db;
-use Kobens\Gemini\Api\Rest\Request\Order\Status\PastTrades;
-use Zend\Db\Adapter\Exception\InvalidQueryException;
 
 final class TradeHistory extends Command
 {
-    protected static $defaultName = 'kobens:gemini:order:logger:trade-history';
+    protected static $defaultName = 'gemini:rest:order:logger:trade-history';
 
     /**
      * @var TableGateway
@@ -61,7 +62,7 @@ final class TradeHistory extends Command
 
             while ($i > 0) {
                 $i--;
-                $trade = $page[$i];
+                $trade = new Trade($page[$i], $this->symbol);
                 $this->logTrade($trade);
                 $this->outputUpdate($trade, $output);
             }
@@ -70,7 +71,7 @@ final class TradeHistory extends Command
                 $timestampms = $this->getLastTradeTimestampMs();
                 if ($timestampms === $pageFirstTimestampms) {
                     $timestampms++;
-                    if (count($page) === PastTrades::LIMIT_MAX) {
+                    if (\count($page) === PastTrades::LIMIT_MAX) {
                         // TODO: Support ticket # 1385118
                         $this->logPageLimitError($pageFirstTimestampms);
                         $output->writeln(\sprintf(
@@ -95,23 +96,23 @@ final class TradeHistory extends Command
         } while ($loop);
     }
 
-    private function outputUpdate(array $trade, OutputInterface $output): void
+    private function outputUpdate(Trade $trade, OutputInterface $output): void
     {
-        $date = $trade['timestampms']/1000;
+        $date = $trade->getTimestampms() / 1000;
         $date = explode('.', $date);
         $formattedDate = \date('Y-m-d H:i:s', $date[0]) . (isset($date[1]) ? '.'.$date[1] : '');
 
         $output->writeln(\sprintf(
             "%s\tLogged transaction %s for order %s. %s order for amount of %s at a price of %s per unit. Which occurred on %s. Fee: %s %s",
             (new \DateTime())->format('Y-m-d H:i:s'),
-            "<fg=yellow>{$trade['tid']}</>",
-            "<fg=yellow>{$trade['order_id']}</>",
-            $trade['type'] === 'Buy' ? "<fg=green>Buy</>" : "<fg=red>{$trade['type']}</>",
-            "<fg=yellow>{$trade['amount']}</>",
-            "<fg=yellow>{$trade['price']}</>",
+            "<fg=yellow>{$trade->getTradeId()}</>",
+            "<fg=yellow>{$trade->getOrderId()}</>",
+            $trade->getType() === 'buy' ? "<fg=green>Buy</>" : "<fg=red>{$trade->getType()}</>",
+            "<fg=yellow>{$trade->getAmount()}</>",
+            "<fg=yellow>{$trade->getPrice()}</>",
             "<fg=yellow>$formattedDate</>",
-            "<fg=yellow>{$trade['fee_amount']}</>",
-            "<fg=yellow>{$trade['fee_currency']}</>"
+            "<fg=yellow>{$trade->getFeeAmount()}</>",
+            "<fg=yellow>{$trade->getFeeCurrency()}</>"
         ));
     }
 
@@ -123,20 +124,24 @@ final class TradeHistory extends Command
         ]);
     }
 
-    private function logTrade(array $trade)
+    private function logTrade(Trade $trade): void
     {
         try {
             $this->getTable()->insert([
-                'transaction_id' => $trade['tid'],
-                'symbol' => $this->symbol,
-                'price' => $trade['price'],
-                'amount' => $trade['amount'],
-                'timestampms' => $trade['timestampms'],
-                'side' => \strtolower($trade['type']),
-                'fee_currency' => $trade['fee_currency'],
-                'fee_amount' => $trade['fee_amount'],
-                'order_id' => $trade['order_id'],
-                'client_order_id' => \array_key_exists('client_order_id', $trade) ? $trade['client_order_id'] : null
+                'transaction_id' => $trade->getTradeId(),
+                'symbol' => $trade->getSymbol(),
+                'price' => $trade->getPrice(),
+                'amount' => $trade->getAmount(),
+                'timestamp' => (int) $trade->getTimestamp(),
+                'timestampms' => (int) $trade->getTimestampms(),
+                'type' => $trade->getType(),
+                'aggressor' => $trade->getAggressor() ? 1 : 0,
+                'fee_amount' => $trade->getFeeAmount(),
+                'fee_currency' => $trade->getFeeCurrency(),
+                'order_id' => $trade->getOrderId(),
+                'client_order_id' => $trade->getClientOrderId(),
+                'exchange' => $trade->getExchange(),
+                'is_auction_fill' => $trade->getIsAuctionFill() ? 1 : 0,
             ]);
         } catch (InvalidQueryException $e) {
             $previous = $e->getPrevious();
@@ -180,7 +185,7 @@ final class TradeHistory extends Command
         return $timestampms;
     }
 
-    private function getTable()
+    private function getTable(): TableGateway
     {
         if (!$this->table) {
             $this->table = new TableGateway('gemini_trade_history', Db::getAdapter());

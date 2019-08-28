@@ -2,18 +2,23 @@
 
 namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
+use Kobens\Gemini\Api\Param\Amount;
+use Kobens\Gemini\Api\Param\ClientOrderId;
+use Kobens\Gemini\Api\Param\Price;
+use Kobens\Gemini\Api\Param\Side;
+use Kobens\Gemini\Api\Param\Symbol;
+use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder\ForceMaker;
+use Kobens\Gemini\Exception\MaxIterationsException;
+use Kobens\Gemini\Exchange\Currency\Pair;
+use Kobens\Gemini\TradeRepeater\DataResource\BuyReady;
+use Kobens\Gemini\TradeRepeater\DataResource\BuySent;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Gemini\TradeRepeater\DataResource\{BuyReady, BuySent};
-use Kobens\Gemini\Api\Param\{Side, Symbol, Amount, Price, ClientOrderId};
-use Kobens\Gemini\Exchange\Currency\Pair;
-use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder\ForceMaker;
-use Kobens\Gemini\Exception\MaxIterationsException;
 
 final class Buyer extends Command
 {
-    protected static $defaultName = 'kobens:gemini:trade-repeater:buyer';
+    protected static $defaultName = 'gemini:trade-repeater:buyer';
 
     protected function configure()
     {

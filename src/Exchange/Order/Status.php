@@ -2,8 +2,8 @@
 
 namespace Kobens\Gemini\Exchange\Order;
 
-use Kobens\Gemini\Exception\Exception;
 use Kobens\Exchange\Order\StatusInterface;
+use Kobens\Gemini\Exception\Exception;
 
 class Status implements StatusInterface
 {

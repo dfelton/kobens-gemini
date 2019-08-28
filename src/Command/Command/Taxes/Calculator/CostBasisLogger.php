@@ -2,17 +2,17 @@
 
 namespace Kobens\Gemini\Command\Command\Taxes\Calculator;
 
+use Kobens\Core\Db;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Zend\Db\TableGateway\TableGateway;
-use Kobens\Core\Db;
 use Zend\Db\ResultSet\ResultSet;
-use \Zend\Db\Sql\Select;
+use Zend\Db\Sql\Select;
+use Zend\Db\TableGateway\TableGateway;
 
 final class CostBasisLogger extends Command
 {
-    protected static $defaultName = 'kobens:gemini:taxes:calculator:cost-basis';
+    protected static $defaultName = 'gemini:taxes:calculator:cost-basis';
 
     /**
      * @var TableGateway
