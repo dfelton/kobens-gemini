@@ -30,9 +30,9 @@ try {
 }
 
 
-$buyBtc  = '0.00004250';
-$sellBtc = '0.00004225';
-
+//$buyBtc  = '0.00004250';
+$buyBtc  = '0.00004500';
+$sellBtc = \bcsub($buyBtc, '0.00000025', 8);
 
 $start       = '';
 $end         = '';
