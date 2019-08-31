@@ -51,9 +51,10 @@ final class TradeHistory extends Command
             $pageFirstTimestampms = $timestampms;
 
             $output->writeln(\sprintf(
-                "%s\tFetching page %d...",
+                "%s\tFetching page %d (%s)",
                 (new \DateTime())->format('Y-m-d H:i:s'),
-                $timestampms
+                $timestampms,
+                \gmdate("Y-m-d H:i:s \U\T\C", \substr($timestampms, 0, 10))
             ));
             $page = $this->getPage($timestampms);
             $i = \count($page);
