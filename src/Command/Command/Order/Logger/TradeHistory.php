@@ -63,7 +63,9 @@ final class TradeHistory extends Command
                 $i--;
                 $trade = $page[$i];
                 $this->logTrade($trade);
-                $this->outputUpdate($trade, $output);
+                if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                    $this->outputUpdate($trade, $output);
+                }
             }
 
             if ($hadResults) {
