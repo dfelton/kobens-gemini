@@ -5,10 +5,11 @@ namespace Kobens\Gemini\Command\Command\Market;
 use Amp\Websocket\Client\ConnectionException;
 use Kobens\Core\Config;
 use Kobens\Exchange\Exception\ClosedBookException;
-use Kobens\Gemini\Command\Argument\Symbol;
-use Kobens\Gemini\Command\Traits\{Traits, GetSymbol};
-use Kobens\Gemini\Exception\Api\WebSocket\SocketSequenceException;
 use Kobens\Gemini\Exchange;
+use Kobens\Gemini\Command\Argument\Symbol;
+use Kobens\Gemini\Command\Traits\GetSymbol;
+use Kobens\Gemini\Command\Traits\Traits;
+use Kobens\Gemini\Exception\Api\WebSocket\SocketSequenceException;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Symfony\Component\Console\Command\Command;
@@ -19,7 +20,7 @@ final class BookKeeper extends Command
 {
     use Traits, GetSymbol;
 
-    protected static $defaultName = 'kobens:gemini:market:book-keeper';
+    protected static $defaultName = 'market:book-keeper';
 
     /**
      * @var \Kobens\Gemini\Api\Param\Symbol

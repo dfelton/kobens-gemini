@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class CancelAll extends Command
 {
-    protected static $defaultName = 'kobens:gemini:order:cancel-all';
+    protected static $defaultName = 'order:cancel-all';
 
     protected function configure()
     {

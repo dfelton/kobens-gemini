@@ -2,14 +2,14 @@
 
 namespace Kobens\Gemini\Command\Command\Order;
 
+use Kobens\Gemini\Api\Websocket\OrderEvents\BookKeeper as OrderBookKeeper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Gemini\Api\Websocket\OrderEvents\BookKeeper as OrderBookKeeper;
 
 final class BookKeeper extends Command
 {
-    protected static $defaultName = 'kobens:gemini:order:book-keeper';
+    protected static $defaultName = 'book-keeper';
 
     protected function configure()
     {

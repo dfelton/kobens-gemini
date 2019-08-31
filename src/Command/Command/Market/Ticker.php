@@ -2,17 +2,18 @@
 
 namespace Kobens\Gemini\Command\Command\Market;
 
-use Kobens\Gemini\Command\Traits\{GetSymbol, Traits};
+use Kobens\Gemini\Command\Argument\Symbol;
+use Kobens\Gemini\Command\Traits\GetSymbol;
+use Kobens\Gemini\Command\Traits\Traits;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Gemini\Command\Argument\Symbol;
 
 final class Ticker extends Command
 {
     use GetSymbol, Traits;
 
-    protected static $defaultName = 'kobens:gemini:market:ticker';
+    protected static $defaultName = 'market:ticker';
 
 
     protected function configure()

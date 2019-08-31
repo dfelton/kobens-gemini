@@ -3,13 +3,13 @@
 namespace Kobens\Gemini\Command\Command\Order\Status;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
 
 final class PastTrades extends Command
 {
-    protected static $defaultName = 'kobens:gemini:order:past-trades';
+    protected static $defaultName = 'order:past-trades';
 
     protected function configure()
     {

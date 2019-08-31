@@ -2,16 +2,16 @@
 
 namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
+use Kobens\Core\Db;
+use Kobens\Gemini\TradeRepeater\DataResource\Archive;
+use Kobens\Gemini\TradeRepeater\DataResource\SellFilled;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Core\Db;
-use Kobens\Gemini\TradeRepeater\DataResource\SellFilled;
-use Kobens\Gemini\TradeRepeater\DataResource\Archive;
 
 final class Archiver extends Command
 {
-    protected static $defaultName = 'kobens:gemini:trade-repeater:archiver';
+    protected static $defaultName = 'trade-repeater:archiver';
 
     protected function configure()
     {

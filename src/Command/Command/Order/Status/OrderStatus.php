@@ -2,15 +2,15 @@
 
 namespace Kobens\Gemini\Command\Command\Order\Status;
 
+use Kobens\Gemini\Api\Rest\Request\Order\Status\OrderStatus as GetOrderStatus;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
-use Kobens\Gemini\Api\Rest\Request\Order\Status\OrderStatus as GetOrderStatus;
 
 final class OrderStatus extends Command
 {
-    protected static $defaultName = 'kobens:gemini:order:status';
+    protected static $defaultName = 'order:status';
 
     protected function configure()
     {

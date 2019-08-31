@@ -2,21 +2,23 @@
 
 namespace Kobens\Gemini\Command\Command\Market;
 
-use Kobens\Exchange\Book\BookInterface;
 use Kobens\Exchange\Exception\ClosedBookException;
-use Kobens\Gemini\Command\Argument\{RefreshRate, Symbol};
-use Kobens\Gemini\Command\Traits\{GetRefreshRate, GetSymbol, Traits};
 use Kobens\Gemini\Exchange;
+use Kobens\Gemini\Command\Argument\RefreshRate;
+use Kobens\Gemini\Command\Argument\Symbol;
+use Kobens\Gemini\Command\Traits\GetRefreshRate;
+use Kobens\Gemini\Command\Traits\GetSymbol;
+use Kobens\Gemini\Command\Traits\Traits;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
 
 final class Watcher extends Command
 {
     use GetRefreshRate, GetSymbol, Traits;
 
-    protected static $defaultName = 'kobens:gemini:market:watcher';
+    protected static $defaultName = 'market:watcher';
 
     private $isInitialized = false;
 
@@ -66,7 +68,7 @@ final class Watcher extends Command
     private $refreshRate = RefreshRate::DEFAULT;
 
     /**
-     * @var BookInterface
+     * @var \Kobens\Exchange\Book\BookInterface
      */
     private $book;
 

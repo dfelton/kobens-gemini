@@ -6,19 +6,19 @@
 
 namespace Kobens\Gemini\Command\Command\Order\Logger;
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
-use Zend\Db\Sql\Select;
-use Zend\Db\TableGateway\TableGateway;
 use Kobens\Core\Db;
 use Kobens\Gemini\Api\Rest\Request\Order\Status\PastTrades;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Adapter\Exception\InvalidQueryException;
+use Zend\Db\Sql\Select;
+use Zend\Db\TableGateway\TableGateway;
 
 final class TradeHistory extends Command
 {
-    protected static $defaultName = 'kobens:gemini:order:logger:trade-history';
+    protected static $defaultName = 'order:logger:trade-history';
 
     /**
      * @var TableGateway
@@ -70,7 +70,7 @@ final class TradeHistory extends Command
                 $timestampms = $this->getLastTradeTimestampMs();
                 if ($timestampms === $pageFirstTimestampms) {
                     $timestampms++;
-                    if (count($page) === PastTrades::LIMIT_MAX) {
+                    if (\count($page) === PastTrades::LIMIT_MAX) {
                         // TODO: Support ticket # 1385118
                         $this->logPageLimitError($pageFirstTimestampms);
                         $output->writeln(\sprintf(

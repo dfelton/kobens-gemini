@@ -2,25 +2,30 @@
 
 namespace Kobens\Gemini\Command\Command\Order\Placement;
 
+use Kobens\Exchange\Exception\Order\MakerOrCancelWouldTakeException;
 use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder as PlaceNewOrder;
-use Kobens\Gemini\Command\Argument\{
-    Amount, ClientOrderId, Price, Side, Symbol
-};
-use Kobens\Gemini\Command\Traits\{
-    Traits, GetAmount, GetClientOrderId, GetPrice, GetSide, GetSymbol
-};
+use Kobens\Gemini\Command\Argument\Amount;
+use Kobens\Gemini\Command\Argument\ClientOrderId;
+use Kobens\Gemini\Command\Argument\Price;
+use Kobens\Gemini\Command\Argument\Side;
+use Kobens\Gemini\Command\Argument\Symbol;
+use Kobens\Gemini\Command\Traits\GetAmount;
+use Kobens\Gemini\Command\Traits\GetClientOrderId;
+use Kobens\Gemini\Command\Traits\GetPrice;
+use Kobens\Gemini\Command\Traits\GetSide;
+use Kobens\Gemini\Command\Traits\GetSymbol;
+use Kobens\Gemini\Command\Traits\Traits;
 use Kobens\Gemini\Exception\Api\InsufficientFundsException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Exchange\Exception\Order\MakerOrCancelWouldTakeException;
 
 final class NewOrder extends Command
 {
     use Traits;
     use GetAmount, GetClientOrderId, GetPrice, GetSide, GetSymbol;
 
-    protected static $defaultName = 'kobens:gemini:order:new';
+    protected static $defaultName = 'order:new';
 
     protected function configure()
     {

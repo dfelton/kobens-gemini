@@ -2,15 +2,15 @@
 
 namespace Kobens\Gemini\Command\Command\Order\Status;
 
+use Kobens\Gemini\Api\Host;
+use Kobens\Gemini\Api\Rest\Request\Order\Status\ActiveOrders as ModelActiveOrders;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Gemini\Api\Rest\Request\Order\Status\ActiveOrders as ModelActiveOrders;
-use Kobens\Gemini\Api\Host;
 
 final class ActiveOrders extends Command
 {
-    protected static $defaultName = 'kobens:gemini:order:list-active';
+    protected static $defaultName = 'list-active';
 
     protected function configure()
     {
