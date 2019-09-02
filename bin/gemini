@@ -3,13 +3,8 @@
 
 require \dirname(__DIR__).'/vendor/autoload.php';
 
-use Kobens\Core\Config;
-use Kobens\Exchange\Exchange\Mapper;
-use Kobens\Gemini\Exchange;
-use Symfony\Component\Console\Application;
-
 try {
-    $config = Config::getInstance();
+    $config = \Kobens\Core\Config::getInstance();
     $config->setConfig(\dirname(__DIR__).'/env/config.xml');
     $config->setRootDir(\dirname(__DIR__));
 
@@ -22,7 +17,7 @@ try {
     unset ($config);
 
     // Init Exchange Mapper (todo: may not be necessary if we're scrapping kobens-exchange's trade-repeater)
-    new Mapper(['gemini' => Exchange::class]);
+    new \Kobens\Exchange\Exchange\Mapper(['gemini' => \Kobens\Gemini\Exchange::class]);
 
     $json = @\file_get_contents(\dirname(__DIR__).'/composer.json');
     if ($json === false) {
@@ -38,18 +33,21 @@ try {
     exit("Initialization Error: {$e->getMessage()}");
 }
 
-$app = new Application($composer->name, $composer->version);
+$app = new \Symfony\Component\Console\Application($composer->name, $composer->version);
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Buyer());
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor());
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Seller());
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Archiver());
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Repairer());
-$app->add(new \Kobens\Gemini\Command\Command\Taxes\Calculator\CostBasisLogger());
-$app->add(new \Kobens\Gemini\Command\Command\Taxes\Calculator\Form8949());
+$app->add(new \Kobens\Gemini\Command\Command\Taxes\BuyLogger());
+$app->add(new \Kobens\Gemini\Command\Command\Taxes\SellLogger());
+$app->add(new \Kobens\Gemini\Command\Command\Taxes\CapitalGains());
+$app->add(new \Kobens\Gemini\Command\Command\Taxes\Form8949());
 $app->add(new \Kobens\Gemini\Command\Command\Market\BookKeeper());
 $app->add(new \Kobens\Gemini\Command\Command\Market\Ticker());
 $app->add(new \Kobens\Gemini\Command\Command\Market\Watcher());
 $app->add(new \Kobens\Gemini\Command\Command\Order\BookKeeper());
+$app->add(new \Kobens\Gemini\Command\Command\Order\Logger\CheckLength());
 $app->add(new \Kobens\Gemini\Command\Command\Order\Logger\TradeHistory());
 $app->add(new \Kobens\Gemini\Command\Command\Order\Placement\Cancel());
 $app->add(new \Kobens\Gemini\Command\Command\Order\Placement\CancelAll());

@@ -3,9 +3,9 @@
 namespace Kobens\Gemini\TradeRepeater\DataResource;
 
 use Kobens\Core\Db;
+use Kobens\Gemini\TradeRepeater\StateStepperInterface;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
-use Kobens\Gemini\TradeRepeater\StateStepperInterface;
 
 abstract class AbstractDataResource implements StateStepperInterface
 {
@@ -18,10 +18,10 @@ abstract class AbstractDataResource implements StateStepperInterface
 
     public function __construct()
     {
-        $this->table = new TableGateway('gemini_trade_repeater', Db::getAdapter());
+        $this->table = new TableGateway('trade_repeater', Db::getAdapter());
     }
 
-    abstract protected function isHealthy(\ArrayObject $record) : bool;
+    abstract protected function isHealthy(\ArrayObject $record): bool;
 
     protected function getRecords(): \Zend\Db\ResultSet\ResultSetInterface
     {
@@ -31,7 +31,7 @@ abstract class AbstractDataResource implements StateStepperInterface
         });
     }
 
-    public function getHealthyRecords() : \Generator
+    public function getHealthyRecords(): \Generator
     {
         foreach ($this->getRecords() as $record) {
             if ($this->isHealthy($record)) {
@@ -40,7 +40,7 @@ abstract class AbstractDataResource implements StateStepperInterface
         }
     }
 
-    public function getUnhealthyRecords() : \Generator
+    public function getUnhealthyRecords(): \Generator
     {
         foreach ($this->getRecords() as $record) {
             if (!$this->isHealthy($record)) {
@@ -63,7 +63,7 @@ abstract class AbstractDataResource implements StateStepperInterface
      * @throws \Exception
      * @return \ArrayObject
      */
-    public function getRecord(int $id) : \ArrayObject
+    public function getRecord(int $id): \ArrayObject
     {
         /** @var \Zend\Db\ResultSet\ResultSet $rows */
         $rows = $this->table->select(function(Select $select) use ($id) {

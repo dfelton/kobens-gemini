@@ -15,13 +15,13 @@ final class Repairer extends Command
 
     protected function configure()
     {
-        $this->setDescription('Archives completed sell orders and marks record for next buy.');
+//         $this->setDescription('');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $db = Db::getAdapter();
-        $table = new TableGateway('gemini_trade_repeater', $db);
+        $table = new TableGateway('trade_repeater', $db);
 
         $loop = true;
         while ($loop) {

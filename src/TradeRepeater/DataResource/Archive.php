@@ -27,7 +27,7 @@ final class Archive
 
     public function __construct()
     {
-        $this->table = new TableGateway('gemini_trade_repeater_archive', Db::getAdapter());
+        $this->table = new TableGateway('trade_repeater_archive', Db::getAdapter());
     }
 
     public function addArchive(array $args): void

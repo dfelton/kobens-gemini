@@ -55,7 +55,7 @@ final class BookKeeper extends Command
         $this->log = new Logger($this->symbol);
         $this->log->pushHandler(new StreamHandler(
             \sprintf(
-                '%s/var/log/gemini_market_book_%d.log',
+                '%s/var/log/market_book_%d.log',
                 Config::getInstance()->getRootDir(),
                 \getmypid()
             ),

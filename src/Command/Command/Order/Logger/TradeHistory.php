@@ -18,6 +18,7 @@ use Zend\Db\TableGateway\TableGateway;
 
 final class TradeHistory extends Command
 {
+
     protected static $defaultName = 'order:logger:trade-history';
 
     /**
@@ -47,6 +48,7 @@ final class TradeHistory extends Command
 
         $timestampms = $this->getLastTradeTimestampMs();
         $loop = true;
+
         do {
             $pageFirstTimestampms = $timestampms;
 
@@ -54,7 +56,7 @@ final class TradeHistory extends Command
                 "%s\tFetching page %d (%s)",
                 (new \DateTime())->format('Y-m-d H:i:s'),
                 $timestampms,
-                \gmdate("Y-m-d H:i:s \U\T\C", \substr($timestampms, 0, 10))
+                \gmdate("Y-m-d H:i:s", \substr($timestampms, 0, 10))
             ));
             $page = $this->getPage($timestampms);
             $i = \count($page);
@@ -63,7 +65,18 @@ final class TradeHistory extends Command
             while ($i > 0) {
                 $i--;
                 $trade = $page[$i];
-                $this->logTrade($trade);
+                try {
+                    $this->logTrade($trade);
+                } catch (\Exception $e) {
+                    $output->writeln('<fg=red>Unhandled error inserting record into history table.</>');
+                    foreach ($trade as $key => $value) {
+                        if (is_bool($value)) {
+                            $value = $value ? 'true' : 'false';
+                        }
+                        $output->writeln(\sprintf("%s\t%s", $key, $value));
+                    }
+                    throw $e;
+                }
                 if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                     $this->outputUpdate($trade, $output);
                 }
@@ -81,15 +94,14 @@ final class TradeHistory extends Command
                             (new \DateTime())->format('Y-m-d H:i:s'),
                             'WARNING. SKIPPING POTENTIAL ORDERS DUE TO MAX PAGE SIZE LIMIT.'
                         ));
-                        \sleep(5);
-    //                     throw new \Exception(
-    //                         'Unable to ensure we can fetch the next page. Maximum results per page yielded trade all executing on the same timestamp. Timestamp Milliseconds: '.$timestampms
-    //                     );
+//                         throw new \Exception(
+//                             'Unable to ensure we can fetch the next page. Maximum results per page yielded trade all executing on the same timestamp. Timestamp Milliseconds: '.$timestampms
+//                         );
                     }
                 }
             } else {
                 $output->write(\sprintf(
-                    "%s\t<fg=green>Trade History for %s pair is up to date. Sleeping for one minute...</>",
+                    "%s\t<fg=green>Trade History for %s pair is up to date. Sleeping for one minute...</>\n",
                     (new \DateTime())->format('Y-m-d H:i:s'),
                     $this->symbol
                 ));
@@ -120,36 +132,40 @@ final class TradeHistory extends Command
 
     private function logPageLimitError(int $timestampms): void
     {
-        (new TableGateway('gemini_trade_history_pageLimitError', Db::getAdapter()))->insert([
+        (new TableGateway('trade_history_pageLimitError', Db::getAdapter()))->insert([
             'symbol' => $this->symbol,
             'timestampms' => $timestampms,
         ]);
     }
 
-    private function logTrade(array $trade)
+    private function logTrade(array $trade): void
     {
         try {
             $this->getTable()->insert([
-                'transaction_id' => $trade['tid'],
-                'symbol' => $this->symbol,
+                'tid' => $trade['tid'],
                 'price' => $trade['price'],
                 'amount' => $trade['amount'],
                 'timestampms' => $trade['timestampms'],
-                'side' => \strtolower($trade['type']),
+                'type' => \strtolower($trade['type']),
+                'aggressor' => $trade['aggressor'] ? 1 : 0,
                 'fee_currency' => $trade['fee_currency'],
                 'fee_amount' => $trade['fee_amount'],
                 'order_id' => $trade['order_id'],
-                'client_order_id' => \array_key_exists('client_order_id', $trade) ? $trade['client_order_id'] : null
+                'client_order_id' => \array_key_exists('client_order_id', $trade) ? $trade['client_order_id'] : null,
+                'trade_date' => \gmdate("Y-m-d H:i:s", \substr($trade['timestampms'], 0, 10)),
             ]);
         } catch (InvalidQueryException $e) {
             $previous = $e->getPrevious();
-            if ($previous instanceof \PDOException && $previous->getCode() === '2300') {
+            if ($previous instanceof \PDOException && $previous->getCode() === '23000') {
+                // TODO: This may cause us to go over our max_error_count setting, we should do a select first
                 // just means we logged it already the prior fetched page
+            } else {
+                throw $e;
             }
         }
     }
 
-    private function getPage(int $timestampms)
+    private function getPage(int $timestampms): array
     {
         return \json_decode($this->getModel()->setTimestamp($timestampms)->getResponse()['body'], true);
     }
@@ -172,7 +188,6 @@ final class TradeHistory extends Command
         $rows = $this->getTable()->select(function (Select $select)
         {
             $select->columns(['timestampms']);
-            $select->where->equalTo('symbol', $this->symbol);
             $select->order('timestampms DESC');
             $select->limit(1);
         });
@@ -183,10 +198,10 @@ final class TradeHistory extends Command
         return $timestampms;
     }
 
-    private function getTable()
+    private function getTable(): TableGateway
     {
         if (!$this->table) {
-            $this->table = new TableGateway('gemini_trade_history', Db::getAdapter());
+            $this->table = new TableGateway('trade_history_'.$this->symbol, Db::getAdapter());
         }
         return $this->table;
     }

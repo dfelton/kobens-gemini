@@ -34,14 +34,24 @@ final class PastTrades extends Command
             $output->writeln($response['body']);
         } else {
             $trades = \json_decode($response['body'], true);
-            $this->outputHeaders($output, $symbol);
-            foreach ($trades as $trade) {
+            foreach ($trades as $i => $trade) {
+                if ($i === 0 || $i % 50 === 0) {
+                    $this->outputHeaders($output, $symbol);
+                }
                 $date = $trade['timestampms']/1000;
                 $date = explode('.', $date);
                 $formattedDate = \date('Y-m-d H:i:s', $date[0]) . (isset($date[1]) ? '.'.$date[1] : '');
 
+                if (\strpos($trade['amount'], '.') !== false) {
+                    $trade['amount'] = \explode('.', $trade['amount']);
+                    $trade['amount'][1] = \str_pad($trade['amount'][1], 8, '0', STR_PAD_RIGHT);
+                    $trade['amount'] = \implode('.', $trade['amount']);
+                } else {
+                    $trade['amount'] .= '.00000000';
+                }
+
                 $output->writeln(\sprintf(
-                    "%s\t%s\t\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+                    "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
                     $trade['price']. (\strlen($trade['price']) < 8 ? "\t" : ''),
                     $trade['amount'],
                     $trade['timestampms'],
@@ -59,9 +69,8 @@ final class PastTrades extends Command
 
     private function outputHeaders(OutputInterface $output, string $symbol): void
     {
-        $output->writeln("Trading history for $symbol:\n");
         $output->write(\sprintf(
-            "%s\t\t%s\t\t%s\t%s       %s\t\t%s\t%s\t%s\t%s\t%s\t%s\n",
+            "\n%s\t\t%s\t\t%s\t%s       %s\t\t%s\t%s\t%s\t%s\t%s\t%s\n",
             '<options=underscore>Price</>',
             '<options=underscore>Amount</>',
             '<options=underscore>TimestampMS</>',
