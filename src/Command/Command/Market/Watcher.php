@@ -125,7 +125,7 @@ final class Watcher extends Command
         }
     }
 
-    private function init(InputInterface $input, OutputInterface $output) : void
+    private function init(InputInterface $input, OutputInterface $output): void
     {
         if ($this->isInitialized) {
             throw new \Exception(\sprintf('Cannot initialize "%" more than once', __CLASS__));
@@ -140,7 +140,7 @@ final class Watcher extends Command
         $this->book = (new Exchange())->getBook($this->symbol);
     }
 
-    private function outputUpdate(OutputInterface $output) : void
+    private function outputUpdate(OutputInterface $output): void
     {
         $tabsBid = 3 - \floor(\strlen($this->bid) / $this->tabLength);
         if ($tabsBid < 0) {

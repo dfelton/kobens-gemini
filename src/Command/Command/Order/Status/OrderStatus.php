@@ -39,7 +39,7 @@ final class OrderStatus extends Command
         }
     }
 
-    private function getFormattedVal($val) : string
+    private function getFormattedVal($val): string
     {
         switch (true) {
             case $val === true:

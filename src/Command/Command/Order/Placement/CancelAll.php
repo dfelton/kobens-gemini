@@ -32,5 +32,4 @@ final class CancelAll extends Command
             ]);
         }
     }
-
 }

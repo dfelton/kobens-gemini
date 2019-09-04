@@ -45,5 +45,4 @@ final class Ticker extends Command
 
         $output->write(PHP_EOL);
     }
-
 }

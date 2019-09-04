@@ -118,28 +118,4 @@ final class BookKeeper extends Command
             $this->log->warning($e->getTraceAsString());
         }
     }
-
-    /**
-     * @todo finish me
-     * @todo move to single purpose class object
-     *
-     * @return bool
-     */
-    protected function isMaintenance() : bool
-    {
-        return false;
-        $ch = \curl_init(\sprintf('https://%s', Config::getInstance()->get('gemini')->api->host));
-        \curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,   // return web page
-            CURLOPT_HEADER         => false,  // don't return headers
-            CURLOPT_FOLLOWLOCATION => false,  // follow redirects
-            CURLOPT_MAXREDIRS      => 10,     // stop after 10 redirects
-            CURLOPT_ENCODING       => "",     // handle compressed
-            CURLOPT_USERAGENT      => "test", // name of client
-            CURLOPT_AUTOREFERER    => true,   // set referrer on redirect
-            CURLOPT_CONNECTTIMEOUT => 120,    // time-out on connect
-            CURLOPT_TIMEOUT        => 120,    // time-out on response
-        ]);
-    }
-
 }
