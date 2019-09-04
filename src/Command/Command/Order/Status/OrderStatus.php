@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class OrderStatus extends Command
 {
-    protected static $defaultName = 'order-status';
+    protected static $defaultName = 'order-status:status';
 
     protected function configure()
     {
