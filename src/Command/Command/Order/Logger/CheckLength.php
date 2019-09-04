@@ -12,7 +12,7 @@ use Zend\Db\TableGateway\TableGateway;
 
 final class CheckLength extends Command
 {
-    protected static $defaultName = 'order:logger:check-length';
+    protected static $defaultName = 'order-logger:check-length';
 
     /**
      * @var TableGateway

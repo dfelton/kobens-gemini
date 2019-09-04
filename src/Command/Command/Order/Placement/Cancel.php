@@ -14,7 +14,7 @@ final class Cancel extends Command
 
     protected function configure()
     {
-        $this->setDescription('Cancel all open orders on the Gemini exchange.');
+        $this->setDescription('Cancel an individual open order on the Gemini exchange.');
         $this->addArgument('order_id', InputArgument::REQUIRED, 'Order id on exchange.');
     }
 

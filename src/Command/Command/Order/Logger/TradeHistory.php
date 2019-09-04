@@ -19,7 +19,7 @@ use Zend\Db\TableGateway\TableGateway;
 final class TradeHistory extends Command
 {
 
-    protected static $defaultName = 'order:logger:trade-history';
+    protected static $defaultName = 'order-logger:trade-history';
 
     /**
      * @var TableGateway

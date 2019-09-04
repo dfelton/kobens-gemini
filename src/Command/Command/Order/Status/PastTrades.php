@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class PastTrades extends Command
 {
-    protected static $defaultName = 'order:past-trades';
+    protected static $defaultName = 'order-status:past-trades';
 
     protected function configure()
     {

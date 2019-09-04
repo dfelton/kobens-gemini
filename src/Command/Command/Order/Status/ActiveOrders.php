@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class ActiveOrders extends Command
 {
-    protected static $defaultName = 'list-active';
+    protected static $defaultName = 'order-status:list-active';
 
     protected function configure()
     {
