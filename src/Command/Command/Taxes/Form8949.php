@@ -34,41 +34,77 @@ final class Form8949 extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $bcadd = Add::getInstance();
-        $capitalGains = '0';
+        $capitalGains = [
+            'assetsSold' => '0',
+            'totalProceeds' => '0',
+
+            'short' => [],
+            'long'  => [],
+            'shortTotal' => '0',
+            'longTotal'  => '0',
+        ];
 
         $i = 0;
         foreach ($this->getData($input) as $row) {
-            if ($i===0 || $i % 50 === 0) {
+            if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE && ($i===0 || $i % 50 === 0)) {
                 $this->outputHeaders($output);
             }
 
-            $capitalGains = $bcadd->getResult($capitalGains, $row['capital_gain']);
+            $capitalGains['assetsSold'] = $bcadd->getResult($capitalGains['assetsSold'], $row['amount']);
+            $capitalGains['totalProceeds'] = $bcadd->getResult($capitalGains['totalProceeds'], $row['proceeds']);
 
-            $output->write(\str_pad(\sprintf('%s Bitcoin', $row['amount']), 24, ' '));
-            $output->write(\substr($row['buy_date'],0,10)."\t");
-            $output->write(\substr($row['sell_date'],0,10)."\t");
-            $output->write(\str_pad($row['proceeds'], 24, ' '));
-            $output->write(\str_pad($row['cost_basis'], 24, ' '));
-            $output->write($row['capital_gain']."\n");
+            if ($this->isLongTerm($row['buy_date'], $row['sell_date'])) {
+                $capitalGains['long'][] = $row;
+                $capitalGains['longTotal'] = $bcadd->getResult($capitalGains['longTotal'], $row['capital_gain']);
+
+
+            } else {
+                $capitalGains['short'][] = $row;
+                $capitalGains['shortTotal'] = $bcadd->getResult($capitalGains['shortTotal'], $row['capital_gain']);
+            }
+
+            if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                $output->write(\str_pad(\sprintf('%s Bitcoin', $row['amount']), 26, ' ', STR_PAD_RIGHT));
+                $output->write(\str_pad(\substr($row['buy_date'],0,10),         16, ' ', STR_PAD_RIGHT));
+                $output->write(\str_pad(\substr($row['sell_date'],0,10),        16, ' ', STR_PAD_RIGHT));
+                $output->write(\str_pad($row['proceeds'],                       24, ' ', STR_PAD_RIGHT));
+                $output->write(\str_pad($row['cost_basis'],                     24, ' ', STR_PAD_RIGHT));
+                $output->write($row['capital_gain']."\n");
+            }
 
             $i++;
         }
 
         $output->write("\n\n");
-        $output->write(\sprintf("Total Capital Gains: %s\n", $capitalGains));
-        $output->write(\sprintf("Total Line Items: %d", $i));
-        $output->write("\n\n");
+        $output->write(\sprintf("Total Short Term Capital Gains: %s\n", $capitalGains['shortTotal']));
+        $output->write(\sprintf("Total Short Term Trades: %d", \count($capitalGains['short'])));
+        $output->write("\n");
+        $output->write(\sprintf("Total Long Term Capital Gains: %s\n", $capitalGains['longTotal']));
+        $output->write(\sprintf("Total Long Term Trades: %d\n", \count($capitalGains['long'])));
+        $output->write("\n");
+        $output->write(\sprintf("Total Proceeds: %s\n", $capitalGains['totalProceeds']));
+        $output->write(\sprintf("Total Assets Sold: %s\n", $capitalGains['assetsSold']));
+        $output->write("\n");
+    }
+
+    private function isLongTerm(string $buyDate, string $sellDate): bool
+    {
+        $hodlDateStart = \strtotime('+1 days', \strtotime(\substr($buyDate, 0, 10)));
+        $hodlDateStart = \strtotime('+1 years', $hodlDateStart);
+        $sellDateStart = \strtotime(\substr($sellDate, 0, 10));
+        return $hodlDateStart <= $sellDateStart;
     }
 
     private function outputHeaders(OutputInterface $output): void
     {
-        $output->write("\n\n");
-        $output->write("<options=underscore>Description of Property</>\t");
-        $output->write("<options=underscore>Date Acquired</>\t");
-        $output->write("<options=underscore>Date Sold</>\t");
-        $output->write("<options=underscore>Proceeds</>\t\t");
-        $output->write("<options=underscore>Cost Basis</>\t\t");
-        $output->write("<options=underscore>Gain or Loss</>\n");
+        $output->write("\n");
+        $output->write(\str_pad("<options=underscore>Description of Property</>", 26+23, ' ', STR_PAD_RIGHT));
+        $output->write(\str_pad("<options=underscore>Date Acquired</>",           16+23, ' ', STR_PAD_RIGHT));
+        $output->write(\str_pad("<options=underscore>Date Sold</>",               16+23, ' ', STR_PAD_RIGHT));
+        $output->write(\str_pad("<options=underscore>Proceeds</>",                24+23, ' ', STR_PAD_RIGHT));
+        $output->write(\str_pad("<options=underscore>Cost Basis</>",              24+23, ' ', STR_PAD_RIGHT));
+        $output->write(         "<options=underscore>Gain or Loss</>");
+        $output->write("\n");
     }
 
     private function getData(InputInterface $input): \Zend\Db\ResultSet\ResultSetInterface
@@ -98,7 +134,6 @@ final class Form8949 extends Command
                 'taxes_btcusd_sell_log.sell_tid ASC',
                 'taxes_btcusd_sell_log.buy_tid ASC'
             ]);
-
         });
     }
 
