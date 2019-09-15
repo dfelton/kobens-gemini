@@ -1,3 +1,7 @@
+--
+-- TODO: Implement a install/upgrade approach better than this
+--
+
 
 
 DROP TABLE IF EXISTS `trade_repeater`;
@@ -114,4 +118,19 @@ CREATE TABLE `taxes_form8949` (
     `created_at` TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'Created At',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - Form 8949';
+
+
+--
+-- TODO: This (schema) originates from kobens-core and doesn't belong in the kobens-gemini
+--
+DROP TABLE IF EXISTS `throttler`;
+CREATE TABLE `throttler` (
+     `id` VARCHAR(255) NOT NULL COMMENT 'Key',
+     `max` INT(10) UNSIGNED NOT NULL COMMENT 'Limit',
+     `count` INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Count',
+     `time` INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Time',
+     PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Throttler';
+INSERT INTO `throttler` (`id`,`max`) VALUES ('api.sandbox.gemini.com', 6), ('api.gemini.com', 6);
+
 
