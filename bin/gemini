@@ -30,7 +30,8 @@ try {
     unset($json);
 
 } catch (\Exception $e) {
-    exit("Initialization Error: {$e->getMessage()}");
+    echo \sprintf("Initialization Error: %s\n", $e->getMessage());
+    exit(1);
 }
 
 $app = new \Symfony\Component\Console\Application($composer->name, $composer->version);
@@ -38,7 +39,6 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Buyer());
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor());
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Seller());
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Archiver());
-$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Repairer());
 $app->add(new \Kobens\Gemini\Command\Command\Taxes\BuyLogger());
 $app->add(new \Kobens\Gemini\Command\Command\Taxes\SellLogger());
 $app->add(new \Kobens\Gemini\Command\Command\Taxes\CapitalGains());
