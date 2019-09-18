@@ -105,7 +105,7 @@ final class BookKeeper extends Command
         }
     }
 
-    protected function logException(\Exception $e, $logNewTrace = true) : void
+    protected function logException(\Exception $e, $logNewTrace = true): void
     {
         $this->log->warning(\json_encode([
             'symbol' => $this->symbol,

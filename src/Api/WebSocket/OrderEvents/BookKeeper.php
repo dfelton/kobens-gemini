@@ -7,8 +7,8 @@ use Amp\Websocket\Client\Handshake;
 use Kobens\Core\Cache;
 use Kobens\Gemini\Exchange;
 use Kobens\Gemini\Api\Host;
-use Kobens\Gemini\Api\Nonce;
 use Kobens\Gemini\Api\Key;
+use Kobens\Gemini\Api\Nonce;
 
 final class BookKeeper
 {
@@ -30,7 +30,7 @@ final class BookKeeper
         $this->cache = (new Cache())->getCache();
     }
 
-    public function openBook() : void
+    public function openBook(): void
     {
         Loop::run(function ()
         {
@@ -50,12 +50,12 @@ final class BookKeeper
         });
     }
 
-    protected function getUrl()
+    protected function getUrl(): string
     {
         return 'wss://'.(new Host())->getHost().static::REQUEST_URI;
     }
 
-    protected function getHeaders() : array
+    protected function getHeaders(): array
     {
         $key = new Key();
         $payload = [
@@ -70,6 +70,5 @@ final class BookKeeper
             'X-GEMINI-SIGNATURE' => $signature,
         ];
     }
-
 
 }

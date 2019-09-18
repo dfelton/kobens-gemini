@@ -40,15 +40,6 @@ abstract class AbstractDataResource implements StateStepperInterface
         }
     }
 
-    public function getUnhealthyRecords(): \Generator
-    {
-        foreach ($this->getRecords() as $record) {
-            if (!$this->isHealthy($record)) {
-                yield $record;
-            }
-        }
-    }
-
     public function setNote(int $id, string $note): bool
     {
         if (strlen($note) > 255) {

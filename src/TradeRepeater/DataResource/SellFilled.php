@@ -7,7 +7,7 @@ final class SellFilled extends AbstractDataResource
     const STATUS_CURRENT = 'SELL_FILLED';
     const STATUS_NEXT    = 'BUY_READY';
 
-    protected function isHealthy(\ArrayObject $record) : bool
+    protected function isHealthy(\ArrayObject $record): bool
     {
         return $record->status === self::STATUS_CURRENT
             && $record->buy_client_order_id !== NULL
@@ -16,7 +16,7 @@ final class SellFilled extends AbstractDataResource
             && $record->sell_order_id !== NULL;
     }
 
-    public function setNextState(int $id, array $args = []) : bool
+    public function setNextState(int $id, array $args = []): bool
     {
         if ($args !== []) {
             throw new \Exception("SellFilled StateStepper does not accept any arguments");

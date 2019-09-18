@@ -2,7 +2,8 @@
 
 namespace Kobens\Gemini\Exchange\Currency;
 
-use Kobens\Currency\{Currency, Pair as CurrencyPair};
+use Kobens\Currency\Currency;
+use Kobens\Currency\Pair as CurrencyPair;
 use Kobens\Exchange\PairInterface;
 
 final class Pair extends CurrencyPair implements PairInterface
@@ -43,7 +44,7 @@ final class Pair extends CurrencyPair implements PairInterface
         $this->minPriceIncrement = self::$pairs[$symbol]['minPriceIncrement'];
     }
 
-    public static function getInstance(string $symbol) : PairInterface
+    public static function getInstance(string $symbol): PairInterface
     {
         if (!\array_key_exists($symbol, self::$instances)) {
             self::$instances[$symbol] = new self($symbol);
@@ -54,7 +55,7 @@ final class Pair extends CurrencyPair implements PairInterface
     /**
      * @return PairInterface[]
      */
-    public static function getAllInstances() : array
+    public static function getAllInstances(): array
     {
         foreach (\array_diff(\array_keys(self::$pairs), \array_keys(self::$instances)) as $symbol) {
             self::getInstance($symbol);

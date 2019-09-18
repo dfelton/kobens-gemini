@@ -2,14 +2,17 @@
 
 namespace Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder;
 
+use Kobens\Exchange\Exception\ClosedBookException;
 use Kobens\Exchange\Exception\Order\MakerOrCancelWouldTakeException;
-use Kobens\Gemini\Api\Param\{Side, Symbol, Amount, Price, ClientOrderId};
+use Kobens\Gemini\Exchange;
+use Kobens\Gemini\Api\Param\Amount;
+use Kobens\Gemini\Api\Param\ClientOrderId;
+use Kobens\Gemini\Api\Param\Price;
+use Kobens\Gemini\Api\Param\Side;
+use Kobens\Gemini\Api\Param\Symbol;
+use Kobens\Gemini\Api\Rest\Request\Market\Ticker;
 use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder;
 use Kobens\Gemini\Exception\MaxIterationsException;
-use Kobens\Gemini\Exchange;
-use Kobens\Exchange\Exception\ClosedBookException;
-use Kobens\Gemini\Api\Rest\Request\Market\Ticker;
-use Kobens\Exchange\PairInterface;
 
 /**
  * FIXME There is too much ability to go wrong here via public setters in the parent. Are we accepting concrete hard limits via the constructor or not? Eliminate public setters or eliminate statefulness in the class.
@@ -31,7 +34,7 @@ final class ForceMaker extends NewOrder
     private $limit;
 
     /**
-     * @var PairInterface
+     * @var \Kobens\Currency\PairInterface
      */
     private $pair;
 
@@ -47,7 +50,7 @@ final class ForceMaker extends NewOrder
         $this->pair = (new Exchange())->getPair($this->payload['symbol']);
     }
 
-    public function getResponse() : array
+    public function getResponse(): array
     {
         $iterations = 0;
         $response = null;

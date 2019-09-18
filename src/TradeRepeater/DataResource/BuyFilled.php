@@ -7,7 +7,7 @@ final class BuyFilled extends AbstractDataResource
     const STATUS_CURRENT = 'BUY_FILLED';
     const STATUS_NEXT    = 'SELL_SENT';
 
-    protected function isHealthy(\ArrayObject $record) : bool
+    protected function isHealthy(\ArrayObject $record): bool
     {
         return $record->status === self::STATUS_CURRENT
             && $record->buy_client_order_id !== NULL
@@ -16,7 +16,7 @@ final class BuyFilled extends AbstractDataResource
             && $record->sell_order_id === NULL;
     }
 
-    public function setNextState(int $id, array $args = []) : bool
+    public function setNextState(int $id, array $args = []): bool
     {
         if (empty($args['sell_client_order_id'])) {
             throw new \Exception("'sell_client_order_id' is required.");
@@ -28,7 +28,7 @@ final class BuyFilled extends AbstractDataResource
         $affectedRows = $this->table->update(
             ['sell_client_order_id' => $args['sell_client_order_id'], 'status' => self::STATUS_NEXT],
             ['id' => $id]
-            );
+        );
         if ($affectedRows !== 1) {
             throw new \Exception ("Order $id not marked '".self::STATUS_NEXT."'");
         }

@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 
 trait GetSide
 {
-    protected function getSide(InputInterface $input) : Param
+    protected function getSide(InputInterface $input): Param
     {
         $side = $input->getArgument(Arg::NAME);
         switch (true) {

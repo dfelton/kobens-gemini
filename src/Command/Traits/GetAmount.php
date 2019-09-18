@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 
 trait GetAmount
 {
-    protected function getAmount(InputInterface $input) : Param
+    protected function getAmount(InputInterface $input): Param
     {
         return new Param($input->getArgument(Arg::NAME));
     }

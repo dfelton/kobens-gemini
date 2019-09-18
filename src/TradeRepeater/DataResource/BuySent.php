@@ -8,7 +8,7 @@ final class BuySent extends AbstractDataResource
     const STATUS_CURRENT = 'BUY_SENT';
     const STATUS_NEXT    = 'BUY_PLACED';
 
-    protected function isHealthy(\ArrayObject $record) : bool
+    protected function isHealthy(\ArrayObject $record): bool
     {
         return $record->status === self::STATUS_CURRENT
             && $record->buy_client_order_id !== NULL
@@ -17,7 +17,7 @@ final class BuySent extends AbstractDataResource
             && $record->sell_order_id === NULL;
     }
 
-    public function setNextState(int $id, array $args = []) : bool
+    public function setNextState(int $id, array $args = []): bool
     {
         if (empty($args['buy_order_id'])) {
             throw new \Exception("'buy_order_id' is required.");

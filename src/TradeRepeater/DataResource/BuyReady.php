@@ -7,7 +7,7 @@ final class BuyReady extends AbstractDataResource
     const STATUS_CURRENT = 'BUY_READY';
     const STATUS_NEXT    = 'BUY_SENT';
 
-    protected function isHealthy(\ArrayObject $record) : bool
+    protected function isHealthy(\ArrayObject $record): bool
     {
         return $record->status === self::STATUS_CURRENT
             && $record->buy_client_order_id === NULL

@@ -10,7 +10,7 @@ trait Traits
 {
     use CoreTraits;
 
-    protected function debugAndSleep(\Exception $e, OutputInterface $output) : void
+    protected function debugAndSleep(\Exception $e, OutputInterface $output): void
     {
         $this->clearTerminal($output);
         if (!$output->isQuiet()) {
@@ -25,7 +25,7 @@ trait Traits
         $this->sleep($output, 10);
     }
 
-    protected function getHost() : string
+    protected function getHost(): string
     {
         return (string) (new Host());
     }

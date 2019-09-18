@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 
 trait GetClientOrderId
 {
-    protected function getClientOrderId(InputInterface $input) : Param
+    protected function getClientOrderId(InputInterface $input): Param
     {
         return new Param($input->getArgument(Arg::NAME));
     }

@@ -5,16 +5,16 @@ namespace Kobens\Gemini\Api\Rest;
 use Kobens\Core\Config;
 use Kobens\Core\Exception\ConnectionException;
 use Kobens\Core\Http\Request\Throttler;
-use Kobens\Gemini\Api\{Host, Key, Nonce};
-use Kobens\Gemini\Exception\{
-    Exception,
-    InvalidResponseException,
-    ResourceMovedException
-};
+use Kobens\Gemini\Api\Host;
+use Kobens\Gemini\Api\Key;
+use Kobens\Gemini\Api\Nonce;
+use Kobens\Gemini\Exception\Exception;
+use Kobens\Gemini\Exception\InvalidResponseException;
+use Kobens\Gemini\Exception\LogicException;
+use Kobens\Gemini\Exception\ResourceMovedException;
 use Kobens\Gemini\Exception\Api\InvalidSignatureException;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
-use Kobens\Gemini\Exception\LogicException;
 
 /**
  * @todo going to want portions of this in kobens/kobens-core somehow; at a minimum inside kobens/kobens-exchange
@@ -69,7 +69,7 @@ abstract class Request
         $this->throttler = new Throttler($config->get('gemini')->api->host);
     }
 
-    public function getResponse() : array
+    public function getResponse(): array
     {
         $response = $this->_getResponse();
         $this->throwResponseException($response['body'], $response['code']);
@@ -82,12 +82,12 @@ abstract class Request
         return $response;
     }
 
-    protected function getUrlPath()
+    protected function getUrlPath(): string
     {
         return static::REQUEST_URI;
     }
 
-    final private function _getResponse() : array
+    final private function _getResponse(): array
     {
         $this->throttler->throttle();
 
@@ -120,7 +120,7 @@ abstract class Request
      *
      * @return array
      */
-    final private function getRequestHeaders() : array
+    final private function getRequestHeaders(): array
     {
         $base64Payload = \base64_encode(\json_encode(\array_merge(
             ['request' => static::REQUEST_URI, 'nonce' => $this->nonce->getNonce()],
@@ -136,7 +136,7 @@ abstract class Request
         ];
     }
 
-    protected function throwResponseException(string $body, int $code) : void
+    protected function throwResponseException(string $body, int $code): void
     {
         switch (true) {
             case $code === 0:

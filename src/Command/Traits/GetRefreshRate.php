@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 trait GetRefreshRate
 {
-    protected function getRefreshRate(InputInterface $input, OutputInterface $output) : Param
+    protected function getRefreshRate(InputInterface $input, OutputInterface $output): Param
     {
         $refreshRate = (int) $input->getArgument('refresh_rate');
         if ($refreshRate < Arg::MIN_VALUE) {
