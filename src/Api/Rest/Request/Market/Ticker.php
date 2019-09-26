@@ -16,7 +16,7 @@ class Ticker extends Request
         parent::__construct();
     }
 
-    protected function getUrlPath()
+    protected function getUrlPath(): string
     {
         return '/v1/pubticker/'.$this->symbol;
     }

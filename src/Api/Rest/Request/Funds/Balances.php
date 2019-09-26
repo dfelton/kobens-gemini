@@ -8,7 +8,7 @@ class Balances extends Request
 {
     const REQUEST_URI = '/v1/balances';
 
-    protected function getUrlPath()
+    protected function getUrlPath(): string
     {
         return self::REQUEST_URI;
     }
