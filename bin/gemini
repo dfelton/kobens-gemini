@@ -35,6 +35,7 @@ try {
 }
 
 $app = new \Symfony\Component\Console\Application($composer->name, $composer->version);
+$app->add(new \Kobens\Gemini\Command\Command\Funds\GetAvailableBalances());
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Buyer());
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor());
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Seller());
