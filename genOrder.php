@@ -30,13 +30,16 @@ try {
 }
 
 
-//$buyBtc  = '0.00004250';
-$buyBtc  = '0.00004500';
-$sellBtc = \bcsub($buyBtc, '0.00000025', 8);
+//$buyBtc  = '0.00004500';
+$buyBtc  = '0.00005000';
+//$buyBtc  = '0.00000500';
+
+//$sellBtc = \bcsub($buyBtc, '0.00000025', 8);
+$sellBtc = \bcsub($buyBtc, '0.00000112', 8);
+//$sellBtc = $buyBtc;
 
 $start       = '';
 $end         = '';
-
 
 $action = ''; // 'buy' | 'sell'
 
@@ -107,13 +110,13 @@ while (floatval($buyPrice) <= floatval($end)) {
         'buy_price' => $buyPrice,
         'buy_amount_usd' => $amountUsd,
         'buy_amount_btc' => $buyBtc,
-        'buy_fee' => $fee,
+        //'buy_fee' => $fee,
         'buy_usd_with_fee' => bcadd($amountUsd, $fee, 14),
         'sell_price' => $sellPrice,
-        'sell_amount_usd' => $sellSubtotalUsd,
+        //'sell_amount_usd' => $sellSubtotalUsd,
         'sell_amount_btc' => $sellBtc,
-        'sell_fee' => $sellFeeUsd,
-        'sell_yield' => $sellYieldUsd,
+        //'sell_fee' => $sellFeeUsd,
+        //'sell_yield' => $sellYieldUsd,
         'position_profits_usd' => $positionProfitUsd,
         'position_profits_btc' => $positionProfitBtc,
     ];
@@ -152,10 +155,18 @@ while (floatval($buyPrice) <= floatval($end)) {
     if ($action === 'buy' || $action === 'sell') {
         $response = $order->getResponse();
         $response['body'] = json_decode($response['body']);
-        \Zend\Debug\Debug::dump($response);
         if ($response['code'] !== 200) {
+            \Zend\Debug\Debug::dump($response);
             break;
         }
+        $r = $response['body'];
+        \Zend\Debug\Debug::dump([
+            'order_id' => $r->order_id,
+            'symbol' => $r->symbol,
+            'side' => $r->side,
+            'amount' => $r->original_amount,
+            'price' => $r->price,
+        ]);
     }
 
     if (floatval(bcadd($buyPrice, $increment, 2)) > floatval($end)) {
