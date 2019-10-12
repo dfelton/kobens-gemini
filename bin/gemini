@@ -1,24 +1,9 @@
 #!/usr/bin/env php
 <?php
 
-require \dirname(__DIR__).'/vendor/autoload.php';
+require \dirname(__DIR__).'/bootstrap.php';
 
 try {
-    $config = \Kobens\Core\Config::getInstance();
-    $config->setConfig(\dirname(__DIR__).'/env/config.xml');
-    $config->setRootDir(\dirname(__DIR__));
-
-    $phpSettings = $config->get('php');
-    if ($phpSettings) {
-        if ($phpSettings->get('timezone')) {
-            \date_default_timezone_set((string) $phpSettings->get('timezone'));
-        }
-    }
-    unset ($config);
-
-    // Init Exchange Mapper (todo: may not be necessary if we're scrapping kobens-exchange's trade-repeater)
-    new \Kobens\Exchange\Exchange\Mapper(['gemini' => \Kobens\Gemini\Exchange::class]);
-
     $json = @\file_get_contents(\dirname(__DIR__).'/composer.json');
     if ($json === false) {
         throw new \Exception('Unable to read application\'s composer.json file.');
