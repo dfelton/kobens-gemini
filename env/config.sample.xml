@@ -19,12 +19,4 @@
     <php>
         <timezone>America/Chicago</timezone>
     </php>
-    <cache>
-        <adapter>
-            <name>filesystem</name>
-            <options>
-                <cache_dir>/tmp/foobar</cache_dir>
-            </options>
-        </adapter>
-    </cache>
 </config>

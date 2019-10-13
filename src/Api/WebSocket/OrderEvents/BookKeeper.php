@@ -27,7 +27,7 @@ final class BookKeeper
     public function __construct()
     {
         $this->exchange = new Exchange();
-        $this->cache = (new Cache())->getCache();
+        $this->cache = Cache::getInstance();
     }
 
     public function openBook(): void
