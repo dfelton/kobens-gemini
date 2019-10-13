@@ -10,6 +10,9 @@ use Kobens\Gemini\Api\Host;
 use Kobens\Gemini\Api\Key;
 use Kobens\Gemini\Api\Nonce;
 
+/**
+ * TODO: Finish me
+ */
 final class BookKeeper
 {
     const REQUEST_URI = '/v1/order/events';
