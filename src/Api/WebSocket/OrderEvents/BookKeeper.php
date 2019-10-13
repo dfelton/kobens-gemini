@@ -1,6 +1,6 @@
 <?php
 
-namespace Kobens\Gemini\Api\Websocket\OrderEvents;
+namespace Kobens\Gemini\Api\WebSocket\OrderEvents;
 
 use Amp\Loop;
 use Amp\Websocket\Client\Handshake;

@@ -2,7 +2,7 @@
 
 namespace Kobens\Gemini\Command\Command\Order;
 
-use Kobens\Gemini\Api\Websocket\OrderEvents\BookKeeper as OrderBookKeeper;
+use Kobens\Gemini\Api\WebSocket\OrderEvents\BookKeeper as OrderBookKeeper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,7 +23,8 @@ final class BookKeeper extends Command
             $book->openBook();
         } catch (\Exception $e) {
             $output->writeln($e->getMessage());
-            \Zend\Debug\Debug::dump($e->getTraceAsString());
+            $output->writeln($e->getTraceAsString());
+            exit(1);
         }
     }
 }
