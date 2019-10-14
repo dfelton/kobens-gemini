@@ -11,11 +11,11 @@ CREATE TABLE `trade_repeater` (
     -- BUY_READY | BUY_SENT | BUY_PLACED | BUY_FILLED | SELL_SENT | SELL_PLACED | SELL_FILLED
     `status` VARCHAR(25) NOT NULL COMMENT 'Status',
     `symbol` VARCHAR(12) NOT NULL COMMENT 'Symbol',
-    `buy_client_order_id` VARCHAR(30) NULL COMMENT 'Buy Client Order ID',
+    `buy_client_order_id` VARCHAR(100) NULL COMMENT 'Buy Client Order ID',
     `buy_order_id` VARCHAR(30) NULL COMMENT 'Buy Order Id',
     `buy_amount` VARCHAR(50) NOT NULL COMMENT 'Buy Amount',
     `buy_price` VARCHAR (50) NOT NULL COMMENT 'Buy Price',
-    `sell_client_order_id` VARCHAR(30) NULL COMMENT 'Sell Client Order ID',
+    `sell_client_order_id` VARCHAR(100) NULL COMMENT 'Sell Client Order ID',
     `sell_order_id` VARCHAR(30) NULL COMMENT 'Sell Order ID',
     `sell_amount` VARCHAR (50) NOT NULL COMMENT 'Sell Amount',
     `sell_price` VARCHAR (50) NOT NULL COMMENT 'Sell Price',
