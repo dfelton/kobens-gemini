@@ -1,6 +1,11 @@
 #!/usr/bin/env php
 <?php
 
+use Kobens\Core\Config;
+use Kobens\Core\EmergencyShutdown;
+use Kobens\Gemini\TradeRepeater\DataResource\BuyReady;
+use Kobens\Gemini\TradeRepeater\DataResource\BuySent;
+
 require \dirname(__DIR__).'/bootstrap.php';
 
 try {
@@ -19,9 +24,16 @@ try {
     exit(1);
 }
 
+$config = Config::getInstance();
+$shutdownInterface = new EmergencyShutdown($config);
+
 $app = new \Symfony\Component\Console\Application($composer->name, $composer->version);
 $app->add(new \Kobens\Gemini\Command\Command\Funds\GetAvailableBalances());
-$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Buyer());
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Buyer(
+    $shutdownInterface,
+    new BuyReady(),
+    new BuySent()
+));
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor());
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Seller());
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Archiver());

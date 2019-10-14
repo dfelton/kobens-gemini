@@ -2,8 +2,7 @@
 
 namespace Kobens\Gemini\TradeRepeater\DataResource;
 
-
-final class BuySent extends AbstractDataResource
+final class BuySent extends AbstractDataResource implements BuySentInterface
 {
     const STATUS_CURRENT = 'BUY_SENT';
     const STATUS_NEXT    = 'BUY_PLACED';
@@ -11,36 +10,34 @@ final class BuySent extends AbstractDataResource
     protected function isHealthy(\ArrayObject $record): bool
     {
         return $record->status === self::STATUS_CURRENT
-            && $record->buy_client_order_id !== NULL
+            && \is_string($record->buy_client_order_id)
+            && \strlen($record->buy_client_order_id) > 0
             && $record->buy_order_id === NULL
             && $record->sell_client_order_id === NULL
             && $record->sell_order_id === NULL;
     }
 
-    public function setNextState(int $id, array $args = []): bool
+    public function setNextState(int $id, string $buyOrderId, string $buyPrice): void
     {
-        if (empty($args['buy_order_id'])) {
-            throw new \Exception("'buy_order_id' is required.");
-        }
-        if (empty($args['buy_json'])) {
-            throw new \Exception("'buy_json' is required.");
-        }
-        $record = $this->getRecord($id);
-        if (!$this->isHealthy($record)) {
-            throw new \Exception("Order '$id' is not in a healthy state for ".\get_class($this));
-        }
+        $record = $this->getHealthyRecord($id);
         $affectedRows = $this->table->update(
             [
-                'buy_order_id' => $args['buy_order_id'],
+                'buy_order_id' => $buyOrderId,
                 'status' => self::STATUS_NEXT,
-                'meta' => \json_encode(['buy_json' => $args['buy_json']])
+                'meta' => \json_encode(['buy_price' => $buyPrice])
             ],
-            ['id' => $id]
+            ['id' => $record->id]
         );
         if ($affectedRows !== 1) {
-            throw new \Exception ("Order $id not marked '".self::STATUS_NEXT."'");
+            throw new \Exception("Order '$id' not marked '".self::STATUS_NEXT."'");
         }
-        return true;
     }
 
+    public function setErrorState(int $id, string $message): void
+    {
+        $record = $this->getRecord($id);
+        $meta = $record->meta === null ? [] : \json_decode($record->meta, true);
+        $meta['error'] = $message;
+        $this->table->update(['meta' => \json_encode($meta)], ['id' => $id]);
+    }
 }

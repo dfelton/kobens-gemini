@@ -10,32 +10,20 @@ final class SellSent extends AbstractDataResource
     protected function isHealthy(\ArrayObject $record): bool
     {
         return $record->status === self::STATUS_CURRENT
-            && $record->buy_client_order_id !== NULL
-            && $record->buy_order_id !== NULL
-            && $record->sell_client_order_id !== NULL
-            && $record->sell_order_id === NULL;
+            && $record->buy_client_order_id !== null
+            && $record->buy_order_id !== null
+            && $record->sell_client_order_id !== null
+            && $record->sell_order_id === null;
     }
 
-    public function setNextState(int $id, array $args = []): bool
+    public function setNextState(int $id, string $orderId, string $price): bool
     {
-        if (empty($args['sell_order_id'])) {
-            throw new \Exception("'sell_order_id' is required.");
-        }
-        if (empty($args['sell_json'])) {
-            throw new \Exception("'sell_json' is required.");
-        }
-        $record = $this->getRecord($id);
-        if (!$this->isHealthy($record)) {
-            throw new \Exception("Order '$id' is not in a healthy state for ".\get_class($this));
-        }
-        $meta = @\json_decode($record['meta'], true);
-        if ($meta === null) {
-            $meta = [];
-        }
-        $meta['sell_json'] = $args['sell_json'];
+        $record = $this->getHealthyRecord($id);
+        $meta = \json_decode($record['meta'], true);
+        $meta['sell_price'] = $price;
         $affectedRows = $this->table->update(
             [
-                'sell_order_id' => $args['sell_order_id'],
+                'sell_order_id' => $orderId,
                 'status' => self::STATUS_NEXT,
                 'meta' => \json_encode($meta)
             ],

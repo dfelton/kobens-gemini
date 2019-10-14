@@ -2,6 +2,8 @@
 
 namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
+use Kobens\Core\EmergencyShutdownInterface;
+use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Param\Amount;
 use Kobens\Gemini\Api\Param\ClientOrderId;
 use Kobens\Gemini\Api\Param\Price;
@@ -10,8 +12,8 @@ use Kobens\Gemini\Api\Param\Symbol;
 use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder\ForceMaker;
 use Kobens\Gemini\Exception\MaxIterationsException;
 use Kobens\Gemini\Exchange\Currency\Pair;
-use Kobens\Gemini\TradeRepeater\DataResource\BuyReady;
-use Kobens\Gemini\TradeRepeater\DataResource\BuySent;
+use Kobens\Gemini\TradeRepeater\DataResource\BuyReadyInterface;
+use Kobens\Gemini\TradeRepeater\DataResource\BuySentInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,6 +22,38 @@ final class Buyer extends Command
 {
     protected static $defaultName = 'trade-repeater:buyer';
 
+    /**
+     * @var EmergencyShutdownInterface
+     */
+    private $shutdown;
+
+    /**
+     * @var BuyReadyInterface
+     */
+    private $buyReady;
+
+    /**
+     * @var BuySentInterface
+     */
+    private $buySent;
+
+    /**
+     * @var Side
+     */
+    private $side;
+
+    public function __construct(
+        EmergencyShutdownInterface $shutdownInterface,
+        BuyReadyInterface $buyReadyInterface,
+        BuySentInterface $buySentInterface
+    ) {
+        $this->shutdown = $shutdownInterface;
+        $this->buyReady = $buyReadyInterface;
+        $this->buySent = $buySentInterface;
+        $this->side = new Side('buy');
+        parent::__construct();
+    }
+
     protected function configure()
     {
         $this->setDescription('Places buy orders on the exchange for the Gemini Trade Repeater');
@@ -27,85 +61,63 @@ final class Buyer extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $buyReady = new BuyReady();
-        $buySent = new BuySent();
-
-        $loop = true;
-        while ($loop) {
+        while ($this->shutdown->isShutdownModeEnabled() === false) {
             try {
-                foreach ($buyReady->getHealthyRecords() as $row) {
-                    $buyClientOrderId = 'repeater_'.$row->id.'_buy_'.\time();
-                    $buyReady->setNextState($row->id, ['buy_client_order_id' => $buyClientOrderId]);
-
-                    $order = new ForceMaker(
-                        new Side('buy'),
-                        new Symbol(Pair::getInstance($row->symbol)),
-                        new Amount($row->buy_amount),
-                        new Price($row->buy_price),
-                        new ClientOrderId($buyClientOrderId)
-                    );
-
-                    try {
-                        $response = $order->getResponse();
-
-                    // TODO Kobens\Core\Exception\ConnectionException
-                    // TODO Lots of other exception types.
-                    } catch (MaxIterationsException $e) {
-                        // there must be a lot of selling going on right this moment
-                        $output->writeln(\sprintf(
-                            "<fg=red>%s\tMax iterations reached for attempting ForceMaker on %s pair for price of %s.</>",
-                            (new \DateTime())->format('Y-m-d H:i:s'),
-                            $row->symbol,
-                            $row->buy_price
-                        ));
-                        $output->writeln(\sprintf(
-                            "<fg=red>%s\tSleeping 5 seconds...</>"
-                            (new \DateTime())->format('Y-m-d H:i:s')
-                        ));
-                        \sleep(5);
-
-                        // we'll pick it up again the next iteration
-                        $buyReady->resetState($row->id);
-                        continue;
-                    }
-                    $msg = \json_decode($response['body']);
-
-                    if ($response['code'] === 200 && $msg->order_id) {
-                        $buySent->setNextState(
-                            $row->id,
-                            ['buy_order_id' => $msg->order_id, 'buy_json' => $response['body']]
-                        );
-                        $output->writeln(\sprintf(
-                            "%s\tBuy Order ID %s placed on %s pair for amount of %s at rate of %s",
-                            (new \DateTime())->format('Y-m-d H:i:s'),
-                            $msg->order_id,
-                            $msg->symbol,
-                            $msg->original_amount,
-                            $msg->price
-                        ));
-                        if ($msg->price !== $row->buy_price) {
-                            $output->writeln(\sprintf(
-                                "%s\t\t<fg=yellow>(original buy price: %s)</>",
-                                (new \DateTime())->format('Y-m-d H:i:s'),
-                                $row->buy_price
-                            ));
-                        }
-                    }
-                }
+                $this->mainLoop($output);
+                \sleep(1);
             } catch (\Exception $e) {
-                \Zend\Debug\Debug::dump(
-                    [
-                        'message' => $e->getMessage(),
-                        'code' => $e->getCode(),
-                        'class' => \get_class($e),
-                        'trace' => $e->getTraceAsString()
-                    ],
-                    (new \DateTime())->format('Y-m-d H:i:s')."\tUnhandled Exception"
-                );
-                $loop = false;
+                $message = \json_encode([
+                    'time' => $this->now(),
+                    'message' => $e->getMessage(),
+                    'class' => \get_class($e),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                $this->shutdown->enableShutdownMode($message);
             }
-            \sleep(1);
         }
+        $output->writeln("<fg=red>Shutdown Signal Detected</>");
+    }
+
+    private function mainLoop(OutputInterface $output): void
+    {
+        foreach ($this->buyReady->getHealthyRecords() as $row) {
+            if ($this->shutdown->isShutdownModeEnabled()) {
+                break;
+            }
+
+            $clientOrderId = new ClientOrderId('repeater_'.$row->id.'_buy_'.\microtime(true));
+            $this->buyReady->setNextState($row->id, $clientOrderId->getValue());
+
+            try {
+                $msg = $this->forceMaker($clientOrderId, $row->symbol, $row->buy_amount, $row->buy_price);
+                $this->buySent->setNextState($row->id, $msg->order_id, $msg->price);
+                $output->writeln(\sprintf(
+                    "%s\tBuy Order ID %s placed on %s pair for amount of %s at rate of %s",
+                    $this->now(), $msg->order_id, $msg->symbol, $msg->original_amount, $msg->price
+                ));
+            } catch (ConnectionException $e) {
+                $this->buyReady->setErrorState($row->id, ConnectionException::class);
+                $output->writeln("<fg=red>{$this->now()}\tConnection Exception Occurred.</>");
+
+            } catch (MaxIterationsException $e) {
+                $this->buyReady->resetState($row->id);
+                $output->writeln(\sprintf(
+                    "<fg=red>%s\tMax iterations reached for attempting ForceMaker on %s pair for price of %s.</>",
+                    $this->now(), $row->symbol, $row->buy_price
+                ));
+            }
+        }
+    }
+
+    private function forceMaker(ClientOrderId $clientOrderId, string $symbol, string $amount, string $price): \stdClass
+    {
+        $order = new ForceMaker($this->side, new Symbol(Pair::getInstance($symbol)), new Amount($amount), new Price($price), $clientOrderId);
+        return \json_decode($order->getResponse()['body']);
+    }
+
+    private function now(): string
+    {
+        return (new \DateTime())->format('Y-m-d H:i:s');
     }
 
 }

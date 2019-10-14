@@ -2,7 +2,7 @@
 
 namespace Kobens\Gemini\TradeRepeater\DataResource;
 
-final class BuyReady extends AbstractDataResource
+final class BuyReady extends AbstractDataResource implements BuyReadyInterface
 {
     const STATUS_CURRENT = 'BUY_READY';
     const STATUS_NEXT    = 'BUY_SENT';
@@ -10,40 +10,41 @@ final class BuyReady extends AbstractDataResource
     protected function isHealthy(\ArrayObject $record): bool
     {
         return $record->status === self::STATUS_CURRENT
-            && $record->buy_client_order_id === NULL
-            && $record->buy_order_id === NULL
-            && $record->sell_client_order_id === NULL
-            && $record->sell_order_id === NULL;
+            && $record->buy_client_order_id === null
+            && $record->buy_order_id === null
+            && $record->sell_client_order_id === null
+            && $record->sell_order_id === null
+            && $record->meta === null;
     }
 
-    public function setNextState(int $id, array $args = []): bool
+    public function setNextState(int $id, string $buyClientOrderId): void
     {
-        if (empty($args['buy_client_order_id'])) {
-            throw new \Exception("'buy_client_order_id' is required.");
-        }
-        $record = $this->getRecord($id);
-        if (!$this->isHealthy($record)) {
-            throw new \Exception("Order '$id' is not in a healthy state for ".\get_class($this));
-        }
+        $record = $this->getHealthyRecord($id);
         $affectedRows = $this->table->update(
-            ['buy_client_order_id' => $args['buy_client_order_id'], 'status' => self::STATUS_NEXT],
-            ['id' => $id]
+            ['buy_client_order_id' => $buyClientOrderId, 'status' => self::STATUS_NEXT],
+            ['id' => $record->id]
         );
         if ($affectedRows !== 1) {
-            throw new \Exception ("Order $id not marked '".self::STATUS_NEXT."'");
+            throw new \Exception("Order $id not marked '".self::STATUS_NEXT."'");
         }
-        return true;
     }
 
-    public function resetState(int $id): bool
+    public function setErrorState(int $id, string $message): void
+    {
+        $this->table->update(
+            ['meta' => \json_encode(['error' => $message])],
+            ['id' => $id]
+        );
+    }
+
+    public function resetState(int $id): void
     {
         $affectedRows = $this->table->update(
             ['buy_client_order_id' => null, 'status' => self::STATUS_CURRENT],
             ['id' => $id]
         );
         if ($affectedRows !== 1) {
-            throw new \Exception ("Order $id not marked '".self::STATUS_CURRENT."'");
+            throw new \Exception("Order $id not marked '".self::STATUS_CURRENT."'");
         }
-        return true;
     }
 }

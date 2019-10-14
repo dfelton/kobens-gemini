@@ -3,11 +3,10 @@
 namespace Kobens\Gemini\TradeRepeater\DataResource;
 
 use Kobens\Core\Db;
-use Kobens\Gemini\TradeRepeater\StateStepperInterface;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
 
-abstract class AbstractDataResource implements StateStepperInterface
+abstract class AbstractDataResource
 {
     const STATUS_CURRENT = '';
 
@@ -31,6 +30,9 @@ abstract class AbstractDataResource implements StateStepperInterface
         });
     }
 
+    /**
+     * @return \Generator
+     */
     public function getHealthyRecords(): \Generator
     {
         foreach ($this->getRecords() as $record) {
@@ -38,15 +40,6 @@ abstract class AbstractDataResource implements StateStepperInterface
                 yield $record;
             }
         }
-    }
-
-    public function setNote(int $id, string $note): bool
-    {
-        if (strlen($note) > 255) {
-            throw new \Exception ('Note Max Length is 255');
-        }
-        $affectedRows = $this->table->update(['note' => $note], ['id' => $id]);
-        return $affectedRows === 1;
     }
 
     /**
@@ -64,6 +57,24 @@ abstract class AbstractDataResource implements StateStepperInterface
             throw new \Exception ("Order ID Not Found");
         }
         return $rows->current();
+    }
+
+    /**
+     * @param int $id
+     * @throws \Exception
+     * @return \ArrayObject
+     */
+    public function getHealthyRecord(int $id): \ArrayObject
+    {
+        $record = $this->getRecord($id);
+        if (!$this->isHealthy($record)) {
+            throw new \Exception(\sprintf(
+                "Trade record '%d' is not healthy for '%s'",
+                $id,
+                self::class
+            ));
+        }
+        return $record;
     }
 
 }

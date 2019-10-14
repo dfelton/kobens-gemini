@@ -34,7 +34,7 @@ final class Seller extends Command
         while ($loop) {
             try {
                 foreach ($buyFilled->getHealthyRecords() as $row) {
-                    $sellClientOrderId = 'repeater_'.$row->id.'_sell_'.\time();
+                    $sellClientOrderId = 'repeater_'.$row->id.'_sell_'.\microtime(true);
                     $buyFilled->setNextState($row->id, ['sell_client_order_id' => $sellClientOrderId]);
 
                     $order = new ForceMaker(
@@ -70,7 +70,7 @@ final class Seller extends Command
                     }
                     $msg = \json_decode($response['body']);
                     if ($response['code'] === 200 && $msg->order_id) {
-                        $sellSent->setNextState($row->id, ['sell_order_id' => $msg->order_id, 'sell_json' => $response['body']]);
+                        $sellSent->setNextState($row->id, $msg->order_id, $msg->price);
                         $output->writeln(\sprintf(
                             "%s\tSell Order ID %s placed on %s pair for amount of %s at rate of %s",
                             (new \DateTime())->format('Y-m-d H:i:s'),

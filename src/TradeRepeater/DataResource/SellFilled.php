@@ -10,10 +10,10 @@ final class SellFilled extends AbstractDataResource
     protected function isHealthy(\ArrayObject $record): bool
     {
         return $record->status === self::STATUS_CURRENT
-            && $record->buy_client_order_id !== NULL
-            && $record->buy_order_id !== NULL
-            && $record->sell_client_order_id !== NULL
-            && $record->sell_order_id !== NULL;
+            && $record->buy_client_order_id !== null
+            && $record->buy_order_id !== null
+            && $record->sell_client_order_id !== null
+            && $record->sell_order_id !== null;
     }
 
     public function setNextState(int $id, array $args = []): bool

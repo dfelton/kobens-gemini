@@ -28,7 +28,11 @@ final class ForceMaker extends Command
 
     protected function configure()
     {
-        $this->setDescription('Places a new maker order on the exchange. If price specified would result in a taker order, price will be adjusted for maker status.');
+        $this->setDescription(\sprintf("%s%s%s",
+            "Places a new maker order on the exchange.\n",
+            \str_pad("", 31, ' '),
+            "If price specified would result in a taker order, price will be adjusted for maker status."
+        ));
         $this->addArgList(
             [
                 new Side(),
