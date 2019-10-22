@@ -2,7 +2,7 @@
 
 namespace Kobens\Gemini\TradeRepeater\DataResource;
 
-final class SellFilled extends AbstractDataResource
+final class SellFilled extends AbstractDataResource implements SellFilledInterface
 {
     const STATUS_CURRENT = 'SELL_FILLED';
     const STATUS_NEXT    = 'BUY_READY';
@@ -16,7 +16,7 @@ final class SellFilled extends AbstractDataResource
             && $record->sell_order_id !== null;
     }
 
-    public function setNextState(int $id, array $args = []): void
+    public function setNextState(int $id): void
     {
         $record = $this->getHealthyRecord($id);
         $this->table->update(
