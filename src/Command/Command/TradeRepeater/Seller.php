@@ -72,8 +72,9 @@ final class Seller extends Command
                     if ($response['code'] === 200 && $msg->order_id) {
                         $sellSent->setNextState($row->id, $msg->order_id, $msg->price);
                         $output->writeln(\sprintf(
-                            "%s\tSell Order ID %s placed on %s pair for amount of %s at rate of %s",
+                            "%s\t(%d) Sell Order ID %s placed on %s pair for amount of %s at rate of %s",
                             (new \DateTime())->format('Y-m-d H:i:s'),
+                            $row->id,
                             $msg->order_id,
                             $msg->symbol,
                             $msg->original_amount,
@@ -103,5 +104,4 @@ final class Seller extends Command
             \sleep(1);
         }
     }
-
 }

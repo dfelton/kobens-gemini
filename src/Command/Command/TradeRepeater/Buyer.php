@@ -92,8 +92,8 @@ final class Buyer extends Command
                 $msg = $this->forceMaker($clientOrderId, $row->symbol, $row->buy_amount, $row->buy_price);
                 $this->buySent->setNextState($row->id, $msg->order_id, $msg->price);
                 $output->writeln(\sprintf(
-                    "%s\tBuy Order ID %s placed on %s pair for amount of %s at rate of %s",
-                    $this->now(), $msg->order_id, $msg->symbol, $msg->original_amount, $msg->price
+                    "%s\t(%d) Buy Order ID %s placed on %s pair for amount of %s at rate of %s",
+                    $this->now(), $row->id, $msg->order_id, $msg->symbol, $msg->original_amount, $msg->price
                 ));
             } catch (ConnectionException $e) {
                 $this->buyReady->setErrorState($row->id, ConnectionException::class);

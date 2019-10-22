@@ -16,15 +16,10 @@ final class SellFilled extends AbstractDataResource
             && $record->sell_order_id !== null;
     }
 
-    public function setNextState(int $id, array $args = []): bool
+    public function setNextState(int $id, array $args = []): void
     {
-        if ($args !== []) {
-            throw new \Exception("SellFilled StateStepper does not accept any arguments");
-        }
-        if (!$this->isHealthy($this->getRecord($id))) {
-            throw new \Exception("Order '$id' is not in a healthy state for ".\get_class($this));
-        }
-        $affectedRows = $this->table->update(
+        $record = $this->getHealthyRecord($id);
+        $this->table->update(
             [
                 'status' => self::STATUS_NEXT,
                 'buy_client_order_id' => null,
@@ -34,11 +29,7 @@ final class SellFilled extends AbstractDataResource
                 'note' => null,
                 'meta' => null,
             ],
-            ['id' => $id]
+            ['id' => $record->id]
         );
-        if ($affectedRows !== 1) {
-            throw new \Exception ("Order $id not marked '".self::STATUS_NEXT."'");
-        }
-        return true;
     }
 }

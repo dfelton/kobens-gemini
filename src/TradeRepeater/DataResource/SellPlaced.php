@@ -2,7 +2,7 @@
 
 namespace Kobens\Gemini\TradeRepeater\DataResource;
 
-final class SellPlaced extends AbstractDataResource
+final class SellPlaced extends AbstractDataResource implements SellPlacedInterface
 {
     const STATUS_CURRENT = 'SELL_PLACED';
     const STATUS_NEXT    = 'SELL_FILLED';
@@ -10,28 +10,18 @@ final class SellPlaced extends AbstractDataResource
     protected function isHealthy(\ArrayObject $record): bool
     {
         return $record->status === self::STATUS_CURRENT
-            && $record->buy_client_order_id !== NULL
-            && $record->buy_order_id !== NULL
-            && $record->sell_client_order_id !== NULL
-            && $record->sell_order_id !== NULL;
+            && $record->buy_client_order_id !== null
+            && $record->buy_order_id !== null
+            && $record->sell_client_order_id !== null
+            && $record->sell_order_id !== null;
     }
 
-    public function setNextState(int $id, array $args = []): bool
+    public function setNextState(int $id): void
     {
-        if ($args !== []) {
-            throw new \Exception("SellPlaced StateStepper does not accept any arguments");
-        }
-        $record = $this->getRecord($id);
-        if (!$this->isHealthy($record)) {
-            throw new \Exception("Order '$id' is not in a healthy state for ".\get_class($this));
-        }
-        $affectedRows = $this->table->update(
+        $record = $this->getHealthyRecord($id);
+        $this->table->update(
             ['status' => self::STATUS_NEXT],
-            ['id' => $id]
+            ['id' => $record->id]
         );
-        if ($affectedRows !== 1) {
-            throw new \Exception ("Order $id not marked '".self::STATUS_NEXT."'");
-        }
-        return true;
     }
 }

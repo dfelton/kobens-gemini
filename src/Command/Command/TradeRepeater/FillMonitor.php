@@ -81,10 +81,10 @@ final class FillMonitor extends Command
                 if ($repeaterId) {
                     if ($msg['side'] === 'buy') {
                         $this->buyFilled->setNextState($repeaterId);
-                        $output->writeln((new \DateTime())->format('Y-m-d H:i:s')."\tBuy order {$msg['order_id']} on {$msg['symbol']} pair for {$msg['original_amount']} at price of {$msg['price']} filled.");
+                        $output->writeln((new \DateTime())->format('Y-m-d H:i:s')."\t($repeaterId) Buy order {$msg['order_id']} on {$msg['symbol']} pair for {$msg['original_amount']} at price of {$msg['price']} filled.");
                     } elseif ($msg['side'] === 'sell') {
                         $this->sellFilled->setNextState($repeaterId);
-                        $output->writeln((new \DateTime())->format('Y-m-d H:i:s')."\tSell order {$msg['order_id']} on {$msg['symbol']} pair for {$msg['original_amount']} at price of {$msg['price']} filled.");
+                        $output->writeln((new \DateTime())->format('Y-m-d H:i:s')."\t($repeaterId) Sell order {$msg['order_id']} on {$msg['symbol']} pair for {$msg['original_amount']} at price of {$msg['price']} filled.");
                     } else {
                         throw new \Exception("Unhandled side '{$msg['side']}'");
                     }
