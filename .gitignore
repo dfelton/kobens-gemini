@@ -1,3 +1,4 @@
 /env/config.xml
 /vendor
 /composer.phar
+/var/emergency_shutdown*
