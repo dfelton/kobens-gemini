@@ -2,7 +2,7 @@
 
 namespace Kobens\Gemini\TradeRepeater\DataResource;
 
-final class SellSent extends AbstractDataResource
+final class SellSent extends AbstractDataResource implements SellSentInterface
 {
     const STATUS_CURRENT = 'SELL_SENT';
     const STATUS_NEXT    = 'SELL_PLACED';
@@ -16,12 +16,12 @@ final class SellSent extends AbstractDataResource
             && $record->sell_order_id === null;
     }
 
-    public function setNextState(int $id, string $orderId, string $price): bool
+    public function setNextState(int $id, string $orderId, string $price): void
     {
         $record = $this->getHealthyRecord($id);
         $meta = \json_decode($record['meta'], true);
         $meta['sell_price'] = $price;
-        $affectedRows = $this->table->update(
+        $this->table->update(
             [
                 'sell_order_id' => $orderId,
                 'status' => self::STATUS_NEXT,
@@ -29,9 +29,5 @@ final class SellSent extends AbstractDataResource
             ],
             ['id' => $id]
         );
-        if ($affectedRows !== 1) {
-            throw new \Exception ("Order $id not marked '".self::STATUS_NEXT."'");
-        }
-        return true;
     }
 }
