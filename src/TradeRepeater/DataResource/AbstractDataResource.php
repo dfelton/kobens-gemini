@@ -3,6 +3,7 @@
 namespace Kobens\Gemini\TradeRepeater\DataResource;
 
 use Kobens\Core\Db;
+use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
 
@@ -68,10 +69,9 @@ abstract class AbstractDataResource
     {
         $record = $this->getRecord($id);
         if (!$this->isHealthy($record)) {
-            throw new \Exception(\sprintf(
-                "Trade record '%d' is not healthy for '%s'",
-                $id,
-                self::class
+            throw new UnhealthyStateException(\sprintf(
+                "Trade record '%d' is not healthy for '%s'. Current State: %s",
+                $id, static::class, \json_encode($record)
             ));
         }
         return $record;
