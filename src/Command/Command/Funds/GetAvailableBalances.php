@@ -5,6 +5,7 @@ namespace Kobens\Gemini\Command\Command\Funds;
 use Kobens\Gemini\Api\Rest\Request\Funds\Balances;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class GetAvailableBalances extends Command
@@ -20,6 +21,7 @@ final class GetAvailableBalances extends Command
     protected function configure()
     {
         $this->setDescription('Returns available balances.');
+        $this->addOption('currency', 'c', InputOption::VALUE_OPTIONAL, 'Currency to get funds of');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -31,10 +33,16 @@ final class GetAvailableBalances extends Command
             $output->writeln($e->getTraceAsString());
             exit(1);
         }
+        $currency = $input->getOption('currency');
         $balances = \json_decode($balances, true);
         foreach ($balances as $balance) {
             unset($balance['type']);
-            $this->outputBalance($output, $balance);
+            if ($currency === null) {
+                $this->outputBalance($output, $balance);
+            } elseif (\strtoupper($currency) === $balance['currency']) {
+                $this->outputBalance($output, $balance);
+                break;
+            }
         }
     }
 
