@@ -41,6 +41,7 @@ final class Archiver extends Command
         ConnectionInterface $connectionInterface
     ) {
         parent::__construct();
+        $this->connection = $connectionInterface;
         $this->archive = $archiveInterface;
         $this->sellFilled = $sellFilledInterface;
         $this->shutdown = $shutdownInterface;

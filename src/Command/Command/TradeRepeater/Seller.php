@@ -74,7 +74,7 @@ final class Seller extends Command
     {
         foreach ($this->buyFilled->getHealthyRecords() as $row) {
             $sellClientOrderId = 'repeater_'.$row->id.'_sell_'.\microtime(true);
-            $this->buyFilled->setNextState($row->id, ['sell_client_order_id' => $sellClientOrderId]);
+            $this->buyFilled->setNextState($row->id, $sellClientOrderId);
 
             $order = new ForceMaker(
                 new Side('sell'),
