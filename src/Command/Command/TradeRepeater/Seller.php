@@ -74,6 +74,9 @@ final class Seller extends Command
     private function mainLoop(OutputInterface $output): void
     {
         foreach ($this->buyFilled->getHealthyRecords() as $row) {
+            if ($this->shutdown->isShutdownModeEnabled()) {
+                break;
+            }
             $sellClientOrderId = 'repeater_'.$row->id.'_sell_'.\microtime(true);
             $this->buyFilled->setNextState($row->id, $sellClientOrderId);
 
