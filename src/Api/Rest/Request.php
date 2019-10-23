@@ -72,8 +72,25 @@ abstract class Request
 
     public function getResponse(): array
     {
-        $response = $this->_getResponse();
-        $this->throwResponseException($response['body'], $response['code']);
+        // TODO: eliminate this iterations bullshit once we implement multi api key features
+        $response = null;
+        $iterations = 0;
+        do {
+            $response = $this->_getResponse();
+            try {
+                $this->throwResponseException($response['body'], $response['code']);
+            } catch (\Exception $e) {
+                if ($e->getCode() !== 9999) {
+                    throw $e;
+                }
+                $iterations++;
+                $response = null;
+            }
+        } while ($response === null && $iterations <= 100);
+        if ($response === null) {
+            throw new \Exception('Max Iterations reached');
+        }
+
         if ($response['code'] !== 200) {
             throw new LogicException(\sprintf(
                 'Response code 200 expected, "%d" received.',
@@ -145,6 +162,14 @@ abstract class Request
             case $code >= 300 && $code < 400:
                 throw new ResourceMovedException($body, $code);
             case $code >= 400 && $code < 500:
+                // TODO: eliminate this once we implement multi api key features
+                if ($code === 400) {
+                    $msg = \json_decode($body, true);
+                    if (\array_key_exists('reason', $msg) && $msg['reason'] === 'InvalidNonce') {
+                        throw new \Exception('InvalidNonce', 9999);
+                    }
+                }
+
                 if ($code === 408) {
                     throw new RequestTimeoutException(
                         \sprintf('%s timed out interacting with server.', static::self),
