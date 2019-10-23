@@ -44,7 +44,7 @@ final class Seller extends Command
         parent::__construct();
         $this->buyFilled = $buyFilledInterface;
         $this->sellSent = $sellSentInterface;
-        $this->shutdownInterface = $shutdownInterface;
+        $this->shutdown = $shutdownInterface;
     }
 
     protected function configure()
