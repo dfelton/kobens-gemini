@@ -4,15 +4,16 @@ namespace Kobens\Gemini\Api\Rest;
 
 use Kobens\Core\Config;
 use Kobens\Core\Exception\ConnectionException;
+use Kobens\Core\Exception\Http\RequestTimeoutException;
 use Kobens\Core\Http\Request\Throttler;
 use Kobens\Gemini\Api\Host;
 use Kobens\Gemini\Api\Key;
 use Kobens\Gemini\Api\Nonce;
-use Kobens\Gemini\Exception\Exception;
 use Kobens\Gemini\Exception\InvalidResponseException;
 use Kobens\Gemini\Exception\LogicException;
 use Kobens\Gemini\Exception\ResourceMovedException;
 use Kobens\Gemini\Exception\Api\InvalidSignatureException;
+use Kobens\Gemini\Exception\Api\RateLimitExceededException;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
@@ -145,14 +146,23 @@ abstract class Request
                 throw new ResourceMovedException($body, $code);
             case $code >= 400 && $code < 500:
                 if ($code === 408) {
-                    throw new Exception('408 Request Time-out', 408);
+                    throw new RequestTimeoutException(
+                        \sprintf('%s timed out interacting with server.', static::self),
+                        new \Exception($body)
+                    );
+                }
+                if ($code === 429) {
+                    throw new RateLimitExceededException(
+                        \sprintf('Exceeded rate limit while attempting to use %s', static::self),
+                        new \Exception($body)
+                    );
                 }
                 $message = \json_decode($body);
                 switch ($message->reason) {
                     case InvalidSignatureException::REASON:
                         throw new InvalidSignatureException($message->message, $code);
                     default:
-                        break;
+                        // do nothing, allow to proceed
                 }
             case $code >= 500:
                 throw new InvalidResponseException($body, $code);
