@@ -77,6 +77,7 @@ final class FillMonitor extends Command
                 ]));
             }
         }
+        $output->writeln("<fg=red>Shutdown Signal Detected</>");
     }
 
     private function main(OutputInterface $output): \Closure
@@ -109,6 +110,9 @@ final class FillMonitor extends Command
                 $output->writeln($this->now()."\tSubscription acknowledged.");
                 break;
             case $msg['type'] === 'heartbeat':
+                if ($this->shutdown->isShutdownModeEnabled()) {
+                    \Amp\Loop::stop();
+                }
                 $output->writeln($this->now()."\tHeartbeat Received");
                 break;
             case $msg['type'] === 'fill' && $msg['remaining_amount'] !== '0':
