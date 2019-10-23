@@ -7,8 +7,8 @@ use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Gemini\Api\Host;
 use Kobens\Gemini\Api\KeyInterface;
 use Kobens\Gemini\Api\NonceInterface;
-use Kobens\Gemini\TradeRepeater\DataResource\BuyFilledInterface;
-use Kobens\Gemini\TradeRepeater\DataResource\SellFilledInterface;
+use Kobens\Gemini\TradeRepeater\DataResource\BuyPlacedInterface;
+use Kobens\Gemini\TradeRepeater\DataResource\SellPlacedInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,14 +18,14 @@ final class FillMonitor extends Command
     protected static $defaultName = 'trade-repeater:fill-monitor';
 
     /**
-     * @var BuyFilledInterface
+     * @var BuyPlacedInterface
      */
-    private $buyFilled;
+    private $buyPlaced;
 
     /**
-     * @var SellFilledInterface
+     * @var SellPlacedInterface
      */
-    private $sellFilled;
+    private $sellPlaced;
 
     /**
      * @var KeyInterface
@@ -43,15 +43,15 @@ final class FillMonitor extends Command
     private $shutdown;
 
     public function __construct(
-        BuyFilledInterface $buyFilledInterface,
-        SellFilledInterface $sellFilledInterface,
+        BuyPlacedInterface $buyPlacedInterface,
+        SellPlacedInterface $sellPlacedInterface,
         NonceInterface $nonceInterface,
         KeyInterface $keyInterface,
         EmergencyShutdownInterface $shutdownInterface
     ) {
         parent::__construct();
-        $this->buyFilled = $buyFilledInterface;
-        $this->sellFilled = $sellFilledInterface;
+        $this->buyPlaced = $buyPlacedInterface;
+        $this->sellPlaced = $sellPlacedInterface;
         $this->key = $keyInterface;
         $this->nonce = $nonceInterface;
         $this->shutdown = $shutdownInterface;
@@ -130,10 +130,10 @@ final class FillMonitor extends Command
                 $repeaterId = $this->getRecordId($msg['client_order_id']);
                 if ($repeaterId) {
                     if ($msg['side'] === 'buy') {
-                        $this->buyFilled->setNextState($repeaterId);
+                        $this->buyPlaced->setNextState($repeaterId);
                         $output->writeln($this->now()."\t($repeaterId) Buy order {$msg['order_id']} on {$msg['symbol']} pair for {$msg['original_amount']} at price of {$msg['price']} filled.");
                     } elseif ($msg['side'] === 'sell') {
-                        $this->sellFilled->setNextState($repeaterId);
+                        $this->sellPlaced->setNextState($repeaterId);
                         $output->writeln($this->now()."\t($repeaterId) Sell order {$msg['order_id']} on {$msg['symbol']} pair for {$msg['original_amount']} at price of {$msg['price']} filled.");
                     } else {
                         throw new \Exception("Unhandled side '{$msg['side']}'");

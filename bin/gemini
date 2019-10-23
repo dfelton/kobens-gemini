@@ -57,8 +57,8 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Buyer(
     $buySentInterface
 ));
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor(
-    $buyFilledInterface,
-    $sellFilledInterface,
+    $buyPlacedInterface,
+    $sellPlacedInterface,
     $nonceInterface,
     $keyInterface,
     $shutdownInterface
