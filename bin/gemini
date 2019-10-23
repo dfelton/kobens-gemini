@@ -14,6 +14,7 @@ use Kobens\Gemini\TradeRepeater\DataResource\BuyReady;
 use Kobens\Gemini\TradeRepeater\DataResource\BuySent;
 use Kobens\Gemini\TradeRepeater\DataResource\SellFilled;
 use Kobens\Gemini\TradeRepeater\DataResource\SellPlaced;
+use Kobens\Gemini\TradeRepeater\DataResource\SellSent;
 
 require \dirname(__DIR__).'/bootstrap.php';
 
@@ -45,6 +46,7 @@ $buyReadyInterface = new BuyReady();
 $buySentInterface = new BuySent();
 $sellFilledInterface = new SellFilled();
 $sellPlacedInterface = new SellPlaced();
+$sellSentInterface = new SellSent();
 $connectionInterface = Db::getAdapter()->getDriver()->getConnection();
 
 $app = new \Symfony\Component\Console\Application($composer->name, $composer->version);
@@ -67,7 +69,11 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor\Rest(
     $buyPlacedInterface,
     $sellPlacedInterface
 ));
-$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Seller());
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Seller(
+    $buyFilledInterface,
+    $sellSentInterface,
+    $shutdownInterface
+));
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Archiver(
     $archiveInterface,
     $sellFilledInterface,
