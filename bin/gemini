@@ -2,11 +2,14 @@
 <?php
 
 use Kobens\Core\Config;
+use Kobens\Core\Db;
 use Kobens\Core\EmergencyShutdown;
 use Kobens\Gemini\Api\Rest\Request\Order\Status\ActiveOrders;
+use Kobens\Gemini\TradeRepeater\DataResource\Archive;
 use Kobens\Gemini\TradeRepeater\DataResource\BuyPlaced;
 use Kobens\Gemini\TradeRepeater\DataResource\BuyReady;
 use Kobens\Gemini\TradeRepeater\DataResource\BuySent;
+use Kobens\Gemini\TradeRepeater\DataResource\SellFilled;
 use Kobens\Gemini\TradeRepeater\DataResource\SellPlaced;
 
 require \dirname(__DIR__).'/bootstrap.php';
@@ -29,9 +32,12 @@ try {
 
 $config = Config::getInstance();
 $shutdownInterface = new EmergencyShutdown($config);
+$archiveInterface = new Archive();
 $activeOrdersInterface = new ActiveOrders();
 $buyPlacedInterface = new BuyPlaced();
+$sellFilledInterface = new SellFilled();
 $sellPlacedInterface = new SellPlaced();
+$connectionInterface = Db::getAdapter()->getDriver()->getConnection();
 
 $app = new \Symfony\Component\Console\Application($composer->name, $composer->version);
 $app->add(new \Kobens\Gemini\Command\Command\Funds\GetAvailableBalances());
@@ -48,7 +54,12 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor\Rest(
     $sellPlacedInterface
 ));
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Seller());
-$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Archiver());
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Archiver(
+    $archiveInterface,
+    $sellFilledInterface,
+    $shutdownInterface,
+    $connectionInterface
+));
 $app->add(new \Kobens\Gemini\Command\Command\Taxes\BuyLogger());
 $app->add(new \Kobens\Gemini\Command\Command\Taxes\SellLogger());
 $app->add(new \Kobens\Gemini\Command\Command\Taxes\CapitalGains());

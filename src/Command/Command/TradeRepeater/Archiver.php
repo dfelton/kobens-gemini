@@ -2,16 +2,49 @@
 
 namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
-use Kobens\Core\Db;
-use Kobens\Gemini\TradeRepeater\DataResource\Archive;
-use Kobens\Gemini\TradeRepeater\DataResource\SellFilled;
+use Kobens\Core\EmergencyShutdownInterface;
+use Kobens\Gemini\TradeRepeater\DataResource\ArchiveInterface;
+use Kobens\Gemini\TradeRepeater\DataResource\SellFilledInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Zend\Db\Adapter\Driver\ConnectionInterface;
 
 final class Archiver extends Command
 {
     protected static $defaultName = 'trade-repeater:archiver';
+
+    /**
+     * @var ArchiveInterface
+     */
+    private $archive;
+
+    /**
+     * @var ConnectionInterface
+     */
+    private $connection;
+
+    /**
+     * @var SellFilledInterface
+     */
+    private $sellFilled;
+
+    /**
+     * @var EmergencyShutdownInterface
+     */
+    private $shutdown;
+
+    public function __construct(
+        ArchiveInterface $archiveInterface,
+        SellFilledInterface $sellFilledInterface,
+        EmergencyShutdownInterface $shutdownInterface,
+        ConnectionInterface $connectionInterface
+    ) {
+        parent::__construct();
+        $this->archive = $archiveInterface;
+        $this->sellFilled = $sellFilledInterface;
+        $this->shutdown = $shutdownInterface;
+    }
 
     protected function configure()
     {
@@ -20,55 +53,48 @@ final class Archiver extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $sellFilled = new SellFilled();
-        $archiver = new Archive();
-        $conn = Db::getAdapter()->getDriver()->getConnection();
-        $inTransaction = false;
-
-        $loop = true;
-        while ($loop) {
+        while (!$this->shutdown->isShutdownModeEnabled()) {
             try {
-                foreach ($sellFilled->getHealthyRecords() as $row) {
-                    $conn->beginTransaction();
-                    $inTransaction = true;
-
-                    $meta = \json_decode($row->meta);
-
-                    $archiver->addArchive(
-                        $row->symbol,
-                        $row->buy_client_order_id,
-                        $row->buy_order_id,
-                        $row->buy_amount,
-                        $meta->buy_price,
-                        $row->sell_client_order_id,
-                        $row->sell_order_id,
-                        $row->sell_amount,
-                        $meta->sell_price
-                    );
-
-                    $sellFilled->setNextState($row->id);
-                    $output->writeln((new \DateTime())->format('Y-m-d H:i:s')."\t({$row->id}) archived and moved to BUY_READY state.");
-
-                    $conn->commit();
-                    $inTransaction = false;
-                }
+                $this->mainLoop($output);
+                \sleep(1);
             } catch (\Exception $e) {
-                if ($inTransaction) {
-                    $conn->rollback();
-                }
-                \Zend\Debug\Debug::dump(
-                    [
-                        'message' => $e->getMessage(),
-                        'code' => $e->getCode(),
-                        'class' => \get_class($e),
-                        'trace' => $e->getTraceAsString()
-                    ],
-                    (new \DateTime())->format('Y-m-d H:i:s')."\tUnhandled Exception"
-                );
-                $loop = false;
+                $this->connection->rollback();
+                $this->shutdown->enableShutdownMode(\json_encode([
+                    'time' => $this->now(),
+                    'message' => $e->getMessage(),
+                    'code' => $e->getCode(),
+                    'class' => \get_class($e),
+                    'trace' => $e->getTraceAsString()
+                ]));
             }
-            \sleep(1);
+        }
+        $output->writeln("<fg=red>Shutdown Signal Detected</>");
+    }
+
+    private function mainLoop(OutputInterface $output): void
+    {
+        foreach ($this->sellFilled->getHealthyRecords() as $row) {
+            $meta = \json_decode($row->meta);
+            $this->connection->beginTransaction();
+            $this->archive->addArchive(
+                $row->symbol,
+                $row->buy_client_order_id,
+                $row->buy_order_id,
+                $row->buy_amount,
+                $meta->buy_price,
+                $row->sell_client_order_id,
+                $row->sell_order_id,
+                $row->sell_amount,
+                $meta->sell_price
+            );
+            $this->sellFilled->setNextState($row->id);
+            $this->connection->commit();
+            $output->writeln($this->now()."\t({$row->id}) archived and moved to BUY_READY state.");
         }
     }
 
+    private function now(): string
+    {
+        return (new \DateTime())->format('Y-m-d H:i:s');
+    }
 }
