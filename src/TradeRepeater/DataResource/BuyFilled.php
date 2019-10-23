@@ -13,7 +13,8 @@ final class BuyFilled extends AbstractDataResource implements BuyFilledInterface
             && $record->buy_client_order_id !== null
             && $record->buy_order_id !== null
             && $record->sell_client_order_id === null
-            && $record->sell_order_id === null;
+            && $record->sell_order_id === null
+            && $record->meta !== null;
     }
 
     public function setNextState(int $id, string $sellClientOrderId): void
@@ -21,6 +22,17 @@ final class BuyFilled extends AbstractDataResource implements BuyFilledInterface
         $record = $this->getHealthyRecord($id);
         $this->table->update(
             ['sell_client_order_id' => $sellClientOrderId, 'status' => self::STATUS_NEXT],
+            ['id' => $record->id]
+        );
+    }
+
+    public function setErrorState(int $id, string $message): void
+    {
+        $record = $this->getRecord($id);
+        $meta = \json_decode($record->meta, true);
+        $meta['error'] = $message;
+        $this->table->update(
+            ['meta' => \json_encode($meta)],
             ['id' => $record->id]
         );
     }

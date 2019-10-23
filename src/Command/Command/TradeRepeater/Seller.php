@@ -3,6 +3,7 @@
 namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
 use Kobens\Core\EmergencyShutdownInterface;
+use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Param\Amount;
 use Kobens\Gemini\Api\Param\ClientOrderId;
 use Kobens\Gemini\Api\Param\Price;
@@ -86,9 +87,10 @@ final class Seller extends Command
 
             try {
                 $response = $order->getResponse();
-
-                // TODO Kobens\Core\Exception\ConnectionException
-                // TODO Lots of other exception types.
+            } catch (ConnectionException $e) {
+                $this->buyFilled->setErrorState($row->id, ConnectionException::class);
+                $output->writeln("<fg=red>{$this->now()}\tConnection Exception Occurred.</>");
+                continue;
             } catch (MaxIterationsException $e) {
                 // there must be a lot of buying going on right this moment
                 $this->buyFilled->resetState($row->id);
