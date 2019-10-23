@@ -5,7 +5,7 @@ namespace Kobens\Gemini\TradeRepeater\DataResource;
 use Kobens\Core\Db;
 use Zend\Db\TableGateway\TableGateway;
 
-final class Archive
+final class Archive implements ArchiveInterface
 {
     /**
      * @var TableGateway
