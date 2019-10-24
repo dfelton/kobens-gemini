@@ -60,13 +60,7 @@ final class Archiver extends Command
                 \sleep(1);
             } catch (\Exception $e) {
                 $this->connection->rollback();
-                $this->shutdown->enableShutdownMode(\json_encode([
-                    'time' => $this->now(),
-                    'message' => $e->getMessage(),
-                    'code' => $e->getCode(),
-                    'class' => \get_class($e),
-                    'trace' => $e->getTraceAsString()
-                ]));
+                $this->shutdown->enableShutdownMode($e);
             }
         }
         $output->writeln("<fg=red>Shutdown Signal Detected</>");

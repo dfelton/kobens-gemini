@@ -60,12 +60,7 @@ final class Seller extends Command
                 $this->mainLoop($output);
                 \sleep(1);
             } catch (\Exception $e) {
-                $this->shutdown->enableShutdownMode(\json_encode([
-                    'message' => $e->getMessage(),
-                    'code' => $e->getCode(),
-                    'class' => \get_class($e),
-                    'trace' => $e->getTraceAsString()
-                ]));
+                $this->shutdown->enableShutdownMode($e);
             }
         }
         $output->writeln("<fg=red>Shutdown Signal Detected</>");

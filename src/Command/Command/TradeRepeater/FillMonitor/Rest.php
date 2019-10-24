@@ -65,13 +65,7 @@ final class Rest extends Command
                 $output->writeln("<fg=red>{$this->now()}\tConnection Exception occurred.</>");
                 \sleep(60);
             } catch (\Exception $e) {
-                $message = \json_encode([
-                    'time' => $this->now(),
-                    'message' => $e->getMessage(),
-                    'class' => \get_class($e),
-                    'trace' => $e->getTraceAsString(),
-                ]);
-                $this->shutdown->enableShutdownMode($message);
+                $this->shutdown->enableShutdownMode($e);
             }
         }
         $output->writeln("<fg=red>Shutdown Signal Detected</>");

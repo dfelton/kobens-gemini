@@ -7,6 +7,7 @@ use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Gemini\Api\Host;
 use Kobens\Gemini\Api\KeyInterface;
 use Kobens\Gemini\Api\NonceInterface;
+use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
 use Kobens\Gemini\TradeRepeater\DataResource\BuyPlacedInterface;
 use Kobens\Gemini\TradeRepeater\DataResource\SellPlacedInterface;
 use Symfony\Component\Console\Command\Command;
@@ -68,13 +69,7 @@ final class FillMonitor extends Command
             try {
                 \Amp\Loop::run($this->main($output));
             } catch (\Exception $e) {
-                $this->shutdown->enableShutdownMode(\json_encode([
-                    'time' => $this->now(),
-                    'message' => $e->getMessage(),
-                    'code' => $e->getCode(),
-                    'class' => \get_class($e),
-                    'trace' => $e->getTraceAsString()
-                ]));
+                $this->shutdown->enableShutdownMode($e);
             }
         }
         $output->writeln("<fg=red>Shutdown Signal Detected</>");
@@ -104,6 +99,15 @@ final class FillMonitor extends Command
     }
 
     private function processMessage(array $msg, OutputInterface $output): void
+    {
+        try {
+            $this->_processMessage($msg, $output);
+        } catch (UnhealthyStateException $e) {
+            throw new \Exception(\json_encode($msg), 0, $e);
+        }
+    }
+
+    private function _processMessage(array $msg, OutputInterface $output): void
     {
         switch (true) {
             case $msg['type'] === 'subscription_ack':
