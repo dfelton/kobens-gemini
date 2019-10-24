@@ -58,7 +58,7 @@ final class BPS
                 return $rate;
             }
         }
-        throw new \LogicException(\sprintf("Unhandled Fee. Amount '%s', Fee '%s'", $amount, $feeAmount));
+        throw new \LogicException(\sprintf("Unhandled Fee. Amount '%s', Fee '%s'", $feeAmount, $feeAmount));
     }
 
 }
