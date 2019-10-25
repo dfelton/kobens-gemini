@@ -10,7 +10,7 @@ final class BuyReady extends AbstractDataResource implements BuyReadyInterface
     protected function isHealthy(\ArrayObject $record): bool
     {
         return $record->status === self::STATUS_CURRENT
-            && $record->is_active === '1'
+            && $record->is_enabled === '1'
             && $record->is_error === '0'
             && $record->buy_client_order_id === null
             && $record->buy_order_id === null
