@@ -57,9 +57,9 @@ function printException(\Exception $e): void
 {
     do {
         echo
-        "Code: {$e->getCode()}",
-        "Message: {$e->getMessage()}\n",
-        "Trace:\{$e->getTraceAsString()}\n\n"
+            "Code: {$e->getCode()}",
+            "Message: {$e->getMessage()}\n",
+            "Trace: {$e->getTraceAsString()}\n\n"
         ;
         $e = $e->getPrevious();
         if ($e instanceof \Exception) {
