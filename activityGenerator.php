@@ -69,6 +69,15 @@ function printException(\Exception $e): void
     } while ($e instanceof \Exception);
 }
 
+function placeOrder(NewOrder $order): void
+{
+    $response = \json_decode($order->getResponse()['body']);
+    echo "{$response->side} {$response->original_amount}\n";
+    if ($response->is_live === true) {
+        (new Cancel($response->order_id))->getResponse();
+    }
+}
+
 
 $range = \getRange($adapter);
 
@@ -80,13 +89,25 @@ do {
     $price = new Price($side === $sideBuy ? $range['buy'] : $range['sell']);
     $order = new NewOrder($side, $symbol, \getAmount(), $price, $clientOrderId);
     try {
-        $response = \json_decode($order->getResponse()['body']);
-        echo "{$response->side} {$response->original_amount}\n";
-        if ($response->is_live === true) {
-            (new Cancel($response->order_id))->getResponse();
-        }
+        \placeOrder($order);
     } catch (\Kobens\Core\Exception\ConnectionException $e) {
         // swallow exception
+    } catch (\Kobens\Gemini\Exception\InvalidResponseException $e) {
+        // Insufficient Funds. Buy or sell to restore some
+        if ($e->getCode() === 406) {
+            $side = $side === $sideBuy ? $sideSell : $sideBuy;
+            $price = new Price($side === $sideBuy ? $range['buy'] : $range['sell']);
+            $order = new NewOrder($side, $symbol, new Amount('10'), $price, $clientOrderId);
+            try {
+                \placeOrder($order);
+            } catch (\Exception $e) {
+                \printException($e);
+                exit(1);
+            }
+        } else {
+            \printException($e);
+            exit(1);
+        }
     } catch (\Exception $e) {
         \printException($e);
         exit(1);
