@@ -85,6 +85,8 @@ do {
         if ($response->is_live === true) {
             (new Cancel($response->order_id))->getResponse();
         }
+    } catch (\Kobens\Core\Exception\ConnectionException $e) {
+        // swallow exception
     } catch (\Exception $e) {
         \printException($e);
         exit(1);
