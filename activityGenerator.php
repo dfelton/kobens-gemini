@@ -57,7 +57,8 @@ function printException(\Exception $e): void
 {
     do {
         echo
-            "Code: {$e->getCode()}",
+            "Code: {$e->getCode()}\n",
+            "Class: ".\get_class($e)."\n",
             "Message: {$e->getMessage()}\n",
             "Trace: {$e->getTraceAsString()}\n\n"
         ;
