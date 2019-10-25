@@ -10,6 +10,8 @@ final class BuyReady extends AbstractDataResource implements BuyReadyInterface
     protected function isHealthy(\ArrayObject $record): bool
     {
         return $record->status === self::STATUS_CURRENT
+            && $record->is_active === '1'
+            && $record->is_error === '0'
             && $record->buy_client_order_id === null
             && $record->buy_order_id === null
             && $record->sell_client_order_id === null
@@ -23,7 +25,10 @@ final class BuyReady extends AbstractDataResource implements BuyReadyInterface
         try {
             $record = $this->getHealthyRecord($id, true);
             $this->table->update(
-                ['buy_client_order_id' => $buyClientOrderId, 'status' => self::STATUS_NEXT],
+                [
+                    'buy_client_order_id' => $buyClientOrderId,
+                    'status' => self::STATUS_NEXT,
+                ],
                 ['id' => $record->id]
             );
             $this->connection->commit();
@@ -31,14 +36,6 @@ final class BuyReady extends AbstractDataResource implements BuyReadyInterface
             $this->connection->rollback();
             throw $e;
         }
-    }
-
-    public function setErrorState(int $id, string $message): void
-    {
-        $this->table->update(
-            ['meta' => \json_encode(['error' => $message])],
-            ['id' => $id]
-        );
     }
 
     public function resetState(int $id): void

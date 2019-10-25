@@ -6,7 +6,5 @@ interface BuyFilledInterface extends DataResourceInterface
 {
     public function setNextState(int $id, string $sellClientOrderId): void;
 
-    public function setErrorState(int $id, string $message): void;
-
     public function resetState(int $id): void;
 }

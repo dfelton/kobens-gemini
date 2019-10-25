@@ -96,7 +96,7 @@ final class Buyer extends Command
                     ));
                 }
             } catch (ConnectionException $e) {
-                $this->buyReady->setErrorState($row->id, ConnectionException::class);
+                $this->buySent->setErrorState($row->id, ConnectionException::class);
                 $output->writeln("<fg=red>{$this->now()}\tConnection Exception Occurred.</>");
 
             } catch (MaxIterationsException $e) {

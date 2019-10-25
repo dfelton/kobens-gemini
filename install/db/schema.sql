@@ -8,6 +8,7 @@ DROP TABLE IF EXISTS `trade_repeater`;
 CREATE TABLE `trade_repeater` (
     `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Trade Repeater ID',
     `is_enabled` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Is Enabled',
+    `is_error` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Is Error',
     -- BUY_READY | BUY_SENT | BUY_PLACED | BUY_FILLED | SELL_SENT | SELL_PLACED | SELL_FILLED
     `status` VARCHAR(25) NOT NULL COMMENT 'Status',
     `symbol` VARCHAR(12) NOT NULL COMMENT 'Symbol',
@@ -24,7 +25,8 @@ CREATE TABLE `trade_repeater` (
     `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `IDX_STATUS` (`status`),
-    KEY `IDX_IS_ENABLED` (`is_enabled`)
+    KEY `IDX_IS_ENABLED` (`is_enabled`),
+    KEY `IDX_IS_ERROR` (`is_error`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Trade Repeater';
 
 

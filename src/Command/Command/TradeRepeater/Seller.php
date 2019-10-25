@@ -86,7 +86,7 @@ final class Seller extends Command
             try {
                 $response = $order->getResponse();
             } catch (ConnectionException $e) {
-                $this->buyFilled->setErrorState($row->id, ConnectionException::class);
+                $this->sellSent->setErrorState($row->id, ConnectionException::class);
                 $output->writeln("<fg=red>{$this->now()}\tConnection Exception Occurred.</>");
                 continue;
             } catch (MaxIterationsException $e) {

@@ -40,6 +40,7 @@ abstract class AbstractDataResource
     {
         return $this->table->select(function(Select $select) {
             $select->where->equalTo('is_enabled', 1);
+            $select->where->equalTo('is_error', 0);
             $select->where->equalTo('status', static::STATUS_CURRENT);
         });
     }

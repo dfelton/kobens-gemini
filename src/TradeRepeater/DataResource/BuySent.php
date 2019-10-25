@@ -10,6 +10,8 @@ final class BuySent extends AbstractDataResource implements BuySentInterface
     protected function isHealthy(\ArrayObject $record): bool
     {
         return $record->status === self::STATUS_CURRENT
+            && $record->is_active === '1'
+            && $record->is_error === '0'
             && \is_string($record->buy_client_order_id)
             && \strlen($record->buy_client_order_id) > 0
             && $record->buy_order_id === null
@@ -45,7 +47,13 @@ final class BuySent extends AbstractDataResource implements BuySentInterface
             $record = $this->getRecord($id, true);
             $meta = $record->meta === null ? [] : \json_decode($record->meta, true);
             $meta['error'] = $message;
-            $this->table->update(['meta' => \json_encode($meta)], ['id' => $id]);
+            $this->table->update(
+                [
+                    'meta' => \json_encode($meta),
+                    'is_error' => 1,
+                ],
+                ['id' => $id]
+            );
             $this->connection->commit();
         } catch (\Exception $e) {
             $this->connection->rollback();

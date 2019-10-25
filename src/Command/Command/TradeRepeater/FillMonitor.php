@@ -123,11 +123,13 @@ final class FillMonitor extends Command
                 $repeaterId = $this->getRecordId($msg['client_order_id']);
                 if ($repeaterId) {
                     if ($msg['side'] === 'buy') {
-                        $this->buyPlaced->setNextState($repeaterId);
-                        $output->writeln($this->now()."\t($repeaterId) Buy order {$msg['order_id']} on {$msg['symbol']} pair for {$msg['original_amount']} at price of {$msg['price']} filled.");
+                        if ($this->buyPlaced->setNextState($repeaterId)) {
+                            $output->writeln($this->now()."\t($repeaterId) Buy order {$msg['order_id']} on {$msg['symbol']} pair for {$msg['original_amount']} at price of {$msg['price']} filled.");
+                        }
                     } elseif ($msg['side'] === 'sell') {
-                        $this->sellPlaced->setNextState($repeaterId);
-                        $output->writeln($this->now()."\t($repeaterId) Sell order {$msg['order_id']} on {$msg['symbol']} pair for {$msg['original_amount']} at price of {$msg['price']} filled.");
+                        if ($this->sellPlaced->setNextState($repeaterId)) {
+                            $output->writeln($this->now()."\t($repeaterId) Sell order {$msg['order_id']} on {$msg['symbol']} pair for {$msg['original_amount']} at price of {$msg['price']} filled.");
+                        }
                     } else {
                         throw new \Exception("Unhandled side '{$msg['side']}'");
                     }

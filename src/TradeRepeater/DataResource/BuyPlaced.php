@@ -12,13 +12,15 @@ final class BuyPlaced extends AbstractDataResource implements BuyPlacedInterface
     protected function isHealthy(\ArrayObject $record): bool
     {
         return $record->status === self::STATUS_CURRENT
+            && $record->is_active === '1'
+            && $record->is_error === '0'
             && $record->buy_client_order_id !== null
             && $record->buy_order_id !== null
             && $record->sell_client_order_id === null
             && $record->sell_order_id === null;
     }
 
-    public function setNextState(int $id): void
+    public function setNextState(int $id): bool
     {
         $this->connection->beginTransaction();
         try {
@@ -30,10 +32,12 @@ final class BuyPlaced extends AbstractDataResource implements BuyPlacedInterface
             $this->connection->commit();
         } catch (UnhealthyStateException $e) {
             $this->connection->rollback();
-            // silently eat the exception (race between Rest and Websocket FillMonitors)
+            // swallow exception (race between Rest and Websocket FillMonitors)
+            return false;
         } catch (\Exception $e) {
             $this->connection->rollback();
             throw $e;
         }
+        return true;
     }
 }

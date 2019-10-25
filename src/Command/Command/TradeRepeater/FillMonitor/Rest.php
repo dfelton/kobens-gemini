@@ -88,8 +88,9 @@ final class Rest extends Command
                 continue;
             }
             if (!\in_array($row, $activeIds) && $this->isFilled($row->buy_order_id)) {
-                $output->writeln("{$this->now()}\t({$row->id}) Buy order {$row->buy_order_id} on {$row->symbol} pair filled.");
-                $this->buyPlaced->setNextState($row->id);
+                if ($this->buyPlaced->setNextState($row->id)) {
+                    $output->writeln("{$this->now()}\t({$row->id}) Buy order {$row->buy_order_id} on {$row->symbol} pair filled.");
+                }
             }
         }
         foreach ($this->getOldSellPlacedRecords() as $row) {
@@ -100,8 +101,9 @@ final class Rest extends Command
                 continue;
             }
             if (!\in_array($row, $activeIds) && $this->isFilled($row->sell_order_id)) {
-                $output->writeln("{$this->now()}\t({$row->id}) Sell order {$row->sell_order_id} on {$row->symbol} pair filled.");
-                $this->sellPlaced->setNextState($row->id);
+                if ($this->sellPlaced->setNextState($row->id)) {
+                    $output->writeln("{$this->now()}\t({$row->id}) Sell order {$row->sell_order_id} on {$row->symbol} pair filled.");
+                }
             }
         }
     }
