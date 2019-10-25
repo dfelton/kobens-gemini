@@ -34,20 +34,27 @@ $clientOrderId = new ClientOrderId();
 
 function getRange(\Zend\Db\Adapter\Adapter $adapter): array
 {
-    /** @var \Zend\Db\Adapter\Driver\Pdo\Statement $minSell */
-    $minSell = $adapter->query('select buy_price from trade_repeater order by buy_price asc limit 1')->execute()->current();
-    $maxBuy = $adapter->query('select sell_price from trade_repeater order by sell_price desc limit 1')->execute()->current();
-    return [
-        'sell' => $minSell['buy_price'],
-        'buy' => $maxBuy['sell_price'],
+    $range = [
+        'sell' => null,
+        'buy' => null,
         'time' => \time(),
     ];
+    $prices = $adapter->query('select buy_price,sell_price from trade_repeater')->execute();
+    foreach ($prices as $price) {
+        if ($range['sell'] === null || (float) $range['sell'] > (float) $price['buy_price']) {
+            $range['sell'] = $price['buy_price'];
+        }
+        if ($range['buy'] === null || (float) $range['buy'] < (float) $price['sell_price']) {
+            $range['buy'] = $price['sell_price'];
+        }
+    }
+    return $range;
 }
 
 function getAmount(): Amount
 {
     $overOneBtc = \rand(0, 100) > 90;
-    $whole = $overOneBtc ? (string) \rand(1, 10) : '0';
+    $whole = $overOneBtc ? (string) \rand(1, 9) : '0';
     $satoshi = (string) \rand(1000, 99999999);
     $satoshi = \str_pad($satoshi, 8, \STR_PAD_LEFT);
     return new Amount("$whole.$satoshi");
@@ -72,7 +79,14 @@ function printException(\Exception $e): void
 function placeOrder(NewOrder $order): void
 {
     $response = \json_decode($order->getResponse()['body']);
-    echo "{$response->side} {$response->original_amount}\n";
+    echo
+        \str_pad($response->side, 5, ' ', \STR_PAD_RIGHT),
+        \str_pad($response->executed_amount, 12, ' ', \STR_PAD_RIGHT);
+    if ($response->executed_amount !== $response->original_amount) {
+        echo " of {$response->original_amount}";
+    }
+    $avg = (string) \round((float) $response->avg_execution_price, 2);
+    echo " at average price of {$avg}\n";
     if ($response->is_live === true) {
         (new Cancel($response->order_id))->getResponse();
     }
@@ -86,8 +100,7 @@ do {
         $range = \getRange($adapter);
     }
     $side = \rand(0, 1) ? $sideBuy : $sideSell;
-    $price = new Price($side === $sideBuy ? $range['buy'] : $range['sell']);
-    $order = new NewOrder($side, $symbol, \getAmount(), $price, $clientOrderId);
+    $order = new NewOrder($side, $symbol, \getAmount(), new Price($range[$side->getValue()]), $clientOrderId);
     try {
         \placeOrder($order);
     } catch (\Kobens\Core\Exception\ConnectionException $e) {
@@ -96,8 +109,7 @@ do {
         // Insufficient Funds. Buy or sell to restore some
         if ($e->getCode() === 406) {
             $side = $side === $sideBuy ? $sideSell : $sideBuy;
-            $price = new Price($side === $sideBuy ? $range['buy'] : $range['sell']);
-            $order = new NewOrder($side, $symbol, new Amount('10'), $price, $clientOrderId);
+            $order = new NewOrder($side, $symbol, new Amount('9'), new Price($range[$side->getValue()]), $clientOrderId);
             try {
                 \placeOrder($order);
             } catch (\Exception $e) {
