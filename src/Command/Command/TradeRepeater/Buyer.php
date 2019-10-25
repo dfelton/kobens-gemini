@@ -89,6 +89,12 @@ final class Buyer extends Command
                     "%s\t(%d) Buy Order ID %s placed on %s pair for amount of %s at rate of %s",
                     $this->now(), $row->id, $msg->order_id, $msg->symbol, $msg->original_amount, $msg->price
                 ));
+                if ($msg->price !== $row->buy_price) {
+                    $output->writeln(\sprintf(
+                        "%s\t\t<fg=yellow>(original buy price: %s)</>",
+                        $this->now(), $row->buy_price
+                    ));
+                }
             } catch (ConnectionException $e) {
                 $this->buyReady->setErrorState($row->id, ConnectionException::class);
                 $output->writeln("<fg=red>{$this->now()}\tConnection Exception Occurred.</>");
