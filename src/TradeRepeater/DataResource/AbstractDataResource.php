@@ -2,8 +2,8 @@
 
 namespace Kobens\Gemini\TradeRepeater\DataResource;
 
-use Kobens\Core\Db;
 use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
+use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
 
@@ -16,9 +16,22 @@ abstract class AbstractDataResource
      */
     protected $table;
 
-    public function __construct()
-    {
-        $this->table = new TableGateway('trade_repeater', Db::getAdapter());
+    /**
+     * @var Adapter
+     */
+    protected $adapter;
+
+    /**
+     * @var \Zend\Db\Adapter\Driver\ConnectionInterface
+     */
+    protected $connection;
+
+    public function __construct(
+        Adapter $adapter
+    ) {
+        $this->adapter = $adapter;
+        $this->connection = $adapter->getDriver()->getConnection();
+        $this->table = new TableGateway('trade_repeater', $adapter);
     }
 
     abstract protected function isHealthy(\ArrayObject $record): bool;
@@ -48,12 +61,14 @@ abstract class AbstractDataResource
      * @throws \Exception
      * @return \ArrayObject
      */
-    public function getRecord(int $id): \ArrayObject
+    public function getRecord(int $id, bool $forUpdate = false): \ArrayObject
     {
+        $sql = 'SELECT * FROM trade_repeater WHERE id = :id';
+        if ($forUpdate) {
+            $sql .= ' FOR UPDATE';
+        }
         /** @var \Zend\Db\ResultSet\ResultSet $rows */
-        $rows = $this->table->select(function(Select $select) use ($id) {
-            $select->where->equalTo('id', $id);
-        });
+        $rows = $this->adapter->query($sql, ['id' => $id]);
         if ($rows->count() !== 1) {
             throw new \Exception ("Order ID Not Found");
         }
@@ -65,9 +80,9 @@ abstract class AbstractDataResource
      * @throws \Exception
      * @return \ArrayObject
      */
-    public function getHealthyRecord(int $id): \ArrayObject
+    public function getHealthyRecord(int $id, bool $forUpdate = false): \ArrayObject
     {
-        $record = $this->getRecord($id);
+        $record = $this->getRecord($id, $forUpdate);
         if (!$this->isHealthy($record)) {
             throw new UnhealthyStateException(\sprintf(
                 "Trade record '%d' is not healthy for '%s'. Current State: %s",

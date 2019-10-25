@@ -19,13 +19,17 @@ final class BuyReady extends AbstractDataResource implements BuyReadyInterface
 
     public function setNextState(int $id, string $buyClientOrderId): void
     {
-        $record = $this->getHealthyRecord($id);
-        $affectedRows = $this->table->update(
-            ['buy_client_order_id' => $buyClientOrderId, 'status' => self::STATUS_NEXT],
-            ['id' => $record->id]
-        );
-        if ($affectedRows !== 1) {
-            throw new \Exception("Order $id not marked '".self::STATUS_NEXT."'");
+        $this->connection->beginTransaction();
+        try {
+            $record = $this->getHealthyRecord($id, true);
+            $this->table->update(
+                ['buy_client_order_id' => $buyClientOrderId, 'status' => self::STATUS_NEXT],
+                ['id' => $record->id]
+            );
+            $this->connection->commit();
+        } catch (\Exception $e) {
+            $this->connection->rollback();
+            throw $e;
         }
     }
 
@@ -39,12 +43,9 @@ final class BuyReady extends AbstractDataResource implements BuyReadyInterface
 
     public function resetState(int $id): void
     {
-        $affectedRows = $this->table->update(
+        $this->table->update(
             ['buy_client_order_id' => null, 'status' => self::STATUS_CURRENT],
             ['id' => $id]
         );
-        if ($affectedRows !== 1) {
-            throw new \Exception("Order $id not marked '".self::STATUS_CURRENT."'");
-        }
     }
 }

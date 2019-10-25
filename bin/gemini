@@ -35,19 +35,20 @@ try {
 }
 
 $config = Config::getInstance();
+$adapter = Db::getAdapter();
+$connectionInterface = $adapter->getDriver()->getConnection();
 $shutdownInterface = new EmergencyShutdown($config);
 $keyInterface = new Key();
 $nonceInterface = new Nonce();
 $archiveInterface = new Archive();
 $activeOrdersInterface = new ActiveOrders();
-$buyFilledInterface = new BuyFilled();
-$buyPlacedInterface = new BuyPlaced();
-$buyReadyInterface = new BuyReady();
-$buySentInterface = new BuySent();
-$sellFilledInterface = new SellFilled();
-$sellPlacedInterface = new SellPlaced();
-$sellSentInterface = new SellSent();
-$connectionInterface = Db::getAdapter()->getDriver()->getConnection();
+$buyFilledInterface = new BuyFilled($adapter);
+$buyPlacedInterface = new BuyPlaced($adapter);
+$buyReadyInterface = new BuyReady($adapter);
+$buySentInterface = new BuySent($adapter);
+$sellFilledInterface = new SellFilled($adapter);
+$sellPlacedInterface = new SellPlaced($adapter);
+$sellSentInterface = new SellSent($adapter);
 
 $app = new \Symfony\Component\Console\Application($composer->name, $composer->version);
 $app->add(new \Kobens\Gemini\Command\Command\Funds\GetAvailableBalances());

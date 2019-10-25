@@ -8,5 +8,5 @@ interface DataResourceInterface
 
     public function getHealthyRecord(int $id): \ArrayObject;
 
-    public function getRecord(int $id): \ArrayObject;
+    public function getRecord(int $id, bool $forUpdate = false): \ArrayObject;
 }

@@ -18,18 +18,25 @@ final class SellFilled extends AbstractDataResource implements SellFilledInterfa
 
     public function setNextState(int $id): void
     {
-        $record = $this->getHealthyRecord($id);
-        $this->table->update(
-            [
-                'status' => self::STATUS_NEXT,
-                'buy_client_order_id' => null,
-                'buy_order_id' => null,
-                'sell_client_order_id' => null,
-                'sell_order_id' => null,
-                'note' => null,
-                'meta' => null,
-            ],
-            ['id' => $record->id]
-        );
+        $this->connection->beginTransaction();
+        try {
+            $record = $this->getHealthyRecord($id, true);
+            $this->table->update(
+                [
+                    'status' => self::STATUS_NEXT,
+                    'buy_client_order_id' => null,
+                    'buy_order_id' => null,
+                    'sell_client_order_id' => null,
+                    'sell_order_id' => null,
+                    'note' => null,
+                    'meta' => null,
+                ],
+                ['id' => $record->id]
+            );
+            $this->connection->commit();
+        } catch (\Exception $e) {
+            $this->connection->rollback();
+            throw $e;
+        }
     }
 }

@@ -12,32 +12,44 @@ final class BuySent extends AbstractDataResource implements BuySentInterface
         return $record->status === self::STATUS_CURRENT
             && \is_string($record->buy_client_order_id)
             && \strlen($record->buy_client_order_id) > 0
-            && $record->buy_order_id === NULL
-            && $record->sell_client_order_id === NULL
-            && $record->sell_order_id === NULL;
+            && $record->buy_order_id === null
+            && $record->sell_client_order_id === null
+            && $record->sell_order_id === null
+            && $record->meta === null;
     }
 
     public function setNextState(int $id, string $buyOrderId, string $buyPrice): void
     {
-        $record = $this->getHealthyRecord($id);
-        $affectedRows = $this->table->update(
-            [
-                'buy_order_id' => $buyOrderId,
-                'status' => self::STATUS_NEXT,
-                'meta' => \json_encode(['buy_price' => $buyPrice])
-            ],
-            ['id' => $record->id]
-        );
-        if ($affectedRows !== 1) {
-            throw new \Exception("Order '$id' not marked '".self::STATUS_NEXT."'");
+        $this->connection->beginTransaction();
+        try {
+            $record = $this->getHealthyRecord($id, true);
+            $this->table->update(
+                [
+                    'buy_order_id' => $buyOrderId,
+                    'status' => self::STATUS_NEXT,
+                    'meta' => \json_encode(['buy_price' => $buyPrice])
+                ],
+                ['id' => $record->id]
+            );
+            $this->connection->commit();
+        } catch (\Exception $e) {
+            $this->connection->rollback();
+            throw $e;
         }
     }
 
     public function setErrorState(int $id, string $message): void
     {
-        $record = $this->getRecord($id);
-        $meta = $record->meta === null ? [] : \json_decode($record->meta, true);
-        $meta['error'] = $message;
-        $this->table->update(['meta' => \json_encode($meta)], ['id' => $id]);
+        $this->connection->beginTransaction();
+        try {
+            $record = $this->getRecord($id, true);
+            $meta = $record->meta === null ? [] : \json_decode($record->meta, true);
+            $meta['error'] = $message;
+            $this->table->update(['meta' => \json_encode($meta)], ['id' => $id]);
+            $this->connection->commit();
+        } catch (\Exception $e) {
+            $this->connection->rollback();
+            throw $e;
+        }
     }
 }

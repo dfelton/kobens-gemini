@@ -19,22 +19,36 @@ final class BuyFilled extends AbstractDataResource implements BuyFilledInterface
 
     public function setNextState(int $id, string $sellClientOrderId): void
     {
-        $record = $this->getHealthyRecord($id);
-        $this->table->update(
-            ['sell_client_order_id' => $sellClientOrderId, 'status' => self::STATUS_NEXT],
-            ['id' => $record->id]
-        );
+        $this->connection->beginTransaction();
+        try {
+            $record = $this->getHealthyRecord($id, true);
+            $this->table->update(
+                ['sell_client_order_id' => $sellClientOrderId, 'status' => self::STATUS_NEXT],
+                ['id' => $record->id]
+            );
+            $this->connection->commit();
+        } catch (\Exception $e) {
+            $this->connection->rollback();
+            throw $e;
+        }
     }
 
     public function setErrorState(int $id, string $message): void
     {
-        $record = $this->getRecord($id);
-        $meta = \json_decode($record->meta, true);
-        $meta['error'] = $message;
-        $this->table->update(
-            ['meta' => \json_encode($meta)],
-            ['id' => $record->id]
-        );
+        try {
+            $this->connection->beginTransaction();
+            $record = $this->getRecord($id, true);
+            $meta = \json_decode($record->meta, true);
+            $meta['error'] = $message;
+            $this->table->update(
+                ['meta' => \json_encode($meta)],
+                ['id' => $record->id]
+            );
+            $this->connection->commit();
+        } catch (\Exception $e) {
+            $this->connection->rollback();
+            throw $e;
+        }
     }
 
     public function resetState(int $id): void

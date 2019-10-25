@@ -6,7 +6,6 @@ use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Rest\Request\Order\Status\ActiveOrdersInterface;
 use Kobens\Gemini\Api\Rest\Request\Order\Status\OrderStatus;
-use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
 use Kobens\Gemini\TradeRepeater\DataResource\BuyPlacedInterface;
 use Kobens\Gemini\TradeRepeater\DataResource\SellPlacedInterface;
 use Symfony\Component\Console\Command\Command;
@@ -78,12 +77,6 @@ final class Rest extends Command
             if ($this->shutdown->isShutdownModeEnabled()) {
                 break;
             }
-            try {
-                $row = $this->buyPlaced->getHealthyRecord($row->id);
-            } catch (UnhealthyStateException $e) {
-                // Due to lag the Websocket FillMonitor may have beaten us to this record
-                continue;
-            }
             if (!\in_array($row, $activeIds) && $this->isFilled($row->buy_order_id)) {
                 $output->writeln("{$this->now()}\t({$row->id}) Buy order {$row->buy_order_id} on {$row->symbol} pair filled.");
                 $this->buyPlaced->setNextState($row->id);
@@ -92,12 +85,6 @@ final class Rest extends Command
         foreach ($this->getOldSellPlacedRecords() as $row) {
             if ($this->shutdown->isShutdownModeEnabled()) {
                 break;
-            }
-            try {
-                $row = $this->buyPlaced->getHealthyRecord($row->id);
-            } catch (UnhealthyStateException $e) {
-                // Due to lag the Websocket FillMonitor may have beaten us to this record
-                continue;
             }
             if (!\in_array($row, $activeIds) && $this->isFilled($row->sell_order_id)) {
                 $output->writeln("{$this->now()}\t({$row->id}) Sell order {$row->sell_order_id} on {$row->symbol} pair filled.");

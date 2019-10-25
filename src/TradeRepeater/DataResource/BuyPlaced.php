@@ -2,6 +2,8 @@
 
 namespace Kobens\Gemini\TradeRepeater\DataResource;
 
+use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
+
 final class BuyPlaced extends AbstractDataResource implements BuyPlacedInterface
 {
     const STATUS_CURRENT = 'BUY_PLACED';
@@ -18,10 +20,20 @@ final class BuyPlaced extends AbstractDataResource implements BuyPlacedInterface
 
     public function setNextState(int $id): void
     {
-        $record = $this->getHealthyRecord($id);
-        $this->table->update(
-            ['status' => self::STATUS_NEXT],
-            ['id' => $record->id]
-        );
+        $this->connection->beginTransaction();
+        try {
+            $record = $this->getHealthyRecord($id, true);
+            $this->table->update(
+                ['status' => self::STATUS_NEXT],
+                ['id' => $record->id]
+            );
+            $this->connection->commit();
+        } catch (UnhealthyStateException $e) {
+            $this->connection->rollback();
+            // silently eat the exception (race between Rest and Websocket FillMonitors)
+        } catch (\Exception $e) {
+            $this->connection->rollback();
+            throw $e;
+        }
     }
 }

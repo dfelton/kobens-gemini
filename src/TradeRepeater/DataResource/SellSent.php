@@ -18,16 +18,23 @@ final class SellSent extends AbstractDataResource implements SellSentInterface
 
     public function setNextState(int $id, string $orderId, string $price): void
     {
-        $record = $this->getHealthyRecord($id);
-        $meta = \json_decode($record['meta'], true);
-        $meta['sell_price'] = $price;
-        $this->table->update(
-            [
-                'sell_order_id' => $orderId,
-                'status' => self::STATUS_NEXT,
-                'meta' => \json_encode($meta)
-            ],
-            ['id' => $id]
-        );
+        $this->connection->beginTransaction();
+        try {
+            $record = $this->getHealthyRecord($id, true);
+            $meta = \json_decode($record['meta'], true);
+            $meta['sell_price'] = $price;
+            $this->table->update(
+                [
+                    'sell_order_id' => $orderId,
+                    'status' => self::STATUS_NEXT,
+                    'meta' => \json_encode($meta)
+                ],
+                ['id' => $id]
+            );
+            $this->connection->commit();
+        } catch (\Exception $e) {
+            $this->connection->rollback();
+            throw $e;
+        }
     }
 }

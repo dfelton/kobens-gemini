@@ -7,7 +7,6 @@ use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Gemini\Api\Host;
 use Kobens\Gemini\Api\KeyInterface;
 use Kobens\Gemini\Api\NonceInterface;
-use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
 use Kobens\Gemini\TradeRepeater\DataResource\BuyPlacedInterface;
 use Kobens\Gemini\TradeRepeater\DataResource\SellPlacedInterface;
 use Symfony\Component\Console\Command\Command;
@@ -86,7 +85,6 @@ final class FillMonitor extends Command
             while ($message = yield $connection->receive()) {
                 $payload = yield $message->buffer();
                 $data = \json_decode($payload, true);
-
                 if (\strpos($payload, '[') === 0) {
                     foreach ($data as $update) {
                         $this->processMessage($update, $output);
@@ -94,29 +92,20 @@ final class FillMonitor extends Command
                 } else {
                     $this->processMessage($data, $output);
                 }
+                if ($this->shutdown->isShutdownModeEnabled()) {
+                    \Amp\Loop::stop();
+                }
             }
         };
     }
 
     private function processMessage(array $msg, OutputInterface $output): void
     {
-        try {
-            $this->_processMessage($msg, $output);
-        } catch (UnhealthyStateException $e) {
-            throw new \Exception(\json_encode($msg), 0, $e);
-        }
-    }
-
-    private function _processMessage(array $msg, OutputInterface $output): void
-    {
         switch (true) {
             case $msg['type'] === 'subscription_ack':
                 $output->writeln($this->now()."\tSubscription acknowledged.");
                 break;
             case $msg['type'] === 'heartbeat':
-                if ($this->shutdown->isShutdownModeEnabled()) {
-                    \Amp\Loop::stop();
-                }
                 $output->writeln($this->now()."\tHeartbeat Received");
                 break;
             case $msg['type'] === 'fill' && $msg['remaining_amount'] !== '0':
