@@ -59,7 +59,7 @@ abstract class Request
         $config = Config::getInstance();
         $this->restKey = new Key();
         $this->nonce = new Nonce();
-        $this->logTimer = new Logger(static::REQUEST_URI);
+        $this->logTimer = new Logger($this->getUrlPath());
         $this->logTimer->pushHandler(new StreamHandler(
             \sprintf(
                 '%s/var/log/curl_timers.log',
