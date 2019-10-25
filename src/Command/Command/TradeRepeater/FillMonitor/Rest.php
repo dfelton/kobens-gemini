@@ -6,6 +6,8 @@ use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Rest\Request\Order\Status\ActiveOrdersInterface;
 use Kobens\Gemini\Api\Rest\Request\Order\Status\OrderStatus;
+use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
+use Kobens\Gemini\TradeRepeater\DataResource\AbstractDataResource;
 use Kobens\Gemini\TradeRepeater\DataResource\BuyPlacedInterface;
 use Kobens\Gemini\TradeRepeater\DataResource\SellPlacedInterface;
 use Symfony\Component\Console\Command\Command;
@@ -70,12 +72,20 @@ final class Rest extends Command
         $output->writeln("<fg=red>Shutdown Signal Detected</>");
     }
 
+    /**
+     * TODO: still seeing a ton of calls to /v1/order/status. See if we can reduce this
+     *
+     * @param OutputInterface $output
+     */
     private function mainLoop(OutputInterface $output): void
     {
         $activeIds = $this->getActiveOrderIds();
         foreach ($this->getOldBuyPlacedRecords() as $row) {
             if ($this->shutdown->isShutdownModeEnabled()) {
                 break;
+            }
+            if (!$this->isStillHealthy($this->buyPlaced, $row->id)) {
+                continue;
             }
             if (!\in_array($row, $activeIds) && $this->isFilled($row->buy_order_id)) {
                 $output->writeln("{$this->now()}\t({$row->id}) Buy order {$row->buy_order_id} on {$row->symbol} pair filled.");
@@ -86,11 +96,35 @@ final class Rest extends Command
             if ($this->shutdown->isShutdownModeEnabled()) {
                 break;
             }
+            if (!$this->isStillHealthy($this->sellPlaced, $row->id)) {
+                continue;
+            }
             if (!\in_array($row, $activeIds) && $this->isFilled($row->sell_order_id)) {
                 $output->writeln("{$this->now()}\t({$row->id}) Sell order {$row->sell_order_id} on {$row->symbol} pair filled.");
                 $this->sellPlaced->setNextState($row->id);
             }
         }
+    }
+
+    /**
+     * Due to lag, it could have been picked up by the WebSocket FillMonitor.
+     * By performing a redundant call to our db we can save ourselves a
+     * curl request which is more important than the reduction of db calls
+     * in order to preserve rate limits on exchange.
+     *
+     * @param AbstractDataResource $resource
+     * @param $id
+     * @return bool
+     */
+    private function isStillHealthy(AbstractDataResource $resource, int $id): bool
+    {
+        try {
+            $resource->getHealthyRecord($id);
+        } catch (UnhealthyStateException $e) {
+            // swallow exception
+            return false;
+        }
+        return true;
     }
 
     private function isFilled(int $id): bool
