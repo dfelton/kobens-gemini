@@ -15,7 +15,12 @@ use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder;
 use Kobens\Gemini\Exception\MaxIterationsException;
 
 /**
- * FIXME There is too much ability to go wrong here via public setters in the parent. Are we accepting concrete hard limits via the constructor or not? Eliminate public setters or eliminate statefulness in the class.
+ * FIXME There is too much ability to go wrong here via public setters in the parent.
+ * Are we accepting concrete hard limits via the constructor or not?
+ * Eliminate public setters or eliminate statefulness in the class.
+ *
+ * FIXME When comparing current market price to current "price" use original
+ * value not latest set price.
  */
 final class ForceMaker extends NewOrder
 {
@@ -83,7 +88,7 @@ final class ForceMaker extends NewOrder
                     $newPrice = $this->limit;
                 } else {
                     // Get smallest decrement possible from current ask price
-                    $newPrice = bcsub($price['ask'], $this->pair->minPriceIncrement, $this->pair->getQuote()->getScale());
+                    $newPrice = \bcsub($price['ask'], $this->pair->minPriceIncrement, $this->pair->getQuote()->getScale());
                 }
                 break;
             case 'sell':
@@ -93,9 +98,8 @@ final class ForceMaker extends NewOrder
                     $newPrice = $this->limit;
                 } else {
                     // Get smallest inrement possible from current bid price
-                    $newPrice = bcadd($price['bid'], $this->pair->minPriceIncrement, $this->pair->getQuote()->getScale());
+                    $newPrice = \bcadd($price['bid'], $this->pair->minPriceIncrement, $this->pair->getQuote()->getScale());
                 }
-                break;
                 break;
             default:
                 throw new \Exception('Invalid side.');
