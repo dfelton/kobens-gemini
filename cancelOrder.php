@@ -20,7 +20,7 @@ foreach (\json_decode((new ActiveOrders())->getResponse()['body']) as $order) {
         && (float) $order->price >= (float) $priceFrom
         && (float) $order->price <= (float) $priceTo
     ) {
-        if ($order->original_amount === $amount && $order->remaining_amount === $amount) {
+        if ($order->executed_amount === '0') {
             $orderIds[] = $order->order_id;
         } else {
             $abort = true;
