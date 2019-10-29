@@ -1,28 +1,9 @@
 <?php
 
-require __DIR__.'/vendor/autoload.php';
+require __DIR__.'/bootstrap.php';
 
-use Kobens\Core\Config;
-use Kobens\Exchange\Exchange\Mapper;
-use Kobens\Gemini\Exchange;
 use Kobens\Gemini\Api\Rest\Request\Order\Status\ActiveOrders;
 use Kobens\Gemini\Api\Rest\Request\Order\Placement\Cancel;
-
-try {
-    $config = Config::getInstance();
-    $config->setRootDir(__DIR__);
-    $config->setConfig(__DIR__.'/env/config.xml');
-    new Mapper([
-        'gemini' => Exchange::class
-    ]);
-} catch (Exception $e) {
-    echo \sprintf(
-        'Initialization Error: %s',
-        $e->getMessage()
-    );
-    exit(1);
-}
-
 
 $symbol = 'btcusd';
 $side   = '';
@@ -31,26 +12,48 @@ $amount = '';
 $priceFrom = '';
 $priceTo   = '';
 
-exit;
-
-$ordersToCancel = [];
-foreach (json_decode((new ActiveOrders())->getResponse()['body']) as $order) {
-    if ($order->symbol === $symbol && $order->side === $side && $order->original_amount === $amount && $order->remaining_amount = $amount) {
-        if ((float) $order->price >= (float) $priceFrom && (float) $order->price <= (float) $priceTo) {
-            \Zend\Debug\Debug::dump($order);exit;
-            $ordersToCancel[] = $order->order_id;
+$abort = false;
+$orderIds = [];
+foreach (\json_decode((new ActiveOrders())->getResponse()['body']) as $order) {
+    if (   $order->symbol === $symbol
+        && $order->side === $side
+        && (float) $order->price >= (float) $priceFrom
+        && (float) $order->price <= (float) $priceTo
+    ) {
+        if ($order->original_amount === $amount && $order->remaining_amount === $amount) {
+            $orderIds[] = $order->order_id;
+        } else {
+            $abort = true;
+            echo
+                "Order ID {$order->order_id} at price of {$order->price} has executed {$order->executed_amount} of {$order->original_amount}. ",
+                "Skipping for cancellation.\n";
         }
     }
 }
+unset($order);
 
-\Zend\Debug\Debug::dump(count($ordersToCancel));exit;
+echo "\n{$side} orders to be cancelled: ",\count($orderIds),"\n";
 
-foreach ($ordersToCancel as $orderId) {
-    $response = (new Cancel($orderId))->getResponse();
-    $response['body'] = json_decode($response['body']);
-    \Zend\Debug\Debug::dump($response);
-    if ($response['code'] !== 200) {
-        break;
-    }
+if ($abort) {
+    echo "Not all orders have full original_amount remaining. Aborting.\n";
+    exit(1);
 }
+if (   isset($_SERVER['argv'][1]) && $_SERVER['argv'][1] === 'confirm'
+    && isset($_SERVER['argv'][2]) && $_SERVER['argv'][2] === 'cancelNow'
+) {
+    echo "Starting cancellation in 10 seconds...\n";
+    \sleep(10);
+    foreach ($orderIds as $orderId) {
+        $response = (new Cancel($orderId))->getResponse();
+        $response['body'] = \json_decode($response['body']);
+        if ($response['code'] !== 200) {
+            \Zend\Debug\Debug::dump($response);
+            exit(1);
+        }
+        echo "Order ID {$response['body']->order_id} at price of {$response['body']->price} cancelled.\n";
+    }
+} else {
+    echo "Cancellation confirmation not detected. No action taken\n";
+}
+exit(0);
 
