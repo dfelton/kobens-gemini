@@ -17,6 +17,7 @@ $orderIds = [];
 foreach (\json_decode((new ActiveOrders())->getResponse()['body']) as $order) {
     if (   $order->symbol === $symbol
         && $order->side === $side
+        && $order->original_amount === $amount
         && (float) $order->price >= (float) $priceFrom
         && (float) $order->price <= (float) $priceTo
     ) {
