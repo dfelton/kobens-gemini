@@ -4,7 +4,7 @@ namespace Kobens\Gemini\Api;
 
 use Kobens\Core\Config;
 
-class Host
+class Host implements HostInterface
 {
     public function getHost(): string
     {

@@ -35,9 +35,9 @@ final class Archiver extends Command
     private $shutdown;
 
     public function __construct(
-        ArchiveInterface $archiveInterface,
-        SellFilledInterface $sellFilledInterface,
         EmergencyShutdownInterface $shutdownInterface,
+        SellFilledInterface $sellFilledInterface,
+        ArchiveInterface $archiveInterface,
         ConnectionInterface $connectionInterface
     ) {
         parent::__construct();

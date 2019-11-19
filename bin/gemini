@@ -4,9 +4,23 @@
 use Kobens\Core\Config;
 use Kobens\Core\Db;
 use Kobens\Core\EmergencyShutdown;
+use Kobens\Core\Http\Request\Throttler;
+use Kobens\Gemini\Exchange;
+use Kobens\Gemini\Api\Host;
 use Kobens\Gemini\Api\Key;
 use Kobens\Gemini\Api\Nonce;
-use Kobens\Gemini\Api\Rest\Request\Order\Status\ActiveOrders;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetAvailableBalances;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelAllActiveOrders;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelOrder;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\FillOrKill;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\ForceMaker;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\ImmediateOrCancel;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\Limit;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\MakerOrCancel;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetActiveOrders;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetPastTrades;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatus;
+use Kobens\Gemini\Api\Rest\PublicEndpoints\Ticker;
 use Kobens\Gemini\TradeRepeater\DataResource\Archive;
 use Kobens\Gemini\TradeRepeater\DataResource\BuyFilled;
 use Kobens\Gemini\TradeRepeater\DataResource\BuyPlaced;
@@ -38,10 +52,28 @@ $config = Config::getInstance();
 $adapter = Db::getAdapter();
 $connectionInterface = $adapter->getDriver()->getConnection();
 $shutdownInterface = new EmergencyShutdown($config);
+$exchangeInterface = new Exchange();
+
+$hostInterface = new Host();
 $keyInterface = new Key();
 $nonceInterface = new Nonce();
+$throttlerInterface = new Throttler($hostInterface->getHost());
+$tickerInterface = new Ticker($hostInterface, $throttlerInterface);
+
+$fillOrKillInterface = new FillOrKill($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
+$forceMakerInterface = new ForceMaker($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface, $exchangeInterface, $tickerInterface);
+$immediateOrCancelInterface = new ImmediateOrCancel($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
+$limitInterface = new Limit($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
+$makerOrCancelInterface = new MakerOrCancel($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
+
+$cancelAllActiveOrdersInterface = new CancelAllActiveOrders($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
+$cancelOrderInterface = new CancelOrder($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
+$getPastTradesInterface = new GetPastTrades($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
+$getActiveOrdersInterface = new GetActiveOrders($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
+$getAvailableBalancesInterface = new GetAvailableBalances($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
+$orderStatusInterface = new OrderStatus($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
+
 $archiveInterface = new Archive();
-$activeOrdersInterface = new ActiveOrders();
 $buyFilledInterface = new BuyFilled($adapter);
 $buyPlacedInterface = new BuyPlaced($adapter);
 $buyReadyInterface = new BuyReady($adapter);
@@ -50,52 +82,73 @@ $sellFilledInterface = new SellFilled($adapter);
 $sellPlacedInterface = new SellPlaced($adapter);
 $sellSentInterface = new SellSent($adapter);
 
+
 $app = new \Symfony\Component\Console\Application($composer->name, $composer->version);
-$app->add(new \Kobens\Gemini\Command\Command\Funds\GetAvailableBalances());
+
+// TODO: All TradeRepeater classes will need to use Kobens\Gemini\Api\Rest\* objects that have their own KeyInterface per TradeRepeater to avoid Nonce clashing
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Buyer(
     $shutdownInterface,
     $buyReadyInterface,
-    $buySentInterface
+    $buySentInterface,
+    $forceMakerInterface
 ));
-$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor(
-    $buyPlacedInterface,
-    $sellPlacedInterface,
-    $nonceInterface,
-    $keyInterface,
-    $shutdownInterface
-));
-$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor\Rest(
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor\WebSocket(
     $shutdownInterface,
-    $activeOrdersInterface,
+    $hostInterface,
+    $keyInterface,
+    $nonceInterface,
     $buyPlacedInterface,
     $sellPlacedInterface
 ));
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor\Rest(
+    $shutdownInterface,
+    $buyPlacedInterface,
+    $sellPlacedInterface,
+    $getActiveOrdersInterface,
+    $orderStatusInterface
+));
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Seller(
+    $shutdownInterface,
     $buyFilledInterface,
     $sellSentInterface,
-    $shutdownInterface
+    $forceMakerInterface
 ));
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Archiver(
-    $archiveInterface,
-    $sellFilledInterface,
     $shutdownInterface,
+    $sellFilledInterface,
+    $archiveInterface,
     $connectionInterface
 ));
+
+// $app->add(new \Kobens\Gemini\Command\Command\Taxes\CapitalGains()); // @deprecated
 $app->add(new \Kobens\Gemini\Command\Command\Taxes\BuyLogger());
 $app->add(new \Kobens\Gemini\Command\Command\Taxes\SellLogger());
-$app->add(new \Kobens\Gemini\Command\Command\Taxes\CapitalGains());
 $app->add(new \Kobens\Gemini\Command\Command\Taxes\Form8949());
+
 $app->add(new \Kobens\Gemini\Command\Command\Market\BookKeeper());
-$app->add(new \Kobens\Gemini\Command\Command\Market\Ticker());
+$app->add(new \Kobens\Gemini\Command\Command\Market\Ticker($tickerInterface));
 $app->add(new \Kobens\Gemini\Command\Command\Market\Watcher());
-$app->add(new \Kobens\Gemini\Command\Command\Order\BookKeeper());
-$app->add(new \Kobens\Gemini\Command\Command\Order\Logger\CheckLength());
-$app->add(new \Kobens\Gemini\Command\Command\Order\Logger\TradeHistory());
-$app->add(new \Kobens\Gemini\Command\Command\Order\Placement\Cancel());
-$app->add(new \Kobens\Gemini\Command\Command\Order\Placement\CancelAll());
-$app->add(new \Kobens\Gemini\Command\Command\Order\Placement\NewOrder());
-$app->add(new \Kobens\Gemini\Command\Command\Order\Placement\ForceMaker());
-$app->add(new \Kobens\Gemini\Command\Command\Order\Status\ActiveOrders());
-$app->add(new \Kobens\Gemini\Command\Command\Order\Status\OrderStatus());
-$app->add(new \Kobens\Gemini\Command\Command\Order\Status\PastTrades());
+
+// TODO: This Command should use a unique KeyInterface, with no Trading Authority
+$app->add(new \Kobens\Gemini\Command\Command\OrderStatus\BookKeeper());
+
+// TODO: This Command should use a unique KeyInterface, with no Trading Authority
+$app->add(new \Kobens\Gemini\Command\Command\Logger\TradeHistory($getPastTradesInterface, $shutdownInterface));
+
+
+// TODO: The following commands can use a common KeyInterface, with Trading Authority
+$app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\CancelOrder($cancelOrderInterface));
+$app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\CancelAllActive($cancelAllActiveOrdersInterface));
+$app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\NewOrder\FillOrKill($fillOrKillInterface));
+$app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\NewOrder\ForceMaker($forceMakerInterface));
+$app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\NewOrder\ImmediateOrCancel($immediateOrCancelInterface));
+$app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\NewOrder\Limit($limitInterface));
+$app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\NewOrder\MakerOrCancel($makerOrCancelInterface));
+
+// TODO: The following commands can use a common KeyInterface, and should have no Trading Authority
+$app->add(new \Kobens\Gemini\Command\Command\Funds\GetAvailableBalances($getAvailableBalancesInterface));
+$app->add(new \Kobens\Gemini\Command\Command\OrderStatus\GetActiveOrders($hostInterface, $getActiveOrdersInterface));
+$app->add(new \Kobens\Gemini\Command\Command\OrderStatus\GetPastTrades($getPastTradesInterface));
+$app->add(new \Kobens\Gemini\Command\Command\OrderStatus\OrderStatus($orderStatusInterface));
+
 $app->run();

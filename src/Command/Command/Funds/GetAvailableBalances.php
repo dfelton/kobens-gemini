@@ -2,7 +2,7 @@
 
 namespace Kobens\Gemini\Command\Command\Funds;
 
-use Kobens\Gemini\Api\Rest\Request\Funds\Balances;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetAvailableBalancesInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -18,6 +18,18 @@ final class GetAvailableBalances extends Command
         'availableForWithdrawal' => "Available For Withdrawal...",
     ];
 
+    /**
+     * @var GetAvailableBalancesInterface
+     */
+    private $balances;
+
+    public function __construct(
+        GetAvailableBalancesInterface $getAvailableBalancesInterface
+    ) {
+        $this->balances = $getAvailableBalancesInterface;
+        parent::__construct();
+    }
+
     protected function configure()
     {
         $this->setDescription('Returns available balances.');
@@ -26,33 +38,21 @@ final class GetAvailableBalances extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        try {
-            $balances = (new Balances())->getResponse()['body'];
-        } catch (\Exception $e) {
-            $output->writeln($e->getMessage());
-            $output->writeln($e->getTraceAsString());
-            exit(1);
-        }
         $currency = $input->getOption('currency');
-        $balances = \json_decode($balances, true);
-        foreach ($balances as $balance) {
-            unset($balance['type']);
-            if ($currency === null) {
+        if ($currency) {
+            $this->outputBalance($output, $this->balances->getCurrency($currency));
+        } else {
+            foreach ($this->balances->getBalances() as $balance) {
                 $this->outputBalance($output, $balance);
-            } elseif (\strtoupper($currency) === $balance['currency']) {
-                $this->outputBalance($output, $balance);
-                break;
             }
         }
     }
 
-    private function outputBalance(OutputInterface $output, array $balance): void
+    private function outputBalance(OutputInterface $output, \stdClass $balance): void
     {
-        $output->writeln("<options=bold,underscore>${balance['currency']}</>");
-        unset($balance['currency']);
-        foreach ($balance as $key => $val) {
-            $key = $this->keyLabels[$key];
-            $output->writeln("$key$val");
+        $output->writeln("<options=bold,underscore>{$balance->currency}</>");
+        foreach ($this->keyLabels as $key => $label) {
+            $output->writeln("$label{$balance->{$key}}");
         }
         $output->write(PHP_EOL);
     }

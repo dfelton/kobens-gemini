@@ -4,8 +4,8 @@ namespace Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor;
 
 use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Core\Exception\ConnectionException;
-use Kobens\Gemini\Api\Rest\Request\Order\Status\ActiveOrdersInterface;
-use Kobens\Gemini\Api\Rest\Request\Order\Status\OrderStatus;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetActiveOrdersInterface;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
 use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
 use Kobens\Gemini\TradeRepeater\DataResource\AbstractDataResource;
 use Kobens\Gemini\TradeRepeater\DataResource\BuyPlacedInterface;
@@ -19,12 +19,7 @@ final class Rest extends Command
     protected static $defaultName = 'trade-repeater:fill-monitor-rest';
 
     /**
-     * Threshold in seconds to consider a non-active record old
-     */
-    private const OLD_RECORD_THRESHOLD = 30;
-
-    /**
-     * @var ActiveOrdersInterface
+     * @var GetActiveOrdersInterface
      */
     private $activeOrders;
 
@@ -43,17 +38,24 @@ final class Rest extends Command
      */
     private $shutdown;
 
+    /**
+     * @var OrderStatusInterface
+     */
+    private $orderStatus;
+
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,
-        ActiveOrdersInterface $activeOrdersInterface,
         BuyPlacedInterface $buyPlacedInterface,
-        SellPlacedInterface $sellPlacedInterface
+        SellPlacedInterface $sellPlacedInterface,
+        GetActiveOrdersInterface $getActiveOrdersInterface,
+        OrderStatusInterface $orderStatusInterface
     ) {
-        parent::__construct();
-        $this->activeOrders = $activeOrdersInterface;
+        $this->shutdown = $shutdownInterface;
         $this->buyPlaced = $buyPlacedInterface;
         $this->sellPlaced = $sellPlacedInterface;
-        $this->shutdown = $shutdownInterface;
+        $this->activeOrders = $getActiveOrdersInterface;
+        $this->orderStatus = $orderStatusInterface;
+        parent::__construct();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -69,41 +71,37 @@ final class Rest extends Command
                 $this->shutdown->enableShutdownMode($e);
             }
         }
-        $output->writeln("<fg=red>Shutdown Signal Detected</>");
+        $output->writeln("\n<fg=red>Shutdown Signal Detected</>\n");
     }
 
     /**
-     * TODO: still seeing a ton of calls to /v1/order/status. See if we can reduce this
-     *
      * @param OutputInterface $output
      */
     private function mainLoop(OutputInterface $output): void
     {
         $activeIds = $this->getActiveOrderIds();
-        foreach ($this->getOldBuyPlacedRecords() as $row) {
+        foreach ($this->buyPlaced->getHealthyRecords() as $row) {
             if ($this->shutdown->isShutdownModeEnabled()) {
                 break;
             }
-            if (!$this->isStillHealthy($this->buyPlaced, $row->id)) {
-                continue;
-            }
-            if (!\in_array($row, $activeIds) && $this->isFilled($row->buy_order_id)) {
-                if ($this->buyPlaced->setNextState($row->id)) {
-                    $output->writeln("{$this->now()}\t({$row->id}) Buy order {$row->buy_order_id} on {$row->symbol} pair filled.");
-                }
+            if (   !\array_key_exists($row->buy_order_id, $activeIds['buy'])
+                && $this->isStillHealthy($this->buyPlaced, $row->id)
+                && $this->isFilled($row->buy_order_id)
+                && $this->buyPlaced->setNextState($row->id)
+            ) {
+                $output->writeln("{$this->now()}\t({$row->id}) Buy order {$row->buy_order_id} on {$row->symbol} pair filled.");
             }
         }
-        foreach ($this->getOldSellPlacedRecords() as $row) {
+        foreach ($this->sellPlaced->getHealthyRecords() as $row) {
             if ($this->shutdown->isShutdownModeEnabled()) {
                 break;
             }
-            if (!$this->isStillHealthy($this->sellPlaced, $row->id)) {
-                continue;
-            }
-            if (!\in_array($row, $activeIds) && $this->isFilled($row->sell_order_id)) {
-                if ($this->sellPlaced->setNextState($row->id)) {
-                    $output->writeln("{$this->now()}\t({$row->id}) Sell order {$row->sell_order_id} on {$row->symbol} pair filled.");
-                }
+            if (   !\array_key_exists($row->sell_order_id, $activeIds['sell'])
+                && $this->isStillHealthy($this->sellPlaced, $row->id)
+                && $this->isFilled($row->sell_order_id)
+                && $this->sellPlaced->setNextState($row->id)
+            ) {
+                $output->writeln("{$this->now()}\t({$row->id}) Sell order {$row->sell_order_id} on {$row->symbol} pair filled.");
             }
         }
     }
@@ -123,41 +121,22 @@ final class Rest extends Command
         try {
             $resource->getHealthyRecord($id);
         } catch (UnhealthyStateException $e) {
-            // swallow exception
-            return false;
+            return false; // swallow exception
         }
         return true;
     }
 
-    private function isFilled(int $id): bool
+    private function isFilled(int $orderId): bool
     {
-        $order = \json_decode((new OrderStatus($id))->getResponse()['body']);
+        $order = $this->orderStatus->getStatus($orderId);
         return $order->executed_amount === $order->original_amount;
-    }
-
-    private function getOldBuyPlacedRecords(): \Generator
-    {
-        foreach ($this->buyPlaced->getHealthyRecords() as $row) {
-            if (\time() - \strtotime($row->updated_at) > self::OLD_RECORD_THRESHOLD) {
-                yield $row;
-            }
-        }
-    }
-
-    private function getOldSellPlacedRecords(): \Generator
-    {
-        foreach ($this->sellPlaced->getHealthyRecords() as $row) {
-            if (\time() - \strtotime($row->updated_at) > self::OLD_RECORD_THRESHOLD) {
-                yield $row;
-            }
-        }
     }
 
     private function getActiveOrderIds(): array
     {
-        $ids = [];
-        foreach (\json_decode($this->activeOrders->getResponse()['body']) as $order) {
-            $ids[] = $order->id;
+        $ids = ['buy' => [], 'sell' => []];
+        foreach ($this->activeOrders->getOrders() as $order) {
+            $ids[$order->side][$order->order_id] = null;
         }
         return $ids;
     }

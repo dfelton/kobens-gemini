@@ -4,15 +4,14 @@ namespace Kobens\Gemini\Command\Command\Taxes;
 
 use Kobens\Core\Db;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
 
 final class BuyLogger extends Command
 {
-
     /**
      * @var string
      */
@@ -35,12 +34,12 @@ final class BuyLogger extends Command
 
     protected function configure()
     {
-        $this->addArgument('symbol', InputArgument::REQUIRED);
+        $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Trading Symbol', 'btcusd');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->symbol = $input->getArgument('symbol');
+        $this->symbol = $input->getOption('symbol');
         do {
             /** @var \Zend\Db\ResultSet\ResultSetInterface $rows */
             $rows = $this->getTradeHistoryTable()->select(function (Select $select)
@@ -63,7 +62,7 @@ final class BuyLogger extends Command
     private function getBuyLogTable(): TableGateway
     {
         if (!$this->tblBuyLog) {
-            $this->tblBuyLog = new TableGateway('taxes_btcusd_buy_log', Db::getAdapter());
+            $this->tblBuyLog = new TableGateway("taxes_{$this->symbol}_buy_log", Db::getAdapter());
         }
         return $this->tblBuyLog;
     }
@@ -75,5 +74,4 @@ final class BuyLogger extends Command
         }
         return $this->tblTradeHistory;
     }
-
 }

@@ -4,20 +4,19 @@ namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
 use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Core\Exception\ConnectionException;
-use Kobens\Gemini\Api\Param\Amount;
-use Kobens\Gemini\Api\Param\ClientOrderId;
-use Kobens\Gemini\Api\Param\Price;
-use Kobens\Gemini\Api\Param\Side;
-use Kobens\Gemini\Api\Param\Symbol;
-use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder\ForceMaker;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\ForceMakerInterface;
 use Kobens\Gemini\Exception\MaxIterationsException;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\DataResource\BuyReadyInterface;
 use Kobens\Gemini\TradeRepeater\DataResource\BuySentInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * TODO: Implement a pid file so this command cannot be ran more than process at a time.
+ */
 final class Buyer extends Command
 {
     protected static $defaultName = 'trade-repeater:buyer';
@@ -38,52 +37,67 @@ final class Buyer extends Command
     private $buySent;
 
     /**
-     * @var Side
+     * @var ForceMakerInterface
      */
-    private $side;
+    private $forceMaker;
 
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,
         BuyReadyInterface $buyReadyInterface,
-        BuySentInterface $buySentInterface
+        BuySentInterface $buySentInterface,
+        ForceMakerInterface $forceMakerInterface
     ) {
         $this->shutdown = $shutdownInterface;
         $this->buyReady = $buyReadyInterface;
         $this->buySent = $buySentInterface;
-        $this->side = new Side('buy');
+        $this->forceMaker = $forceMakerInterface;
         parent::__construct();
     }
 
     protected function configure()
     {
         $this->setDescription('Places buy orders on the exchange for the Gemini Trade Repeater');
+        $this->addOption('delay', 'd', InputOption::VALUE_OPTIONAL, 'Delay in seconds to start looking again for new BUY_READY orders. Minimum 5 seconds', 5);
+        $this->addOption('maxIterationsDelay', null, InputOption::VALUE_OPTIONAL, 'Delay in seconds to resume operations when a MaxIterationsException occurrs', 5);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $delay = (int) $input->getOption('delay');
+        if ($delay < 5) {
+            $delay = 5;
+        }
+        $reportSleep = true;
         while ($this->shutdown->isShutdownModeEnabled() === false) {
             try {
-                $this->mainLoop($output);
-                \sleep(1);
+                if (!$this->mainLoop($input, $output)) {
+                    if ($reportSleep) {
+                        $output->writeln("{$this->now()}\tBuy orders up to date. Sleeping...");
+                        $reportSleep = false;
+                    }
+                    \sleep($delay);
+                } else {
+                    $reportSleep = true;
+                }
             } catch (\Exception $e) {
                 $this->shutdown->enableShutdownMode($e);
             }
         }
-        $output->writeln("<fg=red>Shutdown Signal Detected</>");
+        $output->writeln("\n<fg=red>Shutdown Signal Detected</>\n");
     }
 
-    private function mainLoop(OutputInterface $output): void
+    private function mainLoop(InputInterface $input, OutputInterface $output): bool
     {
+        $placedOrders = false;
         foreach ($this->buyReady->getHealthyRecords() as $row) {
             if ($this->shutdown->isShutdownModeEnabled()) {
                 break;
             }
 
-            $clientOrderId = new ClientOrderId('repeater_'.$row->id.'_buy_'.\microtime(true));
-            $this->buyReady->setNextState($row->id, $clientOrderId->getValue());
+            $buyClientOrderId = 'repeater_'.$row->id.'_buy_'.\microtime(true);
+            $this->buyReady->setNextState($row->id, $buyClientOrderId);
 
-            try {
-                $msg = $this->forceMaker($clientOrderId, $row->symbol, $row->buy_amount, $row->buy_price);
+            if (true == $msg = $this->place($input, $output, $row, $buyClientOrderId)) {
                 $this->buySent->setNextState($row->id, $msg->order_id, $msg->price);
                 $output->writeln(\sprintf(
                     "%s\t(%d) Buy Order ID %s placed on %s pair for amount of %s at rate of %s",
@@ -95,24 +109,34 @@ final class Buyer extends Command
                         $this->now(), $row->buy_price
                     ));
                 }
-            } catch (ConnectionException $e) {
-                $this->buySent->setErrorState($row->id, ConnectionException::class);
-                $output->writeln("<fg=red>{$this->now()}\tConnection Exception Occurred.</>");
-
-            } catch (MaxIterationsException $e) {
-                $this->buyReady->resetState($row->id);
-                $output->writeln(\sprintf(
-                    "<fg=red>%s\tMax iterations reached for attempting ForceMaker on %s pair for price of %s.</>",
-                    $this->now(), $row->symbol, $row->buy_price
-                ));
+                $placedOrders = true;
             }
         }
+        return $placedOrders;
     }
 
-    private function forceMaker(ClientOrderId $clientOrderId, string $symbol, string $amount, string $price): \stdClass
+    private function place(InputInterface $input, OutputInterface $output, \ArrayObject $row, string $buyClientOrderId): ?\stdClass
     {
-        $order = new ForceMaker($this->side, new Symbol(Pair::getInstance($symbol)), new Amount($amount), new Price($price), $clientOrderId);
-        return \json_decode($order->getResponse()['body']);
+        $msg = null;
+        try {
+            $msg = $this->forceMaker->place(Pair::getInstance($row->symbol), 'buy', $row->buy_amount, $row->buy_price, $buyClientOrderId);
+        } catch (ConnectionException $e) {
+            $this->buyReady->resetState($row->id);
+            $output->writeln("<fg=red>{$this->now()}\tConnection Exception Occurred.</>");
+
+        } catch (MaxIterationsException $e) {
+            $this->buyReady->resetState($row->id);
+            $output->writeln(\sprintf(
+                "<fg=red>%s\tMax iterations reached for attempting ForceMaker on %s pair for price of %s.</>",
+                $this->now(), $row->symbol, $row->buy_price
+            ));
+            $output->writeln("<fg=red>{$this->now()}\tSleeping {$input->getOption('maxIterationsDelay')} seconds...</>");
+            \sleep($input->getOption('maxIterationsDelay'));
+        } catch (\Exception $e) {
+            $this->buySent->setErrorState($row->id, \get_class($e)."::{$e->getMessage()}");
+            throw $e;
+        }
+        return $msg;
     }
 
     private function now(): string

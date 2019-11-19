@@ -1,0 +1,182 @@
+<?php
+
+namespace Kobens\Gemini\Api\Rest;
+
+use Kobens\Core\Exception\ConnectionException;
+use Kobens\Core\Exception\Http\RequestTimeoutException;
+use Kobens\Core\Http\Request\ThrottlerInterface;
+use Kobens\Gemini\Api\HostInterface;
+use Kobens\Gemini\Exception\InvalidResponseException;
+use Kobens\Gemini\Exception\LogicException;
+use Kobens\Gemini\Exception\ResourceMovedException;
+use Kobens\Gemini\Exception\Api\InvalidSignatureException;
+use Kobens\Gemini\Exception\Api\RateLimitExceededException;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
+abstract class AbstractRequest
+{
+    private const CURL_CONNECTTIMEOUT = 60;
+    private const CURL_TIMEOUT        = 120;
+    private const CURL_RETURNTRANSFER = true;
+    const CURL_POST = true;
+
+    /**
+     * @var ThrottlerInterface
+     */
+    private $throttler;
+
+    /**
+     * @var HostInterface
+     */
+    private $host;
+
+    /**
+     * @var Logger
+     */
+    private $logger;
+
+    public function __construct(
+        HostInterface $hostInterface,
+        ThrottlerInterface $throttlerInterface
+    ) {
+        $this->host = $hostInterface;
+        $this->throttler = $throttlerInterface;
+    }
+
+    abstract protected function getUrlPath(): string;
+
+    abstract protected function getRequestHeaders(): array;
+
+    final protected function getLogger(): Logger
+    {
+        if (!$this->logger) {
+            $this->logger = new Logger($this->getUrlPath());
+            $this->logger->pushHandler(new StreamHandler('/tmp/curl_timers.log', Logger::INFO));
+        }
+        return $this->logger;
+    }
+
+    final protected function getResponse(): array
+    {
+        // TODO: eliminate this iterations bullshit once we implement multi api key features
+        $response = null;
+        $iterations = 0;
+        do {
+            $response = $this->_getResponse();
+            try {
+                $this->throwResponseException($response);
+            } catch (\Exception $e) {
+                if ($e->getCode() !== 9999) {
+                    throw $e;
+                }
+                $iterations++;
+                $response = null;
+            }
+        } while ($response === null && $iterations <= 100);
+        if ($response === null) {
+            throw new \Exception('Max Iterations reached');
+        }
+
+        if ($response['code'] !== 200) {
+            throw new LogicException(\sprintf(
+                'Response code 200 expected, "%d" received.',
+                $response['code']
+            ));
+        }
+        return $response;
+    }
+
+    final private function _getResponse(): array
+    {
+        $this->throttler->throttle();
+
+        $ch = \curl_init();
+
+        \curl_setopt($ch, CURLOPT_URL,            'https://'.$this->host->getHost().$this->getUrlPath());
+        \curl_setopt($ch, CURLOPT_HTTPHEADER,     $this->getRequestHeaders());
+        \curl_setopt($ch, CURLOPT_POST,           static::CURL_POST);
+        \curl_setopt($ch, CURLOPT_RETURNTRANSFER, self::CURL_RETURNTRANSFER);
+        \curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, self::CURL_CONNECTTIMEOUT);
+        \curl_setopt($ch, CURLOPT_TIMEOUT,        self::CURL_TIMEOUT);
+
+        $data = [
+            'body' => (string) \curl_exec($ch),
+            'code' => (int) \curl_getinfo($ch, CURLINFO_RESPONSE_CODE),
+            'curl_errno' => \curl_errno($ch),
+            'curl_error' => \curl_error($ch),
+            'curlinfo_connect_time' => \curl_getinfo($ch, CURLINFO_CONNECT_TIME),
+            'curlinfo_total_time' => \curl_getinfo($ch, CURLINFO_TOTAL_TIME),
+        ];
+
+        $this->getLogger()->info(\json_encode([
+            'curl_errno' => $data['curl_errno'],
+            'curl_error' => $data['curl_error'],
+            'curlinfo_connect_time' => $data['curlinfo_connect_time'],
+            'curlinfo_total_time' => $data['curlinfo_total_time'],
+        ]));
+
+        \curl_close($ch);
+
+        return $data;
+    }
+
+    protected function throwResponseException(array $response): void
+    {
+        switch (true) {
+            case $response['code'] === 0:
+                throw new ConnectionException(\sprintf(
+                    'Unable to establish a connection with "%s"',
+                    $this->host->getHost(),
+                    new \Exception(\json_encode($response))
+                ));
+            case $response['code'] >= 300 && $response['code'] < 400:
+                throw new ResourceMovedException(
+                    'Resource Has Moved',
+                    $response['code'],
+                    new \Exception(\json_encode($response))
+                );
+            case $response['code'] >= 400 && $response['code'] < 500:
+                // TODO: eliminate this once we implement multi api key features
+                if ($response['code'] === 400) {
+                    $msg = \json_decode($response['body'], true);
+                    if (\array_key_exists('reason', $msg) && $msg['reason'] === 'InvalidNonce') {
+                        throw new \Exception('InvalidNonce', 9999);
+                    }
+                }
+
+                if ($response['code'] === 408) {
+                    throw new RequestTimeoutException(
+                        \sprintf('%s timed out interacting with server.', static::self),
+                        new \Exception(\json_encode($response))
+                    );
+                }
+                if ($response['code'] === 429) {
+                    throw new RateLimitExceededException(
+                        \sprintf('Exceeded rate limit while attempting to use %s', static::self),
+                        new \Exception(\json_encode($response))
+                    );
+                }
+                $message = \json_decode($response['body']);
+                switch ($message->reason) {
+                    case InvalidSignatureException::REASON:
+                        throw new InvalidSignatureException(
+                            $message->message,
+                            $response['code'],
+                            new \Exception(\json_encode($response))
+                        );
+                    default:
+                        // do nothing, allow to proceed
+                }
+            case $response['code'] >= 500:
+                throw new InvalidResponseException(
+                    $response['body'],
+                    $response['code'],
+                    new \Exception(\json_encode($response))
+                );
+            default:
+                break;
+        }
+    }
+
+}

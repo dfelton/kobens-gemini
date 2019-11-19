@@ -11,6 +11,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
 
+/**
+ * @deprecated
+ */
 final class CapitalGains extends Command
 {
 
