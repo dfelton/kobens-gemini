@@ -1,13 +1,11 @@
 <?php
 
-namespace Kobens\Gemini\TradeRepeater\DataResource;
+namespace Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action;
 
-use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
-
-final class SellPlaced extends AbstractDataResource implements SellPlacedInterface
+final class SellFilled extends AbstractAction implements SellFilledInterface
 {
-    const STATUS_CURRENT = 'SELL_PLACED';
-    const STATUS_NEXT    = 'SELL_FILLED';
+    const STATUS_CURRENT = 'SELL_FILLED';
+    const STATUS_NEXT    = 'BUY_READY';
 
     protected function isHealthy(\ArrayObject $record): bool
     {
@@ -20,24 +18,27 @@ final class SellPlaced extends AbstractDataResource implements SellPlacedInterfa
             && $record->sell_order_id !== null;
     }
 
-    public function setNextState(int $id): bool
+    public function setNextState(int $id): void
     {
         $this->connection->beginTransaction();
         try {
             $record = $this->getHealthyRecord($id, true);
             $this->table->update(
-                ['status' => self::STATUS_NEXT],
+                [
+                    'status' => self::STATUS_NEXT,
+                    'buy_client_order_id' => null,
+                    'buy_order_id' => null,
+                    'sell_client_order_id' => null,
+                    'sell_order_id' => null,
+                    'note' => null,
+                    'meta' => null,
+                ],
                 ['id' => $record->id]
             );
             $this->connection->commit();
-        } catch (UnhealthyStateException $e) {
-            $this->connection->rollback();
-            // swallow exception (race between Rest and Websocket FillMonitors)
-            return false;
         } catch (\Exception $e) {
             $this->connection->rollback();
             throw $e;
         }
-        return true;
     }
 }

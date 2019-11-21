@@ -9,6 +9,7 @@ use Kobens\Gemini\Exchange;
 use Kobens\Gemini\Api\Host;
 use Kobens\Gemini\Api\Key;
 use Kobens\Gemini\Api\Nonce;
+use Kobens\Gemini\Api\Market\GetPrice;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetAvailableBalances;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelAllActiveOrders;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelOrder;
@@ -21,14 +22,14 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetActiveOrders;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetPastTrades;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatus;
 use Kobens\Gemini\Api\Rest\PublicEndpoints\Ticker;
-use Kobens\Gemini\TradeRepeater\DataResource\Archive;
-use Kobens\Gemini\TradeRepeater\DataResource\BuyFilled;
-use Kobens\Gemini\TradeRepeater\DataResource\BuyPlaced;
-use Kobens\Gemini\TradeRepeater\DataResource\BuyReady;
-use Kobens\Gemini\TradeRepeater\DataResource\BuySent;
-use Kobens\Gemini\TradeRepeater\DataResource\SellFilled;
-use Kobens\Gemini\TradeRepeater\DataResource\SellPlaced;
-use Kobens\Gemini\TradeRepeater\DataResource\SellSent;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\Archive;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyFilled;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyPlaced;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyReady;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuySent;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellFilled;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellPlaced;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellSent;
 
 require \dirname(__DIR__).'/bootstrap.php';
 
@@ -60,8 +61,10 @@ $nonceInterface = new Nonce();
 $throttlerInterface = new Throttler($hostInterface->getHost());
 $tickerInterface = new Ticker($hostInterface, $throttlerInterface);
 
+$getPriceInterface = new GetPrice($exchangeInterface, $tickerInterface);
+
 $fillOrKillInterface = new FillOrKill($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
-$forceMakerInterface = new ForceMaker($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface, $exchangeInterface, $tickerInterface);
+$forceMakerInterface = new ForceMaker($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface, $getPriceInterface);
 $immediateOrCancelInterface = new ImmediateOrCancel($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
 $limitInterface = new Limit($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
 $makerOrCancelInterface = new MakerOrCancel($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);

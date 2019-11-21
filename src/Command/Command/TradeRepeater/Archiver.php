@@ -3,8 +3,8 @@
 namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
 use Kobens\Core\EmergencyShutdownInterface;
-use Kobens\Gemini\TradeRepeater\DataResource\ArchiveInterface;
-use Kobens\Gemini\TradeRepeater\DataResource\SellFilledInterface;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\ArchiveInterface;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellFilledInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

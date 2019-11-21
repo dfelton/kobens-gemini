@@ -1,13 +1,13 @@
 <?php
 
-namespace Kobens\Gemini\TradeRepeater\DataResource;
+namespace Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action;
 
 use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
 
-abstract class AbstractDataResource
+abstract class AbstractAction
 {
     const STATUS_CURRENT = '';
 

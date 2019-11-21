@@ -1,8 +1,8 @@
 <?php
 
-namespace Kobens\Gemini\TradeRepeater\DataResource;
+namespace Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action;;
 
-interface DataResourceInterface
+interface ActionInterface
 {
     public function getHealthyRecords(): \Generator;
 

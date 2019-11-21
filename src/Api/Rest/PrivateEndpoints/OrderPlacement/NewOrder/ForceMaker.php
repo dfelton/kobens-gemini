@@ -3,13 +3,11 @@
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder;
 
 use Kobens\Core\Http\Request\ThrottlerInterface;
-use Kobens\Exchange\ExchangeInterface;
 use Kobens\Exchange\PairInterface;
-use Kobens\Exchange\Exception\ClosedBookException;
 use Kobens\Gemini\Api\HostInterface;
 use Kobens\Gemini\Api\KeyInterface;
 use Kobens\Gemini\Api\NonceInterface;
-use Kobens\Gemini\Api\Rest\PublicEndpoints\TickerInterface;
+use Kobens\Gemini\Api\Market\GetPriceInterface;
 use Kobens\Gemini\Exception\MaxIterationsException;
 
 final class ForceMaker extends AbstractNewOrder implements ForceMakerInterface
@@ -17,25 +15,18 @@ final class ForceMaker extends AbstractNewOrder implements ForceMakerInterface
     private const MAX_ITERATIONS = 100;
 
     /**
-     * @var ExchangeInterface
+     * @var GetPriceInterface
      */
-    private $exchange;
-
-    /**
-     * @var TickerInterface
-     */
-    private $ticker;
+    private $getPrice;
 
     public function __construct(
         HostInterface $hostInterface,
         ThrottlerInterface $throttlerInterface,
         KeyInterface $keyInterface,
         NonceInterface $nonceInterface,
-        ExchangeInterface $exchangeInterface,
-        TickerInterface $tickerInterface
+        GetPriceInterface $getPriceInterface
     ) {
-        $this->exchange = $exchangeInterface;
-        $this->ticker = $tickerInterface;
+        $this->getPrice = $getPriceInterface;
         parent::__construct($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
     }
 
@@ -76,55 +67,33 @@ final class ForceMaker extends AbstractNewOrder implements ForceMakerInterface
 
     private function getNewPrice(PairInterface $pair, string $priceLimit): string
     {
-        try {
-            $price = $this->getPriceViaBook($pair->getSymbol());
-        } catch (ClosedBookException $e) {
-            $price = $this->getPriceViaTicker($pair->getSymbol());
-        }
         switch ($this->payload['side']) {
             case 'buy':
+                $ask = $this->getPrice->getAsk($pair->getSymbol());
                 // If lowest ask is above what we are willing to bid, maker will place if we act now
-                if ( (float) $priceLimit < (float) $price['ask']) {
+                if ( (float) $priceLimit < (float) $ask) {
                     $newPrice = $priceLimit;
                 } else {
                     // Get smallest decrement possible from current ask price
-                    $newPrice = \bcsub($price['ask'], $pair->getMinPriceIncrement(), $pair->getQuote()->getScale());
+                    $newPrice = \bcsub($ask, $pair->getMinPriceIncrement(), $pair->getQuote()->getScale());
                 }
                 break;
+
             case 'sell':
+                $bid = $this->getPrice->getBid($pair->getSymbol());
                 // If highest bid is above what we are willing to ask, maker will place if we act now
-                if ( (float) $priceLimit > (float) $price['bid']) {
+                if ( (float) $priceLimit > (float) $bid) {
                     $newPrice = $priceLimit;
                 } else {
                     // Get smallest inrement possible from current bid price
-                    $newPrice = \bcadd($price['bid'], $pair->getMinPriceIncrement(), $pair->getQuote()->getScale());
+                    $newPrice = \bcadd($bid, $pair->getMinPriceIncrement(), $pair->getQuote()->getScale());
                 }
                 break;
+
             default:
                 throw new \Exception('Invalid side.');
         }
         return $newPrice;
-    }
-
-    private function getPriceViaTicker(string $symbol): array
-    {
-        $data = $this->ticker->getData($symbol);
-        return [
-            'bid' => $data->bid,
-            'ask' => $data->ask
-        ];
-    }
-
-    /**
-     * @throws ClosedBookException
-     */
-    private function getPriceViaBook(string $symbol): array
-    {
-        $book = $this->exchange->getBook($symbol);
-        return [
-            'bid' => $book->getBidPrice(),
-            'ask' => $book->getAskPrice()
-        ];
     }
 
 }

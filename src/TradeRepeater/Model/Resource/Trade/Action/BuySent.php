@@ -1,8 +1,8 @@
 <?php
 
-namespace Kobens\Gemini\TradeRepeater\DataResource;
+namespace Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action;
 
-final class BuySent extends AbstractDataResource implements BuySentInterface
+final class BuySent extends AbstractAction implements BuySentInterface
 {
     const STATUS_CURRENT = 'BUY_SENT';
     const STATUS_NEXT    = 'BUY_PLACED';

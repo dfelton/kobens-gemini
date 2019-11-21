@@ -1,11 +1,11 @@
 <?php
 
-namespace Kobens\Gemini\TradeRepeater\DataResource;
+namespace Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action;
 
-final class SellFilled extends AbstractDataResource implements SellFilledInterface
+final class BuyFilled extends AbstractAction implements BuyFilledInterface
 {
-    const STATUS_CURRENT = 'SELL_FILLED';
-    const STATUS_NEXT    = 'BUY_READY';
+    const STATUS_CURRENT = 'BUY_FILLED';
+    const STATUS_NEXT    = 'SELL_SENT';
 
     protected function isHealthy(\ArrayObject $record): bool
     {
@@ -14,24 +14,20 @@ final class SellFilled extends AbstractDataResource implements SellFilledInterfa
             && $record->is_error === '0'
             && $record->buy_client_order_id !== null
             && $record->buy_order_id !== null
-            && $record->sell_client_order_id !== null
-            && $record->sell_order_id !== null;
+            && $record->sell_client_order_id === null
+            && $record->sell_order_id === null
+            && $record->meta !== null;
     }
 
-    public function setNextState(int $id): void
+    public function setNextState(int $id, string $sellClientOrderId): void
     {
         $this->connection->beginTransaction();
         try {
             $record = $this->getHealthyRecord($id, true);
             $this->table->update(
                 [
+                    'sell_client_order_id' => $sellClientOrderId,
                     'status' => self::STATUS_NEXT,
-                    'buy_client_order_id' => null,
-                    'buy_order_id' => null,
-                    'sell_client_order_id' => null,
-                    'sell_order_id' => null,
-                    'note' => null,
-                    'meta' => null,
                 ],
                 ['id' => $record->id]
             );
@@ -40,5 +36,13 @@ final class SellFilled extends AbstractDataResource implements SellFilledInterfa
             $this->connection->rollback();
             throw $e;
         }
+    }
+
+    public function resetState(int $id): void
+    {
+        $this->table->update(
+            ['sell_client_order_id' => null, 'status' => self::STATUS_CURRENT],
+            ['id' => $id]
+        );
     }
 }

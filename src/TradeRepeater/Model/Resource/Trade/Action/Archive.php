@@ -1,6 +1,6 @@
 <?php
 
-namespace Kobens\Gemini\TradeRepeater\DataResource;
+namespace Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action;
 
 use Kobens\Core\Db;
 use Zend\Db\TableGateway\TableGateway;

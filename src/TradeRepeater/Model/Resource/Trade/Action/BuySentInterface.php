@@ -1,8 +1,8 @@
 <?php
 
-namespace Kobens\Gemini\TradeRepeater\DataResource;
+namespace Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action;
 
-interface BuySentInterface extends DataResourceInterface
+interface BuySentInterface extends ActionInterface
 {
     public function setNextState(int $id, string $buyOrderId, string $buyPrice): void;
 

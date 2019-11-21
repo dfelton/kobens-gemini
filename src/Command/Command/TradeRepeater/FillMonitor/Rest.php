@@ -7,9 +7,9 @@ use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetActiveOrdersInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
 use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
-use Kobens\Gemini\TradeRepeater\DataResource\AbstractDataResource;
-use Kobens\Gemini\TradeRepeater\DataResource\BuyPlacedInterface;
-use Kobens\Gemini\TradeRepeater\DataResource\SellPlacedInterface;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\AbstractAction;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyPlacedInterface;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellPlacedInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -112,11 +112,11 @@ final class Rest extends Command
      * curl request which is more important than the reduction of db calls
      * in order to preserve rate limits on exchange.
      *
-     * @param AbstractDataResource $resource
+     * @param AbstractAction $resource
      * @param $id
      * @return bool
      */
-    private function isStillHealthy(AbstractDataResource $resource, int $id): bool
+    private function isStillHealthy(AbstractAction $resource, int $id): bool
     {
         try {
             $resource->getHealthyRecord($id);

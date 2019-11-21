@@ -1,13 +1,13 @@
 <?php
 
-namespace Kobens\Gemini\TradeRepeater\DataResource;
+namespace Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action;
 
 use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
 
-final class BuyPlaced extends AbstractDataResource implements BuyPlacedInterface
+final class SellPlaced extends AbstractAction implements SellPlacedInterface
 {
-    const STATUS_CURRENT = 'BUY_PLACED';
-    const STATUS_NEXT    = 'BUY_FILLED';
+    const STATUS_CURRENT = 'SELL_PLACED';
+    const STATUS_NEXT    = 'SELL_FILLED';
 
     protected function isHealthy(\ArrayObject $record): bool
     {
@@ -16,8 +16,8 @@ final class BuyPlaced extends AbstractDataResource implements BuyPlacedInterface
             && $record->is_error === '0'
             && $record->buy_client_order_id !== null
             && $record->buy_order_id !== null
-            && $record->sell_client_order_id === null
-            && $record->sell_order_id === null;
+            && $record->sell_client_order_id !== null
+            && $record->sell_order_id !== null;
     }
 
     public function setNextState(int $id): bool
