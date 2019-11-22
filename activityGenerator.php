@@ -2,35 +2,38 @@
 
 use Kobens\Core\Config;
 use Kobens\Core\EmergencyShutdown;
-use Kobens\Gemini\Exchange;
+use Kobens\Core\Http\Request\Throttler;
 use Kobens\Gemini\Api\Host;
-use Kobens\Gemini\Api\Param\Amount;
-use Kobens\Gemini\Api\Param\ClientOrderId;
-use Kobens\Gemini\Api\Param\Price;
-use Kobens\Gemini\Api\Param\Side;
-use Kobens\Gemini\Api\Param\Symbol;
-use Kobens\Gemini\Api\Rest\Request\Order\Placement\Cancel;
-use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder;
+use Kobens\Gemini\Api\Key;
+use Kobens\Gemini\Api\Nonce;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\ImmediateOrCancel;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\ImmediateOrCancelInterface;
+use Kobens\Gemini\Exchange\Currency\Pair;
 use Zend\Db\TableGateway\TableGateway;
 
 require __DIR__.'/bootstrap.php';
 
-if ((string) new Host() !== 'api.sandbox.gemini.com') {
+$host = new Host();
+
+if ($host->getHost() !== 'api.sandbox.gemini.com') {
     echo "\nActivity Generator only allowed on api.sandbox.gemini.com\n";
     exit(1);
 }
 
 $config = Config::getInstance();
 $adapter = \Kobens\Core\Db::getAdapter();
-$connection = $adapter->getDriver()->getConnection();
-$shutdown = new EmergencyShutdown($config);
+$shutdown = new EmergencyShutdown(__DIR__.'/var');
 $tbl = new TableGateway('trade_repater', $adapter);
-$exchange = new Exchange();
 
-$sideBuy = new Side('buy');
-$sideSell = new Side('sell');
-$symbol = new Symbol($exchange->getPair('btcusd'));
-$clientOrderId = new ClientOrderId();
+$immediateOrCancel = new ImmediateOrCancel(
+    $host,
+    new Throttler($host->getHost()),
+    new Key(
+        $config->get('gemini')->api->key->public_key,
+        $config->get('gemini')->api->key->secret_key
+    ),
+    new Nonce()
+);
 
 function getRange(\Zend\Db\Adapter\Adapter $adapter): array
 {
@@ -51,13 +54,13 @@ function getRange(\Zend\Db\Adapter\Adapter $adapter): array
     return $range;
 }
 
-function getAmount(): Amount
+function getAmount(): string
 {
-    $overOneBtc = \rand(0, 100) > 90;
+    $overOneBtc = \rand(0, 100) > 95;
     $whole = $overOneBtc ? (string) \rand(1, 9) : '0';
-    $satoshi = (string) \rand(1000, 99999999);
+    $satoshi = (string) (\rand(0, 1) ? \rand(1000, 999999): \rand(1000, 49999999));
     $satoshi = \str_pad($satoshi, 8, \STR_PAD_LEFT);
-    return new Amount("$whole.$satoshi");
+    return "$whole.$satoshi";
 }
 
 function printException(\Exception $e): void
@@ -76,20 +79,17 @@ function printException(\Exception $e): void
     } while ($e instanceof \Exception);
 }
 
-function placeOrder(NewOrder $order): void
+function placeOrder(ImmediateOrCancelInterface $immediateOrCancel, string $symbol, string $side, string $amount, string $price): void
 {
-    $response = \json_decode($order->getResponse()['body']);
+    $data = $immediateOrCancel->place(Pair::getInstance($symbol), $side, $amount, $price);
     echo
-        \str_pad($response->side, 5, ' ', \STR_PAD_RIGHT),
-        \str_pad($response->executed_amount, 12, ' ', \STR_PAD_RIGHT);
-    if ($response->executed_amount !== $response->original_amount) {
-        echo " of {$response->original_amount}";
+        \str_pad($data->side, 5, ' ', \STR_PAD_RIGHT),
+        \str_pad($data->executed_amount, 12, ' ', \STR_PAD_RIGHT);
+    if ($data->executed_amount !== $data->original_amount) {
+        echo " of {$data->original_amount}";
     }
-    $avg = (string) \round((float) $response->avg_execution_price, 2);
+    $avg = (string) \round((float) $data->avg_execution_price, 2);
     echo " at average price of {$avg}\n";
-    if ($response->is_live === true) {
-        (new Cancel($response->order_id))->getResponse();
-    }
 }
 
 
@@ -99,24 +99,15 @@ do {
     if (\time() - $range['time'] > 600) {
         $range = \getRange($adapter);
     }
-    $side = \rand(0, 1) ? $sideBuy : $sideSell;
-    $order = new NewOrder($side, $symbol, \getAmount(), new Price($range[$side->getValue()]), $clientOrderId);
+    $side = \rand(0, 1) ? 'buy' : 'sell';
     try {
-        \placeOrder($order);
+        \placeOrder($immediateOrCancel, 'btcusd', $side, $range[$side], \getAmount());
     } catch (\Kobens\Core\Exception\ConnectionException $e) {
         // swallow exception
-    } catch (\Kobens\Gemini\Exception\InvalidResponseException $e) {
-        // Insufficient Funds. Buy or sell to restore some
-        if ($e->getCode() === 406) {
-            $side = $side === $sideBuy ? $sideSell : $sideBuy;
-            $order = new NewOrder($side, $symbol, new Amount('9'), new Price($range[$side->getValue()]), $clientOrderId);
-            try {
-                \placeOrder($order);
-            } catch (\Exception $e) {
-                \printException($e);
-                exit(1);
-            }
-        } else {
+    } catch (\Kobens\Gemini\Exception\Api\Reason\InsufficientFundsException $e) {
+        try {
+            \placeOrder($immediateOrCancel, 'btcusd', $side === 'buy' ? 'sell' : 'buy', $range[$side], (string) \rand(1, 5));
+        } catch (\Exception $e) {
             \printException($e);
             exit(1);
         }
