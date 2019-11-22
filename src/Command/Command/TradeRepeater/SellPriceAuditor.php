@@ -5,10 +5,13 @@ namespace Kobens\Gemini\Command\Command\TradeRepeater;
 use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Core\BinaryCalculator\Compare;
 use Kobens\Core\BinaryCalculator\Subtract;
+use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Market\GetPriceInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelOrderInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\ForceMakerInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
+use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
+use Kobens\Gemini\Exception\Api\Reason\SystemException;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellPlacedInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,6 +25,8 @@ use Zend\Db\TableGateway\TableGateway;
  */
 final class SellPriceAuditor extends Command
 {
+    private const EXCEPTION_DELAY = 60;
+
     private const MIN_AGE    = 1800;  // 30 minutes
     private const MIN_SPREAD = '200';
 
@@ -118,12 +123,27 @@ final class SellPriceAuditor extends Command
                 $this->mainLoop($output);
                 $output->writeln("{$this->now()}\tRecords examined. Sleeping $sleep seconds.");
                 \sleep($sleep);
+            } catch (ConnectionException $e) {
+                $this->exceptionDelay($output, $e);
+            } catch (MaintenanceException $e) {
+                $this->exceptionDelay($output, $e);
+            } catch (SystemException $e) {
+                $this->exceptionDelay($output, $e);
             } catch (\Exception $e) {
                 $this->shutdown->enableShutdownMode($e);
             }
         }
 
         $output->writeln("\n<fg=red>{$this->now()}\tShutdown signal detected.\n");
+    }
+
+    private function exceptionDelay(OutputInterface $output, \Exception $e)
+    {
+        $output->writeln([
+            "<fg=red>{$this->now()}\t{$e->getMessage()}</>",
+            "<fg=red>{$this->now()}\tSleeping ".self::EXCEPTION_DELAY." seconds</>"
+        ]);
+        \sleep(self::EXCEPTION_DELAY);
     }
 
     private function mainLoop(OutputInterface $output): void

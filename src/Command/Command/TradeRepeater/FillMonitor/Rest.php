@@ -6,6 +6,8 @@ use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetActiveOrdersInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
+use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
+use Kobens\Gemini\Exception\Api\Reason\SystemException;
 use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\AbstractAction;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyPlacedInterface;
@@ -16,6 +18,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class Rest extends Command
 {
+    private const EXCEPTION_DELAY = 60;
+
     protected static $defaultName = 'trade-repeater:fill-monitor-rest';
 
     /**
@@ -67,11 +71,24 @@ final class Rest extends Command
             } catch (ConnectionException $e) {
                 $output->writeln("<fg=red>{$this->now()}\tConnection Exception occurred.</>");
                 \sleep(60);
+            } catch (MaintenanceException $e) {
+                $this->exceptionDelay($output, $e);
+            } catch (SystemException $e) {
+                $this->exceptionDelay($output, $e);
             } catch (\Exception $e) {
                 $this->shutdown->enableShutdownMode($e);
             }
         }
         $output->writeln("\n<fg=red>{$this->now()}\tShutdown signal detected.\n");
+    }
+
+    private function exceptionDelay(OutputInterface $output, \Exception $e)
+    {
+        $output->writeln([
+            "<fg=red>{$this->now()}\t{$e->getMessage()}</>",
+            "<fg=red>{$this->now()}\tSleeping ".self::EXCEPTION_DELAY." seconds</>"
+                ]);
+        \sleep(self::EXCEPTION_DELAY);
     }
 
     /**

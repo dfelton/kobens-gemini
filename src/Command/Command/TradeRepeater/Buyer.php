@@ -6,6 +6,8 @@ use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\ForceMakerInterface;
 use Kobens\Gemini\Exception\MaxIterationsException;
+use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
+use Kobens\Gemini\Exception\Api\Reason\SystemException;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyReadyInterface;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuySentInterface;
@@ -19,6 +21,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class Buyer extends Command
 {
+    private const EXCEPTION_DELAY = 60;
+
     protected static $defaultName = 'trade-repeater:buyer';
 
     /**
@@ -123,6 +127,16 @@ final class Buyer extends Command
         } catch (ConnectionException $e) {
             $this->buyReady->resetState($row->id);
             $output->writeln("<fg=red>{$this->now()}\tConnection Exception Occurred.</>");
+
+        } catch (MaintenanceException $e) {
+            $this->buyReady->resetState($row->id);
+            $output->writeln("<fg=red>{$this->now()}\t ({$row->symbol}) $e->getMessage()");
+            $output->writeln("<fg=red>{$this->now()}\tSleeping ".self::EXCEPTION_DELAY." seconds...</>");
+
+        } catch (SystemException $e) {
+            $this->buyReady->resetState($row->id);
+            $output->writeln("<fg=red>{$this->now()}\t ({$row->symbol}) $e->getMessage()");
+            $output->writeln("<fg=red>{$this->now()}\tSleeping ".self::EXCEPTION_DELAY." seconds...</>");
 
         } catch (MaxIterationsException $e) {
             $this->buyReady->resetState($row->id);
