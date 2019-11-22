@@ -2,7 +2,7 @@
 
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder;
 
-interface LimitInterface extends NewOrderInterface
+interface StopLimitInterface extends NewOrderInterface
 {
 
 }

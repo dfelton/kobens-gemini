@@ -2,20 +2,20 @@
 
 namespace Kobens\Gemini\Command\Command\OrderPlacement\NewOrder;
 
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\LimitInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\NewOrderInterface;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\StopLimitInterface;
 
-final class Limit extends AbstractNewOrder
+final class StopLimit extends AbstractNewOrder
 {
-    protected static $defaultName = 'order-placement:new-order:limit';
+    protected static $defaultName = 'order-placement:new-order:stop-limit';
 
     /**
-     * @var LimitInterface
+     * @var StopLimitInterface
      */
     private $limitOrder;
 
     public function __construct(
-        LimitInterface $limitInterface
+        StopLimitInterface $limitInterface
     ) {
         $this->limitOrder = $limitInterface;
         $this->setDescription('Places a new <fg=yellow>limit</> order on the exchange.');

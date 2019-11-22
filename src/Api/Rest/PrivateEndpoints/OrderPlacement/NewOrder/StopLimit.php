@@ -4,7 +4,7 @@ namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder;
 
 use Kobens\Exchange\PairInterface;
 
-final class Limit extends AbstractNewOrder implements LimitInterface
+final class StopLimit extends AbstractNewOrder implements StopLimitInterface
 {
     public function place(PairInterface $pair, string $side, string $amount, string $price, string $clientOrderId = null): \stdClass
     {

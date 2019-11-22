@@ -18,8 +18,8 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelOrder;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\FillOrKill;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\ForceMaker;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\ImmediateOrCancel;
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\Limit;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\MakerOrCancel;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\StopLimit;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetActiveOrders;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetPastTrades;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatus;
@@ -58,7 +58,10 @@ $shutdownInterface = new EmergencyShutdown($config);
 $exchangeInterface = new Exchange();
 
 $hostInterface = new Host();
-$keyInterface = new Key();
+$keyInterface = new Key(
+    $config->get('gemini')->api->key->public_key,
+    $config->get('gemini')->api->key->secret_key
+);
 $nonceInterface = new Nonce();
 $throttlerInterface = new Throttler($hostInterface->getHost());
 $tickerInterface = new Ticker($hostInterface, $throttlerInterface);
@@ -68,7 +71,7 @@ $getPriceInterface = new GetPrice($exchangeInterface, $tickerInterface);
 $fillOrKillInterface = new FillOrKill($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
 $forceMakerInterface = new ForceMaker($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface, $getPriceInterface);
 $immediateOrCancelInterface = new ImmediateOrCancel($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
-$limitInterface = new Limit($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
+$stopLimitInterface = new StopLimit($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
 $makerOrCancelInterface = new MakerOrCancel($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
 
 $cancelAllActiveOrdersInterface = new CancelAllActiveOrders($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
@@ -160,7 +163,7 @@ $app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\CancelAllActive($can
 $app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\NewOrder\FillOrKill($fillOrKillInterface));
 $app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\NewOrder\ForceMaker($forceMakerInterface));
 $app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\NewOrder\ImmediateOrCancel($immediateOrCancelInterface));
-$app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\NewOrder\Limit($limitInterface));
+$app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\NewOrder\StopLimit($stopLimitInterface));
 $app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\NewOrder\MakerOrCancel($makerOrCancelInterface));
 
 // TODO: The following commands can use a common KeyInterface, and should have no Trading Authority
