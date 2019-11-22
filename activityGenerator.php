@@ -22,7 +22,7 @@ if ($host->getHost() !== 'api.sandbox.gemini.com') {
 
 $config = Config::getInstance();
 $adapter = \Kobens\Core\Db::getAdapter();
-$shutdown = new EmergencyShutdown(__DIR__.'/var');
+$shutdown = new EmergencyShutdown(__DIR__.DIRECTORY_SEPARATOR.'var');
 $tbl = new TableGateway('trade_repater', $adapter);
 
 $immediateOrCancel = new ImmediateOrCancel(

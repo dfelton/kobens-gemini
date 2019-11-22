@@ -54,7 +54,7 @@ try {
 $config = Config::getInstance();
 $adapter = Db::getAdapter();
 $connectionInterface = $adapter->getDriver()->getConnection();
-$shutdownInterface = new EmergencyShutdown($config);
+$shutdownInterface = new EmergencyShutdown(\dirname(__DIR__).DIRECTORY_SEPARATOR.'var');
 $exchangeInterface = new Exchange();
 
 $hostInterface = new Host();
