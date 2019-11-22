@@ -101,12 +101,12 @@ do {
     }
     $side = \rand(0, 1) ? 'buy' : 'sell';
     try {
-        \placeOrder($immediateOrCancel, 'btcusd', $side, $range[$side], \getAmount());
+        \placeOrder($immediateOrCancel, 'btcusd', $side, \getAmount(), $range[$side]);
     } catch (\Kobens\Core\Exception\ConnectionException $e) {
         // swallow exception
     } catch (\Kobens\Gemini\Exception\Api\Reason\InsufficientFundsException $e) {
         try {
-            \placeOrder($immediateOrCancel, 'btcusd', $side === 'buy' ? 'sell' : 'buy', $range[$side], (string) \rand(1, 5));
+            \placeOrder($immediateOrCancel, 'btcusd', $side === 'buy' ? 'sell' : 'buy', (string) \rand(1, 5), $range[$side]);
         } catch (\Exception $e) {
             \printException($e);
             exit(1);
