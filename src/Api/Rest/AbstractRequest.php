@@ -144,7 +144,7 @@ abstract class AbstractRequest
                 );
             case $response['code'] === 408:
                 throw new RequestTimeoutException(
-                    \sprintf('%s timed out interacting with server.', static::self),
+                    \sprintf('%s timed out interacting with server.', static::class),
                     new \Exception(\json_encode($response))
                 );
             case $response['code'] >= 500:
