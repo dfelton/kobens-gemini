@@ -5,9 +5,9 @@ namespace Kobens\Gemini\Api\WebSocket\MarketData;
 use Kobens\Core\Config;
 use Kobens\Exchange\Book\Keeper\AbstractKeeper;
 use Kobens\Exchange\Exception\ClosedBookException;
-use Kobens\Gemini\Exception\Api\WebSocket\SocketSequenceException;
-use Kobens\Gemini\Exception\Exception;
+use Kobens\Gemini\Exception;
 use Kobens\Gemini\Exchange;
+use Kobens\Gemini\Exception\Api\WebSocket\SocketSequenceException;
 
 final class BookKeeper extends AbstractKeeper
 {

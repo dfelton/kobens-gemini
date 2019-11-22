@@ -9,8 +9,7 @@ use Kobens\Gemini\Api\HostInterface;
 use Kobens\Gemini\Exception\InvalidResponseException;
 use Kobens\Gemini\Exception\LogicException;
 use Kobens\Gemini\Exception\ResourceMovedException;
-use Kobens\Gemini\Exception\Api\InvalidSignatureException;
-use Kobens\Gemini\Exception\Api\RateLimitExceededException;
+use Kobens\Gemini\Exception\Api\Reason\InvalidNonceException;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
@@ -65,24 +64,20 @@ abstract class AbstractRequest
         do {
             $response = $this->_getResponse();
             try {
-                $this->throwResponseException($response);
-            } catch (\Exception $e) {
-                if ($e->getCode() !== 9999) {
-                    throw $e;
-                }
-                $iterations++;
+                $this->_throwResponseException($response);
+            } catch (InvalidNonceException $e) {
+                ++$iterations;
                 $response = null;
             }
         } while ($response === null && $iterations <= 100);
         if ($response === null) {
             throw new \Exception('Max Iterations reached');
-        }
-
-        if ($response['code'] !== 200) {
-            throw new LogicException(\sprintf(
-                'Response code 200 expected, "%d" received.',
-                $response['code']
-            ));
+        } elseif ($response['code'] !== 200) {
+            throw new LogicException(
+                'Response code 200 expected',
+                $response['code'],
+                new \Exception(\json_encode($response))
+            );
         }
         return $response;
     }
@@ -121,9 +116,20 @@ abstract class AbstractRequest
         return $data;
     }
 
-    protected function throwResponseException(array $response): void
+    final private function _throwResponseException(array $response): void
     {
+        $body = @\json_decode($response['body']); // 504 responses come back as HTML
         switch (true) {
+            case $body instanceof \stdClass && \property_exists($body, 'result') && $body->result === 'error':
+                $className = "\Kobens\Gemini\Exception\Api\Reason\\{$body->reason}Exception";
+                if (!\class_exists($className)) {
+                    $className = \Kobens\Gemini\Exception::class;
+                }
+                throw new $className(
+                    $body->message,
+                    $response['code'],
+                    new \Exception(\json_encode($response))
+                );
             case $response['code'] === 0:
                 throw new ConnectionException(\sprintf(
                     'Unable to establish a connection with "%s"',
@@ -136,38 +142,11 @@ abstract class AbstractRequest
                     $response['code'],
                     new \Exception(\json_encode($response))
                 );
-            case $response['code'] >= 400 && $response['code'] < 500:
-                // TODO: eliminate this once we implement multi api key features
-                if ($response['code'] === 400) {
-                    $msg = \json_decode($response['body'], true);
-                    if (\array_key_exists('reason', $msg) && $msg['reason'] === 'InvalidNonce') {
-                        throw new \Exception('InvalidNonce', 9999);
-                    }
-                }
-
-                if ($response['code'] === 408) {
-                    throw new RequestTimeoutException(
-                        \sprintf('%s timed out interacting with server.', static::self),
-                        new \Exception(\json_encode($response))
-                    );
-                }
-                if ($response['code'] === 429) {
-                    throw new RateLimitExceededException(
-                        \sprintf('Exceeded rate limit while attempting to use %s', static::self),
-                        new \Exception(\json_encode($response))
-                    );
-                }
-                $message = \json_decode($response['body']);
-                switch ($message->reason) {
-                    case InvalidSignatureException::REASON:
-                        throw new InvalidSignatureException(
-                            $message->message,
-                            $response['code'],
-                            new \Exception(\json_encode($response))
-                        );
-                    default:
-                        // do nothing, allow to proceed
-                }
+            case $response['code'] === 408:
+                throw new RequestTimeoutException(
+                    \sprintf('%s timed out interacting with server.', static::self),
+                    new \Exception(\json_encode($response))
+                );
             case $response['code'] >= 500:
                 throw new InvalidResponseException(
                     $response['body'],
@@ -177,6 +156,17 @@ abstract class AbstractRequest
             default:
                 break;
         }
+        $this->throwResponseException($response);
+    }
+
+    /**
+     * To be overriden in child classes if necessary
+     *
+     * @param array $response
+     */
+    protected function throwResponseException(array $response): void
+    {
+        return;
     }
 
 }

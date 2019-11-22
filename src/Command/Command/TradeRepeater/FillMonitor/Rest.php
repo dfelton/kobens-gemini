@@ -71,7 +71,7 @@ final class Rest extends Command
                 $this->shutdown->enableShutdownMode($e);
             }
         }
-        $output->writeln("\n<fg=red>Shutdown Signal Detected</>\n");
+        $output->writeln("\n<fg=red>{$this->now()}\tShutdown signal detected.\n");
     }
 
     /**

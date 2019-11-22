@@ -40,7 +40,7 @@ abstract class AbstractPrivateRequest extends AbstractRequest
     {
         $base64Payload = \base64_encode(\json_encode(\array_merge(
             $this->getPayload(),
-            ['request' => $this->getUrlPath(), 'nonce' => $this->nonce->getNonce()]
+            ['request' => $this->getUrlPath(),'nonce' => $this->nonce->getNonce()]
         )));
         return [
             'cache-control:no-cache',

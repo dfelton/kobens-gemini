@@ -1,6 +1,6 @@
 <?php
 
-namespace Kobens\Gemini\Exception;
+namespace Kobens\Gemini;
 
 class Exception extends \Exception
 {

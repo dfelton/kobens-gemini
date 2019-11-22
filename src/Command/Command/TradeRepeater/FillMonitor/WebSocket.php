@@ -90,7 +90,7 @@ final class WebSocket extends Command
                 $this->shutdown->enableShutdownMode($e);
             }
         }
-        $output->writeln("\n<fg=red>Shutdown Signal Detected</>\n");
+        $output->writeln("\n<fg=red>{$this->now()}\tShutdown signal detected.\n");
     }
 
     private function main(OutputInterface $output): \Closure

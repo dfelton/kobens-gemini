@@ -4,6 +4,8 @@
 use Kobens\Core\Config;
 use Kobens\Core\Db;
 use Kobens\Core\EmergencyShutdown;
+use Kobens\Core\BinaryCalculator\Compare;
+use Kobens\Core\BinaryCalculator\Subtract;
 use Kobens\Core\Http\Request\Throttler;
 use Kobens\Gemini\Exchange;
 use Kobens\Gemini\Api\Host;
@@ -122,6 +124,19 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Archiver(
     $archiveInterface,
     $connectionInterface
 ));
+
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\SellPriceAuditor(
+    $shutdownInterface,
+    $sellPlacedInterface,
+    $getPriceInterface,
+    $orderStatusInterface,
+    $cancelOrderInterface,
+    $forceMakerInterface,
+    Subtract::getInstance(),
+    Compare::getInstance(),
+    $adapter
+));
+
 
 // $app->add(new \Kobens\Gemini\Command\Command\Taxes\CapitalGains()); // @deprecated
 $app->add(new \Kobens\Gemini\Command\Command\Taxes\BuyLogger());
