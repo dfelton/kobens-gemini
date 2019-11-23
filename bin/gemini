@@ -128,7 +128,7 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Archiver(
     $connectionInterface
 ));
 
-$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\SellPriceAuditor(
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Auditor\SellPrice(
     $shutdownInterface,
     $sellPlacedInterface,
     $getPriceInterface,

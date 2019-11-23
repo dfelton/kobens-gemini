@@ -1,6 +1,6 @@
 <?php
 
-namespace Kobens\Gemini\Command\Command\TradeRepeater;
+namespace Kobens\Gemini\Command\Command\TradeRepeater\Auditor;
 
 use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Core\BinaryCalculator\Compare;
@@ -23,14 +23,14 @@ use Zend\Db\TableGateway\TableGateway;
  * FIXME: This currently only works well for USD quoted trading pairs.
  * TODO:  Need to use a percentage based spread rather than fixed amount
  */
-final class SellPriceAuditor extends Command
+final class SellPrice extends Command
 {
     private const EXCEPTION_DELAY = 60;
 
     private const MIN_AGE    = 1800;  // 30 minutes
     private const MIN_SPREAD = '200';
 
-    protected static $defaultName = 'trade-repeater:price-auditor-sell';
+    protected static $defaultName = 'trade-repeater:audit:sell-price';
 
     /**
      * @var EmergencyShutdownInterface
