@@ -55,12 +55,15 @@ abstract class AbstractNewOrder extends Command
             case $value === true:
                 $str = "<fg=green>true</>";
                 break;
+
             case $value === false;
-            $str = "<fg=red>false</>";
-            break;
+                $str = "<fg=red>false</>";
+                break;
+
             case \is_numeric($value);
-            $str = "<fg=yellow>$value</>";
-            break;
+                $str = "<fg=yellow>$value</>";
+                break;
+
             case \is_array($value):
                 $str = PHP_EOL;
                 foreach ($value as $key => $val) {
@@ -68,6 +71,7 @@ abstract class AbstractNewOrder extends Command
                     $str .= "\t$key: $val";
                 }
                 break;
+
             default:
                 $str = "<fg=white>$value</>";
                 break;
