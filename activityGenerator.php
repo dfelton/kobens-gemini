@@ -26,7 +26,7 @@ if ($host->getHost() !== 'api.sandbox.gemini.com') {
 $config = Config::getInstance();
 $adapter = \Kobens\Core\Db::getAdapter();
 
-$shutdownDir = \array_key_exists($_SERVER['argv'][1]) && \is_dir($_SERVER['argv'][1])
+$shutdownDir = \array_key_exists(1, $_SERVER['argv']) && \is_dir($_SERVER['argv'][1])
     ? $_SERVER['argv'][1]
     : __DIR__.DIRECTORY_SEPARATOR.'var'
 ;
