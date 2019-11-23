@@ -2,12 +2,15 @@
 
 use Kobens\Core\Config;
 use Kobens\Core\EmergencyShutdown;
+use Kobens\Core\Exception\ConnectionException;
 use Kobens\Core\Http\Request\Throttler;
 use Kobens\Gemini\Api\Host;
 use Kobens\Gemini\Api\Key;
 use Kobens\Gemini\Api\Nonce;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\ImmediateOrCancel;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\ImmediateOrCancelInterface;
+use Kobens\Gemini\Exception\Api\Reason\InsufficientFundsException;
+use Kobens\Gemini\Exception\Api\Reason\SystemException;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Zend\Db\TableGateway\TableGateway;
 
@@ -22,7 +25,13 @@ if ($host->getHost() !== 'api.sandbox.gemini.com') {
 
 $config = Config::getInstance();
 $adapter = \Kobens\Core\Db::getAdapter();
-$shutdown = new EmergencyShutdown(__DIR__.DIRECTORY_SEPARATOR.'var');
+
+$shutdownDir = \array_key_exists($_SERVER['argv'][1]) && \is_dir($_SERVER['argv'][1])
+    ? $_SERVER['argv'][1]
+    : __DIR__.DIRECTORY_SEPARATOR.'var'
+;
+
+$shutdown = new EmergencyShutdown($shutdownDir);
 $tbl = new TableGateway('trade_repater', $adapter);
 
 $immediateOrCancel = new ImmediateOrCancel(
@@ -56,7 +65,7 @@ function getRange(\Zend\Db\Adapter\Adapter $adapter): array
 
 function getAmount(): string
 {
-    $overOneBtc = \rand(0, 100) > 95;
+    $overOneBtc = \rand(0, 100) > 98;
     $whole = $overOneBtc ? (string) \rand(1, 9) : '0';
     $satoshi = (string) (\rand(0, 1) ? \rand(1000, 999999): \rand(1000, 49999999));
     $satoshi = \str_pad($satoshi, 8, \STR_PAD_LEFT);
@@ -94,28 +103,32 @@ function placeOrder(ImmediateOrCancelInterface $immediateOrCancel, string $symbo
 
 
 $range = \getRange($adapter);
+$sleep = 0;
 
 do {
+    if ($sleep) {
+        \sleep($sleep);
+    }
     if (\time() - $range['time'] > 600) {
         $range = \getRange($adapter);
     }
     $side = \rand(0, 1) ? 'buy' : 'sell';
     try {
         \placeOrder($immediateOrCancel, 'btcusd', $side, \getAmount(), $range[$side]);
-    } catch (\Kobens\Core\Exception\ConnectionException $e) {
-        // swallow exception
-    } catch (\Kobens\Gemini\Exception\Api\Reason\InsufficientFundsException $e) {
-        try {
-            \placeOrder($immediateOrCancel, 'btcusd', $side === 'buy' ? 'sell' : 'buy', (string) \rand(1, 5), $range[$side]);
-        } catch (\Exception $e) {
-            \printException($e);
-            exit(1);
-        }
+        $sleep = 1;
+    } catch (ConnectionException $e) {
+        echo "e[91m{$e->getMessage()}\e[0m\n";
+        $sleep = 1;
+    } catch (SystemException $e) {
+        echo "e[91m{$e->getMessage()}\e[0m\n";
+        $sleep = 10;
+    } catch (InsufficientFundsException $e) {
+        echo "e[91m{$e->getMessage()}\e[0m\n";
+        $sleep = 1;
     } catch (\Exception $e) {
         \printException($e);
         exit(1);
     }
-    \sleep(1);
 } while ($shutdown->isShutdownModeEnabled() === false);
 
 echo "\nShutdown Detected\n";
