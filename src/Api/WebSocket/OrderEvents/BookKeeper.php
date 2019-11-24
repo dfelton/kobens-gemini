@@ -4,16 +4,15 @@ namespace Kobens\Gemini\Api\WebSocket\OrderEvents;
 
 use Amp\Loop;
 use Amp\Websocket\Client\Handshake;
-use Kobens\Core\Cache;
-use Kobens\Gemini\Exchange;
-use Kobens\Gemini\Api\Host;
-use Kobens\Gemini\Api\Key;
-use Kobens\Gemini\Api\Nonce;
+use Kobens\Gemini\Api\HostInterface;
+use Kobens\Gemini\Api\KeyInterface;
+use Kobens\Gemini\Api\NonceInterface;
+use Zend\Cache\Storage\StorageInterface;
 
 /**
  * TODO: Finish me
  */
-final class BookKeeper
+final class BookKeeper implements BookKeeperInterface
 {
     const REQUEST_URI = '/v1/order/events';
 
@@ -23,14 +22,30 @@ final class BookKeeper
     protected $cache;
 
     /**
-     * @var \Kobens\Exchange\ExchangeInterface
+     * @var HostInterface
      */
-    protected $exchange;
+    private $host;
 
-    public function __construct()
-    {
-        $this->exchange = new Exchange();
-        $this->cache = Cache::getInstance();
+    /**
+     * @var KeyInterface
+     */
+    private $key;
+
+    /**
+     * @var NonceInterface
+     */
+    private $nonce;
+
+    public function __construct(
+        HostInterface $hostInterface,
+        NonceInterface $nonceInterface,
+        KeyInterface $keyInterface,
+        StorageInterface $storageInterface
+    ) {
+        $this->host = $hostInterface;
+        $this->nonce = $nonceInterface;
+        $this->key = $keyInterface;
+        $this->cache = $storageInterface;
     }
 
     public function openBook(): void
@@ -55,20 +70,19 @@ final class BookKeeper
 
     protected function getUrl(): string
     {
-        return 'wss://'.(new Host())->getHost().static::REQUEST_URI;
+        return 'wss://'.$this->host->getHost().self::REQUEST_URI;
     }
 
     protected function getHeaders(): array
     {
-        $key = new Key();
         $payload = [
-            'request' => static::REQUEST_URI,
-            'nonce' => (new Nonce())->getNonce()
+            'request' => self::REQUEST_URI,
+            'nonce' => $this->nonce->getNonce()
         ];
         $base64Payload = \base64_encode(\json_encode($payload));
-        $signature = \hash_hmac('sha384', $base64Payload, $key->getSecretKey());
+        $signature = \hash_hmac('sha384', $base64Payload, $this->key->getSecretKey());
         return [
-            'X-GEMINI-APIKEY'    => $key->getPublicKey(),
+            'X-GEMINI-APIKEY'    => $this->key->getPublicKey(),
             'X-GEMINI-PAYLOAD'   => $base64Payload,
             'X-GEMINI-SIGNATURE' => $signature,
         ];

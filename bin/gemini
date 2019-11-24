@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use Kobens\Core\Cache;
 use Kobens\Core\Config;
 use Kobens\Core\Db;
 use Kobens\Core\EmergencyShutdown;
@@ -25,6 +26,7 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetActiveOrders;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetPastTrades;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatus;
 use Kobens\Gemini\Api\Rest\PublicEndpoints\Ticker;
+use Kobens\Gemini\Api\WebSocket\OrderEvents\BookKeeper;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\Archive;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyFilled;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyPlaced;
@@ -156,7 +158,9 @@ $app->add(new \Kobens\Gemini\Command\Command\Market\Watcher());
 $app->add(new \Kobens\Gemini\Command\Command\FeeAndVolume\GetNotationalVolume($getNotationalVolumeInterface));
 
 // TODO: This Command should use a unique KeyInterface, with no Trading Authority
-$app->add(new \Kobens\Gemini\Command\Command\OrderStatus\BookKeeper());
+$app->add(new \Kobens\Gemini\Command\Command\OrderStatus\BookKeeper(
+    new BookKeeper($hostInterface, $nonceInterface, $keyInterface, Cache::getInstance())
+));
 
 // TODO: This Command should use a unique KeyInterface, with no Trading Authority
 $app->add(new \Kobens\Gemini\Command\Command\Logger\TradeHistory($getPastTradesInterface, $shutdownInterface));
