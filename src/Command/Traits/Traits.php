@@ -3,7 +3,6 @@
 namespace Kobens\Gemini\Command\Traits;
 
 use Kobens\Core\Command\Traits\Traits as CoreTraits;
-use Kobens\Gemini\Api\Host;
 use Symfony\Component\Console\Output\OutputInterface;
 
 trait Traits
@@ -16,7 +15,6 @@ trait Traits
         if (!$output->isQuiet()) {
             $output->writeln([
                 $this->getNow(),
-                'Host:'.$this->getHost(),
                 'Error Class:'.\get_class($e),
                 'Error Message:'.$e->getMessage(),
                 'Error Code:'.$e->getCode(),
@@ -25,8 +23,4 @@ trait Traits
         $this->sleep($output, 10);
     }
 
-    protected function getHost(): string
-    {
-        return (string) (new Host());
-    }
 }

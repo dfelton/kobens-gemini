@@ -2,25 +2,33 @@
 
 namespace Kobens\Gemini\Command\Command\Market;
 
+use Kobens\Exchange\ExchangeInterface;
 use Kobens\Exchange\Exception\ClosedBookException;
-use Kobens\Gemini\Exchange;
-use Kobens\Gemini\Command\Argument\RefreshRate;
-use Kobens\Gemini\Command\Argument\Symbol;
-use Kobens\Gemini\Command\Traits\GetRefreshRate;
-use Kobens\Gemini\Command\Traits\GetSymbol;
+use Kobens\Gemini\Api\HostInterface;
 use Kobens\Gemini\Command\Traits\Traits;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class Watcher extends Command
 {
-    use GetRefreshRate, GetSymbol, Traits;
+    use Traits;
+
+    private const REFRESH_DEFAULT = 500000; // micro seconds
+    private const REFRESH_MIN     = 100000; // micro seconds
 
     protected static $defaultName = 'market:watcher';
 
-    private $isInitialized = false;
+    /**
+     * @var ExchangeInterface
+     */
+    private $exchange;
+
+    /**
+     * @var HostInterface
+     */
+    private $host;
 
     /**
      * @var string
@@ -65,18 +73,28 @@ final class Watcher extends Command
     /**
      * @var int
      */
-    private $refreshRate = RefreshRate::DEFAULT;
+    private $refreshRate;
 
     /**
      * @var \Kobens\Exchange\Book\BookInterface
      */
     private $book;
 
+    public function __construct(
+        ExchangeInterface $exchangeInterface,
+        HostInterface $hostInterface
+    ) {
+        $this->exchange = $exchangeInterface;
+        $this->host = $hostInterface;
+        parent::__construct();
+    }
+
     protected function configure()
     {
         $this->setDescription('Outputs details on a market book.');
-        $this->addArgList([new Symbol(), new RefreshRate()], $this);
-        $this->addArgument('tab_length', InputArgument::OPTIONAL, 'Terminal Tab Length', 8);
+        $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Trading Pair Symbol', 'btcusd');
+        $this->addOption('refresh', 'r', InputOption::VALUE_OPTIONAL, 'Refresh rate in micro seconds', self::REFRESH_DEFAULT);
+        $this->addOption('tab_length', 'l', InputOption::VALUE_OPTIONAL, 'Terminal Tab Length', 8);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -84,9 +102,7 @@ final class Watcher extends Command
         $this->init($input, $output);
 
         while (true) {
-
             $time = \time();
-
             try {
                 $ask = $this->book->getAskPrice();
                 $bid = $this->book->getBidPrice();
@@ -102,14 +118,13 @@ final class Watcher extends Command
                     $output->write(\sprintf(
                         '<fg=red>Book "%s" on "%s" is closed.</>',
                         $this->symbol,
-                        $this->getHost()
+                        $this->host->getHost()
                     ));
                 }
                 $output->write('<fg=red>.</>');
                 \sleep(1);
                 continue;
             }
-
             if (   $this->ask !== $ask
                 || $this->bid !== $bid
                 || $this->spread !== $spread
@@ -127,17 +142,17 @@ final class Watcher extends Command
 
     private function init(InputInterface $input, OutputInterface $output): void
     {
-        if ($this->isInitialized) {
-            throw new \Exception(\sprintf('Cannot initialize "%" more than once', __CLASS__));
+        $this->symbol = $input->getOption('symbol');
+        $this->refreshRate = (int) $input->getOption('refresh');
+        if ($this->refreshRate < self::REFRESH_MIN) {
+            $this->refreshRate = self::REFRESH_DEFAULT;
         }
-        $this->symbol = $this->getSymbol($input)->getValue();
-        $this->refreshRate = $this->getRefreshRate($input, $output)->getValue();
-        $tabLength = (int) $input->getArgument('tab_length');
+        $tabLength = (int) $input->getOption('tab_length');
         if ($tabLength <= 0) {
             $tabLength = 0;
         }
         $this->tabLength = $tabLength;
-        $this->book = (new Exchange())->getBook($this->symbol);
+        $this->book = $this->exchange->getBook($this->symbol);
     }
 
     private function outputUpdate(OutputInterface $output): void
@@ -161,7 +176,7 @@ final class Watcher extends Command
         $output->writeln([
             \str_repeat('-', 41),
             \sprintf("- Date:\t\t%s\t-", $this->getNow()),
-            \sprintf("- Host:\t\t%s\t-", $this->getHost()),
+            \sprintf("- Host:\t\t%s\t-", $this->host->getHost()),
             \sprintf("- Symbol:\t%s\t\t\t-", \strtoupper($this->symbol)),
             "-\t\t\t\t\t-",
             \sprintf("- Ask:\t\t<fg=red>%s</>%s-", $this->ask, \str_repeat("\t", $tabsAsk)),

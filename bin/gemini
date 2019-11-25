@@ -26,6 +26,7 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetActiveOrders;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetPastTrades;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatus;
 use Kobens\Gemini\Api\Rest\PublicEndpoints\Ticker;
+use Kobens\Gemini\Api\WebSocket\MarketData\BookKeeperFactory;
 use Kobens\Gemini\Api\WebSocket\OrderEvents\BookKeeper;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\Archive;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyFilled;
@@ -60,7 +61,7 @@ $connectionInterface = $adapter->getDriver()->getConnection();
 $shutdownInterface = new EmergencyShutdown(\dirname(__DIR__).DIRECTORY_SEPARATOR.'var');
 $exchangeInterface = new Exchange();
 
-$hostInterface = new Host();
+$hostInterface = new Host($config->get('gemini')->api->host);
 $keyInterface = new Key(
     $config->get('gemini')->api->key->public_key,
     $config->get('gemini')->api->key->secret_key
@@ -150,9 +151,12 @@ $app->add(new \Kobens\Gemini\Command\Command\Taxes\BuyLogger());
 $app->add(new \Kobens\Gemini\Command\Command\Taxes\SellLogger());
 $app->add(new \Kobens\Gemini\Command\Command\Taxes\Form8949());
 
-$app->add(new \Kobens\Gemini\Command\Command\Market\BookKeeper());
+$app->add(new \Kobens\Gemini\Command\Command\Market\BookKeeper(
+    new BookKeeperFactory($exchangeInterface, Cache::getInstance()),
+    $config
+));
 $app->add(new \Kobens\Gemini\Command\Command\Market\Ticker($tickerInterface));
-$app->add(new \Kobens\Gemini\Command\Command\Market\Watcher());
+$app->add(new \Kobens\Gemini\Command\Command\Market\Watcher($exchangeInterface, $hostInterface));
 
 // TODO: Use Auditor Key
 $app->add(new \Kobens\Gemini\Command\Command\FeeAndVolume\GetNotationalVolume($getNotationalVolumeInterface));

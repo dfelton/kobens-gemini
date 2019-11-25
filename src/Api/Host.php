@@ -2,13 +2,22 @@
 
 namespace Kobens\Gemini\Api;
 
-use Kobens\Core\Config;
 
 class Host implements HostInterface
 {
+    /**
+     * @var string
+     */
+    private $host;
+
+    public function __construct(string $host)
+    {
+        $this->host = $host;
+    }
+
     public function getHost(): string
     {
-        return Config::getInstance()->get('gemini')->api->host;
+        return $this->host;
     }
 
     public function __toString(): string

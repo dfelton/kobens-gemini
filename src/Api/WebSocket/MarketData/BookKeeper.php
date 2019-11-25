@@ -6,7 +6,6 @@ use Kobens\Core\Config;
 use Kobens\Exchange\Book\Keeper\AbstractKeeper;
 use Kobens\Exchange\Exception\ClosedBookException;
 use Kobens\Gemini\Exception;
-use Kobens\Gemini\Exchange;
 use Kobens\Gemini\Exception\Api\WebSocket\SocketSequenceException;
 
 final class BookKeeper extends AbstractKeeper
@@ -28,11 +27,6 @@ final class BookKeeper extends AbstractKeeper
         'bids'     => 'true',
         'offers'   => 'true'
     ];
-
-    public function __construct(string $pairKey)
-    {
-        parent::__construct((new Exchange()), $pairKey);
-    }
 
     public function openBook(): void
     {
