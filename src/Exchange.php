@@ -3,9 +3,7 @@
 namespace Kobens\Gemini;
 
 use Kobens\Exchange\AbstractExchange;
-use Kobens\Exchange\Book\Keeper\KeeperInterface;
 use Kobens\Exchange\Order\StatusInterface;
-use Kobens\Gemini\Api\WebSocket\MarketData\BookKeeper;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\Exchange\Order\Status;
 
@@ -21,11 +19,6 @@ final class Exchange extends AbstractExchange
     public function getCacheKey(): string
     {
         return self::CACHE_KEY;
-    }
-
-    public function getBookKeeper(string $pairKey): KeeperInterface
-    {
-        return new BookKeeper($pairKey);
     }
 
     /**
