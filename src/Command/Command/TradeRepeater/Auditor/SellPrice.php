@@ -159,7 +159,7 @@ final class SellPrice extends Command
 
                 if ($data->is_cancelled === true && $data->executed_amount === '0') {
                     $output->writeln("{$this->now()}\tResetting {$row->id}");
-                    unset($meta['sell']);
+                    unset($meta['sell_price']);
                     $this->table->update(
                         [
                             'status' => 'BUY_FILLED',
@@ -175,9 +175,7 @@ final class SellPrice extends Command
                     $meta['cancel_order_json'] = \json_encode($data);
                     $this->table->update(
                         [
-                            'status' => 'BUY_FILLED',
-                            'sell_order_id' => null,
-                            'sell_client_order_id' => null,
+                            'is_error' => 1,
                             'meta' => \json_encode($meta),
                         ],
                         ['id' => $row->id]
