@@ -133,7 +133,16 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Seller(
     $shutdownInterface,
     $buyFilledInterface,
     $sellSentInterface,
-    $forceMakerInterface
+    new ForceMaker(
+        $hostInterface,
+        $throttlerInterface,
+        new Key(
+            $config->get('gemini')->keys->trade_repeater->seller->public,
+            $config->get('gemini')->keys->trade_repeater->seller->secret
+        ),
+        $nonceInterface,
+        $getPriceInterface
+    )
 ));
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Archiver(
     $shutdownInterface,

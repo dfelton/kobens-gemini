@@ -14,6 +14,10 @@
                     <public>account-00000000000000000000</public>
                     <secret>0000000000000000000000000000</secret>
                 </buyer>
+                <seller>
+                    <public>account-00000000000000000000</public>
+                    <secret>0000000000000000000000000000</secret>
+                </seller>
             </trade_repeater>
         </keys>
     </gemini>
