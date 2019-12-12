@@ -4,10 +4,18 @@
         <api>
             <host>api.sandbox.gemini.com</host>
             <key>
-                <public_key>00000000000000000000</public_key>
+                <public_key>account-00000000000000000000</public_key>
                 <secret_key>0000000000000000000000000000</secret_key>
             </key>
         </api>
+        <keys>
+            <trade_repeater>
+                <buyer>
+                    <public>account-00000000000000000000</public>
+                    <secret>0000000000000000000000000000</secret>
+                </buyer>
+            </trade_repeater>
+        </keys>
     </gemini>
     <database>
         <driver>pdo_mysql</driver>
