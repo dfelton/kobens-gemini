@@ -20,6 +20,7 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelOrder;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\FillOrKill;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\ForceMaker;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\ImmediateOrCancel;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\Limit;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\MakerOrCancel;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\StopLimit;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetActiveOrders;
@@ -76,6 +77,7 @@ $fillOrKillInterface = new FillOrKill($hostInterface, $throttlerInterface, $keyI
 $forceMakerInterface = new ForceMaker($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface, $getPriceInterface);
 $immediateOrCancelInterface = new ImmediateOrCancel($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
 $stopLimitInterface = new StopLimit($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
+$limitInterface = new Limit($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
 $makerOrCancelInterface = new MakerOrCancel($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
 
 $cancelAllActiveOrdersInterface = new CancelAllActiveOrders($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
@@ -195,6 +197,7 @@ $app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\NewOrder\FillOrKill(
 $app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\NewOrder\ForceMaker($forceMakerInterface));
 $app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\NewOrder\ImmediateOrCancel($immediateOrCancelInterface));
 $app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\NewOrder\StopLimit($stopLimitInterface));
+$app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\NewOrder\Limit($limitInterface));
 $app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\NewOrder\MakerOrCancel($makerOrCancelInterface));
 
 // TODO: The following commands can use a common KeyInterface, and should have no Trading Authority
