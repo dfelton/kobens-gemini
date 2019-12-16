@@ -28,5 +28,4 @@ abstract class AbstractNewOrder extends AbstractPrivateRequest implements NewOrd
     {
         return $this->payload;
     }
-
 }

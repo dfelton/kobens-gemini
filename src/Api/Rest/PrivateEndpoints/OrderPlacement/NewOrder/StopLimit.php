@@ -14,21 +14,6 @@ final class StopLimit extends AbstractPrivateRequest implements StopLimitInterfa
      */
     protected $payload = [];
 
-    final protected function getUrlPath(): string
-    {
-        return self::URL_PATH;
-    }
-
-    /**
-     * It is up to the concrete class to set this prior to calling getResponse()
-     *
-     * {@inheritDoc}
-     * @see \Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest::getPayload()
-     */
-    final protected function getPayload(): array
-    {
-        return $this->payload;
-    }
     public function place(PairInterface $pair, string $side, string $amount, string $price, string $stopPrice, string $clientOrderId = null): \stdClass
     {
         $this->payload = [
@@ -44,4 +29,21 @@ final class StopLimit extends AbstractPrivateRequest implements StopLimitInterfa
         };
         return \json_decode($this->getResponse()['body']);
     }
+
+    final protected function getUrlPath(): string
+    {
+        return self::URL_PATH;
+    }
+
+    /**
+     * It is up to the concrete class to set this prior to calling getResponse()
+     *
+     * {@inheritDoc}
+     * @see \Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest::getPayload()
+     */
+    final protected function getPayload(): array
+    {
+        return $this->payload;
+    }
+
 }

@@ -11,10 +11,12 @@
         <keys>
             <trade_repeater>
                 <buyer>
+                    <!-- Required Permissions: Trading  -->
                     <public>account-00000000000000000000</public>
                     <secret>0000000000000000000000000000</secret>
                 </buyer>
                 <seller>
+                    <!-- Required Permissions: Trading  -->
                     <public>account-00000000000000000000</public>
                     <secret>0000000000000000000000000000</secret>
                 </seller>
