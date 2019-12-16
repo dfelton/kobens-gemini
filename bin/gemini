@@ -159,7 +159,6 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Auditor\SellPrice(
     $getPriceInterface,
     $orderStatusInterface,
     $cancelOrderInterface,
-    $forceMakerInterface,
     Subtract::getInstance(),
     Compare::getInstance(),
     $adapter

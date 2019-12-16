@@ -8,7 +8,6 @@ use Kobens\Core\BinaryCalculator\Subtract;
 use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Market\GetPriceInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelOrderInterface;
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\ForceMakerInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
 use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
 use Kobens\Gemini\Exception\Api\Reason\SystemException;
@@ -58,11 +57,6 @@ final class SellPrice extends Command
     private $cancelOrder;
 
     /**
-     * @var ForceMakerInterface
-     */
-    private $forceMaker;
-
-    /**
      * @var Subtract
      */
     private $bcsub;
@@ -88,7 +82,6 @@ final class SellPrice extends Command
         GetPriceInterface $getPriceInterface,
         OrderStatusInterface $orderStatusInterface,
         CancelOrderInterface $cancelOrderInterface,
-        ForceMakerInterface $forceMakerInterface,
         Subtract $bcsub,
         Compare $bccomp,
         \Zend\Db\Adapter\Adapter $adapter
@@ -98,7 +91,6 @@ final class SellPrice extends Command
         $this->getPrice = $getPriceInterface;
         $this->orderStatus = $orderStatusInterface;
         $this->cancelOrder = $cancelOrderInterface;
-        $this->forceMaker = $forceMakerInterface;
         $this->bcsub = $bcsub;
         $this->bccomp = $bccomp;
         $this->connection = $adapter->getDriver()->getConnection();
