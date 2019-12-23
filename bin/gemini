@@ -116,10 +116,14 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Buyer(
         $getPriceInterface
     )
 ));
+
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor\WebSocket(
     $shutdownInterface,
     $hostInterface,
-    $keyInterface,
+    new Key(
+        $config->get('gemini')->keys->trade_repeater->fill_monitor_websocket->public,
+        $config->get('gemini')->keys->trade_repeater->fill_monitor_websocket->secret
+    ),
     $nonceInterface,
     $buyPlacedInterface,
     $sellPlacedInterface

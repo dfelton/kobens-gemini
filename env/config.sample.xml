@@ -30,6 +30,11 @@
                     <public>account-00000000000000000000</public>
                     <secret>0000000000000000000000000000</secret>
                 </fill_monitor_rest>
+                <fill_monitor_websocket>
+                    <!-- Required Permissions: Auditor  -->
+                    <public>account-00000000000000000000</public>
+                    <secret>0000000000000000000000000000</secret>
+                </fill_monitor_websocket>
             </trade_repeater>
         </keys>
     </gemini>
