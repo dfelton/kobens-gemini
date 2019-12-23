@@ -9,7 +9,6 @@ use Kobens\Gemini\Api\HostInterface;
 use Kobens\Gemini\Exception\InvalidResponseException;
 use Kobens\Gemini\Exception\LogicException;
 use Kobens\Gemini\Exception\ResourceMovedException;
-use Kobens\Gemini\Exception\Api\Reason\InvalidNonceException;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
@@ -58,21 +57,9 @@ abstract class AbstractRequest
 
     final protected function getResponse(): array
     {
-        // TODO: eliminate this iterations bullshit once we implement multi api key features
-        $response = null;
-        $iterations = 0;
-        do {
-            $response = $this->_getResponse();
-            try {
-                $this->_throwResponseException($response);
-            } catch (InvalidNonceException $e) {
-                ++$iterations;
-                $response = null;
-            }
-        } while ($response === null && $iterations <= 100);
-        if ($response === null) {
-            throw new \Exception('Max Iterations reached');
-        } elseif ($response['code'] !== 200) {
+        $response = $this->_getResponse();
+        $this->_throwResponseException($response);
+        if ($response['code'] !== 200) {
             throw new LogicException(
                 'Response code 200 expected',
                 $response['code'],
