@@ -153,16 +153,26 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Archiver(
     $connectionInterface
 ));
 
+$sellAuditorKey = new Key(
+    $config->get('gemini')->keys->trade_repeater->auditor_sell_price->public,
+    $config->get('gemini')->keys->trade_repeater->auditor_sell_price->secret
+);
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Auditor\SellPrice(
     $shutdownInterface,
     $sellPlacedInterface,
     $getPriceInterface,
-    $orderStatusInterface,
-    $cancelOrderInterface,
+    new OrderStatus(
+        $hostInterface,
+        $throttlerInterface,
+        $sellAuditorKey,
+        $nonceInterface
+    ),
+    new CancelOrder($hostInterface, $throttlerInterface, $sellAuditorKey, $nonceInterface),
     Subtract::getInstance(),
     Compare::getInstance(),
     $adapter
 ));
+unset($sellAuditorKey);
 
 
 // $app->add(new \Kobens\Gemini\Command\Command\Taxes\CapitalGains()); // @deprecated

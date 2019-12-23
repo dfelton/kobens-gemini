@@ -20,6 +20,11 @@
                     <public>account-00000000000000000000</public>
                     <secret>0000000000000000000000000000</secret>
                 </seller>
+                <auditor_sell_price>
+                    <!-- Required Permissions: Trading  -->
+                    <public>account-00000000000000000000</public>
+                    <secret>0000000000000000000000000000</secret>
+                </auditor_sell_price>
             </trade_repeater>
         </keys>
     </gemini>
