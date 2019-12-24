@@ -16,14 +16,14 @@ use Zend\Db\TableGateway\TableGateway;
 
 require __DIR__.'/bootstrap.php';
 
-$host = new Host();
+$config = Config::getInstance();
+$host = new Host($config->get('gemini')->api->host);
 
 if ($host->getHost() !== 'api.sandbox.gemini.com') {
     echo "\nActivity Generator only allowed on api.sandbox.gemini.com\n";
     exit(1);
 }
 
-$config = Config::getInstance();
 $adapter = \Kobens\Core\Db::getAdapter();
 
 $shutdownDir = \array_key_exists(1, $_SERVER['argv']) && \is_dir($_SERVER['argv'][1])
@@ -66,8 +66,8 @@ function getRange(\Zend\Db\Adapter\Adapter $adapter): array
 function getAmount(): string
 {
     $overOneBtc = \rand(0, 100) > 98;
-    $whole = $overOneBtc ? (string) \rand(1, 9) : '0';
-    $satoshi = (string) (\rand(0, 1) ? \rand(1000, 999999): \rand(1000, 49999999));
+    $whole = $overOneBtc ? (string) \rand(1, 5) : '0';
+    $satoshi = (string) (\rand(1, 10) > 1 ? \rand(1000, 999999): \rand(1000, 49999999));
     $satoshi = \str_pad($satoshi, 8, \STR_PAD_LEFT);
     return "$whole.$satoshi";
 }
