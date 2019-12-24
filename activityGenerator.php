@@ -115,13 +115,13 @@ do {
         \placeOrder($immediateOrCancel, 'btcusd', $side, \getAmount(), $range[$side]);
         $sleep = 1;
     } catch (ConnectionException $e) {
-        echo "e[91m{$e->getMessage()}\e[0m\n";
+        echo "\e[91m{$e->getMessage()}\e[0m\n";
         $sleep = 1;
     } catch (SystemException $e) {
-        echo "e[91m{$e->getMessage()}\e[0m\n";
+        echo "\e[91m{$e->getMessage()}\e[0m\n";
         $sleep = 10;
     } catch (InsufficientFundsException $e) {
-        echo "e[91m{$e->getMessage()}\e[0m\n";
+        echo "\e[91m{$e->getMessage()}\e[0m\n";
         $sleep = 1;
     } catch (\Exception $e) {
         \printException($e);
