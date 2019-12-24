@@ -133,6 +133,13 @@ CREATE TABLE `throttler` (
      `time` INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Time',
      PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Throttler';
-INSERT INTO `throttler` (`id`,`max`) VALUES ('api.sandbox.gemini.com', 6), ('api.gemini.com', 6);
+
+INSERT INTO `throttler` (`id`,`max`)
+VALUES
+  ('api.sandbox.gemini.com::public',  2),
+  ('api.sandbox.gemini.com::private', 10),
+  ('api.gemini.com::public',  2),
+  ('api.gemini.com::private', 10)
+;
 
 

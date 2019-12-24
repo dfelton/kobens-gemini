@@ -68,25 +68,30 @@ $keyInterface = new Key(
     $config->get('gemini')->api->key->secret_key
 );
 $nonceInterface = new Nonce();
+
 $throttlerInterface = new Throttler($hostInterface->getHost());
-$tickerInterface = new Ticker($hostInterface, $throttlerInterface);
+
+$publicThrottlerInterface = new Throttler($hostInterface->getHost().'::public');
+$privateThrottlerInterface = new Throttler($hostInterface->getHost().'::private');
+
+$tickerInterface = new Ticker($hostInterface, $publicThrottlerInterface);
 
 $getPriceInterface = new GetPrice($exchangeInterface, $tickerInterface);
 
-$fillOrKillInterface = new FillOrKill($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
-$forceMakerInterface = new ForceMaker($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface, $getPriceInterface);
-$immediateOrCancelInterface = new ImmediateOrCancel($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
-$stopLimitInterface = new StopLimit($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
-$limitInterface = new Limit($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
-$makerOrCancelInterface = new MakerOrCancel($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
+$fillOrKillInterface = new FillOrKill($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+$forceMakerInterface = new ForceMaker($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface, $getPriceInterface);
+$immediateOrCancelInterface = new ImmediateOrCancel($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+$stopLimitInterface = new StopLimit($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+$limitInterface = new Limit($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+$makerOrCancelInterface = new MakerOrCancel($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
 
-$cancelAllActiveOrdersInterface = new CancelAllActiveOrders($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
-$cancelOrderInterface = new CancelOrder($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
-$getPastTradesInterface = new GetPastTrades($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
-$getActiveOrdersInterface = new GetActiveOrders($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
-$getAvailableBalancesInterface = new GetAvailableBalances($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
-$orderStatusInterface = new OrderStatus($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
-$getNotationalVolumeInterface = new GetNotationalVolume($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
+$cancelAllActiveOrdersInterface = new CancelAllActiveOrders($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+$cancelOrderInterface = new CancelOrder($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+$getPastTradesInterface = new GetPastTrades($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+$getActiveOrdersInterface = new GetActiveOrders($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+$getAvailableBalancesInterface = new GetAvailableBalances($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+$orderStatusInterface = new OrderStatus($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+$getNotationalVolumeInterface = new GetNotationalVolume($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
 
 $archiveInterface = new Archive();
 $buyFilledInterface = new BuyFilled($adapter);
@@ -107,7 +112,7 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Buyer(
     $buySentInterface,
     new ForceMaker(
         $hostInterface,
-        $throttlerInterface,
+        $privateThrottlerInterface,
         new Key(
             $config->get('gemini')->keys->trade_repeater->buyer->public,
             $config->get('gemini')->keys->trade_repeater->buyer->secret
@@ -137,8 +142,8 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor\Rest(
     $shutdownInterface,
     $buyPlacedInterface,
     $sellPlacedInterface,
-    new GetActiveOrders($hostInterface, $throttlerInterface, $restFillMonitorKey, $nonceInterface),
-    new OrderStatus($hostInterface, $throttlerInterface, $restFillMonitorKey, $nonceInterface)
+    new GetActiveOrders($hostInterface, $privateThrottlerInterface, $restFillMonitorKey, $nonceInterface),
+    new OrderStatus($hostInterface, $privateThrottlerInterface, $restFillMonitorKey, $nonceInterface)
 ));
 unset($restFillMonitorKey);
 
@@ -148,7 +153,7 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Seller(
     $sellSentInterface,
     new ForceMaker(
         $hostInterface,
-        $throttlerInterface,
+        $privateThrottlerInterface,
         new Key(
             $config->get('gemini')->keys->trade_repeater->seller->public,
             $config->get('gemini')->keys->trade_repeater->seller->secret
@@ -174,11 +179,11 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Auditor\SellPrice(
     $getPriceInterface,
     new OrderStatus(
         $hostInterface,
-        $throttlerInterface,
+        $privateThrottlerInterface,
         $sellAuditorKey,
         $nonceInterface
     ),
-    new CancelOrder($hostInterface, $throttlerInterface, $sellAuditorKey, $nonceInterface),
+    new CancelOrder($hostInterface, $privateThrottlerInterface, $sellAuditorKey, $nonceInterface),
     Subtract::getInstance(),
     Compare::getInstance(),
     $adapter

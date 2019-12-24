@@ -12,7 +12,6 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\ImmediateOrC
 use Kobens\Gemini\Exception\Api\Reason\InsufficientFundsException;
 use Kobens\Gemini\Exception\Api\Reason\SystemException;
 use Kobens\Gemini\Exchange\Currency\Pair;
-use Zend\Db\TableGateway\TableGateway;
 
 require __DIR__.'/bootstrap.php';
 
@@ -32,11 +31,10 @@ $shutdownDir = \array_key_exists(1, $_SERVER['argv']) && \is_dir($_SERVER['argv'
 ;
 
 $shutdown = new EmergencyShutdown($shutdownDir);
-$tbl = new TableGateway('trade_repater', $adapter);
 
 $immediateOrCancel = new ImmediateOrCancel(
     $host,
-    new Throttler($host->getHost()),
+    new Throttler($host->getHost().'::private'),
     new Key(
         $config->get('gemini')->api->key->public_key,
         $config->get('gemini')->api->key->secret_key
