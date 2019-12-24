@@ -69,8 +69,6 @@ $keyInterface = new Key(
 );
 $nonceInterface = new Nonce();
 
-$throttlerInterface = new Throttler($hostInterface->getHost());
-
 $publicThrottlerInterface = new Throttler($hostInterface->getHost().'::public');
 $privateThrottlerInterface = new Throttler($hostInterface->getHost().'::private');
 
