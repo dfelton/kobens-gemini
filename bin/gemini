@@ -8,6 +8,7 @@ use Kobens\Core\EmergencyShutdown;
 use Kobens\Core\BinaryCalculator\Compare;
 use Kobens\Core\BinaryCalculator\Subtract;
 use Kobens\Core\Http\Request\Throttler;
+use Kobens\Core\Http\Request\Throttler\Adapter\MariaDb;
 use Kobens\Gemini\Exchange;
 use Kobens\Gemini\Api\Host;
 use Kobens\Gemini\Api\Key;
@@ -69,8 +70,15 @@ $keyInterface = new Key(
 );
 $nonceInterface = new Nonce();
 
-$publicThrottlerInterface = new Throttler($hostInterface->getHost().'::public');
-$privateThrottlerInterface = new Throttler($hostInterface->getHost().'::private');
+// TODO: Maybe use db user that only has rights to read/write on throttler table.
+$publicThrottlerInterface = new Throttler(
+    new MariaDb(new \Zend\Db\Adapter\Adapter($config->get('database')->toArray())),
+    $hostInterface->getHost().'::public'
+);
+$privateThrottlerInterface = new Throttler(
+    new MariaDb(new \Zend\Db\Adapter\Adapter($config->get('database')->toArray())),
+    $hostInterface->getHost().'::private'
+);
 
 $tickerInterface = new Ticker($hostInterface, $publicThrottlerInterface);
 
