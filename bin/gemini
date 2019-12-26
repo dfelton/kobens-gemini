@@ -71,6 +71,8 @@ $keyInterface = new Key(
 $nonceInterface = new Nonce();
 
 // TODO: Maybe use db user that only has rights to read/write on throttler table.
+// NOTE: Throttlers intentionally use their own db connection so as to not have transactional
+//       operations interfere with the rest of the application (BEGIN/COMMIT).
 $publicThrottlerInterface = new Throttler(
     new MariaDb(new \Zend\Db\Adapter\Adapter($config->get('database')->toArray())),
     $hostInterface->getHost().'::public'
