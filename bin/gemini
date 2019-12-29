@@ -5,6 +5,7 @@ use Kobens\Core\Cache;
 use Kobens\Core\Config;
 use Kobens\Core\Db;
 use Kobens\Core\EmergencyShutdown;
+use Kobens\Core\Sleeper;
 use Kobens\Core\Http\Request\Throttler;
 use Kobens\Core\Http\Request\Throttler\Adapter\MariaDb;
 use Kobens\Gemini\Exchange;
@@ -60,6 +61,7 @@ $adapter = Db::getAdapter();
 $connectionInterface = $adapter->getDriver()->getConnection();
 $shutdownInterface = new EmergencyShutdown(\dirname(__DIR__).DIRECTORY_SEPARATOR.'var');
 $exchangeInterface = new Exchange();
+$sleeperInterface = new Sleeper();
 
 $hostInterface = new Host($config->get('gemini')->api->host);
 $keyInterface = new Key(
@@ -67,6 +69,7 @@ $keyInterface = new Key(
     $config->get('gemini')->api->key->secret_key
 );
 $nonceInterface = new Nonce();
+
 
 // TODO: Maybe use db user that only has rights to read/write on throttler table.
 // NOTE: Throttlers intentionally use their own db connection so as to not have transactional
@@ -125,7 +128,8 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Buyer(
         ),
         $nonceInterface,
         $getPriceInterface
-    )
+    ),
+    $sleeperInterface
 ));
 
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor\WebSocket(
@@ -137,7 +141,8 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor\WebSocket
     ),
     $nonceInterface,
     $buyPlacedInterface,
-    $sellPlacedInterface
+    $sellPlacedInterface,
+    $sleeperInterface
 ));
 
 $restFillMonitorKey = new Key(
@@ -149,7 +154,8 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor\Rest(
     $buyPlacedInterface,
     $sellPlacedInterface,
     new GetActiveOrders($hostInterface, $privateThrottlerInterface, $restFillMonitorKey, $nonceInterface),
-    new OrderStatus($hostInterface, $privateThrottlerInterface, $restFillMonitorKey, $nonceInterface)
+    new OrderStatus($hostInterface, $privateThrottlerInterface, $restFillMonitorKey, $nonceInterface),
+    $sleeperInterface
 ));
 unset($restFillMonitorKey);
 
@@ -166,13 +172,15 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Seller(
         ),
         $nonceInterface,
         $getPriceInterface
-    )
+    ),
+    $sleeperInterface
 ));
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Archiver(
     $shutdownInterface,
     $sellFilledInterface,
     $archiveInterface,
-    $connectionInterface
+    $connectionInterface,
+    $sleeperInterface
 ));
 
 $sellAuditorKey = new Key(
@@ -190,7 +198,8 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Auditor\SellPrice(
         $nonceInterface
     ),
     new CancelOrder($hostInterface, $privateThrottlerInterface, $sellAuditorKey, $nonceInterface),
-    $adapter
+    $adapter,
+    $sleeperInterface
 ));
 unset($sellAuditorKey);
 

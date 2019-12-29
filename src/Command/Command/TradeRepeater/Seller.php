@@ -3,6 +3,7 @@
 namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
 use Kobens\Core\EmergencyShutdownInterface;
+use Kobens\Core\SleeperInterface;
 use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\ForceMakerInterface;
 use Kobens\Gemini\Exception\MaxIterationsException;
@@ -21,6 +22,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class Seller extends Command
 {
+    use SleeperTrait;
+
     private const EXCEPTION_DELAY = 60;
 
     protected static $defaultName = 'trade-repeater:seller';
@@ -45,17 +48,24 @@ final class Seller extends Command
      */
     private $forceMaker;
 
+    /**
+     * @var SleeperInterface
+     */
+    private $sleeper;
+
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,
         BuyFilledInterface $buyFilledInterface,
         SellSentInterface $sellSentInterface,
-        ForceMakerInterface $forceMakerInterface
+        ForceMakerInterface $forceMakerInterface,
+        SleeperInterface $sleeperInterface
     ) {
-        parent::__construct();
         $this->buyFilled = $buyFilledInterface;
         $this->sellSent = $sellSentInterface;
         $this->shutdown = $shutdownInterface;
         $this->forceMaker = $forceMakerInterface;
+        $this->sleeper = $sleeperInterface;
+        parent::__construct();
     }
 
     protected function configure()
@@ -79,7 +89,7 @@ final class Seller extends Command
                         $output->writeln("{$this->now()}\tSell orders up to date. Sleeping...");
                         $reportSleep = false;
                     }
-                    \sleep($delay);
+                    $this->sleep($delay, $this->sleeper, $this->shutdown);
                 } else {
                     $reportSleep = true;
                 }
@@ -134,11 +144,13 @@ final class Seller extends Command
             $this->buyReady->resetState($row->id);
             $output->buyFilled("<fg=red>{$this->now()}\t ({$row->symbol}) $e->getMessage()");
             $output->writeln("<fg=red>{$this->now()}\tSleeping ".self::EXCEPTION_DELAY." seconds...</>");
+            $this->sleep(self::EXCEPTION_DELAY, $this->sleeper, $this->shutdown);
 
         } catch (SystemException $e) {
             $this->buyFilled->resetState($row->id);
             $output->writeln("<fg=red>{$this->now()}\t ({$row->symbol}) $e->getMessage()");
             $output->writeln("<fg=red>{$this->now()}\tSleeping ".self::EXCEPTION_DELAY." seconds...</>");
+            $this->sleep(self::EXCEPTION_DELAY, $this->sleeper, $this->shutdown);
 
         } catch (MaxIterationsException $e) {
             $this->buyFilled->resetState($row->id);
@@ -147,7 +159,8 @@ final class Seller extends Command
                 $this->now(), $row->symbol, $row->sell_price
             ));
             $output->writeln("<fg=red>{$this->now()}\tSleeping {$input->getOption('maxIterationsDelay')} seconds...</>");
-            \sleep($input->getOption('maxIterationsDelay'));
+            $this->sleep((int) $input->getOption('maxIterationsDelay'), $this->sleeper, $this->shutdown);
+
         } catch (\Exception $e) {
             $this->sellSent->setErrorState($row->id, \get_class($e)."::{$e->getMessage()}");
             throw $e;

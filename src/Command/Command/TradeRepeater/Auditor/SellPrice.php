@@ -3,10 +3,12 @@
 namespace Kobens\Gemini\Command\Command\TradeRepeater\Auditor;
 
 use Kobens\Core\EmergencyShutdownInterface;
+use Kobens\Core\SleeperInterface;
 use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Market\GetPriceInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelOrderInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
+use Kobens\Gemini\Command\Command\TradeRepeater\SleeperTrait;
 use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
 use Kobens\Gemini\Exception\Api\Reason\SystemException;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellPlacedInterface;
@@ -20,6 +22,8 @@ use Zend\Db\TableGateway\TableGateway;
 
 final class SellPrice extends Command
 {
+    use SleeperTrait;
+
     private const EXCEPTION_DELAY = 60;
 
     private const MIN_AGE    = 1800;  // 30 minutes
@@ -62,13 +66,19 @@ final class SellPrice extends Command
      */
     private $table;
 
+    /**
+     * @var SleeperInterface
+     */
+    private $sleeper;
+
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,
         SellPlacedInterface $sellPlacedInterface,
         GetPriceInterface $getPriceInterface,
         OrderStatusInterface $orderStatusInterface,
         CancelOrderInterface $cancelOrderInterface,
-        \Zend\Db\Adapter\Adapter $adapter
+        \Zend\Db\Adapter\Adapter $adapter,
+        SleeperInterface $sleeperInterface
     ) {
         $this->shutdown = $shutdownInterface;
         $this->sellPlaced = $sellPlacedInterface;
@@ -77,6 +87,7 @@ final class SellPrice extends Command
         $this->cancelOrder = $cancelOrderInterface;
         $this->connection = $adapter->getDriver()->getConnection();
         $this->table = new TableGateway('trade_repeater', $adapter);
+        $this->sleeper = $sleeperInterface;
         parent::__construct();
     }
 
@@ -96,7 +107,7 @@ final class SellPrice extends Command
             try {
                 $this->mainLoop($output);
                 $output->writeln("{$this->now()}\tRecords examined. Sleeping $sleep seconds.");
-                \sleep($sleep);
+                $this->sleep($sleep, $this->sleeper, $this->shutdown);
             } catch (ConnectionException $e) {
                 $this->exceptionDelay($output, $e);
             } catch (MaintenanceException $e) {
@@ -117,7 +128,7 @@ final class SellPrice extends Command
             "<fg=red>{$this->now()}\t{$e->getMessage()}</>",
             "<fg=red>{$this->now()}\tSleeping ".self::EXCEPTION_DELAY." seconds</>"
         ]);
-        \sleep(self::EXCEPTION_DELAY);
+        $this->sleep(self::EXCEPTION_DELAY, $this->sleeper, $this->shutdown);
     }
 
     private function mainLoop(OutputInterface $output): void

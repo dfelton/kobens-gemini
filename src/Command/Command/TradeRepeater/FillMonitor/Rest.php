@@ -3,9 +3,11 @@
 namespace Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor;
 
 use Kobens\Core\EmergencyShutdownInterface;
+use Kobens\Core\SleeperInterface;
 use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetActiveOrdersInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
+use Kobens\Gemini\Command\Command\TradeRepeater\SleeperTrait;
 use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
 use Kobens\Gemini\Exception\Api\Reason\SystemException;
 use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
@@ -18,6 +20,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class Rest extends Command
 {
+    use SleeperTrait;
+
     private const EXCEPTION_DELAY = 60;
 
     protected static $defaultName = 'trade-repeater:fill-monitor-rest';
@@ -47,18 +51,25 @@ final class Rest extends Command
      */
     private $orderStatus;
 
+    /**
+     * @var SleeperInterface
+     */
+    private $sleeper;
+
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,
         BuyPlacedInterface $buyPlacedInterface,
         SellPlacedInterface $sellPlacedInterface,
         GetActiveOrdersInterface $getActiveOrdersInterface,
-        OrderStatusInterface $orderStatusInterface
+        OrderStatusInterface $orderStatusInterface,
+        SleeperInterface $sleeperInterface
     ) {
         $this->shutdown = $shutdownInterface;
         $this->buyPlaced = $buyPlacedInterface;
         $this->sellPlaced = $sellPlacedInterface;
         $this->activeOrders = $getActiveOrdersInterface;
         $this->orderStatus = $orderStatusInterface;
+        $this->sleeper = $sleeperInterface;
         parent::__construct();
     }
 
@@ -67,14 +78,17 @@ final class Rest extends Command
         while ($this->shutdown->isShutdownModeEnabled() === false) {
             try {
                 $this->mainLoop($output);
-                \sleep(60);
+                $this->sleep(60, $this->sleeper, $this->shutdown);
+
             } catch (ConnectionException $e) {
-                $output->writeln("<fg=red>{$this->now()}\tConnection Exception occurred.</>");
-                \sleep(60);
+                $this->exceptionDelay($output, $e);
+
             } catch (MaintenanceException $e) {
                 $this->exceptionDelay($output, $e);
+
             } catch (SystemException $e) {
                 $this->exceptionDelay($output, $e);
+
             } catch (\Exception $e) {
                 $this->shutdown->enableShutdownMode($e);
             }
@@ -87,8 +101,8 @@ final class Rest extends Command
         $output->writeln([
             "<fg=red>{$this->now()}\t{$e->getMessage()}</>",
             "<fg=red>{$this->now()}\tSleeping ".self::EXCEPTION_DELAY." seconds</>"
-                ]);
-        \sleep(self::EXCEPTION_DELAY);
+        ]);
+        $this->sleep(self::EXCEPTION_DELAY, $this->sleeper, $this->shutdown);
     }
 
     /**

@@ -3,9 +3,11 @@
 namespace Kobens\Gemini\Command\Command\TradeRepeater\Auditor;
 
 use Kobens\Core\EmergencyShutdownInterface;
+use Kobens\Core\SleeperInterface;
 use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\FeeAndVolume\GetNotationalVolumeInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelAllSessionOrdersInterface;
+use Kobens\Gemini\Command\Command\TradeRepeater\SleeperTrait;
 use Kobens\Gemini\Exception\Api\Reason\InvalidNonceException;
 use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
 use Kobens\Gemini\Exception\Api\Reason\SystemException;
@@ -21,17 +23,11 @@ use Symfony\Component\Console\Output\OutputInterface;
  * trade repeater, this class will initiate an emergency shutdown event so
  * all trading activity is halted. Furthermore, it will use the CancelAllSessionOrdersInterface
  * to cancel all currently open sell orders placed by the TradeRepeater's Seller class.
- *
- * TODO: (The description below)
- *
- * IMPORTANT: For this class to work properly, it should utilize a unique key for the
- * GetNotationalVolumeInterface, to prevent nonce clashing with other classes.
- * **HOWEVER** it MUST use a CancelAllSessionOrdersInterface class that has been
- * instantiated with the same API key used by the Seller class (so as to only cancel those
- * sell orders).
  */
 final class BPS extends Command
 {
+    use SleeperTrait;
+
     private const SLEEP_DELAY = 600;
     private const SLEEP_EXCEPTION_DELAY = 10;
 
@@ -62,18 +58,25 @@ final class BPS extends Command
      */
     private $cancel;
 
+    /**
+     * @var SleeperInterface
+     */
+    private $sleeper;
+
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,
         GetNotationalVolumeInterface $getNotationalVolumeInterface,
         MaxBPSInterface $maxBPSInterface,
         SellPlacedInterface $sellPlacedInterface,
-        CancelAllSessionOrdersInterface $cancelAllSessionOrdersInterface
+        CancelAllSessionOrdersInterface $cancelAllSessionOrdersInterface,
+        SleeperInterface $sleeperInterface
     ) {
         $this->shutdown = $shutdownInterface;
         $this->volume = $getNotationalVolumeInterface;
         $this->maxBPS = $maxBPSInterface;
         $this->sellPlaced = $sellPlacedInterface;
         $this->cancel = $cancelAllSessionOrdersInterface;
+        $this->sleeper = $sleeperInterface;
         parent::__construct();
     }
 
@@ -81,7 +84,7 @@ final class BPS extends Command
     {
         $sleep = 0;
         while (!$this->shutdown->isShutdownModeEnabled()) {
-            \sleep($sleep);
+            $this->sleep($sleep, $this->sleeper, $this->shutdown);
             try {
                 $currentBPS = $this->volume->getVolume()->api_maker_fee_bps;
                 if ($currentBPS <= $this->maxBPS->getMaxBPS()) {

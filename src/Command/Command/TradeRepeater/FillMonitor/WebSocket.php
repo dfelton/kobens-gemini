@@ -4,9 +4,11 @@ namespace Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor;
 
 use Amp\Websocket\Client\Handshake;
 use Kobens\Core\EmergencyShutdownInterface;
+use Kobens\Core\SleeperInterface;
 use Kobens\Gemini\Api\HostInterface;
 use Kobens\Gemini\Api\KeyInterface;
 use Kobens\Gemini\Api\NonceInterface;
+use Kobens\Gemini\Command\Command\TradeRepeater\SleeperTrait;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyPlacedInterface;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellPlacedInterface;
 use Symfony\Component\Console\Command\Command;
@@ -16,6 +18,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class WebSocket extends Command
 {
+    use SleeperTrait;
+
     protected static $defaultName = 'trade-repeater:fill-monitor-websocket';
 
     /**
@@ -48,21 +52,28 @@ final class WebSocket extends Command
      */
     private $host;
 
+    /**
+     * @var SleeperInterface
+     */
+    private $sleeper;
+
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,
         HostInterface $hostInterface,
         KeyInterface $keyInterface,
         NonceInterface $nonceInterface,
         BuyPlacedInterface $buyPlacedInterface,
-        SellPlacedInterface $sellPlacedInterface
+        SellPlacedInterface $sellPlacedInterface,
+        SleeperInterface $sleeperInterface
     ) {
-        parent::__construct();
         $this->shutdown = $shutdownInterface;
         $this->host = $hostInterface;
         $this->key = $keyInterface;
         $this->nonce = $nonceInterface;
         $this->buyPlaced = $buyPlacedInterface;
         $this->sellPlaced = $sellPlacedInterface;
+        $this->sleeper = $sleeperInterface;
+        parent::__construct();
     }
 
     protected function configure()
@@ -85,7 +96,7 @@ final class WebSocket extends Command
                     "<fg=red>{$this->now()}\t{$e->getMessage()}</>",
                     "<fg=yellow>{$this->now()}\tSleeping {$reconnectDelay} seconds before next reconnect attempt.</>"
                 ]);
-                \sleep($reconnectDelay);
+                $this->sleep($reconnectDelay, $this->sleeper, $this->shutdown);
             } catch (\Exception $e) {
                 $this->shutdown->enableShutdownMode($e);
             }

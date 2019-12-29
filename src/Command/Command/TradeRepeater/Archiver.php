@@ -3,15 +3,21 @@
 namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
 use Kobens\Core\EmergencyShutdownInterface;
+use Kobens\Core\SleeperInterface;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\ArchiveInterface;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellFilledInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Adapter\Driver\ConnectionInterface;
 
 final class Archiver extends Command
 {
+    use SleeperTrait;
+
+    private const DEFAULT_DELAY = 5;
+
     protected static $defaultName = 'trade-repeater:archiver';
 
     /**
@@ -34,30 +40,42 @@ final class Archiver extends Command
      */
     private $shutdown;
 
+    /**
+     * @var SleeperInterface
+     */
+    private $sleeper;
+
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,
         SellFilledInterface $sellFilledInterface,
         ArchiveInterface $archiveInterface,
-        ConnectionInterface $connectionInterface
+        ConnectionInterface $connectionInterface,
+        SleeperInterface $sleeperInterface
     ) {
-        parent::__construct();
         $this->connection = $connectionInterface;
         $this->archive = $archiveInterface;
         $this->sellFilled = $sellFilledInterface;
         $this->shutdown = $shutdownInterface;
+        $this->sleeper = $sleeperInterface;
+        parent::__construct();
     }
 
     protected function configure()
     {
         $this->setDescription('Archives completed sell orders and marks record for next buy.');
+        $this->addOption('delay', 'd', InputOption::VALUE_OPTIONAL, 'Delay in seconds between looking for records.', self::DEFAULT_DELAY);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $delay = (int) $input->getOption('delay');
+        if ($delay <= 0) {
+            $delay = self::DEFAULT_DELAY;
+        }
         while (!$this->shutdown->isShutdownModeEnabled()) {
             try {
                 $this->mainLoop($output);
-                \sleep(1);
+                $this->sleep($delay, $this->sleeper, $this->shutdown);
             } catch (\Exception $e) {
                 $this->connection->rollback();
                 $this->shutdown->enableShutdownMode($e);
