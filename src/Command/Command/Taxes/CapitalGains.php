@@ -3,7 +3,7 @@
 namespace Kobens\Gemini\Command\Command\Taxes;
 
 use Kobens\Core\Db;
-use Kobens\Core\BinaryCalculator\Add;
+use Kobens\Math\BasicCalculator\Add;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -35,7 +35,6 @@ final class CapitalGains extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $table = new TableGateway('taxes_'.$input->getArgument('symbol').'_sell_log', Db::getAdapter());
-        $bcadd = Add::getInstance();
 
         /** @var \Zend\Db\ResultSet\ResultSetInterface $rows */
         $rows = $table->select(function (Select $select)
@@ -47,7 +46,7 @@ final class CapitalGains extends Command
         foreach ($rows as $row) {
             $data = \json_decode($row['metadata'], true);
             foreach ($data['buys'] as $transaction) {
-                $allTime = $bcadd->getResult($allTime, $transaction['gain_or_loss']);
+                $allTime = Add::getResult($allTime, $transaction['gain_or_loss']);
             }
         }
         $output->writeln('All Time Capital Gain / Loss: '. $allTime);

@@ -23,6 +23,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/dfelton/kobens-exchange"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/dfelton/kobens-math"
         }
     ],
     "require": {
@@ -34,6 +38,7 @@
         "kobens/kobens-core": "dev-master",
         "kobens/kobens-currency": "dev-master",
         "kobens/kobens-exchange": "dev-master",
+        "kobens/kobens-math": "dev-master",
         "symfony/console": "^4.2",
         "zendframework/zend-config": "^3.2",
         "zendframework/zend-db": "^2.9"

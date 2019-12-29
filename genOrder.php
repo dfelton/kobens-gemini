@@ -6,21 +6,16 @@
 
 require __DIR__.'/bootstrap.php';
 
-use Kobens\Core\BinaryCalculator\Add;
-use Kobens\Core\BinaryCalculator\Multiply;
-use Kobens\Core\BinaryCalculator\Subtract;
-use Kobens\Gemini\Api\Rest\Request\Order\Placement\NewOrder;
+use Kobens\Exchange\TradeStrategies\Repeater\NewOrder;
+use Kobens\Gemini\Exchange;
+use Kobens\Gemini\Api\Param\Amount;
+use Kobens\Gemini\Api\Param\ClientOrderId;
+use Kobens\Gemini\Api\Param\Price;
 use Kobens\Gemini\Api\Param\Side;
 use Kobens\Gemini\Api\Param\Symbol;
-use Kobens\Gemini\Api\Param\Amount;
-use Kobens\Gemini\Api\Param\Price;
-use Kobens\Gemini\Api\Param\ClientOrderId;
-use Kobens\Gemini\Exchange;
-use Kobens\Gemini\Api\Rest\Request\Funds\Balances;
-
-$bcAdd = Add::getInstance();
-$bcMul = Multiply::getInstance();
-$bcSub = Subtract::getInstance();
+use Kobens\Math\BasicCalculator\Add;
+use Kobens\Math\BasicCalculator\Multiply;
+use Kobens\Math\BasicCalculator\Subtract;
 
 
 $buyBtc  = '0.00005';
@@ -33,7 +28,7 @@ $action = ''; // 'buy' | 'sell'
 
 
 $cashLimit     =  null;
-$sellBtc       =  $bcSub->getResult($buyBtc, $saveBtc);
+$sellBtc       =  Subtract::getResult($buyBtc, $saveBtc);
 $increment     =  '2.50';
 $sellAfterGain =  '0.025';
 
@@ -47,15 +42,15 @@ $buyPrice = $start;
 
 while (\floatval($buyPrice) <= \floatval($end)) {
 
-    $amountUsd = $bcMul->getResult($buyBtc, $buyPrice);
+    $amountUsd = Multiply::getResult($buyBtc, $buyPrice);
     if (\floatval($amountUsd) === \floatval(0)) {
         throw new Exception('Invalid amount');
     }
 
-    $fee = $bcMul->getResult($amountUsd, $feePercent);
-    $holdFee = $bcAdd->getResult($holdFee, $bcMul->getResult($amountUsd, $holdPercent));
+    $fee = Multiply::getResult($amountUsd, $feePercent);
+    $holdFee = Add::getResult($holdFee, Multiply::getResult($amountUsd, $holdPercent));
 
-    if (\is_string($cashLimit) && \floatval($bcSub->getResult($cashLimit, $bcAdd->getResult($totalBuyUsd, $bcAdd->getResult($totalBuyFees, $bcAdd->getResult($fee, $amountUsd))))) < 0) {
+    if (\is_string($cashLimit) && \floatval(Subtract::getResult($cashLimit, Add::getResult($totalBuyUsd, Add::getResult($totalBuyFees, Add::getResult($fee, $amountUsd))))) < 0) {
         break;
     }
 
@@ -81,18 +76,18 @@ while (\floatval($buyPrice) <= \floatval($end)) {
         : \bcadd($sellPriceRoundedDown, '.01', 2);
     $sellPrice = \bcadd($buyPrice, $sellPrice, 2);
 
-    $sellSubtotalUsd = $bcMul->getResult($sellPrice, $sellBtc);
-    $sellFeeUsd = $bcMul->getResult($sellSubtotalUsd, $feePercent);
-    $sellYieldUsd = $bcSub->getResult($sellSubtotalUsd, $sellFeeUsd);
+    $sellSubtotalUsd = Multiply::getResult($sellPrice, $sellBtc);
+    $sellFeeUsd = Multiply::getResult($sellSubtotalUsd, $feePercent);
+    $sellYieldUsd = Subtract::getResult($sellSubtotalUsd, $sellFeeUsd);
 
-    $positionProfitUsd = $bcSub->getResult($sellYieldUsd, $bcAdd->getResult($amountUsd, $fee));
+    $positionProfitUsd = Subtract::getResult($sellYieldUsd, Add::getResult($amountUsd, $fee));
 
     $data = [
         'buy_price' => $buyPrice,
         'buy_amount_usd' => $amountUsd,
         'buy_amount_btc' => $buyBtc,
         //'buy_fee' => $fee,
-        'buy_usd_with_fee' => $bcAdd->getResult($amountUsd, $fee),
+        'buy_usd_with_fee' => Add::getResult($amountUsd, $fee),
         'sell_price' => $sellPrice,
         //'sell_amount_usd' => $sellSubtotalUsd,
         'sell_amount_btc' => $sellBtc,
@@ -104,17 +99,17 @@ while (\floatval($buyPrice) <= \floatval($end)) {
 
     $orders[] = $data;
 
-    $totalBuyFees = $bcAdd->getResult($totalBuyFees, $fee);
-    $totalBuyUsd  = $bcAdd->getResult($totalBuyUsd, $amountUsd);
-    $totalBuyBtc  = $bcAdd->getResult($totalBuyBtc, $buyBtc);
+    $totalBuyFees = Add::getResult($totalBuyFees, $fee);
+    $totalBuyUsd  = Add::getResult($totalBuyUsd, $amountUsd);
+    $totalBuyBtc  = Add::getResult($totalBuyBtc, $buyBtc);
 
-    $totalSellBtc  = $bcAdd->getResult($totalSellBtc, $sellBtc);
-    $totalSellFees = $bcAdd->getResult($totalSellFees, $sellFeeUsd);
-    $totalSellUsd  = $bcAdd->getResult($totalSellUsd, $sellSubtotalUsd);
+    $totalSellBtc  = Add::getResult($totalSellBtc, $sellBtc);
+    $totalSellFees = Add::getResult($totalSellFees, $sellFeeUsd);
+    $totalSellUsd  = Add::getResult($totalSellUsd, $sellSubtotalUsd);
 
-    $totalProfitUsd = $bcAdd->getResult($totalProfitUsd, $positionProfitUsd);
- 
-    $buyPrice = $bcAdd->getResult($buyPrice, $increment);
+    $totalProfitUsd = Add::getResult($totalProfitUsd, $positionProfitUsd);
+
+    $buyPrice = Add::getResult($buyPrice, $increment);
 
     if (\floatval($buyPrice) > \floatval($end)) {
         break;
@@ -129,7 +124,7 @@ if ($action === 'buy' || $action === 'sell') {
     if ($action === 'buy') {
         foreach ($funds as $fund) {
             if ($fund->currency === 'USD') {
-                $amountRequired = $bcAdd->getResult($totalBuyUsd, $holdFee);
+                $amountRequired = Add::getResult($totalBuyUsd, $holdFee);
                 if (\floatval($fund->available) < \floatval($amountRequired)) {
                     echo "\nInsufficient funds for orders.\nRequired: {$amountRequired}\nAvailable: {$fund->available}\n";
                     exit(1);
@@ -157,7 +152,7 @@ if ($action === 'buy' || $action === 'sell') {
             new Price($orders[$i]["{$action}_price"]),
             new ClientOrderId()
         );
-    
+
         $response = $order->getResponse();
         $response['body'] = \json_decode($response['body']);
         if ($response['code'] !== 200) {
@@ -180,9 +175,9 @@ if ($action === 'buy' || $action === 'sell') {
     'order_last' => \count($orders) > 1 ? \end($orders) : null,
     'order_count' => \count($orders),
     'buy_btc' => $totalBuyBtc,
-    'buy_usd_hold' => $bcAdd->getResult($totalBuyUsd, $holdFee),
+    'buy_usd_hold' => Add::getResult($totalBuyUsd, $holdFee),
     'sell_btc' => $totalSellBtc,
     'total_profit_usd' => $totalProfitUsd,
-    'total_profit_btc' => $bcMul->getResult(\count($orders), $saveBtc),
+    'total_profit_btc' => Multiply::getResult(\count($orders), $saveBtc),
 ]);
 

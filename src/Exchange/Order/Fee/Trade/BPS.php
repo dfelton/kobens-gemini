@@ -2,6 +2,8 @@
 
 namespace Kobens\Gemini\Exchange\Order\Fee\Trade;
 
+use Kobens\Math\BasicCalculator\Multiply;
+
 final class BPS
 {
     private $knownRates = [
@@ -50,10 +52,9 @@ final class BPS
      */
     public function getRate(string $baseAmount, string $quoteRate, string $feeAmount): string
     {
-        $bcmul = \Kobens\Core\BinaryCalculator\Multiply::getInstance();
-        $quoteAmount = $bcmul->getResult($baseAmount, $quoteRate);
+        $quoteAmount = Multiply::getResult($baseAmount, $quoteRate);
         foreach ($this->knownRates as $rate) {
-            $result = $bcmul->getResult($quoteAmount, $rate);
+            $result = Multiply::getResult($quoteAmount, $rate);
             if ($result === $feeAmount) {
                 return $rate;
             }

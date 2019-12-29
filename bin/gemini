@@ -5,8 +5,6 @@ use Kobens\Core\Cache;
 use Kobens\Core\Config;
 use Kobens\Core\Db;
 use Kobens\Core\EmergencyShutdown;
-use Kobens\Core\BinaryCalculator\Compare;
-use Kobens\Core\BinaryCalculator\Subtract;
 use Kobens\Core\Http\Request\Throttler;
 use Kobens\Core\Http\Request\Throttler\Adapter\MariaDb;
 use Kobens\Gemini\Exchange;
@@ -192,8 +190,6 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Auditor\SellPrice(
         $nonceInterface
     ),
     new CancelOrder($hostInterface, $privateThrottlerInterface, $sellAuditorKey, $nonceInterface),
-    Subtract::getInstance(),
-    Compare::getInstance(),
     $adapter
 ));
 unset($sellAuditorKey);

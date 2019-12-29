@@ -3,7 +3,7 @@
 namespace Kobens\Gemini\Command\Command\Taxes;
 
 use Kobens\Core\Db;
-use Kobens\Core\BinaryCalculator\Add;
+use Kobens\Math\BasicCalculator\Add;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -33,7 +33,6 @@ final class Form8949 extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $bcadd = Add::getInstance();
         $capitalGains = [
             'assetsSold' => '0',
             'totalProceeds' => '0',
@@ -50,17 +49,17 @@ final class Form8949 extends Command
                 $this->outputHeaders($output);
             }
 
-            $capitalGains['assetsSold'] = $bcadd->getResult($capitalGains['assetsSold'], $row['amount']);
-            $capitalGains['totalProceeds'] = $bcadd->getResult($capitalGains['totalProceeds'], $row['proceeds']);
+            $capitalGains['assetsSold'] = Add::getResult($capitalGains['assetsSold'], $row['amount']);
+            $capitalGains['totalProceeds'] = Add::getResult($capitalGains['totalProceeds'], $row['proceeds']);
 
             if ($this->isLongTerm($row['buy_date'], $row['sell_date'])) {
                 $capitalGains['long'][] = $row;
-                $capitalGains['longTotal'] = $bcadd->getResult($capitalGains['longTotal'], $row['capital_gain']);
+                $capitalGains['longTotal'] = Add::getResult($capitalGains['longTotal'], $row['capital_gain']);
 
 
             } else {
                 $capitalGains['short'][] = $row;
-                $capitalGains['shortTotal'] = $bcadd->getResult($capitalGains['shortTotal'], $row['capital_gain']);
+                $capitalGains['shortTotal'] = Add::getResult($capitalGains['shortTotal'], $row['capital_gain']);
             }
 
             if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {

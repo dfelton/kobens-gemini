@@ -3,8 +3,6 @@
 namespace Kobens\Gemini\Command\Command\TradeRepeater\Auditor;
 
 use Kobens\Core\EmergencyShutdownInterface;
-use Kobens\Core\BinaryCalculator\Compare;
-use Kobens\Core\BinaryCalculator\Subtract;
 use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Market\GetPriceInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelOrderInterface;
@@ -12,22 +10,20 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
 use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
 use Kobens\Gemini\Exception\Api\Reason\SystemException;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellPlacedInterface;
+use Kobens\Math\PercentDifference;
+use Kobens\Math\BasicCalculator\Compare;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\TableGateway\TableGateway;
 
-/**
- * FIXME: This currently only works well for USD quoted trading pairs.
- * TODO:  Need to use a percentage based spread rather than fixed amount
- */
 final class SellPrice extends Command
 {
     private const EXCEPTION_DELAY = 60;
 
     private const MIN_AGE    = 1800;  // 30 minutes
-    private const MIN_SPREAD = '200';
+    private const MIN_SPREAD = '2';   // Percentage
 
     protected static $defaultName = 'trade-repeater:audit:sell-price';
 
@@ -57,16 +53,6 @@ final class SellPrice extends Command
     private $cancelOrder;
 
     /**
-     * @var Subtract
-     */
-    private $bcsub;
-
-    /**
-     * @var Compare
-     */
-    private $bccomp;
-
-    /**
      * @var \Zend\Db\Adapter\Driver\ConnectionInterface
      */
     private $connection;
@@ -82,8 +68,6 @@ final class SellPrice extends Command
         GetPriceInterface $getPriceInterface,
         OrderStatusInterface $orderStatusInterface,
         CancelOrderInterface $cancelOrderInterface,
-        Subtract $bcsub,
-        Compare $bccomp,
         \Zend\Db\Adapter\Adapter $adapter
     ) {
         $this->shutdown = $shutdownInterface;
@@ -91,8 +75,6 @@ final class SellPrice extends Command
         $this->getPrice = $getPriceInterface;
         $this->orderStatus = $orderStatusInterface;
         $this->cancelOrder = $cancelOrderInterface;
-        $this->bcsub = $bcsub;
-        $this->bccomp = $bccomp;
         $this->connection = $adapter->getDriver()->getConnection();
         $this->table = new TableGateway('trade_repeater', $adapter);
         parent::__construct();
@@ -191,8 +173,8 @@ final class SellPrice extends Command
 
     private function isSpreadOverThreshold(string $symbol, string $ask): bool
     {
-        $difference = $this->bcsub->getResult($ask, $this->getPrice->getAsk($symbol));
-        return $this->bccomp->getResult($difference, self::MIN_SPREAD) === Compare::LEFT_GREATER_THAN;
+        $difference = PercentDifference::getResult($this->getPrice->getAsk($symbol), $ask);
+        return Compare::getResult($difference, self::MIN_SPREAD) === Compare::LEFT_GREATER_THAN;
     }
 
     private function now(): string

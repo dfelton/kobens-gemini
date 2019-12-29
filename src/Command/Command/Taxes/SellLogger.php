@@ -3,11 +3,11 @@
 namespace Kobens\Gemini\Command\Command\Taxes;
 
 use Kobens\Core\Db;
-use Kobens\Core\BinaryCalculator\Add;
-use Kobens\Core\BinaryCalculator\Compare;
-use Kobens\Core\BinaryCalculator\Multiply;
-use Kobens\Core\BinaryCalculator\Subtract;
 use Kobens\Gemini\Exchange\Order\Fee\Trade\BPS;
+use Kobens\Math\BasicCalculator\Add;
+use Kobens\Math\BasicCalculator\Compare;
+use Kobens\Math\BasicCalculator\Multiply;
+use Kobens\Math\BasicCalculator\Subtract;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,6 +15,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
 
+/**
+ * TODO: Waaaay too much going on here for one class.
+ */
 final class SellLogger extends Command
 {
 
@@ -62,10 +65,6 @@ final class SellLogger extends Command
 
         $this->symbol = $input->getArgument('symbol');
         $bps = BPS::getInstance();
-        $bccomp = Compare::getInstance();
-        $bcmul = Multiply::getInstance();
-        $bcsub = Subtract::getInstance();
-        $bcadd = Add::getInstance();
         do {
             $rows = $this->getSellRecordsToLog();
             foreach ($rows as $sell) {
@@ -81,10 +80,10 @@ final class SellLogger extends Command
                             throw \Exception('missing buy order to match with sell.');
                         }
 
-                        switch ($bccomp->getResult($sellRemaining, $buy['amount_remaining'])) {
+                        switch (Compare::getResult($sellRemaining, $buy['amount_remaining'])) {
                             case Compare::RIGHT_GREATER_THAN: // buy is larger than sell remaining
                                 $logAmount = $sellRemaining;
-                                $buyRemaining = $bcsub->getResult($buy['amount_remaining'], $sellRemaining);
+                                $buyRemaining = Subtract::getResult($buy['amount_remaining'], $sellRemaining);
                                 $sellRemaining = '0';
                                 break;
 
@@ -97,7 +96,7 @@ final class SellLogger extends Command
                             case Compare::LEFT_GREATER_THAN: // sell remaining is larger than buy
                                 $logAmount = $buy['amount_remaining'];
                                 $buyRemaining = '0';
-                                $sellRemaining = $bcsub->getResult($sellRemaining, $buy['amount_remaining']);
+                                $sellRemaining = Subtract::getResult($sellRemaining, $buy['amount_remaining']);
                                 break;
 
                             default:
@@ -107,34 +106,34 @@ final class SellLogger extends Command
                         $sellFeePercent = $bps->getRate($sell['amount'], $sell['price'], $sell['fee_amount']);
                         $buyFeePercent  = $bps->getRate($buy['amount'], $buy['price'], $buy['fee_amount']);
 
-                        $buyToLogQuoteAmount  = $bcmul->getResult($logAmount, $buy['price']);
-                        $buyToLogFee          = $bcmul->getResult($buyToLogQuoteAmount, $buyFeePercent);
-                        $sellToLogQuoteAmount = $bcmul->getResult($logAmount, $sell['price']);
-                        $sellToLogFee         = $bcmul->getResult($sellToLogQuoteAmount, $sellFeePercent);
+                        $buyToLogQuoteAmount  = Multiply::getResult($logAmount, $buy['price']);
+                        $buyToLogFee          = Multiply::getResult($buyToLogQuoteAmount, $buyFeePercent);
+                        $sellToLogQuoteAmount = Multiply::getResult($logAmount, $sell['price']);
+                        $sellToLogFee         = Multiply::getResult($sellToLogQuoteAmount, $sellFeePercent);
 
-                        $costBasis   = $bcadd->getResult($buyToLogQuoteAmount, $buyToLogFee);
-                        $proceeds    = $bcsub->getResult($sellToLogQuoteAmount, $sellToLogFee);
-                        $capitalGain = $bcsub->getResult($proceeds, $costBasis);
+                        $costBasis   = Add::getResult($buyToLogQuoteAmount, $buyToLogFee);
+                        $proceeds    = Subtract::getResult($sellToLogQuoteAmount, $sellToLogFee);
+                        $capitalGain = Subtract::getResult($proceeds, $costBasis);
 
-                        if ($bccomp->getResult($logAmount, '0') === Compare::RIGHT_GREATER_THAN) {
+                        if (Compare::getResult($logAmount, '0') === Compare::RIGHT_GREATER_THAN) {
                             throw new \LogicException('Negative Log Amount');
                         }
-                        if ($bccomp->getResult($costBasis, '0') === Compare::RIGHT_GREATER_THAN) {
+                        if (Compare::getResult($costBasis, '0') === Compare::RIGHT_GREATER_THAN) {
                             throw new \LogicException('Negative Cost Basis');
                         }
-                        if ($bccomp->getResult($proceeds, '0') === Compare::RIGHT_GREATER_THAN) {
+                        if (Compare::getResult($proceeds, '0') === Compare::RIGHT_GREATER_THAN) {
                             throw new \LogicException('Negative Proceeds');
                         }
-                        if ($bccomp->getResult($sellToLogFee, '0') === Compare::RIGHT_GREATER_THAN) {
+                        if (Compare::getResult($sellToLogFee, '0') === Compare::RIGHT_GREATER_THAN) {
                             throw new \LogicException('Negative Sell Fee');
                         }
-                        if ($bccomp->getResult($buyToLogFee, '0') === Compare::RIGHT_GREATER_THAN) {
+                        if (Compare::getResult($buyToLogFee, '0') === Compare::RIGHT_GREATER_THAN) {
                             throw new \LogicException('Negative Buy Fee');
                         }
-                        if ($bccomp->getResult($sellRemaining, '0') === Compare::RIGHT_GREATER_THAN) {
+                        if (Compare::getResult($sellRemaining, '0') === Compare::RIGHT_GREATER_THAN) {
                             throw new \LogicException('Negative Sell Remaining Amount');
                         }
-                        if ($bccomp->getResult($buyRemaining, '0') === Compare::RIGHT_GREATER_THAN) {
+                        if (Compare::getResult($buyRemaining, '0') === Compare::RIGHT_GREATER_THAN) {
                             throw new \LogicException('Negative Buy Remaining Amount');
                         }
 
@@ -166,7 +165,7 @@ final class SellLogger extends Command
                         unset($logAmount);
                         unset($buy);
 
-                    } while ($bccomp->getResult($sellRemaining, '0') !== Compare::EQUAL);
+                    } while (Compare::getResult($sellRemaining, '0') !== Compare::EQUAL);
 
                     $output->writeln(\sprintf('Commiting data for sale of transaction id %s', $sell['tid']));
 
