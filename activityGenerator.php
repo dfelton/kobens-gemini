@@ -63,10 +63,10 @@ function getRange(\Zend\Db\Adapter\Adapter $adapter): array
 
 function getAmount(): string
 {
-    $overOneBtc = \rand(0, 100) > 98;
+    $overOneBtc = \rand(0, 100) > 60;
     $whole = $overOneBtc ? (string) \rand(1, 5) : '0';
     $satoshi = (string) (\rand(1, 10) > 1 ? \rand(1000, 999999): \rand(1000, 49999999));
-    $satoshi = \str_pad($satoshi, 8, \STR_PAD_LEFT);
+    $satoshi = \str_pad($satoshi, 8, '0', \STR_PAD_LEFT);
     return "$whole.$satoshi";
 }
 
