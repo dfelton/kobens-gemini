@@ -183,6 +183,7 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Archiver(
     $sleeperInterface
 ));
 
+
 $sellAuditorKey = new Key(
     $config->get('gemini')->keys->trade_repeater->auditor_sell_price->public,
     $config->get('gemini')->keys->trade_repeater->auditor_sell_price->secret
@@ -202,6 +203,27 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Auditor\SellPrice(
     $sleeperInterface
 ));
 unset($sellAuditorKey);
+
+
+$buyAuditorKey = new Key(
+    $config->get('gemini')->keys->trade_repeater->auditor_buy_price->public,
+    $config->get('gemini')->keys->trade_repeater->auditor_buy_price->secret
+);
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Auditor\BuyPrice(
+    $shutdownInterface,
+    $buyPlacedInterface,
+    $getPriceInterface,
+    new OrderStatus(
+        $hostInterface,
+        $privateThrottlerInterface,
+        $buyAuditorKey,
+        $nonceInterface
+    ),
+    new CancelOrder($hostInterface, $privateThrottlerInterface, $buyAuditorKey, $nonceInterface),
+    $adapter,
+    $sleeperInterface
+));
+unset($buyAuditorKey);
 
 
 // $app->add(new \Kobens\Gemini\Command\Command\Taxes\CapitalGains()); // @deprecated

@@ -25,6 +25,11 @@
                     <public>account-00000000000000000000</public>
                     <secret>0000000000000000000000000000</secret>
                 </auditor_sell_price>
+                <auditor_buy_price>
+                    <!-- Required Permissions: Trading  -->
+                    <public>account-00000000000000000000</public>
+                    <secret>0000000000000000000000000000</secret>
+                </auditor_buy_price>
                 <fill_monitor_rest>
                     <!-- Required Permissions: Auditor  -->
                     <public>account-00000000000000000000</public>
