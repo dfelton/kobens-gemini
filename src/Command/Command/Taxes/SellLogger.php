@@ -3,20 +3,24 @@
 namespace Kobens\Gemini\Command\Command\Taxes;
 
 use Kobens\Core\Db;
+use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\Exchange\Order\Fee\Trade\BPS;
 use Kobens\Math\BasicCalculator\Add;
 use Kobens\Math\BasicCalculator\Compare;
 use Kobens\Math\BasicCalculator\Multiply;
 use Kobens\Math\BasicCalculator\Subtract;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
 
 /**
  * TODO: Waaaay too much going on here for one class.
+ * TODO: Unable to handle if we send currency into / out of exchange.
+ * TODO: Unable to handle if we perform any crypto to crypto transactions.
+ * TODO: both the sell-logger and buy-logger should be able to pick up where it left off rather than truncating
  */
 final class SellLogger extends Command
 {
@@ -45,25 +49,24 @@ final class SellLogger extends Command
 
     protected function configure()
     {
-        $this->addArgument('symbol', InputArgument::REQUIRED);
+        $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Trading Pair Symbol', 'btcusd');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $conn = Db::getAdapter()->getDriver()->getConnection();
+        $pair = Pair::getInstance($input->getOption('symbol'));
+        $this->symbol = $pair->getSymbol();
 
-        // TODO: needs dynamic table name
         $output->writeln('Truncating existing tables');
-        $conn->execute('TRUNCATE taxes_btcusd_buy_log;');
-        $conn->execute('TRUNCATE taxes_btcusd_sell_log;');
+        $conn->execute("TRUNCATE taxes_{$pair->getSymbol()}_buy_log;");
+        $conn->execute("TRUNCATE taxes_{$pair->getSymbol()}_sell_log;");
 
-        // TODO: Don't like this either
         $output->writeln('Populating buy table');
         $buyLogger = new BuyLogger();
         $buyLogger->setApplication($this->getApplication());
         $buyLogger->run($input, $output);
 
-        $this->symbol = $input->getArgument('symbol');
         $bps = BPS::getInstance();
         do {
             $rows = $this->getSellRecordsToLog();
