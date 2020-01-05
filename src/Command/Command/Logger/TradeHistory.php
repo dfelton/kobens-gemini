@@ -64,7 +64,7 @@ final class TradeHistory extends Command
     protected function configure()
     {
         $this->setDescription('Maintains The trading history for a specified symbol.');
-        $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Symbol to fetch history for.',         self::DEFAULT_SYMBOL);
+        $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Symbol to fetch history for.', self::DEFAULT_SYMBOL);
         $this->addOption('delay',  'd', InputOption::VALUE_OPTIONAL, \sprintf(
                 'Time in seconds to delay between requests when up to date. (%d - %d)',
                 self::MIN_DELAY, self::MAX_DELAY
