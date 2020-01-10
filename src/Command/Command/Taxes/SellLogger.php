@@ -5,6 +5,7 @@ namespace Kobens\Gemini\Command\Command\Taxes;
 use Kobens\Core\Db;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\Exchange\Order\Fee\Trade\BPS;
+use Kobens\Gemini\Taxes\GetUnsoldBuysFactoryInterface;
 use Kobens\Math\BasicCalculator\Add;
 use Kobens\Math\BasicCalculator\Compare;
 use Kobens\Math\BasicCalculator\Multiply;
@@ -13,10 +14,12 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
 
 /**
+ * TODO  Change Logic to calculate aggregates
  * TODO: Waaaay too much going on here for one class.
  * TODO: Unable to handle if we send currency into / out of exchange.
  * TODO: Unable to handle if we perform any crypto to crypto transactions.
@@ -33,9 +36,14 @@ final class SellLogger extends Command
     private $tblSellLog;
 
     /**
-     * @var TableGateway
+     * @var Adapter
      */
-    private $tblBuyLog;
+    private $adapter;
+
+    /**
+     * @var GetUnsoldBuysFactoryInterface
+     */
+    private $getUnsoldBuysFactory;
 
     /**
      * @var TableGateway
@@ -47,6 +55,14 @@ final class SellLogger extends Command
      */
     private $symbol;
 
+    public function __construct(
+        Adapter $adapter,
+        GetUnsoldBuysFactoryInterface $getUnsoldBuysFactoryInterface
+    ) {
+        $this->adapter = $adapter;
+        parent::__construct();
+    }
+
     protected function configure()
     {
         $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Trading Pair Symbol', 'btcusd');
@@ -54,7 +70,7 @@ final class SellLogger extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $conn = Db::getAdapter()->getDriver()->getConnection();
+        $conn = $this->adapter->getDriver()->getConnection();
         $pair = Pair::getInstance($input->getOption('symbol'));
         $this->symbol = $pair->getSymbol();
 
@@ -72,21 +88,20 @@ final class SellLogger extends Command
             $rows = $this->getSellRecordsToLog();
             foreach ($rows as $sell) {
 
-                $buyIds = [];
                 $sellRemaining = $sell['amount'];
 
                 try {
                     $conn->beginTransaction();
                     do {
-                        $buy = $this->getNextBuyForSale($buyIds);
-                        if ($buy === []) {
+                        $buy = $this->getNextBuyForSale();
+                        if ($buy === null) {
                             throw \Exception('missing buy order to match with sell.');
                         }
 
-                        switch (Compare::getResult($sellRemaining, $buy['amount_remaining'])) {
+                        switch (Compare::getResult($sellRemaining, $buy->amount_remaining)) {
                             case Compare::RIGHT_GREATER_THAN: // buy is larger than sell remaining
                                 $logAmount = $sellRemaining;
-                                $buyRemaining = Subtract::getResult($buy['amount_remaining'], $sellRemaining);
+                                $buyRemaining = Subtract::getResult($buy->amount_remaining, $sellRemaining);
                                 $sellRemaining = '0';
                                 break;
 
@@ -97,9 +112,9 @@ final class SellLogger extends Command
                                 break;
 
                             case Compare::LEFT_GREATER_THAN: // sell remaining is larger than buy
-                                $logAmount = $buy['amount_remaining'];
+                                $logAmount = $buy->amount_remaining;
                                 $buyRemaining = '0';
-                                $sellRemaining = Subtract::getResult($sellRemaining, $buy['amount_remaining']);
+                                $sellRemaining = Subtract::getResult($sellRemaining, $buy->amount_remaining);
                                 break;
 
                             default:
@@ -107,9 +122,9 @@ final class SellLogger extends Command
                         }
 
                         $sellFeePercent = $bps->getRate($sell['amount'], $sell['price'], $sell['fee_amount']);
-                        $buyFeePercent  = $bps->getRate($buy['amount'], $buy['price'], $buy['fee_amount']);
+                        $buyFeePercent  = $bps->getRate($buy->amount, $buy->price, $buy->fee_amount);
 
-                        $buyToLogQuoteAmount  = Multiply::getResult($logAmount, $buy['price']);
+                        $buyToLogQuoteAmount  = Multiply::getResult($logAmount, $buy->price);
                         $buyToLogFee          = Multiply::getResult($buyToLogQuoteAmount, $buyFeePercent);
                         $sellToLogQuoteAmount = Multiply::getResult($logAmount, $sell['price']);
                         $sellToLogFee         = Multiply::getResult($sellToLogQuoteAmount, $sellFeePercent);
@@ -147,14 +162,12 @@ final class SellLogger extends Command
 
                         $this->getSellLogTable()->insert([
                             'sell_tid' => $sell['tid'],
-                            'buy_tid' => $buy['tid'],
+                            'buy_tid' => $buy->tid,
                             'amount' => $logAmount,
                             'cost_basis' => $costBasis,
                             'proceeds' => $proceeds,
                             'capital_gain' => $capitalGain,
                         ]);
-
-                        $buyIds[] = $buy['tid'];
 
                         unset($capitalGain);
                         unset($proceeds);
@@ -184,14 +197,12 @@ final class SellLogger extends Command
         $output->writeln('Sale Data Generated');
     }
 
-    private function getNextBuyForSale(array $omitTransactionIds = []): array
+    private function getNextBuyForSale(): array
     {
-        $rows = $this->getBuyLogTable()->select(function (Select $select) use ($omitTransactionIds)
+        $rows = $this->getBuyLogTable()->select(function (Select $select)
         {
             $select->where->notEqualTo('amount_remaining', '0');
-            if ($omitTransactionIds !== []) {
-                $select->where->notIn('tid', $omitTransactionIds);
-            }
+            $select->columns('amount_remaining');
             $select->order('tid ASC');
             $select->limit(1);
         });
