@@ -12,7 +12,7 @@ class GetAvailableBalances extends AbstractPrivateRequest implements GetAvailabl
     {
         $balances = \json_decode($this->getResponse()['body']);
         foreach ($balances as $balance) {
-            if ($balance->currency === $currency) {
+            if (\strtolower($balance->currency) === \strtolower($currency)) {
                 return $balance;
             }
         }
