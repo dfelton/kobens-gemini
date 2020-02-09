@@ -6,29 +6,31 @@
 
 require __DIR__.'/bootstrap.php';
 
-use Kobens\Exchange\TradeStrategies\Repeater\NewOrder;
-use Kobens\Gemini\Exchange;
-use Kobens\Gemini\Api\Param\Amount;
-use Kobens\Gemini\Api\Param\ClientOrderId;
-use Kobens\Gemini\Api\Param\Price;
-use Kobens\Gemini\Api\Param\Side;
-use Kobens\Gemini\Api\Param\Symbol;
+use Kobens\Core\Config;
+use Kobens\Core\Http\Request\Throttler;
+use Kobens\Core\Http\Request\Throttler\Adapter\MariaDb;
+use Kobens\Gemini\Api\Host;
+use Kobens\Gemini\Api\Key;
+use Kobens\Gemini\Api\Nonce;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetAvailableBalances;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\MakerOrCancel;
+use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Math\BasicCalculator\Add;
+use Kobens\Math\BasicCalculator\Compare;
 use Kobens\Math\BasicCalculator\Multiply;
 use Kobens\Math\BasicCalculator\Subtract;
 
+$pair = Pair::getInstance('btcusd');
 
-$buyBtc  = '0.00005';
-$saveBtc = '0.00000112';
+$buy  = '0.00000000';
+$save = '0.00000000';
 
-$start       = '';
-$end         = '';
-
+$start  = '';
+$end    = '';
 $action = ''; // 'buy' | 'sell'
 
 
-$cashLimit     =  null;
-$sellBtc       =  Subtract::getResult($buyBtc, $saveBtc);
+$sell          =  Subtract::getResult($buy, $save);
 $increment     =  '2.50';
 $sellAfterGain =  '0.025';
 
@@ -36,23 +38,22 @@ $feePercent    =  '0.001';
 $holdPercent   =  '0.0035';
 
 
-$holdFee = $totalProfitUsd = $totalSellBtc = $totalSellUsd = $totalSellFees = $totalBuyBtc = $totalBuyUsd = $totalBuyFees = '0';
+$holdFee = $totalProfitQuote = $totalSellBase = $totalSellQuote = $totalSellFees = $totalBuyBase = $totalBuyQuote = $totalBuyFees = '0';
 $orders = [];
 $buyPrice = $start;
 
-while (\floatval($buyPrice) <= \floatval($end)) {
+$base  = $pair->getBase();
+$quote = $pair->getQuote();
 
-    $amountUsd = Multiply::getResult($buyBtc, $buyPrice);
-    if (\floatval($amountUsd) === \floatval(0)) {
+while (Compare::getResult($buyPrice, $end) !== Compare::RIGHT_LESS_THAN) {
+
+    $amountQuote = Multiply::getResult($buy, $buyPrice);
+    if (Compare::getResult('0', $amountQuote) !== Compare::LEFT_LESS_THAN) {
         throw new Exception('Invalid amount');
     }
 
-    $fee = Multiply::getResult($amountUsd, $feePercent);
-    $holdFee = Add::getResult($holdFee, Multiply::getResult($amountUsd, $holdPercent));
-
-    if (\is_string($cashLimit) && \floatval(Subtract::getResult($cashLimit, Add::getResult($totalBuyUsd, Add::getResult($totalBuyFees, Add::getResult($fee, $amountUsd))))) < 0) {
-        break;
-    }
+    $fee = Multiply::getResult($amountQuote, $feePercent);
+    $holdFee = Add::getResult($holdFee, Multiply::getResult($amountQuote, $holdPercent));
 
     /**
      * Determine the sell price based off
@@ -64,6 +65,7 @@ while (\floatval($buyPrice) <= \floatval($end)) {
      * asset to the nearest minimum increment amount, and then increment the quote price increment by the minimum
      * allowed amount.
      */
+    // FIXME This needs to be revised to be compatible with multiple pairs
     $precision = \strlen(\substr($sellAfterGain, \strpos($sellAfterGain, '.') + 1)) * 2; // Length of gain precision * length of USD precision
 
     $sellPriceExact = \bcmul($buyPrice, $sellAfterGain, $precision);
@@ -76,108 +78,98 @@ while (\floatval($buyPrice) <= \floatval($end)) {
         : \bcadd($sellPriceRoundedDown, '.01', 2);
     $sellPrice = \bcadd($buyPrice, $sellPrice, 2);
 
-    $sellSubtotalUsd = Multiply::getResult($sellPrice, $sellBtc);
-    $sellFeeUsd = Multiply::getResult($sellSubtotalUsd, $feePercent);
-    $sellYieldUsd = Subtract::getResult($sellSubtotalUsd, $sellFeeUsd);
+    $sellSubtotalQuote = Multiply::getResult($sellPrice, $sell);
+    $sellFeeQuote      = Multiply::getResult($sellSubtotalQuote, $feePercent);
+    $sellYieldQuote    = Subtract::getResult($sellSubtotalQuote, $sellFeeQuote);
 
-    $positionProfitUsd = Subtract::getResult($sellYieldUsd, Add::getResult($amountUsd, $fee));
+    $positionProfitQuote = Subtract::getResult($sellYieldQuote, Add::getResult($amountQuote, $fee));
 
     $data = [
         'buy_price' => $buyPrice,
-        'buy_amount_usd' => $amountUsd,
-        'buy_amount_btc' => $buyBtc,
-        //'buy_fee' => $fee,
-        'buy_usd_with_fee' => Add::getResult($amountUsd, $fee),
+        "buy_amount_{$quote->getSymbol()}" => $amountQuote,
+        "buy_amount_{$base->getSymbol()}" => $buy,
+        'buy_fee' => $fee,
         'sell_price' => $sellPrice,
-        //'sell_amount_usd' => $sellSubtotalUsd,
-        'sell_amount_btc' => $sellBtc,
-        //'sell_fee' => $sellFeeUsd,
-        //'sell_yield' => $sellYieldUsd,
-        'position_profits_usd' => $positionProfitUsd,
-        'position_profits_btc' => $saveBtc
+        "sell_amount_{$base->getSymbol()}" => $sell,
+        'sell_subtotal' => $sellSubtotalQuote,
+        'sell_fee' => $sellFeeQuote,
+        "position_profits_{$quote->getSymbol()}" => $positionProfitQuote,
+        "position_profits_{$base->getSymbol()}" => $save
     ];
 
     $orders[] = $data;
 
     $totalBuyFees = Add::getResult($totalBuyFees, $fee);
-    $totalBuyUsd  = Add::getResult($totalBuyUsd, $amountUsd);
-    $totalBuyBtc  = Add::getResult($totalBuyBtc, $buyBtc);
+    $totalBuyQuote  = Add::getResult($totalBuyQuote,  $amountQuote);
+    $totalBuyBase  = Add::getResult($totalBuyBase,  $buy);
 
-    $totalSellBtc  = Add::getResult($totalSellBtc, $sellBtc);
-    $totalSellFees = Add::getResult($totalSellFees, $sellFeeUsd);
-    $totalSellUsd  = Add::getResult($totalSellUsd, $sellSubtotalUsd);
+    $totalSellBase  = Add::getResult($totalSellBase,  $sell);
+    $totalSellFees = Add::getResult($totalSellFees, $sellFeeQuote);
+    $totalSellQuote  = Add::getResult($totalSellQuote,  $sellSubtotalQuote);
 
-    $totalProfitUsd = Add::getResult($totalProfitUsd, $positionProfitUsd);
+    $totalProfitQuote = Add::getResult($totalProfitQuote, $positionProfitQuote);
 
     $buyPrice = Add::getResult($buyPrice, $increment);
 
-    if (\floatval($buyPrice) > \floatval($end)) {
-        break;
-    }
 }
 
+unset(
+    $data, $fee, $precision, $start, $end, $positionProfitQuote, $amountQuote,
+    $buy, $sell, $sellFeeQuote, $sellSubtotalQuote, $sellYieldQuote, $sellPriceExact,
+    $sellPriceRoundedDown, $sellPrice, $buyPrice, $feePercent, $holdPercent, $increment
+);
+
+
+$config = Config::getInstance();
+$hostInterface = new Host($config->get('gemini')->api->host);
+$privateThrottlerInterface = new Throttler(
+    new MariaDb(new \Zend\Db\Adapter\Adapter($config->get('database')->toArray())),
+    $hostInterface->getHost().'::private'
+);
+$keyInterface = new Key(
+    $config->get('gemini')->api->key->public_key,
+    $config->get('gemini')->api->key->secret_key
+);
+$nonceInterface = new Nonce();
+$makerOrCancel = new MakerOrCancel($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+$getAvailableBalances = new GetAvailableBalances($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+
+unset($config, $keyInterface, $hostInterface, $privateThrottlerInterface, $nonceInterface);
 
 if ($action === 'buy' || $action === 'sell') {
+    $funds = $getAvailableBalances->getCurrency(
+        ($action === 'buy' ? $quote->getSymbol() : $base->getSymbol())
+    );
 
-    // Verify funds on hand
-    $funds = \json_decode((new Balances())->getResponse()['body']);
-    if ($action === 'buy') {
-        foreach ($funds as $fund) {
-            if ($fund->currency === 'USD') {
-                $amountRequired = Add::getResult($totalBuyUsd, $holdFee);
-                if (\floatval($fund->available) < \floatval($amountRequired)) {
-                    echo "\nInsufficient funds for orders.\nRequired: {$amountRequired}\nAvailable: {$fund->available}\n";
-                    exit(1);
-                }
-                break;
-            }
-        }
-    } else {
-        foreach ($funds as $fund) {
-            if ($fund->currency === 'BTC') {
-                if (\floatval($fund->available) < \floatval($totalSellBtc)) {
-                    echo "\nInsufficient funds for orders.\nRequired: {$totalSellBtc}\nAvailable: {$fund->available}\n";
-                    exit(1);
-                }
-                break;
-            }
-        }
+    $amountRequired = $action === 'buy' ? Add::getResult($totalBuyQuote, $holdFee) : $totalSellBase;
+    if (Compare::getResult('0', Subtract::getResult($funds->available, $amountRequired)) === Compare::LEFT_GREATER_THAN) {
+        echo "\nInsufficient funds for order(s).\nRequired: {$amountRequired}\nAvailable: {$funds->available}\n";
+        exit(1);
     }
 
     for ($i = 0, $j = \count($orders); $i < $j; $i++) {
-        $order = new NewOrder(
-            new Side($action),
-            new Symbol((new Exchange())->getPair('btcusd')),
-            new Amount($orders[$i]["{$action}_amount_btc"]),
-            new Price($orders[$i]["{$action}_price"]),
-            new ClientOrderId()
+        $r = $makerOrCancel->place(
+            $pair,
+            $action,
+            $orders[$i]["{$action}_amount_{$base->getSymbol()}"],
+            $orders[$i]["{$action}_price"]
         );
 
-        $response = $order->getResponse();
-        $response['body'] = \json_decode($response['body']);
-        if ($response['code'] !== 200) {
-            \Zend\Debug\Debug::dump($response);
-            break;
-        }
-        $r = $response['body'];
-        \Zend\Debug\Debug::dump([
-            'order_id' => $r->order_id,
-            'symbol' => $r->symbol,
-            'side' => $r->side,
-            'amount' => $r->original_amount,
-            'price' => $r->price,
-        ]);
+        echo "order {$r->order_id} {$r->side} {$r->symbol} {$r->original_amount} @ {$r->price}\n";
     }
 }
 
-\Zend\Debug\Debug::dump([
-    'order_first' => $orders[0],
-    'order_last' => \count($orders) > 1 ? \end($orders) : null,
-    'order_count' => \count($orders),
-    'buy_btc' => $totalBuyBtc,
-    'buy_usd_hold' => Add::getResult($totalBuyUsd, $holdFee),
-    'sell_btc' => $totalSellBtc,
-    'total_profit_usd' => $totalProfitUsd,
-    'total_profit_btc' => Multiply::getResult(\count($orders), $saveBtc),
-]);
+\Zend\Debug\Debug::dump(
+    [
+        'order_first' => $orders[0],
+        'order_last' => \count($orders) > 1 ? \end($orders) : null,
+        'order_count' => \count($orders),
+        "buy_{$base->getSymbol()}" => $totalBuyBase,
+        "buy_{$quote->getSymbol()}_hold" => Add::getResult($totalBuyQuote, $holdFee),
+        "sell_{$quote->getSymbol()}" => $totalSellBase,
+        "total_profit_{$quote->getSymbol()}" => $totalProfitQuote,
+        "total_profit_{$base->getSymbol()}" => Multiply::getResult(\count($orders), $save),
+    ],
+    'Summary'
+);
 
