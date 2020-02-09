@@ -46,6 +46,7 @@
     <database>
         <driver>pdo_mysql</driver>
         <hostname>127.0.0.1</hostname>
+        <port>3306</port>
         <username>foo</username>
         <password>bar</password>
         <database>foobar</database>
