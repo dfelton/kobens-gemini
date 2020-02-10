@@ -2,8 +2,16 @@
 
 require __DIR__.'/bootstrap.php';
 
-use Kobens\Gemini\Api\Rest\Request\Order\Status\ActiveOrders;
-use Kobens\Gemini\Api\Rest\Request\Order\Placement\Cancel;
+use Kobens\Core\Config;
+use Kobens\Core\Http\Request\Throttler;
+use Kobens\Core\Http\Request\Throttler\Adapter\MariaDb;
+use Kobens\Gemini\Api\Host;
+use Kobens\Gemini\Api\Key;
+use Kobens\Gemini\Api\Nonce;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelOrder;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetActiveOrders;
+
+
 
 $symbol = 'btcusd';
 $side   = '';
@@ -12,9 +20,27 @@ $amount = '';
 $priceFrom = '';
 $priceTo   = '';
 
+
+
 $abort = false;
 $orderIds = [];
-foreach (\json_decode((new ActiveOrders())->getResponse()['body']) as $order) {
+
+$config = Config::getInstance();
+$hostInterface = new Host($config->get('gemini')->api->host);
+$privateThrottlerInterface = new Throttler(
+    new MariaDb(new \Zend\Db\Adapter\Adapter($config->get('database')->toArray())),
+    $hostInterface->getHost().'::private'
+);
+$keyInterface = new Key(
+    $config->get('gemini')->api->key->public_key,
+    $config->get('gemini')->api->key->secret_key
+);
+$nonceInterface = new Nonce();
+$activeOrders = new GetActiveOrders($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+$cancelOrder = new CancelOrder($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+unset ($nonceInterface, $keyInterface, $privateThrottlerInterface, $hostInterface, $config);
+
+foreach ($activeOrders->getOrders() as $order) {
     if (   $order->symbol === $symbol
         && $order->side === $side
         && $order->original_amount === $amount
@@ -45,13 +71,8 @@ if (   isset($_SERVER['argv'][1]) && $_SERVER['argv'][1] === 'confirm'
     echo "Starting cancellation in 10 seconds...\n";
     \sleep(10);
     foreach ($orderIds as $orderId) {
-        $response = (new Cancel($orderId))->getResponse();
-        $response['body'] = \json_decode($response['body']);
-        if ($response['code'] !== 200) {
-            \Zend\Debug\Debug::dump($response);
-            exit(1);
-        }
-        echo "Order ID {$response['body']->order_id} at price of {$response['body']->price} cancelled.\n";
+        $response = $cancelOrder->cancel($orderId);
+        echo "Order ID {$response->order_id} at price of {$response->price} cancelled.\n";
     }
 } else {
     echo "Cancellation confirmation not detected. No action taken\n";
