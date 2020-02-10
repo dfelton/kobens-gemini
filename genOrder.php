@@ -158,14 +158,19 @@ if ($action === 'buy' || $action === 'sell') {
             $orders[$i]["{$action}_amount_{$base->getSymbol()}"],
             $orders[$i]["{$action}_price"]
         );
-        echo "order {$r->order_id} {$r->side} {$r->symbol} {$r->original_amount} @ {$r->price}\n";
+        if ($r->is_live) {
+            echo "order {$r->order_id} {$r->side} {$r->symbol} {$r->original_amount} @ {$r->price}\n";
+        } else {
+            \Zend\Debug\Debug::dump($r, 'Order Not Live:');
+            exit(1);
+        }
     }
 }
 
 \Zend\Debug\Debug::dump(
     [
-        'order_first' => $action === 'buy' ? $orders[0] : \end($orders),
-        'order_last' => \count($orders) > 1 ? ($action === 'buy' ? \end($orders) : \reset($orders)) : null,
+        'order_first' => $action === 'sell' ? \end($orders) : $orders[0],
+        'order_last' => \count($orders) > 1 ? ($action === 'sell' ? \reset($orders) : \end($orders)) : null,
         'order_count' => \count($orders),
         "buy_{$base->getSymbol()}" => $totalBuyBase,
         "buy_{$quote->getSymbol()}_hold" => Add::getResult($totalBuyQuote, $holdFee),
@@ -175,4 +180,6 @@ if ($action === 'buy' || $action === 'sell') {
     ],
     'Summary'
 );
+
+exit(0);
 
