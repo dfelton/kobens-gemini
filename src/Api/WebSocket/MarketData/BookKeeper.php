@@ -47,7 +47,7 @@ final class BookKeeper extends AbstractKeeper
         $websocketUrl = $this->getWebSocketUrl();
         return function () use ($websocketUrl)
         {
-            /** @var \Amp\Websocket\Connection $connection */
+            /** @var \Amp\Websocket\Client\Rfc6455Connection $connection */
             /** @var \Amp\Websocket\Message $message */
             $connection = yield \Amp\Websocket\Client\connect($websocketUrl);
             while ($message = yield $connection->receive()) {
