@@ -1,7 +1,3 @@
---
--- TODO: Implement a install/upgrade approach better than this
---
-
 
 
 DROP TABLE IF EXISTS `trade_repeater`;
@@ -62,7 +58,7 @@ CREATE TABLE `trade_repeater_profit_summary` (
 
 
 DROP TABLE IF EXISTS `trade_history_btcusd`;
-CREATE TABLE `trade_history_btcusd` (
+CREATE TABLE IF NOT EXISTS `trade_history_btcusd` (
     `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
     `price` VARCHAR(50) NOT NULL COMMENT 'Price',
     `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
@@ -78,6 +74,39 @@ CREATE TABLE `trade_history_btcusd` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History BTCUSD';
 
 
+DROP TABLE IF EXISTS `trade_history_ethusd`;
+CREATE TABLE IF NOT EXISTS `trade_history_ethusd` (
+    `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+    `price` VARCHAR(50) NOT NULL COMMENT 'Price',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `timestampms` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Timestamp Milliseconds',
+    `type` VARCHAR(4) NOT NULL COMMENT 'Type',
+    `aggressor` TINYINT(1) NOT NULL COMMENT 'Aggressor',
+    `fee_currency` VARCHAR(10) NOT NULL COMMENT 'Fee Currency',
+    `fee_amount` VARCHAR(50) NOT NULL COMMENT 'Fee Amount',
+    `order_id` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Order Id',
+    `client_order_id` VARCHAR(100) DEFAULT NULL,
+    `trade_date` TIMESTAMP(3) NOT NULL COMMENT 'Trade Date',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History ETHUSD';
+
+
+DROP TABLE IF EXISTS `trade_history_zecusd`;
+CREATE TABLE IF NOT EXISTS `trade_history_zecusd` (
+    `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+    `price` VARCHAR(50) NOT NULL COMMENT 'Price',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `timestampms` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Timestamp Milliseconds',
+    `type` VARCHAR(4) NOT NULL COMMENT 'Type',
+    `aggressor` TINYINT(1) NOT NULL COMMENT 'Aggressor',
+    `fee_currency` VARCHAR(10) NOT NULL COMMENT 'Fee Currency',
+    `fee_amount` VARCHAR(50) NOT NULL COMMENT 'Fee Amount',
+    `order_id` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Order Id',
+    `client_order_id` VARCHAR(100) DEFAULT NULL,
+    `trade_date` TIMESTAMP(3) NOT NULL COMMENT 'Trade Date',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History ZECUSD';
+
 DROP TABLE IF EXISTS `trade_history_pageLimitError`;
 CREATE TABLE `trade_history_pageLimitError` (
     `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Transaction ID',
@@ -88,15 +117,31 @@ CREATE TABLE `trade_history_pageLimitError` (
 
 
 DROP TABLE IF EXISTS `taxes_btcusd_buy_log`;
-CREATE TABLE `taxes_btcusd_buy_log` (
+CREATE TABLE IF NOT EXISTS `taxes_btcusd_buy_log` (
 	`tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
 	`amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
     PRIMARY KEY (`tid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - BTCUSD Buy Log';
 
 
-DROP TABLE IF EXISTS `taxes_btcusd_sell_log`;
-CREATE TABLE `taxes_btcusd_sell_log` (
+DROP TABLE IF EXISTS `taxes_ethusd_buy_log`;
+CREATE TABLE IF NOT EXISTS `taxes_ethusd_buy_log` (
+        `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+        `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - ETHUSD Buy Log';
+
+
+DROP TABLE IF EXISTS `taxes_zecusd_buy_log`;
+CREATE TABLE IF NOT EXISTS `taxes_zecusd_buy_log` (
+        `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+        `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - ZECUSD Buy Log';
+
+
+-- DROP TABLE IF EXISTS `taxes_btcusd_sell_log`;
+CREATE TABLE IF NOT EXISTS `taxes_btcusd_sell_log` (
 	`sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
 	`buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
 	`amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
@@ -107,19 +152,43 @@ CREATE TABLE `taxes_btcusd_sell_log` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - BTCUSD Sell Log';
 
 
-DROP TABLE IF EXISTS `taxes_form8949`;
-CREATE TABLE `taxes_form8949` (
-	`id` BIGINT(13) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
-	`tid` BIGINT(10) UNSIGNED NOT NULL COMMENT 'Transaction ID',
-	`description` VARCHAR(50) NOT NULL COMMENT 'Description of Property',
-	`date_acquired` TIMESTAMP NOT NULL COMMENT 'Date Acquired',
-	`date_sold` TIMESTAMP NOT NULL COMMENT 'Date Sold',
-	`proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
-	`cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
-	`gain_or_loss` VARCHAR(50) NOT NULL COMMENT 'Gain or (loss)',
-    `created_at` TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'Created At',
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - Form 8949';
+DROP TABLE IF EXISTS `taxes_ethusd_sell_log`;
+CREATE TABLE IF NOT EXISTS `taxes_ethusd_sell_log` (
+        `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+        `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+        `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+        `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+        `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+        `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - ETHUSD Sell Log';
+
+
+DROP TABLE IF EXISTS `taxes_zecusd_sell_log`;
+CREATE TABLE IF NOT EXISTS `taxes_zecusd_sell_log` (
+        `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+        `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+        `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+        `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+        `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+        `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - ZECUSD Sell Log';
+
+
+-- DROP TABLE IF EXISTS `taxes_form8949`;
+-- CREATE TABLE IF NOT EXISTS `taxes_form8949` (
+--	`id` BIGINT(13) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID',
+--	`tid` BIGINT(10) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+--	`description` VARCHAR(50) NOT NULL COMMENT 'Description of Property',
+--	`date_acquired` TIMESTAMP NOT NULL COMMENT 'Date Acquired',
+--	`date_sold` TIMESTAMP NOT NULL COMMENT 'Date Sold',
+--	`proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+--	`cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+--	`gain_or_loss` VARCHAR(50) NOT NULL COMMENT 'Gain or (loss)',
+--    `created_at` TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'Created At',
+--    PRIMARY KEY (`id`)
+-- ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - Form 8949';
 
 
 --
