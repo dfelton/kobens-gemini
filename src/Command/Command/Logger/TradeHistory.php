@@ -86,7 +86,7 @@ final class TradeHistory extends Command
         while (!$this->shutdown->isShutdownModeEnabled()) {
             $pageFirstTimestampms = $timestampms;
 
-            $output->writeln(\sprintf("%s\tFetching page %d (%s)",
+            $output->writeln(\sprintf("\n%s\tFetching page %d (%s)",
                 $this->now(), $timestampms, \gmdate("Y-m-d H:i:s", \substr($timestampms, 0, 10))
             ));
 
@@ -105,7 +105,6 @@ final class TradeHistory extends Command
 
             $i = \count($page);
             $j = $i - 1;
-            $newLine = false;
             $hadResults = $i > 0 ? true : false;
 
             while ($i > 0) {
@@ -113,8 +112,7 @@ final class TradeHistory extends Command
                 try {
                     if ($this->logTrade($page[$i])) {
                         if ($i === $j) {
-                            $output->write("{$this->now()}\t");
-                            $newLine = true;
+                            $output->write("\n{$this->now()}\t");
                         }
                         $output->write('.');
                     }
@@ -122,9 +120,6 @@ final class TradeHistory extends Command
                     $this->shutdown->enableShutdownMode($e);
                     break;
                 }
-            }
-            if ($newLine) {
-                $output->write(PHP_EOL);
             }
 
             if (!$this->shutdown->isShutdownModeEnabled()) {
@@ -139,13 +134,13 @@ final class TradeHistory extends Command
                             // );
                             $this->logPageLimitError($pageFirstTimestampms);
                             $output->writeln(
-                                "{$this->now()}\t<fg=red>SKIPPING POTENTIAL $pageFirstTimestampms ORDERS DUE TO MAX PAGE SIZE LIMIT.</>"
+                                "\n{$this->now()}\t<fg=red>SKIPPING POTENTIAL $pageFirstTimestampms ORDERS DUE TO MAX PAGE SIZE LIMIT.</>"
                             );
                         }
                     }
                 } else {
                     $output->write(\sprintf(
-                        "%s\t<fg=green>Trade History for %s pair is up to date. Sleeping for %d seconds...</>\n",
+                        "\n%s\t<fg=green>Trade History for %s pair is up to date. Sleeping for %d seconds...</>\n",
                         $this->now(), $this->symbol, $this->delay
                     ));
                     \sleep($this->delay);
