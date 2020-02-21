@@ -27,7 +27,7 @@ $save = '0.00000300';
 
 $start  = '';
 $end    = '';
-$action = ''; // 'buy' | 'sell'
+$action = '';
 
 
 $sell          =  Subtract::getResult($buy, $save);
