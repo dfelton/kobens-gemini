@@ -4,27 +4,10 @@
  * points across a range of price points.
  */
 
-require __DIR__.'/vendor/autoload.php';
+require __DIR__.'/bootstrap.php';
 
-use Kobens\Core\{Config, Db};
-use Kobens\Exchange\Exchange\Mapper;
-use Kobens\Gemini\Exchange;
+use Kobens\Core\Db;
 use Zend\Db\TableGateway\TableGateway;
-
-try {
-    new Config(
-        __DIR__.'/env/config.xml',
-        __DIR__
-    );
-    new Mapper([
-        'gemini' => Exchange::class
-    ]);
-} catch (Exception $e) {
-    exit(\sprintf(
-        'Initialization Error: %s',
-        $e->getMessage()
-    ));
-}
 
 $buyBtc  = '0.00002';
 $sellBtc = '0.00001950';
