@@ -14,6 +14,6 @@ final class GetPercent
 
     public static function get(string $bps): string
     {
-        return Divide::getResult($bps, '100', 3);
+        return Divide::getResult($bps, '10000', 5);
     }
 }
