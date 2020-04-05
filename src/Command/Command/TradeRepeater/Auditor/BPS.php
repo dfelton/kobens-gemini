@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\Command\Command\TradeRepeater\Auditor;
 
 use Kobens\Core\EmergencyShutdownInterface;
@@ -11,8 +13,9 @@ use Kobens\Gemini\Command\Command\TradeRepeater\SleeperTrait;
 use Kobens\Gemini\Exception\Api\Reason\InvalidNonceException;
 use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
 use Kobens\Gemini\Exception\Api\Reason\SystemException;
-use Kobens\Gemini\TradeRepeater\Model\MaxBPSInterface;
+use Kobens\Gemini\Exchange\Order\Fee\MaxApiMakerBps;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellPlacedInterface;
+use Kobens\Math\BasicCalculator\Compare;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -46,11 +49,6 @@ final class BPS extends Command
     private $volume;
 
     /**
-     * @var MaxBPSInterface
-     */
-    private $maxBPS;
-
-    /**
      * @var SellPlacedInterface
      */
     private $sellPlaced;
@@ -68,14 +66,12 @@ final class BPS extends Command
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,
         GetNotationalVolumeInterface $getNotationalVolumeInterface,
-        MaxBPSInterface $maxBPSInterface,
         SellPlacedInterface $sellPlacedInterface,
         CancelAllSessionOrdersInterface $cancelAllSessionOrdersInterface,
         SleeperInterface $sleeperInterface
     ) {
         $this->shutdown = $shutdownInterface;
         $this->volume = $getNotationalVolumeInterface;
-        $this->maxBPS = $maxBPSInterface;
         $this->sellPlaced = $sellPlacedInterface;
         $this->cancel = $cancelAllSessionOrdersInterface;
         $this->sleeper = $sleeperInterface;
@@ -115,7 +111,7 @@ final class BPS extends Command
     private function auditBPS(OutputInterface $output): void
     {
         $currentBPS = $this->volume->getVolume()->api_maker_fee_bps;
-        if ($currentBPS <= $this->maxBPS->getMaxBPS()) {
+        if (Compare::getResult((string) $currentBPS, MaxApiMakerBps::get()) === Compare::LEFT_GREATER_THAN) {
             $output->writeln("{$this->now()}\tBPS verified to be at or under threshold: <fg=green>$currentBPS</>");
             $this->sleep(self::SLEEP_DELAY, $this->sleeper, $this->shutdown);
         } else {

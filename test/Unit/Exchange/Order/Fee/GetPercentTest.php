@@ -10,8 +10,6 @@ use PHPUnit\Framework\TestCase;
 class GetPercentTest extends TestCase
 {
     /**
-     */
-    /**
      * @dataProvider dataSet()
      * @param string $expected
      * @param string $bps

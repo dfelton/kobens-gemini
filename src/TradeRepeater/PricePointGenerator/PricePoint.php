@@ -41,6 +41,11 @@ final class PricePoint
     private $bps;
 
     /**
+     * @var string
+     */
+    private $holdBps;
+
+    /**
      * @param string $buyAmount
      * @param string $buyPrice
      * @param string $sellAmount
@@ -52,13 +57,15 @@ final class PricePoint
         string $buyPrice,
         string $sellAmount,
         string $sellPrice,
-        string $bps
+        string $bps,
+        string $holdBps
     ) {
         $this->buyAmount  = $buyAmount;
         $this->buyPrice   = $buyPrice;
         $this->sellAmount = $sellAmount;
         $this->sellPrice  = $sellPrice;
         $this->bps        = $bps;
+        $this->holdBps    = $holdBps;
     }
 
     /**
@@ -91,6 +98,14 @@ final class PricePoint
     public function getBuyFee(): string
     {
         return Multiply::getResult($this->getBuyAmountQuote(), GetPercent::get($this->bps));
+    }
+
+    /**
+     * @return string
+     */
+    public function getBuyFeeHold(): string
+    {
+        return Multiply::getResult($this->getBuyAmountQuote(), GetPercent::get($this->holdBps));
     }
 
     /**

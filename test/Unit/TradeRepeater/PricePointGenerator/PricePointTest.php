@@ -21,11 +21,16 @@ class PricePointTest extends TestCase
      * @param string $sellAmount
      * @param string $sellPrice
      * @param string $bps
+     * @param string $holdBps
      */
-    public function testGetBuyPrice(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps): void
+    public function testGetBuyPrice(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps, string $holdBps): void
     {
-        $pricePoint = new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps);
-        $this->assertSame($expected, $pricePoint->getBuyPrice());
+        $this->assertSame(
+            $expected,
+            (
+                new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps, $holdBps)
+            )->getBuyPrice()
+        );
     }
 
     /**
@@ -37,11 +42,16 @@ class PricePointTest extends TestCase
      * @param string $sellAmount
      * @param string $sellPrice
      * @param string $bps
+     * @param string $holdBps
      */
-    public function testGetBuyAmountBase(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps): void
+    public function testGetBuyAmountBase(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps, string $holdBps): void
     {
-        $pricePoint = new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps);
-        $this->assertSame($expected, $pricePoint->getBuyAmountBase());
+        $this->assertSame(
+            $expected,
+            (
+                new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps, $holdBps)
+            )->getBuyAmountBase()
+        );
     }
 
     /**
@@ -53,11 +63,16 @@ class PricePointTest extends TestCase
      * @param string $sellAmount
      * @param string $sellPrice
      * @param string $bps
+     * @param string $holdBps
      */
-    public function testGetBuyAmountQuote(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps): void
+    public function testGetBuyAmountQuote(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps, string $holdBps): void
     {
-        $pricePoint = new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps);
-        $this->assertSame($expected, $pricePoint->getBuyAmountQuote());
+        $this->assertSame(
+            $expected,
+            (
+                new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps, $holdBps)
+            )->getBuyAmountQuote()
+        );
     }
 
     /**
@@ -69,11 +84,37 @@ class PricePointTest extends TestCase
      * @param string $sellAmount
      * @param string $sellPrice
      * @param string $bps
+     * @param string $holdBps
      */
-    public function testGetBuyFee(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps): void
+    public function testGetBuyFee(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps, string $holdBps): void
     {
-        $pricePoint = new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps);
-        $this->assertSame($expected, $pricePoint->getBuyFee());
+        $this->assertSame(
+            $expected,
+            (
+                new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps, $holdBps)
+            )->getBuyFee()
+        );
+    }
+
+    /**
+     * @dataProvider \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\PricePointDataProvider::buyFeeHold()
+     * @see \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\PricePointDataProvider::buyFeeHold()
+     * @param string $expected
+     * @param string $buyAmount
+     * @param string $buyPrice
+     * @param string $sellAmount
+     * @param string $sellPrice
+     * @param string $bps
+     * @param string $holdBps
+     */
+    public function testGetBuyFeeHold(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps, string $holdBps): void
+    {
+        $this->assertSame(
+            $expected,
+            (
+                new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps, $holdBps)
+            )->getBuyFeeHold()
+        );
     }
 
     /**
@@ -85,11 +126,16 @@ class PricePointTest extends TestCase
      * @param string $sellAmount
      * @param string $sellPrice
      * @param string $bps
+     * @param string $holdBps
      */
-    public function testGetSellPrice(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps): void
+    public function testGetSellPrice(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps, string $holdBps): void
     {
-        $pricePoint = new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps);
-        $this->assertSame($expected, $pricePoint->getSellPrice());
+        $this->assertSame(
+            $expected,
+            (
+                new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps, $holdBps)
+            )->getSellPrice()
+        );
     }
 
     /**
@@ -101,11 +147,16 @@ class PricePointTest extends TestCase
      * @param string $sellAmount
      * @param string $sellPrice
      * @param string $bps
+     * @param string $holdBps
      */
-    public function testGetSellAmountBase(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps): void
+    public function testGetSellAmountBase(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps, string $holdBps): void
     {
-        $pricePoint = new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps);
-        $this->assertSame($expected, $pricePoint->getSellAmountBase());
+        $this->assertSame(
+            $expected,
+            (
+                new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps, $holdBps)
+            )->getSellAmountBase()
+        );
     }
 
     /**
@@ -117,11 +168,16 @@ class PricePointTest extends TestCase
      * @param string $sellAmount
      * @param string $sellPrice
      * @param string $bps
+     * @param string $holdBps
      */
-    public function testGetSellAmountQuote(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps): void
+    public function testGetSellAmountQuote(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps, string $holdBps): void
     {
-        $pricePoint = new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps);
-        $this->assertSame($expected, $pricePoint->getSellAmountQuote());
+        $this->assertSame(
+            $expected,
+            (
+                new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps, $holdBps)
+            )->getSellAmountQuote()
+        );
     }
 
     /**
@@ -133,11 +189,16 @@ class PricePointTest extends TestCase
      * @param string $sellAmount
      * @param string $sellPrice
      * @param string $bps
+     * @param string $holdBps
      */
-    public function testGetSellFee(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps): void
+    public function testGetSellFee(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps, string $holdBps): void
     {
-        $pricePoint = new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps);
-        $this->assertSame($expected, $pricePoint->getSellFee());
+        $this->assertSame(
+            $expected,
+            (
+                new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps, $holdBps)
+            )->getSellFee()
+        );
     }
 
     /**
@@ -149,11 +210,16 @@ class PricePointTest extends TestCase
      * @param string $sellAmount
      * @param string $sellPrice
      * @param string $bps
+     * @param string $holdBps
      */
-    public function testGetProfitBase(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps): void
+    public function testGetProfitBase(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps, string $holdBps): void
     {
-        $pricePoint = new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps);
-        $this->assertSame($expected, $pricePoint->getProfitBase());
+        $this->assertSame(
+            $expected,
+            (
+                new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps, $holdBps)
+            )->getProfitBase()
+        );
     }
 
     /**
@@ -165,10 +231,15 @@ class PricePointTest extends TestCase
      * @param string $sellAmount
      * @param string $sellPrice
      * @param string $bps
+     * @param string $holdBps
      */
-    public function testGetProfitQuote(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps): void
+    public function testGetProfitQuote(string $expected, string $buyAmount, string $buyPrice, string $sellAmount, string $sellPrice, string $bps, string $holdBps): void
     {
-        $pricePoint = new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps);
-        $this->assertSame($expected, $pricePoint->getProfitQuote());
+        $this->assertSame(
+            $expected,
+            (
+                new PricePoint($buyAmount, $buyPrice, $sellAmount, $sellPrice, $bps, $holdBps)
+            )->getProfitQuote()
+        );
     }
 }
