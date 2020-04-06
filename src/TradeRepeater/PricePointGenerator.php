@@ -14,6 +14,10 @@ use Kobens\Math\BasicCalculator\Subtract;
 
 final class PricePointGenerator
 {
+    private function __construct()
+    {
+    }
+
     /**
      * FIXME: Implement logic with \Kobens\Exchange\PairInterface::getMinPriceIncrement to verify the increment is valid
      * FIXME: Implement logic with \Kobens\Exchange\PairInterface::getMinPriceIncrement to verify the buy start price is valid
@@ -29,7 +33,7 @@ final class PricePointGenerator
      * @throws \Exception
      * @return PricePointGenerator\Result
      */
-    public function getPricePoints(PairInterface $pair, string $buyAmount, string $priceStart, string $priceEnd, string $increment, string $sellAfterGain, string $saveAmount = '0'): PricePointGenerator\Result
+    public static function get(PairInterface $pair, string $buyAmount, string $priceStart, string $priceEnd, string $increment, string $sellAfterGain, string $saveAmount = '0'): PricePointGenerator\Result
     {
         $sellAmount = Subtract::getResult($buyAmount, $saveAmount);
         $orders = [];
@@ -63,7 +67,7 @@ final class PricePointGenerator
             if ($sellPriceExact === $sellPriceRoundedDown) {
                 $sellPrice = \bcadd($sellPriceRoundedDown, '.00', 2);
             } else {
-                $sellPrice = \bcadd($sellPriceRoundedDown, '.00', 2);
+                $sellPrice = \bcadd($sellPriceRoundedDown, '.01', 2);
                 $hasVariablePriceIncrement = true;
             }
             $sellPrice = \bcadd($priceStart, $sellPrice, $quote->getScale());
@@ -80,6 +84,6 @@ final class PricePointGenerator
             $priceStart = Add::getResult($priceStart, $increment);
         }
 
-        return new PricePointGenerator\Result($orders);
+        return new PricePointGenerator\Result($orders, $hasVariablePriceIncrement);
     }
 }
