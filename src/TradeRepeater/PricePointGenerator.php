@@ -8,6 +8,7 @@ use Kobens\Exchange\PairInterface;
 use Kobens\Gemini\Exchange\Order\Fee\ApiMakerHoldBps;
 use Kobens\Gemini\Exchange\Order\Fee\MaxApiMakerBps;
 use Kobens\Gemini\TradeRepeater\PricePointGenerator\PricePoint;
+use Kobens\Gemini\TradeRepeater\PricePointGenerator\Result;
 use Kobens\Math\BasicCalculator\Add;
 use Kobens\Math\BasicCalculator\Compare;
 use Kobens\Math\BasicCalculator\Subtract;
@@ -31,9 +32,9 @@ final class PricePointGenerator
      * @param string $sellAfterGain
      * @param string $saveAmount
      * @throws \Exception
-     * @return PricePointGenerator\Result
+     * @return Result
      */
-    public static function get(PairInterface $pair, string $buyAmount, string $priceStart, string $priceEnd, string $increment, string $sellAfterGain, string $saveAmount = '0'): PricePointGenerator\Result
+    public static function get(PairInterface $pair, string $buyAmount, string $priceStart, string $priceEnd, string $increment, string $sellAfterGain, string $saveAmount = '0'): Result
     {
         $sellAmount = Subtract::getResult($buyAmount, $saveAmount);
         $orders = [];
@@ -84,6 +85,6 @@ final class PricePointGenerator
             $priceStart = Add::getResult($priceStart, $increment);
         }
 
-        return new PricePointGenerator\Result($orders, $hasVariablePriceIncrement);
+        return new Result($orders, $hasVariablePriceIncrement);
     }
 }
