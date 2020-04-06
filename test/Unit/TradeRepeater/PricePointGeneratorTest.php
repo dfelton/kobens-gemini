@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace KobensTest\Gemini\Unit\TradeRepeater;
 
 use Kobens\Exchange\PairInterface;
+use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\PricePointGenerator;
 use PHPUnit\Framework\TestCase;
 
@@ -27,7 +28,13 @@ class PricePointGeneratorTest extends TestCase
 
     public function testPriceIncrementsCorrectly(): void
     {
-        $this->markTestIncomplete();
+        $pricePoints = PricePointGenerator::get(Pair::getInstance('btcusd'), '1', '2.5', '10', '2.5', '0.025')->getPricePoints();
+        $buyPrices = ['2.5', '5', '7.5', '10'];
+        $sellPrices = ['2.57', '5.13', '7.69', '10.25'];
+        foreach ($pricePoints as $i => $pricePoint) {
+            $this->assertSame($buyPrices[$i], $pricePoint->getBuyPrice());
+            $this->assertSame($sellPrices[$i], $pricePoint->getSellPrice());
+        }
     }
 
     /**
@@ -61,6 +68,13 @@ class PricePointGeneratorTest extends TestCase
 
     public function testSetsHasVariablePriceIncrementCorrectly(): void
     {
-        $this->markTestIncomplete();
+        $this->assertSame(
+            true,
+            PricePointGenerator::get(Pair::getInstance('btcusd'), '1', '2.5', '10', '2.5', '0.025')->hasVariablePriceIncrementPercent()
+        );
+        $this->assertSame(
+            false,
+            PricePointGenerator::get(Pair::getInstance('btcusd'), '1', '10', '100', '10', '0.025')->hasVariablePriceIncrementPercent()
+        );
     }
 }
