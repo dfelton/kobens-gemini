@@ -9,59 +9,161 @@ use PHPUnit\Framework\TestCase;
 
 class ResultTest extends TestCase
 {
-    public function testGetPricePoints(): void
+
+    /**
+     * @dataProvider \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\ResultDataProvider::pricePoints
+     * @see \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\ResultDataProvider::pricePoints()
+     * @param string $expected
+     * @param \Kobens\Gemini\TradeRepeater\PricePointGenerator\PricePoint[] $pricePoints
+     */
+    public function testGetPricePoints(array $pricePoints): void
     {
-        $this->markTestIncomplete();
+        $this->assertSame(
+            $pricePoints,
+            (new Result($pricePoints, false))->getPricePoints(),
+            'Do we get the same price points we passed in'
+        );
     }
 
-    public function testGetTotalBuyFees(): void
+    /**
+     * @dataProvider \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\ResultDataProvider::buyFees
+     * @see \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\ResultDataProvider::buyFees()
+     * @param string $expected
+     * @param \Kobens\Gemini\TradeRepeater\PricePointGenerator\PricePoint[] $pricePoints
+     */
+    public function testGetTotalBuyFees(string $expected, array $pricePoints): void
     {
-        $this->markTestIncomplete();
+        $this->assertSame(
+            $expected,
+            (new Result($pricePoints, false))->getTotalBuyFees(),
+            'Does the fees for buy orders add up correctly'
+        );
     }
 
-    public function testGetTotalBuyFeeHold(): void
+    /**
+     * @dataProvider \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\ResultDataProvider::buyFeesHold
+     * @see \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\ResultDataProvider::buyFeesHold()
+     * @param string $expected
+     * @param \Kobens\Gemini\TradeRepeater\PricePointGenerator\PricePoint[] $pricePoints
+     */
+    public function testGetTotalBuyFeesHold(string $expected, array $pricePoints): void
     {
-        $this->markTestIncomplete();
+        $this->assertSame(
+            $expected,
+            (new Result($pricePoints, false))->getTotalBuyFeesHold(),
+            'Does the fees held for buy orders add up correctly'
+        );
     }
 
-    public function testGetBuyQuote(): void
+    /**
+     * @dataProvider \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\ResultDataProvider::buyQuote
+     * @see \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\ResultDataProvider::buyQuote()
+     * @param string $expected
+     * @param \Kobens\Gemini\TradeRepeater\PricePointGenerator\PricePoint[] $pricePoints
+     */
+    public function testGetBuyQuote(string $expected, array $pricePoints): void
     {
-        $this->markTestIncomplete();
+        $this->assertSame(
+            $expected,
+            (new Result($pricePoints, false))->getTotalBuyQuote(),
+            'Does the quote quantity add up correctly'
+        );
     }
 
-    public function testGetBuyBase(): void
+    /**
+     * @dataProvider \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\ResultDataProvider::buyBase
+     * @see \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\ResultDataProvider::buyBase()
+     * @param string $expected
+     * @param \Kobens\Gemini\TradeRepeater\PricePointGenerator\PricePoint[] $pricePoints
+     */
+    public function testGetBuyBase(string $expected, array $pricePoints): void
     {
-        $this->markTestIncomplete();
+        $this->assertSame(
+            $expected,
+            (new Result($pricePoints, false))->getTotalBuyBase(),
+            'Does the base quantity add up correctly'
+        );
     }
 
-    public function testGetTotalSellFees(): void
+    /**
+     * @dataProvider \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\ResultDataProvider::sellFees
+     * @see \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\ResultDataProvider::sellFees()
+     * @param string $expected
+     * @param \Kobens\Gemini\TradeRepeater\PricePointGenerator\PricePoint[] $pricePoints
+     */
+    public function testGetTotalSellFees(string $expected, array $pricePoints): void
     {
-        $this->markTestIncomplete();
+        $this->assertSame(
+            $expected,
+            (new Result($pricePoints, false))->getTotalSellFees()
+        );
     }
 
-    public function testGetSellQuote(): void
+    /**
+     * @dataProvider \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\ResultDataProvider::sellQuote
+     * @see \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\ResultDataProvider::sellQuote()
+     * @param string $expected
+     * @param \Kobens\Gemini\TradeRepeater\PricePointGenerator\PricePoint[] $pricePoints
+     */
+    public function testGetSellQuote(string $expected, array $pricePoints): void
     {
-        $this->markTestIncomplete();
+        $this->assertSame(
+            $expected,
+            (new Result($pricePoints, false))->getTotalSellQuote()
+        );
     }
 
-    public function testGetSellBase(): void
+    /**
+     * @dataProvider \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\ResultDataProvider::sellBase
+     * @see \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\ResultDataProvider::sellBase()
+     * @param string $expected
+     * @param \Kobens\Gemini\TradeRepeater\PricePointGenerator\PricePoint[] $pricePoints
+     */
+    public function testGetSellBase(string $expected, array $pricePoints): void
     {
-        $this->markTestIncomplete();
+        $this->assertSame(
+            $expected,
+            (new Result($pricePoints, false))->getTotalSellBase()
+        );
     }
 
-    public function testGetProfitBase(): void
+    /**
+     * @dataProvider \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\ResultDataProvider::profitBase
+     * @see \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\ResultDataProvider::profitBase()
+     * @param string $expected
+     * @param \Kobens\Gemini\TradeRepeater\PricePointGenerator\PricePoint[] $pricePoints
+     */
+    public function testGetProfitBase(string $expected, array $pricePoints): void
     {
-        $this->markTestIncomplete();
+        $this->assertSame(
+            $expected,
+            (new Result($pricePoints, false))->getTotalProfitBase()
+        );
     }
 
-    public function testGetProfitQuote(): void
+    /**
+     * @dataProvider \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\ResultDataProvider::profitQuote
+     * @see \KobensTest\Gemini\Unit\TradeRepeater\PricePointGenerator\ResultDataProvider::profitQuote()
+     * @param string $expected
+     * @param \Kobens\Gemini\TradeRepeater\PricePointGenerator\PricePoint[] $pricePoints
+     */
+    public function testGetProfitQuote(string $expected, array $pricePoints): void
     {
-        $this->markTestIncomplete();
+        $this->assertSame(
+            $expected,
+            (new Result($pricePoints, false))->getTotalProfitQuote()
+        );
     }
 
     public function testGetVariableIncrementPrcent(): void
     {
         $this->assertTrue((new Result([], true))->hasVariablePriceIncrementPercent());
         $this->assertFalse((new Result([], false))->hasVariablePriceIncrementPercent());
+    }
+
+    public function testInstantiationThrowsLogicException(): void
+    {
+        $this->expectException(\LogicException::class);
+        new Result([null], false);
     }
 }

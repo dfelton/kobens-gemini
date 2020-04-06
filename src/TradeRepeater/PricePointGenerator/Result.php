@@ -69,7 +69,7 @@ final class Result
             if ($pricePoint instanceof PricePoint) {
                 $this->add($pricePoint);
             } else {
-                throw new \LogicException(\sprint(
+                throw new \LogicException(\sprintf(
                     '"%s" only accepts "%s" objects.',
                     self::class,
                     PricePoint::class
@@ -90,7 +90,7 @@ final class Result
         $this->totalSellBase    = Add::getResult($this->totalSellBase,    $pricePoint->getSellAmountBase());
         $this->totalSellFees    = Add::getResult($this->totalSellFees,    $pricePoint->getSellFee());
         $this->totalSellQuote   = Add::getResult($this->totalSellQuote,   $pricePoint->getSellAmountQuote());
-        $this->totalProfitBase  = Add::getResult($this->totalProfitQuote, $pricePoint->getProfitBase());
+        $this->totalProfitBase  = Add::getResult($this->totalProfitBase,  $pricePoint->getProfitBase());
         $this->totalProfitQuote = Add::getResult($this->totalProfitQuote, $pricePoint->getProfitQuote());
     }
 
@@ -99,7 +99,7 @@ final class Result
      */
     public function getPricePoints(): array
     {
-        return $this->getPricePoints();
+        return $this->pricePoints;
     }
 
     public function getTotalBuyFees(): string
@@ -107,7 +107,7 @@ final class Result
         return $this->totalBuyFees;
     }
 
-    public function getTotalBuyFeeHold(): string
+    public function getTotalBuyFeesHold(): string
     {
         return $this->totalBuyFeeHold;
     }
