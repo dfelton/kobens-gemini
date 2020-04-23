@@ -6,5 +6,8 @@ use Kobens\Gemini\Exception;
 
 final class MaintenanceException extends Exception
 {
+    public function __construct(string $message = 'The Gemini Exchange is currently undergoing maintenance.', int $code = 503, \Throwable $e = null)
+    {
 
+    }
 }

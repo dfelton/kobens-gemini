@@ -107,7 +107,7 @@ abstract class AbstractRequest
     {
         $body = @\json_decode($response['body']); // 504 responses come back as HTML
         switch (true) {
-            case $body instanceof \stdClass && \property_exists($body, 'result') && $body->result === 'error':
+            case $body instanceof \stdClass && ($body->result ?? null) === 'error' && $body->reason ?? null:
                 $className = "\Kobens\Gemini\Exception\Api\Reason\\{$body->reason}Exception";
                 if (!\class_exists($className)) {
                     $className = \Kobens\Gemini\Exception::class;
