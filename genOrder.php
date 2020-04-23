@@ -23,11 +23,11 @@ use Kobens\Math\BasicCalculator\Subtract;
 
 $pair = Pair::getInstance('btcusd');
 
-$buy  = '0.00014000';
+$buy  = '0.00016000';
 $save = '0.00000300';
 
-$start  = '2.5';
-$end    = '5';
+$start  = '';
+$end    = '';
 $action = '';
 
 $increment     =  '2.50';
