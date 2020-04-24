@@ -5,11 +5,14 @@ namespace Kobens\Gemini\Api\Market;
 use Kobens\Core\Exception\ConnectionException;
 use Kobens\Exchange\ExchangeInterface;
 use Kobens\Exchange\Exception\ClosedBookException;
+use Kobens\Gemini\Api\Market\GetPrice\Result;
+use Kobens\Gemini\Api\Market\GetPrice\ResultInterface;
 use Kobens\Gemini\Api\Rest\PublicEndpoints\TickerInterface;
 
 class GetPrice implements GetPriceInterface
 {
     private const MAX_ATTEMPTS = 50;
+
     /**
      * @var ExchangeInterface
      */
@@ -36,6 +39,12 @@ class GetPrice implements GetPriceInterface
     public function getBid(string $symbol): string
     {
         return $this->getData($symbol)['bid'];
+    }
+
+    public function getResult(string $symbol): ResultInterface
+    {
+        $data = $this->getData($symbol);
+        return new Result($data['bid'], $data['ask']);
     }
 
     private function getData(string $symbol): array
