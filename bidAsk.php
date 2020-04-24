@@ -48,7 +48,7 @@ while (true) {
         $percent = $spread && $bid ? bcdiv($spread, $bid, 4) : '0';
         echo "Lowest Ask:\t$ask\nHighest Bid\t$bid\nSpread:\t\t\$$spread\nSpread:\t\t$percent%\n\n";
     } catch (\Kobens\Gemini\Exception $e) {
-        echo $e->getMessage();
+        echo $e->getMessage(),"\n";
     }
     sleep(5);
 }
