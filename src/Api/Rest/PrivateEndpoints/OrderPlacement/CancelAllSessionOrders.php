@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement;
 
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest;
@@ -10,7 +12,7 @@ final class CancelAllSessionOrders extends AbstractPrivateRequest implements Can
 
     public function cancelSessionOrders(): \stdClass
     {
-        return \json_decode($this->getResponse()['body']);
+        return \json_decode($this->getResponse()->getBody());
     }
 
     protected function getUrlPath(): string

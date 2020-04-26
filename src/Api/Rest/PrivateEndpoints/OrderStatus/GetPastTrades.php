@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus;
 
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest;
@@ -30,7 +32,7 @@ final class GetPastTrades extends AbstractPrivateRequest implements GetPastTrade
         $this->timestampms = $timestampms;
         $this->limitTrades = $limitTrades >= I::LIMIT_MIN && $limitTrades <= I::LIMIT_MAX
             ? $limitTrades : null;
-        return \json_decode($this->getResponse()['body']);
+        return \json_decode($this->getResponse()->getBody());
     }
 
     protected function getUrlPath(): string

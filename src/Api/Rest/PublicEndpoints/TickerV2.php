@@ -14,12 +14,11 @@ final class TickerV2 extends AbstractPublicRequest implements TickerV2Interface
     public function getData(string $symbol): \stdClass
     {
         $this->symbol = $symbol;
-        return \json_decode($this->getResponse()['body']);
+        return \json_decode($this->getResponse()->getBody());
     }
 
     protected function getUrlPath(): string
     {
-        return self::URL_PATH.$this->symbol;
+        return self::URL_PATH . $this->symbol;
     }
-
 }

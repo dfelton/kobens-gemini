@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder;
 
 use Kobens\Core\Http\Request\ThrottlerInterface;
@@ -61,11 +63,15 @@ final class ForceMaker extends AbstractNewOrder implements ForceMakerInterface
         do {
             ++$iterations;
             $response = $this->getResponse();
-            $orderData = \json_decode($response['body']);
+            $orderData = \json_decode($response->getBody());
             if ($orderData->is_cancelled === true && $orderData->reason === 'MakerOrCancelWouldTake') {
                 $this->payload['price'] = $this->getNewPrice($pair, $price);
             } elseif ($orderData->is_cancelled === true) {
-                throw new \Exception($orderData->reason, null, new \Exception($response['body'], $response['code']));
+                throw new \Exception(
+                    $orderData->reason,
+                    null, new
+                    \Exception($response->getBody(), $response->getResponseCode())
+                );
             } else {
                 $isPlaced = true;
             }

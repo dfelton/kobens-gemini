@@ -10,7 +10,7 @@ final class CancelAllActiveOrders extends AbstractPrivateRequest implements Canc
 
     public function cancelAll(): \stdClass
     {
-        return \json_decode($this->getResponse()['body']);
+        return \json_decode($this->getResponse()->getBody());
     }
 
     protected function getUrlPath(): string
@@ -22,5 +22,4 @@ final class CancelAllActiveOrders extends AbstractPrivateRequest implements Canc
     {
         return [];
     }
-
 }

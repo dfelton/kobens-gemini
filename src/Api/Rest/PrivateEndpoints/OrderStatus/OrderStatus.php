@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus;
 
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest;
@@ -16,7 +18,7 @@ class OrderStatus extends AbstractPrivateRequest implements OrderStatusInterface
     public function getStatus(int $orderId): \stdClass
     {
         $this->orderId = $orderId;
-        return \json_decode($this->getResponse()['body']);
+        return \json_decode($this->getResponse()->getBody());
     }
 
     protected function getUrlPath(): string

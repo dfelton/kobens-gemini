@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder;
 
 use Kobens\Exchange\PairInterface;
@@ -24,6 +26,6 @@ final class ImmediateOrCancel extends AbstractNewOrder implements ImmediateOrCan
         if ($clientOrderId) {
             $this->payload['client_order_id'] = $clientOrderId;
         };
-        return \json_decode($this->getResponse()['body']);
+        return \json_decode($this->getResponse()->getBody());
     }
 }

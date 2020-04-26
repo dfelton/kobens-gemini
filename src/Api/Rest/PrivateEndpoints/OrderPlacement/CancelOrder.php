@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement;
 
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest;
@@ -16,7 +18,7 @@ final class CancelOrder extends AbstractPrivateRequest implements CancelOrderInt
     public function cancel(int $orderId): \stdClass
     {
         $this->orderId = $orderId;
-        return \json_decode($this->getResponse()['body']);
+        return \json_decode($this->getResponse()->getBody());
     }
 
     protected function getUrlPath(): string

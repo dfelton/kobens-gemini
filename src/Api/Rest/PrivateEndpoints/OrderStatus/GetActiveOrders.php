@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus;
 
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest;
 
 class GetActiveOrders extends AbstractPrivateRequest implements GetActiveOrdersInterface
 {
-    const URL_PATH = '/v1/orders';
+    protected const URL_PATH = '/v1/orders';
 
     public function getOrders(): array
     {
-        return \json_decode($this->getResponse()['body']);
+        return \json_decode($this->getResponse()->getBody());
     }
 
     protected function getUrlPath(): string

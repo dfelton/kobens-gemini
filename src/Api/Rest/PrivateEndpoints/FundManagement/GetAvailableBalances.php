@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement;
 
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest;
@@ -10,7 +12,7 @@ class GetAvailableBalances extends AbstractPrivateRequest implements GetAvailabl
 
     public function getCurrency(string $currency): \stdClass
     {
-        $balances = \json_decode($this->getResponse()['body']);
+        $balances = \json_decode($this->getResponse()->getBody());
         foreach ($balances as $balance) {
             if (\strtolower($balance->currency) === \strtolower($currency)) {
                 return $balance;
@@ -21,7 +23,7 @@ class GetAvailableBalances extends AbstractPrivateRequest implements GetAvailabl
 
     public function getBalances(): array
     {
-        return \json_decode($this->getResponse()['body']);
+        return \json_decode($this->getResponse()->getBody());
     }
 
     protected function getUrlPath(): string
@@ -33,5 +35,4 @@ class GetAvailableBalances extends AbstractPrivateRequest implements GetAvailabl
     {
         return [];
     }
-
 }

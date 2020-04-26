@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\Api\Rest\PublicEndpoints;
 
 use Kobens\Gemini\Api\Rest\AbstractRequest;
 
 abstract class AbstractPublicRequest extends AbstractRequest
 {
-    const CURL_POST = false;
+    protected const CURL_POST = false;
 
     final protected function getRequestHeaders(): array
     {
