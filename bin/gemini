@@ -37,6 +37,7 @@ use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuySent;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellFilled;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellPlaced;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellSent;
+use Kobens\Gemini\TradeRepeater\Watcher\Helper\Data;
 
 require \dirname(__DIR__).'/bootstrap.php';
 
@@ -224,6 +225,10 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Auditor\BuyPrice(
     $sleeperInterface
 ));
 unset($buyAuditorKey);
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Watcher(
+    new Data($getActiveOrdersInterface, $getPriceInterface),
+    $sleeperInterface
+));
 
 
 // $app->add(new \Kobens\Gemini\Command\Command\Taxes\CapitalGains()); // @deprecated
