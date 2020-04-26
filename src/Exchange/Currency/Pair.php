@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\Exchange\Currency;
 
 use Kobens\Currency\Currency;

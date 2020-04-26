@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\Api\Market;
 
 use Kobens\Gemini\Api\Market\GetPrice\ResultInterface;

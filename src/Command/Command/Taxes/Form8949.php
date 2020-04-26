@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\Command\Command\Taxes;
 
 use Kobens\Core\Db;
+use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Math\BasicCalculator\Add;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
-use Symfony\Component\Console\Input\InputOption;
-use Kobens\Gemini\Exchange\Currency\Pair;
 
 final class Form8949 extends Command
 {

@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+declare(strict_types=1);
+
 use Kobens\Core\Cache;
 use Kobens\Core\Config;
 use Kobens\Core\Db;

@@ -1,7 +1,8 @@
 <?php
 
-namespace Kobens\Gemini\Api;
+declare(strict_types=1);
 
+namespace Kobens\Gemini\Api;
 
 class Host implements HostInterface
 {

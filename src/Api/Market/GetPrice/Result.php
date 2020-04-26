@@ -6,8 +6,14 @@ namespace Kobens\Gemini\Api\Market\GetPrice;
 
 class Result implements ResultInterface
 {
+    /**
+     * @var string
+     */
     private $bid;
 
+    /**
+     * @var string
+     */
     private $ask;
 
     public function __construct(string $bid, string $ask)

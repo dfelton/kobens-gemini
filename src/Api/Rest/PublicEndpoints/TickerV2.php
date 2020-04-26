@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\Api\Rest\PublicEndpoints;
 
 final class TickerV2 extends AbstractPublicRequest implements TickerV2Interface

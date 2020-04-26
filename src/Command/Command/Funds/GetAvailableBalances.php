@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\Command\Command\Funds;
 
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetAvailableBalancesInterface;

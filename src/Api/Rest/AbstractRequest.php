@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\Api\Rest;
 
 use Kobens\Core\Exception\ConnectionException;

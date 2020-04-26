@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\Command\Command\Taxes;
 
 use Kobens\Core\Db;

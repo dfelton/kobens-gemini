@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\Command\Command\Market;
 
 use Amp\Websocket\Client\ConnectionException;

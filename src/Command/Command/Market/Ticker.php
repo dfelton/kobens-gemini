@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\Command\Command\Market;
 
 use Kobens\Gemini\Api\Rest\PublicEndpoints\TickerInterface;

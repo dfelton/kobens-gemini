@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action;
 
 final class BuyReady extends AbstractAction implements BuyReadyInterface

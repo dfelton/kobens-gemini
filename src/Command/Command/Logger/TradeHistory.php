@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * TODO: Don't like how we've shoved the db interactions directly into this command. I was lazy that day.
  */
