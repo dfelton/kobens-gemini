@@ -125,10 +125,12 @@ final class Watcher extends Command
                 \sleep(1);
                 continue;
             }
-            if (   $this->ask !== $ask
-                || $this->bid !== $bid
-                || $this->spread !== $spread
-                || $time - $this->lastOutput > 0) {
+            if (
+                $this->ask !== $ask ||
+                $this->bid !== $bid ||
+                $this->spread !== $spread ||
+                $time - $this->lastOutput > 0
+            ) {
                 $this->lastOutput = $time;
                 $this->ask = $ask;
                 $this->bid = $bid;
