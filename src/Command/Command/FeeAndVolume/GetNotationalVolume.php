@@ -35,14 +35,24 @@ final class GetNotationalVolume extends Command
             $key = \ucwords(\str_replace('_', ' ', $key));
             $key = \str_pad($key, $keyLength, ' ', STR_PAD_RIGHT);
             if ($val !== []) {
-                $output->writeln("$key\t{$this->getFormattedVal($val)}");
+                $output->writeln("$key\t{$this->getFormattedVal($val, $key)}");
             }
         }
     }
 
-    final private function getFormattedVal($value): string
+    final private function getFormattedVal($value, string $key): string
     {
         switch (true) {
+            case $key === 'Notional 1d Volume ':
+                $str = PHP_EOL;
+                foreach ($value as $val) {
+                    $str .= sprintf(
+                        "\t%s:\t%s\n",
+                        $val->date,
+                        $this->formatNotionalVolume($val->notional_volume)
+                    );
+                }
+                break;
             case $value === true:
                 $str = "<fg=green>true</>";
                 break;
@@ -70,4 +80,14 @@ final class GetNotationalVolume extends Command
         return $str;
     }
 
+    private function formatNotionalVolume(string $volume): string
+    {
+        if (strpos($volume, '.') === false) {
+            $volume = $volume . '.';
+        }
+        $volume = explode('.', $volume);
+        $volume[0] = str_pad($volume[0], 4, ' ', STR_PAD_LEFT);
+        $volume[1] = str_pad($volume[1], 14, '0', STR_PAD_RIGHT);
+        return implode('.', $volume);
+    }
 }
