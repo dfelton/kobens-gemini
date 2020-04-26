@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\FeeAndVolume;
 
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\FeeAndVolume\GetNotionalVolume\Response;
 
 final class GetNotionalVolume extends AbstractPrivateRequest implements GetNotionalVolumeInterface
 {
     private const URL_PATH = '/v1/notionalvolume';
 
-    public function getVolume(): \stdClass
+    public function getVolume(): Response
     {
-        return \json_decode($this->getResponse()->getBody());
+        return new Response($this->getResponse()->getBody());
     }
 
     protected function getUrlPath(): string
