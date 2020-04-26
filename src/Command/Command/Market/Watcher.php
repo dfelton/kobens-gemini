@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kobens\Gemini\Command\Command\Market;
 
 use Kobens\Exchange\ExchangeInterface;
@@ -7,6 +9,7 @@ use Kobens\Exchange\Exception\ClosedBookException;
 use Kobens\Gemini\Api\HostInterface;
 use Kobens\Gemini\Command\Traits\Traits;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -94,7 +97,6 @@ final class Watcher extends Command
         $this->setDescription('Outputs details on a market book.');
         $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Trading Pair Symbol', 'btcusd');
         $this->addOption('refresh', 'r', InputOption::VALUE_OPTIONAL, 'Refresh rate in micro seconds', self::REFRESH_DEFAULT);
-        $this->addOption('tab_length', 'l', InputOption::VALUE_OPTIONAL, 'Terminal Tab Length', 8);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -149,42 +151,20 @@ final class Watcher extends Command
         if ($this->refreshRate < self::REFRESH_MIN) {
             $this->refreshRate = self::REFRESH_DEFAULT;
         }
-        $tabLength = (int) $input->getOption('tab_length');
-        if ($tabLength <= 0) {
-            $tabLength = 0;
-        }
-        $this->tabLength = $tabLength;
         $this->book = $this->exchange->getBook($this->symbol);
     }
 
     private function outputUpdate(OutputInterface $output): void
     {
-        $tabsBid = 3 - \floor(\strlen($this->bid) / $this->tabLength);
-        if ($tabsBid < 0) {
-            $tabsBid = 0;
-        }
-
-        $tabsAsk = 3 - \floor(\strlen($this->ask) / $this->tabLength);
-        if ($tabsAsk < 0) {
-            $tabsAsk = 0;
-        }
-
-        $tabsSpread = 3 - \floor(\strlen($this->spread) / $this->tabLength);
-        if ($tabsSpread < 0) {
-            $tabsSpread = 0;
-        }
-
         $this->clearTerminal($output);
-        $output->writeln([
-            \str_repeat('-', 41),
-            \sprintf("- Date:\t\t%s\t-", $this->getNow()),
-            \sprintf("- Host:\t\t%s\t-", $this->host->getHost()),
-            \sprintf("- Symbol:\t%s\t\t\t-", \strtoupper($this->symbol)),
-            "-\t\t\t\t\t-",
-            \sprintf("- Ask:\t\t<fg=red>%s</>%s-", $this->ask, \str_repeat("\t", $tabsAsk)),
-            \sprintf("- Bid:\t\t<fg=green>%s</>%s-", $this->bid, \str_repeat("\t", $tabsBid)),
-            \sprintf("- Spread:\t%s%s-", $this->spread, \str_repeat("\t", $tabsSpread)),
-            \str_repeat('-', 41),
-        ]);
+        $table = new Table($output);
+        $table->setRows([
+            ['Date', $this->getNow()],
+            ['Host', $this->host->getHost()],
+            ['Symbol', strtoupper($this->symbol)],
+            ['Ask', "<fg=red>{$this->ask}</>"],
+            ['Bid', "<fg=green>{$this->bid}</>"],
+            ['Spread', $this->spread],
+        ])->render();
     }
 }
