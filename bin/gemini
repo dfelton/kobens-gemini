@@ -13,7 +13,7 @@ use Kobens\Gemini\Api\Host;
 use Kobens\Gemini\Api\Key;
 use Kobens\Gemini\Api\Nonce;
 use Kobens\Gemini\Api\Market\GetPrice;
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\FeeAndVolume\GetNotationalVolume;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\FeeAndVolume\GetNotionalVolume;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetAvailableBalances;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelAllActiveOrders;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelOrder;
@@ -101,7 +101,7 @@ $getPastTradesInterface = new GetPastTrades($hostInterface, $privateThrottlerInt
 $getActiveOrdersInterface = new GetActiveOrders($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
 $getAvailableBalancesInterface = new GetAvailableBalances($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
 $orderStatusInterface = new OrderStatus($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
-$getNotationalVolumeInterface = new GetNotationalVolume($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+$getNotionalVolumeInterface = new GetNotionalVolume($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
 
 $archiveInterface = new Archive();
 $buyFilledInterface = new BuyFilled($adapter);
@@ -244,7 +244,7 @@ $app->add(new \Kobens\Gemini\Command\Command\Market\Ticker($tickerInterface));
 $app->add(new \Kobens\Gemini\Command\Command\Market\Watcher($exchangeInterface, $hostInterface));
 
 // TODO: Use Auditor Key
-$app->add(new \Kobens\Gemini\Command\Command\FeeAndVolume\GetNotationalVolume($getNotationalVolumeInterface));
+$app->add(new \Kobens\Gemini\Command\Command\FeeAndVolume\GetNotationalVolume($getNotionalVolumeInterface));
 
 // TODO: This Command should use a unique KeyInterface, with no Trading Authority
 $app->add(new \Kobens\Gemini\Command\Command\OrderStatus\BookKeeper(

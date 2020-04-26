@@ -6,7 +6,7 @@ namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\FeeAndVolume;
 
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest;
 
-final class GetNotationalVolume extends AbstractPrivateRequest implements GetNotationalVolumeInterface
+final class GetNotionalVolume extends AbstractPrivateRequest implements GetNotionalVolumeInterface
 {
     private const URL_PATH = '/v1/notionalvolume';
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\FeeAndVolume;
 
-interface GetNotationalVolumeInterface
+interface GetNotionalVolumeInterface
 {
     public function getVolume(): \stdClass;
 }
