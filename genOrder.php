@@ -58,7 +58,7 @@ $orders = $result->getPricePoints();
 
 if ($action === 'buy' || $action === 'sell') {
     $funds = $getAvailableBalances->getCurrency(
-        ($action === 'buy' ? $pair->getQuote->getSymbol() : $base->getSymbol())
+        ($action === 'buy' ? $pair->getQuote()->getSymbol() : $base->getSymbol())
     );
 
     $amountRequired = $action === 'buy'
