@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Kobens\Gemini\TradeRepeater\Watcher;
 
 use Kobens\Gemini\TradeRepeater\Watcher\Helper\DataInterface;
+use Kobens\Math\BasicCalculator\Add;
 use Kobens\Math\BasicCalculator\Compare;
 use Kobens\Math\BasicCalculator\Divide;
 use Kobens\Math\BasicCalculator\Subtract;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Output\OutputInterface;
+
 
 final class TradeSpread
 {
@@ -48,6 +50,23 @@ final class TradeSpread
         $sellSpread = Subtract::getResult($ask, $data->getPriceResult($symbol)->getAsk());
         $bidSpread = Subtract::getResult($data->getPriceResult($symbol)->getBid(), $bid);
 
+        $scale = self::getScale($bid, $ask, $spread);
+        $bid = (string) number_format((float) $bid, $scale);
+        $ask = (string) number_format((float) $ask, $scale);
+        $spread = (string) number_format((float) $spread, $scale);
+        $length = self::getLength($bid, $ask, $spread);
+        $bid = str_pad($bid, $length+2, ' ', STR_PAD_LEFT);
+        $ask = str_pad($ask, $length+2, ' ', STR_PAD_LEFT);
+        $spread = str_pad($spread, $length+2, ' ', STR_PAD_LEFT);
+        $percent = str_pad($percent, $length, ' ', STR_PAD_LEFT);
+
+
+        $scale = self::getScale($sellSpread, $bidSpread);
+        $sellSpread = (string) number_format((float) $sellSpread, $scale);
+        $bidSpread = (string) number_format((float) $bidSpread, $scale);
+        $sellSpread = str_pad($sellSpread, 13, ' ', STR_PAD_LEFT);
+        $bidSpread = str_pad($bidSpread, 13, ' ', STR_PAD_LEFT);
+
         $table = new Table($output);
         $table
             ->setHeaders(
@@ -58,12 +77,38 @@ final class TradeSpread
             )
             ->setRows(
                 [
-                    ['Lowest Ask', "<fg=red>$ask</>", str_pad($sellSpread, 13, ' ', STR_PAD_LEFT)],
-                    ['Highest Bid', "<fg=green>$bid</>", str_pad($bidSpread, 13, ' ', STR_PAD_LEFT)],
+                    ['Lowest Ask', "<fg=red>$ask</>", $sellSpread],
+                    ['Highest Bid', "<fg=green>$bid</>", $bidSpread],
                     ['Spread', $spread],
-                    ['Spread', "$percent %"],
+                    ['Spread', "% $percent"],
                 ]
             );
         return $table;
+    }
+
+    private static function getScale(string ... $values): int
+    {
+        $scale = 0;
+        $prev = $values[0] ?? '0';
+        foreach ($values as $value) {
+            $newScale = Add::getScale($prev, $value);
+            if ($newScale > $scale) {
+                $scale = $newScale;
+            }
+            $prev = $value;
+        }
+        return $scale;
+    }
+
+    private static function getLength(string ... $values): int
+    {
+        $length = 0;
+        foreach ($values as $value) {
+            $newLength = strlen($value);
+            if ($newLength > $length) {
+                $length = $newLength;
+            }
+        }
+        return $length;
     }
 }
