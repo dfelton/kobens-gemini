@@ -55,18 +55,21 @@ final class BookKeeper extends Command
                 $this->outputErrorAndSleep($output, $e->getMessage());
             } catch (ConnectionException $e) {
                 $this->outputErrorAndSleep($output, $e->getMessage());
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $loop = false;
                 do {
                     $output->writeln([
-                        "Error Code: {$e->getCode()}",
-                        "Error Class: ".\get_class($e),
-                        "Error Message: {$e->getMessage()}",
+                        "Code: {$e->getCode()}",
+                        "Class: ".\get_class($e),
+                        "Message: {$e->getMessage()}",
                         "Trace:",
                         $e->getTraceAsString()
                     ]);
                     $e = $e->getPrevious();
-                } while ($e instanceof \Exception);
+                    if ($e instanceof \Throwable) {
+                        $output->writeln("\nPrevious:");
+                    }
+                } while ($e instanceof \Throwable);
             }
         } while ($loop);
     }

@@ -69,12 +69,20 @@ final class Watcher extends Command
                 $this->main($output, $symbol);
                 $this->sleeper->sleep($sleep, function() {});
                 $this->data->reset();
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $loop = false;
-                $output->writeln([
-                    $e->getMessage(),
-                    $e->getTraceAsString(),
-                ]);
+                do {
+                    $output->writeln([
+                        'Code: ' . $e->getCode(),
+                        'Class: ' . \get_class($e),
+                        'Message: ' . $e->getMessage(),
+                        "Strace:\n" . $e->getTraceAsString(),
+                    ]);
+                    $e = $e->getPrevious();
+                    if ($e instanceof \Throwable) {
+                        $output->writeln("\nPrevious:");
+                    }
+                } while ($e instanceof \Throwable);
             }
         }
     }
