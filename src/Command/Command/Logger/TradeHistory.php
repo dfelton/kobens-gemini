@@ -89,7 +89,7 @@ final class TradeHistory extends Command
             $pageFirstTimestampms = $timestampms;
 
             $output->writeln(\sprintf("\n%s\tFetching page %d (%s)",
-                $this->now(), $timestampms, \gmdate("Y-m-d H:i:s", \substr($timestampms, 0, 10))
+                $this->now(), $timestampms, \gmdate("Y-m-d H:i:s", (int) \substr((string) $timestampms, 0, 10))
             ));
 
             try {
@@ -175,7 +175,7 @@ final class TradeHistory extends Command
                 'fee_amount' => $trade->fee_amount,
                 'order_id' => $trade->order_id,
                 'client_order_id' => \property_exists($trade, 'client_order_id') ? $trade->client_order_id : null,
-                'trade_date' => \gmdate('Y-m-d H:i:s', \substr($trade->timestampms, 0, 10)),
+                'trade_date' => \gmdate('Y-m-d H:i:s', (int) \substr((string) $trade->timestampms, 0, 10)),
             ]);
             $result = true;
         } catch (InvalidQueryException $e) {
