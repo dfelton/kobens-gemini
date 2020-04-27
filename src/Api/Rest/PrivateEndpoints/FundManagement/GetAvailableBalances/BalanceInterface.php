@@ -6,11 +6,11 @@ namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetAvailableBal
 
 interface BalanceInterface
 {
+    public function getCurrency(): string;
+
     public function getAmount(): string;
 
     public function getAvailable(): string;
 
     public function getAvailableForWithdrawal(): string;
-
-    public function getCurrency(): string;
 }

@@ -30,7 +30,7 @@ class GetAvailableBalances extends AbstractPrivateRequest implements GetAvailabl
         $balances = [];
         /** @var \stdClass $b */
         foreach (\json_decode($this->getResponse()->getBody()) as $b) {
-            $balances[$b->currency] = new Balance($b->amount, $b->available, $b->availableForWithdrawal, $b->currency);
+            $balances[$b->currency] = new Balance($b->currency, $b->amount, $b->available, $b->availableForWithdrawal);
         }
         return $balances;
     }

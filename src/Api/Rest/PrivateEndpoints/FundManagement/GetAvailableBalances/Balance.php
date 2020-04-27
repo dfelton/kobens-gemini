@@ -9,6 +9,11 @@ final class Balance implements BalanceInterface
     /**
      * @var string
      */
+    private $currency;
+
+    /**
+     * @var string
+     */
     private $amount;
 
     /**
@@ -21,17 +26,16 @@ final class Balance implements BalanceInterface
      */
     private $availableForWithdrawal;
 
-    /**
-     * @var string
-     */
-    private $currency;
-
-    public function __construct(string $amount, string $available, string $availableForWithdrawal, string $currency)
-    {
+    public function __construct(
+        string $currency,
+        string $amount,
+        string $available,
+        string $availableForWithdrawal
+    ) {
+        $this->currency = $currency;
         $this->amount = $amount;
         $this->available = $available;
         $this->availableForWithdrawal = $availableForWithdrawal;
-        $this->currency = $currency;
     }
 
     public function getAmount(): string
