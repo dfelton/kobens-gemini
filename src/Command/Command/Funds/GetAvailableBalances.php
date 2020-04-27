@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Kobens\Gemini\Command\Command\Funds;
 
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetAvailableBalancesInterface;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetAvailableBalances\BalanceInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,12 +16,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class GetAvailableBalances extends Command
 {
     protected static $defaultName = 'funds:balances';
-
-    private $keyLabels = [
-        'amount'                 => "Amount.....................",
-        'available'              => "Available..................",
-        'availableForWithdrawal' => "Available For Withdrawal...",
-    ];
 
     /**
      * @var GetAvailableBalancesInterface
@@ -42,7 +39,7 @@ final class GetAvailableBalances extends Command
     {
         $currency = $input->getOption('currency');
         if ($currency) {
-            $this->outputBalance($output, $this->balances->getCurrency($currency));
+            $this->outputBalance($output, $this->balances->getBalance($currency));
         } else {
             foreach ($this->balances->getBalances() as $balance) {
                 $this->outputBalance($output, $balance);
@@ -50,12 +47,16 @@ final class GetAvailableBalances extends Command
         }
     }
 
-    private function outputBalance(OutputInterface $output, \stdClass $balance): void
+    private function outputBalance(OutputInterface $output, BalanceInterface $balance): void
     {
-        $output->writeln("<options=bold,underscore>{$balance->currency}</>");
-        foreach ($this->keyLabels as $key => $label) {
-            $output->writeln("$label{$balance->{$key}}");
-        }
-        $output->write(PHP_EOL);
+        $table = new Table($output);
+        $table
+            ->setHeaders([new TableCell("<options=bold,underscore>{$balance->getCurrency()}</>", ['colspan' => 2])])
+            ->setRows([
+                ['Amount', $balance->getAmount()],
+                ['Available', $balance->getAvailable()],
+                ['Available For Withdrawal', $balance->getAvailableForWithdrawal()],
+            ]);
+        $table->render();
     }
 }
