@@ -80,6 +80,12 @@ abstract class AbstractRequest
         \curl_close($ch);
 
         if ($data['curl_errno'] !== CURLE_OK) {
+            foreach ($data as $k => $v) {
+                if (@json_encode([$k => $v]) === false) {
+                    unset($data[$k]);
+                }
+            }
+
             $json = (string) json_encode($data);
             throw new \Exception(
                 'Curl Error',
