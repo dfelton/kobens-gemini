@@ -246,7 +246,7 @@ $app->add(new \Kobens\Gemini\Command\Command\Market\Ticker($tickerInterface));
 $app->add(new \Kobens\Gemini\Command\Command\Market\Watcher($exchangeInterface, $hostInterface));
 
 // TODO: Use Auditor Key
-$app->add(new \Kobens\Gemini\Command\Command\FeeAndVolume\GetNotationalVolume($getNotionalVolumeInterface));
+$app->add(new \Kobens\Gemini\Command\Command\FeeAndVolume\GetNotionalVolume($getNotionalVolumeInterface));
 
 // TODO: This Command should use a unique KeyInterface, with no Trading Authority
 $app->add(new \Kobens\Gemini\Command\Command\OrderStatus\BookKeeper(
