@@ -6,7 +6,7 @@ namespace Kobens\Gemini\TradeRepeater\Watcher\Helper;
 
 use Kobens\Gemini\Api\Market\GetPriceInterface;
 use Kobens\Gemini\Api\Market\GetPrice\Result;
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetAvailableBalancesInterface;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetNotionalBalancesInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetActiveOrdersInterface;
 
 final class Data implements DataInterface
@@ -32,24 +32,30 @@ final class Data implements DataInterface
     private $price;
 
     /**
-     * @var GetAvailableBalancesInterface
+     * @var GetNotionalBalancesInterface
      */
-    private $balance;
+    private $notionalBalance;
+
+    /**
+     * @var \Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetNotionalBalances\BalanceInterface[]
+     */
+    private $notionalBalances;
 
     public function __construct(
         GetActiveOrdersInterface $getActiveOrdersInterface,
-        GetPriceInterface $getPriceInterface
-//         GetAvailableBalancesInterface $getAvailableBalancesInterface
+        GetPriceInterface $getPriceInterface,
+        GetNotionalBalancesInterface $getNotionalBalancesInterface
     ) {
         $this->activeOrders = $getActiveOrdersInterface;
         $this->price = $getPriceInterface;
-//         $this->balance = $getAvailableBalancesInterface;
+        $this->notionalBalance = $getNotionalBalancesInterface;
     }
 
     public function reset(): void
     {
         $this->priceResult = [];
         $this->orders = null;
+        $this->notionalBalances = null;
     }
 
     public function getPriceResult(string $symbol): Result
@@ -69,5 +75,16 @@ final class Data implements DataInterface
             $this->orders = $this->activeOrders->getOrders();
         }
         return $this->orders;
+    }
+
+    /**
+     * @return \Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetNotionalBalances\BalanceInterface[]
+     */
+    public function getNotionalBalances(): array
+    {
+        if ($this->notionalBalances === null) {
+            $this->notionalBalances = $this->notionalBalance->getBalances();
+        }
+        return $this->notionalBalances;
     }
 }

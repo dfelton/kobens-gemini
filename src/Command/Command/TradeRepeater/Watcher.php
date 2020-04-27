@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
+use Kobens\Core\Config;
 use Kobens\Core\SleeperInterface;
 use Kobens\Gemini\Exchange\Currency\Pair;
+use Kobens\Gemini\TradeRepeater\Watcher\AccountNotionalBalance;
 use Kobens\Gemini\TradeRepeater\Watcher\MarketSpread;
 use Kobens\Gemini\TradeRepeater\Watcher\TradeSpread;
 use Kobens\Gemini\TradeRepeater\Watcher\Helper\Data;
@@ -122,6 +124,7 @@ final class Watcher extends Command
     {
         $data = [];
         try {
+            $data[] = AccountNotionalBalance::getTable($output, $this->data, Config::getInstance());
             $data[] = TradeSpread::getTable($output, $this->data, $symbol);
             $data[] = MarketSpread::getTable($output, $this->data, $symbol);
         } catch (\Kobens\Gemini\Exception $e) {

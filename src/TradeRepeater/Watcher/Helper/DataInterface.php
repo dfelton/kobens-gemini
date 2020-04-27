@@ -16,4 +16,9 @@ interface DataInterface
      * @return \stdClass[]
      */
     public function getOrdersData(): array;
+
+    /**
+     * @return \Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetNotionalBalances\BalanceInterface[]
+     */
+    public function getNotionalBalances(): array;
 }

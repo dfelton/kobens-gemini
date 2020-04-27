@@ -43,6 +43,9 @@
             </trade_repeater>
         </keys>
     </gemini>
+    <storage>
+        <invested_usd>0.00</invested_usd>
+    </storage>
     <database>
         <driver>pdo_mysql</driver>
         <hostname>127.0.0.1</hostname>
