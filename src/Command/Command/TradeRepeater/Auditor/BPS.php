@@ -7,7 +7,7 @@ namespace Kobens\Gemini\Command\Command\TradeRepeater\Auditor;
 use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Core\SleeperInterface;
 use Kobens\Core\Exception\ConnectionException;
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\FeeAndVolume\GetNotationalVolumeInterface;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\FeeAndVolume\GetNotionalVolumeInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelAllSessionOrdersInterface;
 use Kobens\Gemini\Command\Command\TradeRepeater\SleeperTrait;
 use Kobens\Gemini\Exception\Api\Reason\InvalidNonceException;
@@ -44,7 +44,7 @@ final class BPS extends Command
     private $shutdown;
 
     /**
-     * @var GetNotationalVolumeInterface
+     * @var GetNotionalVolumeInterface
      */
     private $volume;
 
@@ -65,7 +65,7 @@ final class BPS extends Command
 
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,
-        GetNotationalVolumeInterface $getNotationalVolumeInterface,
+        GetNotionalVolumeInterface $getNotationalVolumeInterface,
         SellPlacedInterface $sellPlacedInterface,
         CancelAllSessionOrdersInterface $cancelAllSessionOrdersInterface,
         SleeperInterface $sleeperInterface
