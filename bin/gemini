@@ -17,6 +17,7 @@ use Kobens\Gemini\Api\Nonce;
 use Kobens\Gemini\Api\Market\GetPrice;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\FeeAndVolume\GetNotionalVolume;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetAvailableBalances;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetNotionalBalances;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelAllActiveOrders;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelOrder;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\FillOrKill;
@@ -102,6 +103,7 @@ $cancelOrderInterface = new CancelOrder($hostInterface, $privateThrottlerInterfa
 $getPastTradesInterface = new GetPastTrades($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
 $getActiveOrdersInterface = new GetActiveOrders($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
 $getAvailableBalancesInterface = new GetAvailableBalances($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+$getNotionalBalancesInterface = new GetNotionalBalances($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
 $orderStatusInterface = new OrderStatus($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
 $getNotionalVolumeInterface = new GetNotionalVolume($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
 
@@ -269,6 +271,7 @@ $app->add(new \Kobens\Gemini\Command\Command\OrderPlacement\NewOrder\MakerOrCanc
 
 // TODO: The following commands can use a common KeyInterface, and should have no Trading Authority
 $app->add(new \Kobens\Gemini\Command\Command\Funds\GetAvailableBalances($getAvailableBalancesInterface));
+$app->add(new \Kobens\Gemini\Command\Command\Funds\GetNotionalBalances($getNotionalBalancesInterface));
 $app->add(new \Kobens\Gemini\Command\Command\OrderStatus\GetActiveOrders($hostInterface, $getActiveOrdersInterface));
 $app->add(new \Kobens\Gemini\Command\Command\OrderStatus\GetPastTrades($getPastTradesInterface));
 $app->add(new \Kobens\Gemini\Command\Command\OrderStatus\OrderStatus($orderStatusInterface));

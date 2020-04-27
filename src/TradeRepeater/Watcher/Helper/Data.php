@@ -6,6 +6,7 @@ namespace Kobens\Gemini\TradeRepeater\Watcher\Helper;
 
 use Kobens\Gemini\Api\Market\GetPriceInterface;
 use Kobens\Gemini\Api\Market\GetPrice\Result;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetAvailableBalancesInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetActiveOrdersInterface;
 
 final class Data implements DataInterface
@@ -30,12 +31,19 @@ final class Data implements DataInterface
      */
     private $price;
 
+    /**
+     * @var GetAvailableBalancesInterface
+     */
+    private $balance;
+
     public function __construct(
         GetActiveOrdersInterface $getActiveOrdersInterface,
         GetPriceInterface $getPriceInterface
+//         GetAvailableBalancesInterface $getAvailableBalancesInterface
     ) {
         $this->activeOrders = $getActiveOrdersInterface;
         $this->price = $getPriceInterface;
+//         $this->balance = $getAvailableBalancesInterface;
     }
 
     public function reset(): void
