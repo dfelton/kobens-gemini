@@ -60,7 +60,7 @@ final class BookKeeper extends Command
                 do {
                     $output->writeln([
                         "Code: {$e->getCode()}",
-                        "Class: ".\get_class($e),
+                        "Class: " . \get_class($e),
                         "Message: {$e->getMessage()}",
                         "Trace:",
                         $e->getTraceAsString()
