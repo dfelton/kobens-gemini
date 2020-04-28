@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kobens\Gemini\TradeRepeater;
 
 use Kobens\Exchange\PairInterface;
+use Kobens\Gemini\Exception;
 use Kobens\Gemini\Exchange\Order\Fee\ApiMakerHoldBps;
 use Kobens\Gemini\Exchange\Order\Fee\MaxApiMakerBps;
 use Kobens\Gemini\TradeRepeater\PricePointGenerator\PricePoint;
@@ -15,14 +16,9 @@ use Kobens\Math\BasicCalculator\Subtract;
 
 final class PricePointGenerator
 {
-    private function __construct()
-    {
-    }
-
     /**
      * FIXME: Implement logic with \Kobens\Exchange\PairInterface::getMinPriceIncrement to verify the increment is valid
      * FIXME: Implement logic with \Kobens\Exchange\PairInterface::getMinPriceIncrement to verify the buy start price is valid
-     * FIXME: Implement logic with \Kobens\Exchange\PairInterface::getMinOrderSize to verify the buy amount is valid
      *
      * @param PairInterface $pair
      * @param string $buyAmount
@@ -37,8 +33,20 @@ final class PricePointGenerator
     public static function get(PairInterface $pair, string $buyAmount, string $priceStart, string $priceEnd, string $increment, string $sellAfterGain, string $saveAmount = '0'): Result
     {
         $sellAmount = Subtract::getResult($buyAmount, $saveAmount);
+        if (Compare::getResult($pair->getMinOrderSize(), $buyAmount) === Compare::LEFT_GREATER_THAN) {
+            throw new Exception(sprintf(
+                'Buy amount "%s" is invalid. Minimum order size is "%s".',
+                $buyAmount,
+                $pair->getMinOrderSize()
+            ));
+        } elseif (Compare::getResult($pair->getMinOrderSize(), $sellAmount) === Compare::LEFT_GREATER_THAN) {
+            throw new Exception(sprintf(
+                'Sell amount "%s" is invalid. Minimum order size is "%s".',
+                $sellAmount,
+                $pair->getMinOrderSize()
+            ));
+        }
         $orders = [];
-
         $quote = $pair->getQuote();
 
         // TODO: remove this once issues mentioned in constructor are addressed.
@@ -73,7 +81,7 @@ final class PricePointGenerator
             }
             $sellPrice = \bcadd($priceStart, $sellPrice, $quote->getScale());
 
-            $orders[] = new PricePoint(
+            $pricePoint = new PricePoint(
                 $buyAmount,
                 $priceStart,
                 $sellAmount,
@@ -82,9 +90,22 @@ final class PricePointGenerator
                 ApiMakerHoldBps::get(),
                 $hasVariablePriceIncrement
             );
+            // "Potentially" in the wording here because fees are variable, and we assume the worst
+            if (Compare::getResult($pricePoint->getProfitQuote(), '0') === Compare::RIGHT_GREATER_THAN) {
+                throw new Exception('Params yield potential quote currency losses');
+            } elseif(Compare::getResult($pricePoint->getProfitBase(), '0') === Compare::RIGHT_GREATER_THAN) {
+                throw new Exception('Params yield potential base currency losses.');
+            } elseif (
+                Compare::getResult($pricePoint->getProfitQuote(), '0') === Compare::EQUAL &&
+                Compare::getResult($pricePoint->getProfitBase(), '0') === Compare::EQUAL
+            ) {
+                throw new Exception('Params yield potentially no gains.');
+            }
+            $orders[] = $pricePoint;
             $priceStart = Add::getResult($priceStart, $increment);
         }
 
         return new Result($orders, $hasVariablePriceIncrement);
     }
+
 }
