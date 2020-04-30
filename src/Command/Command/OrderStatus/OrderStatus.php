@@ -34,7 +34,7 @@ final class OrderStatus extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $data = $this->status->getStatus($input->getArgument('order_id'));
+        $data = $this->status->getStatus((int) $input->getArgument('order_id'));
         $data = \get_object_vars($data);
 
         $keyLength = 0;
