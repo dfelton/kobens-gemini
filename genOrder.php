@@ -57,7 +57,7 @@ $quote = $pair->getQuote();
 $orders = $result->getPricePoints();
 
 if ($action === 'buy' || $action === 'sell') {
-    $funds = $getAvailableBalances->getCurrency(
+    $funds = $getAvailableBalances->getBalance(
         ($action === 'buy' ? $pair->getQuote()->getSymbol() : $base->getSymbol())
     );
 
@@ -65,8 +65,8 @@ if ($action === 'buy' || $action === 'sell') {
         ? Add::getResult($result->getTotalBuyQuote(), $result->getTotalBuyFees())
         : $result->getTotalSellBase();
 
-    if (Compare::getResult('0', Subtract::getResult($funds->available, $amountRequired)) === Compare::LEFT_GREATER_THAN) {
-        echo "\nInsufficient funds for order(s).\nRequired: {$amountRequired}\nAvailable: {$funds->available}\n";
+    if (Compare::getResult('0', Subtract::getResult($funds->getAvailable(), $amountRequired)) === Compare::LEFT_GREATER_THAN) {
+        echo "\nInsufficient funds for order(s).\nRequired: {$amountRequired}\nAvailable: {$funds->getAvailable()}\n";
         exit(1);
     }
 
