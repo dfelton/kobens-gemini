@@ -36,7 +36,7 @@ final class CancelOrder extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $data = $this->cancel->cancel($input->getArgument('order_id'));
+        $data = $this->cancel->cancel((int) $input->getArgument('order_id'));
         if ($input->getOption('raw')) {
             $output->writeln(\json_encode($data));
         } else {
