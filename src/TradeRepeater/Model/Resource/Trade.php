@@ -8,10 +8,7 @@ use Zend\Db\TableGateway\TableGateway;
 
 final class Trade
 {
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    private TableGateway $table;
 
     public function __construct(
         \Zend\Db\Adapter\Adapter $adapter

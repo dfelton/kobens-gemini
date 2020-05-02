@@ -6,85 +6,37 @@ namespace Kobens\Gemini\TradeRepeater\Model;
 
 final class Trade
 {
-    /**
-     * @var int
-     */
-    private $id;
+    private ?int $id;
 
-    /**
-     * @var int
-     */
-    private $isEnabled;
+    private int $isEnabled;
 
-    /**
-     * @var int
-     */
-    private $isError;
+    private int $isError;
 
-    /**
-     * @var string
-     */
-    private $status;
+    private string $status;
 
-    /**
-     * @var string
-     */
-    private $symbol;
+    private string $symbol;
 
-    /**
-     * @var string
-     */
-    private $buyAmount;
+    private string $buyAmount;
 
-    /**
-     * @var string
-     */
-    private $buyPrice;
+    private string $buyPrice;
 
-    /**
-     * @var string
-     */
-    private $sellAmount;
+    private string $sellAmount;
 
-    /**
-     * @var string
-     */
-    private $sellPrice;
+    private string $sellPrice;
 
-    /**
-     * @var string
-     */
-    private $buyClientOrderId;
+    private ?string $buyClientOrderId;
 
-    /**
-     * @var string
-     */
-    private $buyOrderId;
+    private ?string $buyOrderId;
 
-    /**
-     * @var string
-     */
-    private $sellClientOrderId;
+    private ?string $sellClientOrderId;
 
-    /**
-     * @var string
-     */
-    private $sellOrderId;
+    private ?string $sellOrderId;
 
-    /**
-     * @var string
-     */
-    private $note;
+    private ?string $note;
 
-    /**
-     * @var string
-     */
-    private $meta;
+    private ?string $meta;
 
-    /**
-     * @var string
-     */
-    private $updatedAt;
+    private ?string $updatedAt;
 
     public function __construct(
         int $id = null,
