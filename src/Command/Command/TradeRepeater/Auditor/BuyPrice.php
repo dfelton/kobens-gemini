@@ -21,6 +21,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Db\Adapter\Driver\ConnectionInterface;
 
 final class BuyPrice extends Command
 {
@@ -33,45 +34,21 @@ final class BuyPrice extends Command
 
     protected static $defaultName = 'trade-repeater:audit:buy-price';
 
-    /**
-     * @var EmergencyShutdownInterface
-     */
-    private $shutdown;
+    private EmergencyShutdownInterface $shutdown;
 
-    /**
-     * @var BuyPlacedInterface
-     */
-    private $buyPlaced;
+    private BuyPlacedInterface $buyPlaced;
 
-    /**
-     * @var GetPriceInterface
-     */
-    private $getPrice;
+    private GetPriceInterface $getPrice;
 
-    /**
-     * @var OrderStatusInterface
-     */
-    private $orderStatus;
+    private OrderStatusInterface $orderStatus;
 
-    /**
-     * @var CancelOrderInterface
-     */
-    private $cancelOrder;
+    private CancelOrderInterface $cancelOrder;
 
-    /**
-     * @var \Zend\Db\Adapter\Driver\ConnectionInterface
-     */
-    private $connection;
+    private ConnectionInterface $connection;
 
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    private TableGateway $table;
 
-    /**
-     * @var SleeperInterface
-     */
-    private $sleeper;
+    private SleeperInterface $sleeper;
 
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,

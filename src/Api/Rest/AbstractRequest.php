@@ -19,15 +19,9 @@ abstract class AbstractRequest
     private const   CURL_RETURNTRANSFER = true;
     protected const CURL_POST           = true;
 
-    /**
-     * @var ThrottlerInterface
-     */
-    private $throttler;
+    private ThrottlerInterface $throttler;
 
-    /**
-     * @var HostInterface
-     */
-    private $host;
+    private HostInterface $host;
 
     public function __construct(
         HostInterface $hostInterface,

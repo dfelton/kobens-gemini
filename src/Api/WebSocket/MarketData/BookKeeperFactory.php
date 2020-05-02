@@ -10,15 +10,9 @@ use Zend\Cache\Storage\StorageInterface;
 
 final class BookKeeperFactory implements BookKeeperFactoryInterface
 {
-    /**
-     * @var ExchangeInterface
-     */
-    private $exchange;
+    private ExchangeInterface $exchange;
 
-    /**
-     * @var StorageInterface
-     */
-    private $storage;
+    private StorageInterface $storage;
 
     public function __construct(
         ExchangeInterface $exchangeInterface,

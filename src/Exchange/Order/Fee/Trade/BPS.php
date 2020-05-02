@@ -8,7 +8,7 @@ use Kobens\Math\BasicCalculator\Multiply;
 
 final class BPS
 {
-    private $knownRates = [
+    private array $knownRates = [
         // API Rates
         '0.001',   // 0.100% (most common, so first to attempt)
 
@@ -31,10 +31,7 @@ final class BPS
         // Market Fee Schedule - Don't even fucking consider charging for that; dicks for hinting it
     ];
 
-    /**
-     * @var BPS
-     */
-    private static $instance;
+    private static self $instance;
 
     private function __construct() { }
 

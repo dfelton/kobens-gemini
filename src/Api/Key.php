@@ -6,15 +6,9 @@ namespace Kobens\Gemini\Api;
 
 final class Key implements KeyInterface
 {
-    /**
-     * @var string
-     */
-    private $public;
+    private string $public;
 
-    /**
-     * @var string
-     */
-    private $secret;
+    private string $secret;
 
     public function __construct(string $public, string $secret)
     {

@@ -11,57 +11,27 @@ final class Result
     /**
      * @var PricePoint[]
      */
-    private $pricePoints = [];
+    private array $pricePoints = [];
 
-    /**
-     * @var string
-     */
-    private $totalBuyFees = '0';
+    private string $totalBuyFees = '0';
 
-    /**
-     * @var string
-     */
-    private $totalBuyFeeHold = '0';
+    private string $totalBuyFeeHold = '0';
 
-    /**
-     * @var string
-     */
-    private $totalBuyQuote = '0';
+    private string $totalBuyQuote = '0';
 
-    /**
-     * @var string
-     */
-    private $totalBuyBase = '0';
+    private string $totalBuyBase = '0';
 
-    /**
-     * @var string
-     */
-    private $totalSellBase = '0';
+    private string $totalSellBase = '0';
 
-    /**
-     * @var string
-     */
-    private $totalSellFees = '0';
+    private string $totalSellFees = '0';
 
-    /**
-     * @var string
-     */
-    private $totalSellQuote = '0';
+    private string $totalSellQuote = '0';
 
-    /**
-     * @var string
-     */
-    private $totalProfitQuote = '0';
+    private string $totalProfitQuote = '0';
 
-    /**
-     * @var string
-     */
-    private $totalProfitBase = '0';
+    private string $totalProfitBase = '0';
 
-    /**
-     * @var bool
-     */
-    private $variableIncrementPercent;
+    private bool $variableIncrementPercent;
 
     public function __construct(array $pricePoints, bool $variableIncrementPercent)
     {

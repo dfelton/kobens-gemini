@@ -38,30 +38,15 @@ final class BPS extends Command
 
     protected static $defaultName = 'trade-repeater:audit:bps';
 
-    /**
-     * @var EmergencyShutdownInterface
-     */
-    private $shutdown;
+    private EmergencyShutdownInterface $shutdown;
 
-    /**
-     * @var GetNotionalVolumeInterface
-     */
-    private $volume;
+    private GetNotionalVolumeInterface $volume;
 
-    /**
-     * @var SellPlacedInterface
-     */
-    private $sellPlaced;
+    private SellPlacedInterface $sellPlaced;
 
-    /**
-     * @var CancelAllSessionOrdersInterface
-     */
-    private $cancel;
+    private CancelAllSessionOrdersInterface $cancel;
 
-    /**
-     * @var SleeperInterface
-     */
-    private $sleeper;
+    private SleeperInterface $sleeper;
 
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,

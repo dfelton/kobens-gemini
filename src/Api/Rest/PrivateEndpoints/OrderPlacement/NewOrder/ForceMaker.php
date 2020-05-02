@@ -27,10 +27,7 @@ final class ForceMaker extends AbstractNewOrder implements ForceMakerInterface
 {
     private const MAX_ITERATIONS = 100;
 
-    /**
-     * @var GetPriceInterface
-     */
-    private $getPrice;
+    private GetPriceInterface $getPrice;
 
     public function __construct(
         HostInterface $hostInterface,

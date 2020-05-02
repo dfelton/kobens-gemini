@@ -11,10 +11,7 @@ final class Limit extends AbstractNewOrder
 {
     protected static $defaultName = 'order-placement:new-order:limit';
 
-    /**
-     * @var LimitInterface
-     */
-    private $limitOrder;
+    private LimitInterface $limitOrder;
 
     public function __construct(
         LimitInterface $limitInterface

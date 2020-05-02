@@ -15,10 +15,7 @@ final class StopLimit extends Command
 {
     protected static $defaultName = 'order-placement:new-order:stop-limit';
 
-    /**
-     * @var StopLimitInterface
-     */
-    private $stopLimitOrder;
+    private StopLimitInterface $stopLimitOrder;
 
     public function __construct(
         StopLimitInterface $limitInterface

@@ -6,25 +6,13 @@ namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetAvailableBal
 
 final class Balance implements BalanceInterface
 {
-    /**
-     * @var string
-     */
-    private $currency;
+    private string $currency;
 
-    /**
-     * @var string
-     */
-    private $amount;
+    private string $amount;
 
-    /**
-     * @var string
-     */
-    private $available;
+    private string $available;
 
-    /**
-     * @var string
-     */
-    private $availableForWithdrawal;
+    private string $availableForWithdrawal;
 
     public function __construct(
         string $currency,

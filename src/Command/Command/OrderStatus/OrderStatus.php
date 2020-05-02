@@ -14,10 +14,7 @@ final class OrderStatus extends Command
 {
     protected static $defaultName = 'order-status:get-status';
 
-    /**
-     * @var OrderStatusInterface
-     */
-    private $status;
+    private OrderStatusInterface $status;
 
     public function __construct(
         OrderStatusInterface $orderStatusInterface

@@ -14,32 +14,23 @@ final class Data implements DataInterface
     /**
      * @var Result[]
      */
-    private $priceResult = [];
+    private array $priceResult = [];
 
     /**
      * @var \stdClass[]
      */
-    private $orders;
+    private ?array $orders = null;
 
-    /**
-     * @var GetActiveOrdersInterface
-     */
-    private $activeOrders;
+    private GetActiveOrdersInterface $activeOrders;
 
-    /**
-     * @var GetPriceInterface
-     */
-    private $price;
+    private GetPriceInterface $price;
 
-    /**
-     * @var GetNotionalBalancesInterface
-     */
-    private $notionalBalance;
+    private GetNotionalBalancesInterface $notionalBalance;
 
     /**
      * @var \Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetNotionalBalances\BalanceInterface[]
      */
-    private $notionalBalances;
+    private ?array $notionalBalances = null;
 
     public function __construct(
         GetActiveOrdersInterface $getActiveOrdersInterface,

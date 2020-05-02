@@ -14,10 +14,7 @@ final class GetNotionalVolume extends Command
 {
     protected static $defaultName = 'fee-volume:get-notional-volume';
 
-    /**
-     * @var GetNotionalVolumeInterface
-     */
-    private $volume;
+    private GetNotionalVolumeInterface $volume;
 
     public function __construct(GetNotionalVolumeInterface $getNotationalVolumeInterface)
     {

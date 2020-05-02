@@ -8,10 +8,7 @@ final class TickerV2 extends AbstractPublicRequest implements TickerV2Interface
 {
     private const URL_PATH = '/v2/ticker/';
 
-    /**
-     * @var string
-     */
-    private $symbol;
+    private string $symbol;
 
     public function getData(string $symbol): \stdClass
     {

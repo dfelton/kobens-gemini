@@ -14,7 +14,7 @@ final class StopLimit extends AbstractPrivateRequest implements StopLimitInterfa
     /**
      * @var array
      */
-    protected $payload = [];
+    protected array $payload = [];
 
     public function place(PairInterface $pair, string $side, string $amount, string $price, string $stopPrice, string $clientOrderId = null): \stdClass
     {

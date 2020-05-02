@@ -14,15 +14,9 @@ final class BookKeeper extends AbstractKeeper
 {
     const API_PATH = '/v1/marketdata/';
 
-    /**
-     * @var int
-     */
-    private $socketSequence;
+    private int $socketSequence;
 
-    /**
-     * @var array
-     */
-    protected $params = [
+    protected array $params = [
         'heartbeat'=> 'true',
         'trades'   => 'false',
         'auctions' => 'false',

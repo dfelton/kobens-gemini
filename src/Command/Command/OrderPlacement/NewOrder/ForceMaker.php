@@ -11,10 +11,7 @@ final class ForceMaker extends AbstractNewOrder
 {
     protected static $defaultName = 'order-placement:new-order:force-maker';
 
-    /**
-     * @var ForceMakerInterface
-     */
-    private $forceMaker;
+    private ForceMakerInterface $forceMaker;
 
     public function __construct(
         ForceMakerInterface $forceMakerInterface

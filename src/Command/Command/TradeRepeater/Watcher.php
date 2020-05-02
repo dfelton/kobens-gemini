@@ -25,15 +25,9 @@ final class Watcher extends Command
 
     static protected $defaultName = 'trade-repeater:watcher';
 
-    /**
-     * @var SleeperInterface
-     */
-    private $sleeper;
+    private SleeperInterface $sleeper;
 
-    /**
-     * @var Data
-     */
-    private $data;
+    private Data $data;
 
     public function __construct(
         Data $data,

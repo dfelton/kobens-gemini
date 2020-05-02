@@ -10,10 +10,7 @@ class OrderStatus extends AbstractPrivateRequest implements OrderStatusInterface
 {
     const URL_PATH = '/v1/order/status';
 
-    /**
-     * @var int
-     */
-    private $orderId;
+    private int $orderId;
 
     public function getStatus(int $orderId): \stdClass
     {

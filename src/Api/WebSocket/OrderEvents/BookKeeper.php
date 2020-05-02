@@ -18,25 +18,13 @@ final class BookKeeper implements BookKeeperInterface
 {
     const REQUEST_URI = '/v1/order/events';
 
-    /**
-     * @var \Zend\Cache\Storage\StorageInterface
-     */
-    protected $cache;
+    protected StorageInterface $cache;
 
-    /**
-     * @var HostInterface
-     */
-    private $host;
+    private HostInterface $host;
 
-    /**
-     * @var KeyInterface
-     */
-    private $key;
+    private KeyInterface $key;
 
-    /**
-     * @var NonceInterface
-     */
-    private $nonce;
+    private NonceInterface $nonce;
 
     public function __construct(
         HostInterface $hostInterface,

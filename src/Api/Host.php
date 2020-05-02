@@ -6,10 +6,7 @@ namespace Kobens\Gemini\Api;
 
 class Host implements HostInterface
 {
-    /**
-     * @var string
-     */
-    private $host;
+    private string $host;
 
     public function __construct(string $host)
     {

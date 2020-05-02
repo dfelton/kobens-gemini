@@ -6,15 +6,9 @@ namespace Kobens\Gemini\Api\Rest;
 
 final class Response implements ResponseInterface
 {
-    /**
-     * @var string
-     */
-    private $body;
+    private int $body;
 
-    /**
-     * @var int
-     */
-    private $responseCode;
+    private int $responseCode;
 
     public function __construct(string $body, int $responseCode)
     {

@@ -107,5 +107,4 @@ final class PricePointGenerator
 
         return new Result($orders, $hasVariablePriceIncrement);
     }
-
 }

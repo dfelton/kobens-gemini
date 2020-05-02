@@ -15,15 +15,9 @@ class GetPrice implements GetPriceInterface
 {
     private const MAX_ATTEMPTS = 50;
 
-    /**
-     * @var ExchangeInterface
-     */
-    private $exchange;
+    private ExchangeInterface $exchange;
 
-    /**
-     * @var TickerInterface
-     */
-    private $ticker;
+    private TickerInterface $ticker;
 
     public function __construct(
         ExchangeInterface $exchangeInterface,

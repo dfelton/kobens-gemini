@@ -29,30 +29,15 @@ final class TradeHistory extends Command
     private const MIN_DELAY      = 60;
     private const MAX_DELAY      = 600;
 
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    private TableGateway $table;
 
-    /**
-     * @var GetPastTradesInterface
-     */
-    private $pastTrades;
+    private GetPastTradesInterface $pastTrades;
 
-    /**
-     * @var EmergencyShutdownInterface
-     */
-    private $shutdown;
+    private EmergencyShutdownInterface $shutdown;
 
-    /**
-     * @var string
-     */
-    private $symbol;
+    private string $symbol;
 
-    /**
-     * @var int
-     */
-    private $delay;
+    private int $delay;
 
     public function __construct(
         GetPastTradesInterface $getPastTradesInterface,

@@ -29,25 +29,13 @@ final class SellLogger extends Command
 
     protected static $defaultName = 'taxes:sell-logger';
 
-    /**
-     * @var TableGateway
-     */
-    private $tblSellLog;
+    private TableGateway $tblSellLog;
 
-    /**
-     * @var TableGateway
-     */
-    private $tblBuyLog;
+    private TableGateway $tblBuyLog;
 
-    /**
-     * @var TableGateway
-     */
-    private $tblTradeHistory;
+    private TableGateway $tblTradeHistory;
 
-    /**
-     * @var string
-     */
-    private $symbol;
+    private string $symbol;
 
     protected function configure()
     {

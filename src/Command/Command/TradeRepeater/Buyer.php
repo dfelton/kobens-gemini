@@ -30,30 +30,15 @@ final class Buyer extends Command
 
     protected static $defaultName = 'trade-repeater:buyer';
 
-    /**
-     * @var EmergencyShutdownInterface
-     */
-    private $shutdown;
+    private EmergencyShutdownInterface $shutdown;
 
-    /**
-     * @var BuyReadyInterface
-     */
-    private $buyReady;
+    private BuyReadyInterface $buyReady;
 
-    /**
-     * @var BuySentInterface
-     */
-    private $buySent;
+    private BuySentInterface $buySent;
 
-    /**
-     * @var ForceMakerInterface
-     */
-    private $forceMaker;
+    private ForceMakerInterface $forceMaker;
 
-    /**
-     * @var SleeperInterface
-     */
-    private $sleeper;
+    private SleeperInterface $sleeper;
 
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,

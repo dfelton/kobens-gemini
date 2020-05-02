@@ -14,15 +14,9 @@ final class GetActiveOrders extends Command
 {
     protected static $defaultName = 'order-status:get-active';
 
-    /**
-     * @var HostInterface
-     */
-    private $host;
+    private HostInterface $host;
 
-    /**
-     * @var GetActiveOrdersInterface
-     */
-    private $activeOrders;
+    private GetActiveOrdersInterface $activeOrders;
 
     public function __construct(
         HostInterface $hostInterface,
@@ -51,5 +45,4 @@ final class GetActiveOrders extends Command
             \Zend\Debug\Debug::dump($orders);
         }
     }
-
 }

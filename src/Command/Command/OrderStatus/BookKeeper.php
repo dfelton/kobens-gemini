@@ -13,10 +13,7 @@ final class BookKeeper extends Command
 {
     protected static $defaultName = 'order-status:book-keeper';
 
-    /**
-     * @var BookKeeperInterface
-     */
-    private $book;
+    private BookKeeperInterface $book;
 
     public function __construct(BookKeeperInterface $bookKeeperInterface)
     {

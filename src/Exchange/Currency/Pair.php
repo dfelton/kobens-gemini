@@ -10,11 +10,11 @@ use Kobens\Exchange\PairInterface;
 
 final class Pair extends CurrencyPair implements PairInterface
 {
-    private $minOrderIncrement;
-    private $minOrderSize;
-    private $minPriceIncrement;
+    private string $minOrderIncrement;
+    private string $minOrderSize;
+    private string $minPriceIncrement;
 
-    private static $pairs = [
+    private static array $pairs = [
         'btcusd' => ['base' => 'btc', 'quote' => 'usd', 'minOrderSize' => '0.00001', 'minOrderIncrement' => '0.00000001', 'minPriceIncrement' => '0.01'],
         'ethbtc' => ['base' => 'eth', 'quote' => 'btc', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
         'ethusd' => ['base' => 'eth', 'quote' => 'usd', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.01'],
@@ -30,7 +30,7 @@ final class Pair extends CurrencyPair implements PairInterface
     /**
      * @var PairInterface[]
      */
-    private static $instances = [];
+    private static array $instances = [];
 
     private function __construct(string $symbol)
     {

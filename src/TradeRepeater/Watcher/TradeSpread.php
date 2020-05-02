@@ -13,7 +13,6 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
 final class TradeSpread
 {
     public static function getTable(OutputInterface $output, DataInterface $data, string $symbol): Table

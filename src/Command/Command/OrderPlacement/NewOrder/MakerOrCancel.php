@@ -11,10 +11,7 @@ final class MakerOrCancel extends AbstractNewOrder
 {
     protected static $defaultName = 'order-placement:new-order:maker-or-cancel';
 
-    /**
-     * @var MakerOrCancelInterface
-     */
-    private $makerOrCancel;
+    private MakerOrCancelInterface $makerOrCancel;
 
     public function __construct(
         MakerOrCancelInterface $makerOrCancelInterface

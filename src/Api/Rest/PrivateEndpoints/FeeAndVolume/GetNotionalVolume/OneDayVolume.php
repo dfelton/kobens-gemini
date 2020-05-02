@@ -6,9 +6,9 @@ namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\FeeAndVolume\GetNotionalVolume
 
 final class OneDayVolume implements \JsonSerializable
 {
-    private $date;
+    private string $date;
 
-    private $notionalVolume;
+    private string $notionalVolume;
 
     public function __construct(string $date, string $notionalVolume)
     {

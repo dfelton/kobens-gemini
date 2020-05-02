@@ -12,15 +12,9 @@ use Kobens\Gemini\Api\Rest\AbstractRequest;
 
 abstract class AbstractPrivateRequest extends AbstractRequest
 {
-    /**
-     * @var KeyInterface
-     */
-    private $key;
+    private KeyInterface $key;
 
-    /**
-     * @var NonceInterface
-     */
-    private $nonce;
+    private NonceInterface $nonce;
 
     public function __construct(
         HostInterface $hostInterface,

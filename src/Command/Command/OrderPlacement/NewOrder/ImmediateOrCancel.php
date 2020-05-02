@@ -11,10 +11,7 @@ final class ImmediateOrCancel extends AbstractNewOrder
 {
     protected static $defaultName = 'order-placement:new-order:immediate-or-cancel';
 
-    /**
-     * @var ImmediateOrCancelInterface
-     */
-    private $immediateOrCancel;
+    private ImmediateOrCancelInterface $immediateOrCancel;
 
     public function __construct(
         ImmediateOrCancelInterface $immediateOrCancelInterface

@@ -22,30 +22,15 @@ final class Archiver extends Command
 
     protected static $defaultName = 'trade-repeater:archiver';
 
-    /**
-     * @var ArchiveInterface
-     */
-    private $archive;
+    private ArchiveInterface $archive;
 
-    /**
-     * @var ConnectionInterface
-     */
-    private $connection;
+    private ConnectionInterface $connection;
 
-    /**
-     * @var SellFilledInterface
-     */
-    private $sellFilled;
+    private SellFilledInterface $sellFilled;
 
-    /**
-     * @var EmergencyShutdownInterface
-     */
-    private $shutdown;
+    private EmergencyShutdownInterface $shutdown;
 
-    /**
-     * @var SleeperInterface
-     */
-    private $sleeper;
+    private SleeperInterface $sleeper;
 
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,

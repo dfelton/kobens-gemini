@@ -6,25 +6,16 @@ namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\FeeAndVolume\GetNotionalVolume
 
 final class Response implements ResponseInterface
 {
-    /**
-     * @var string
-     */
-    private $date;
+    private string $date;
 
-    /**
-     * @var int
-     */
-    private $lastUpdatedMs;
+    private int $lastUpdatedMs;
 
     /**
      * @var OneDayVolume[]
      */
-    private $notional1DayVolume = [];
+    private array $notional1DayVolume = [];
 
-    /**
-     * @var string
-     */
-    private $notional30DayVolume;
+    private string $notional30DayVolume;
 
     /**
      * @var int[]

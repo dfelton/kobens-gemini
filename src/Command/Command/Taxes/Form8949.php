@@ -19,15 +19,9 @@ final class Form8949 extends Command
 {
     protected static $defaultName = 'taxes:form8949';
 
-    /**
-     * @var string
-     */
-    private $symbol;
+    private string $symbol;
 
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    private TableGateway $table;
 
     protected function configure()
     {

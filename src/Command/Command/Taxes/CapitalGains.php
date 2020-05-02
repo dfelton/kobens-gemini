@@ -24,10 +24,7 @@ final class CapitalGains extends Command
      */
     protected static $defaultName = 'taxes:capital-gains';
 
-    /**
-     * @var string
-     */
-    private $symbol;
+    private string $symbol;
 
     protected function configure()
     {

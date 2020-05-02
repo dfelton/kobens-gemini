@@ -10,10 +10,7 @@ final class CancelOrder extends AbstractPrivateRequest implements CancelOrderInt
 {
     private const URL_PATH = '/v1/order/cancel';
 
-    /**
-     * @var int
-     */
-    private $orderId;
+    private int $orderId;
 
     public function cancel(int $orderId): \stdClass
     {

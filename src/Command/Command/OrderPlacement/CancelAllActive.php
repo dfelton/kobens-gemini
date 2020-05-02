@@ -13,10 +13,7 @@ final class CancelAllActive extends Command
 {
     protected static $defaultName = 'order-placement:cancel-all';
 
-    /**
-     * @var CancelAllActiveOrdersInterface
-     */
-    private $cancel;
+    private CancelAllActiveOrdersInterface $cancel;
 
     public function __construct(
         CancelAllActiveOrdersInterface $cancelAllActiveOrdersInterface

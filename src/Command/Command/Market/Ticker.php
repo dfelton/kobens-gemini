@@ -15,10 +15,7 @@ final class Ticker extends Command
 {
     protected static $defaultName = 'market:ticker';
 
-    /**
-     * @var TickerInterface
-     */
-    private $ticker;
+    private TickerInterface $ticker;
 
     public function __construct(
         TickerInterface $tickerInterface

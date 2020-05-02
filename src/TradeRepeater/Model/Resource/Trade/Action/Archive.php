@@ -9,10 +9,7 @@ use Zend\Db\TableGateway\TableGateway;
 
 final class Archive implements ArchiveInterface
 {
-    /**
-     * @var TableGateway
-     */
-    private $table;
+    private TableGateway $table;
 
     public function __construct()
     {

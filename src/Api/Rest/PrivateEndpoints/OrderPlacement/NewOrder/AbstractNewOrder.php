@@ -10,10 +10,7 @@ abstract class AbstractNewOrder extends AbstractPrivateRequest implements NewOrd
 {
     private const URL_PATH = '/v1/order/new';
 
-    /**
-     * @var array
-     */
-    protected $payload = [];
+    protected array $payload = [];
 
     final protected function getUrlPath(): string
     {

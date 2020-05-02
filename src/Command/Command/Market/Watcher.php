@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kobens\Gemini\Command\Command\Market;
 
 use Kobens\Exchange\ExchangeInterface;
+use Kobens\Exchange\Book\BookInterface;
 use Kobens\Exchange\Exception\ClosedBookException;
 use Kobens\Gemini\Api\HostInterface;
 use Kobens\Gemini\Command\Traits\Traits;
@@ -23,65 +24,29 @@ final class Watcher extends Command
 
     protected static $defaultName = 'market:watcher';
 
-    /**
-     * @var ExchangeInterface
-     */
-    private $exchange;
+    private ExchangeInterface $exchange;
 
-    /**
-     * @var HostInterface
-     */
-    private $host;
+    private HostInterface $host;
 
-    /**
-     * @var string
-     */
-    private $symbol;
+    private string $symbol;
 
-    /**
-     * @var bool
-     */
-    private $hasReportedClosedBook = false;
+    private bool $hasReportedClosedBook = false;
 
-    /**
-     * @var bool
-     */
-    private $bookIsOpen = false;
+    private bool $bookIsOpen = false;
 
-    /**
-     * @var string
-     */
-    private $ask;
+    private string $ask;
 
-    /**
-     * @var string
-     */
-    private $bid;
+    private string $bid;
 
-    /**
-     * @var string
-     */
-    private $spread;
+    private string $spread;
 
-    /**
-     * @var int
-     */
-    private $lastOutput = 0;
+    private int $lastOutput = 0;
 
-    /**
-     * @var int
-     */
-    private $tabLength = 8;
+    private int $tabLength = 8;
 
-    /**
-     * @var int
-     */
-    private $refreshRate;
+    private int $refreshRate;
 
-    /**
-     * @var \Kobens\Exchange\Book\BookInterface
-     */
-    private $book;
+    private BookInterface $book;
 
     public function __construct(
         ExchangeInterface $exchangeInterface,

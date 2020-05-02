@@ -28,35 +28,17 @@ final class Rest extends Command
 
     protected static $defaultName = 'trade-repeater:fill-monitor-rest';
 
-    /**
-     * @var GetActiveOrdersInterface
-     */
-    private $activeOrders;
+    private GetActiveOrdersInterface $activeOrders;
 
-    /**
-     * @var BuyPlacedInterface
-     */
-    private $buyPlaced;
+    private BuyPlacedInterface $buyPlaced;
 
-    /**
-     * @var SellPlacedInterface
-     */
-    private $sellPlaced;
+    private SellPlacedInterface $sellPlaced;
 
-    /**
-     * @var EmergencyShutdownInterface
-     */
-    private $shutdown;
+    private EmergencyShutdownInterface $shutdown;
 
-    /**
-     * @var OrderStatusInterface
-     */
-    private $orderStatus;
+    private OrderStatusInterface $orderStatus;
 
-    /**
-     * @var SleeperInterface
-     */
-    private $sleeper;
+    private SleeperInterface $sleeper;
 
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,

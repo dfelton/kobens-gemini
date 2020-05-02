@@ -8,25 +8,17 @@ use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Db\Adapter\Driver\ConnectionInterface;
 
 abstract class AbstractAction
 {
     const STATUS_CURRENT = '';
 
-    /**
-     * @var TableGateway
-     */
-    protected $table;
+    protected TableGateway $table;
 
-    /**
-     * @var Adapter
-     */
-    protected $adapter;
+    protected Adapter $adapter;
 
-    /**
-     * @var \Zend\Db\Adapter\Driver\ConnectionInterface
-     */
-    protected $connection;
+    protected ConnectionInterface $connection;
 
     public function __construct(
         Adapter $adapter

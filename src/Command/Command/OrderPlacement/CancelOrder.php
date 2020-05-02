@@ -15,10 +15,7 @@ final class CancelOrder extends Command
 {
     protected static $defaultName = 'order-placement:cancel';
 
-    /**
-     * @var CancelOrderInterface
-     */
-    private $cancel;
+    private CancelOrderInterface $cancel;
 
     public function __construct(
         CancelOrderInterface $cancelOrderInterface

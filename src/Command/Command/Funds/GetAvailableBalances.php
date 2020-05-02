@@ -17,10 +17,7 @@ final class GetAvailableBalances extends Command
 {
     protected static $defaultName = 'funds:balances';
 
-    /**
-     * @var GetAvailableBalancesInterface
-     */
-    private $balances;
+    private GetAvailableBalancesInterface $balances;
 
     public function __construct(
         GetAvailableBalancesInterface $getAvailableBalancesInterface

@@ -8,10 +8,7 @@ final class Ticker extends AbstractPublicRequest implements TickerInterface
 {
     private const URL_PATH = '/v1/pubticker/';
 
-    /**
-     * @var string
-     */
-    private $symbol;
+    private string $symbol;
 
     public function getData(string $symbol): \stdClass
     {

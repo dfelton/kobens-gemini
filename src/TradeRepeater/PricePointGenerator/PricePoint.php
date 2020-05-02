@@ -15,35 +15,17 @@ use Kobens\Math\BasicCalculator\Subtract;
  */
 final class PricePoint
 {
-    /**
-     * @var string
-     */
-    private $buyPrice;
+    private string $buyPrice;
 
-    /**
-     * @var string
-     */
-    private $buyAmount;
+    private string $buyAmount;
 
-    /**
-     * @var string
-     */
-    private $sellPrice;
+    private string $sellPrice;
 
-    /**
-     * @var string
-     */
-    private $sellAmount;
+    private string $sellAmount;
 
-    /**
-     * @var string
-     */
-    private $bps;
+    private string $bps;
 
-    /**
-     * @var string
-     */
-    private $holdBps;
+    private string $holdBps;
 
     /**
      * @param string $buyAmount

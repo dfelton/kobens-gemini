@@ -18,15 +18,9 @@ final class BookKeeper extends Command
 {
     protected static $defaultName = 'market:book-keeper';
 
-    /**
-     * @var BookKeeperFactoryInterface
-     */
-    private $bookFactory;
+    private BookKeeperFactoryInterface $bookFactory;
 
-    /**
-     * @var string
-     */
-    private $lastExceptionMessage;
+    private string $lastExceptionMessage;
 
     public function __construct(
         BookKeeperFactoryInterface $bookKeeperFactoryInterface,

@@ -24,40 +24,19 @@ final class WebSocket extends Command
 
     protected static $defaultName = 'trade-repeater:fill-monitor-websocket';
 
-    /**
-     * @var BuyPlacedInterface
-     */
-    private $buyPlaced;
+    private BuyPlacedInterface $buyPlaced;
 
-    /**
-     * @var SellPlacedInterface
-     */
-    private $sellPlaced;
+    private SellPlacedInterface $sellPlaced;
 
-    /**
-     * @var KeyInterface
-     */
-    private $key;
+    private KeyInterface $key;
 
-    /**
-     * @var NonceInterface
-     */
-    private $nonce;
+    private NonceInterface $nonce;
 
-    /**
-     * @var EmergencyShutdownInterface
-     */
-    private $shutdown;
+    private EmergencyShutdownInterface $shutdown;
 
-    /**
-     * @var HostInterface
-     */
-    private $host;
+    private HostInterface $host;
 
-    /**
-     * @var SleeperInterface
-     */
-    private $sleeper;
+    private SleeperInterface $sleeper;
 
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,

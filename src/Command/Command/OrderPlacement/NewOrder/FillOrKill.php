@@ -11,10 +11,7 @@ final class FillOrKill extends AbstractNewOrder
 {
     protected static $defaultName = 'order-placement:new-order:fill-or-kill';
 
-    /**
-     * @var FillOrKillInterface
-     */
-    private $fillOrKill;
+    private FillOrKillInterface $fillOrKill;
 
     public function __construct(
         FillOrKillInterface $fillOrKillInterface

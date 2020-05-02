@@ -14,7 +14,7 @@ final class GetPastTrades extends Command
 {
     protected static $defaultName = 'order-status:get-trades';
 
-    private $trades;
+    private GetPastTradesInterface $trades;
 
     public function __construct(
         GetPastTradesInterface $getPastTradesInterface
@@ -22,7 +22,6 @@ final class GetPastTrades extends Command
         $this->trades = $getPastTradesInterface;
         parent::__construct();
     }
-
 
     protected function configure()
     {
@@ -103,5 +102,4 @@ final class GetPastTrades extends Command
         }
         return $amount;
     }
-
 }

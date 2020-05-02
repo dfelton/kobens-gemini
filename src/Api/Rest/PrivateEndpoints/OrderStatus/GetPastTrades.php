@@ -11,20 +11,11 @@ final class GetPastTrades extends AbstractPrivateRequest implements GetPastTrade
 {
     private const URL_PATH = '/v1/mytrades';
 
-    /**
-     * @var string
-     */
-    private $symbol;
+    private string $symbol;
 
-    /**
-     * @var int
-     */
-    private $timestampms;
+    private int $timestampms;
 
-    /**
-     * @var int
-     */
-    private $limitTrades;
+    private int $limitTrades;
 
     public function getTrades(string $symbol, int $timestampms = null, int $limitTrades = null): array
     {

@@ -17,10 +17,7 @@ final class GetNotionalBalances extends Command
 {
     protected static $defaultName = 'funds:notional-balances';
 
-    /**
-     * @var GetNotionalBalancesInterface
-     */
-    private $balances;
+    private GetNotionalBalancesInterface $balances;
 
     public function __construct(
         GetNotionalBalancesInterface $getNotionalBalancesInterface
