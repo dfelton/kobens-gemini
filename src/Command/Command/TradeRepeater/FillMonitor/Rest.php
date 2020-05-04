@@ -64,13 +64,7 @@ final class Rest extends Command
                 $this->mainLoop($output);
                 $this->sleep(60, $this->sleeper, $this->shutdown);
 
-            } catch (ConnectionException $e) {
-                $this->exceptionDelay($output, $e);
-
-            } catch (MaintenanceException $e) {
-                $this->exceptionDelay($output, $e);
-
-            } catch (SystemException $e) {
+            } catch (ConnectionException | MaintenanceException | SystemException $e) {
                 $this->exceptionDelay($output, $e);
 
             } catch (\Exception $e) {
@@ -94,29 +88,44 @@ final class Rest extends Command
      */
     private function mainLoop(OutputInterface $output): void
     {
+        /** @var \Kobens\Gemini\TradeRepeater\Model\Trade $row */
         $activeIds = $this->getActiveOrderIds();
         foreach ($this->buyPlaced->getHealthyRecords() as $row) {
             if ($this->shutdown->isShutdownModeEnabled()) {
                 break;
             }
-            if (   !\array_key_exists($row->buy_order_id, $activeIds['buy'])
-                && $this->isStillHealthy($this->buyPlaced, $row->id)
-                && $this->isFilled($row->buy_order_id)
-                && $this->buyPlaced->setNextState($row->id)
+            if (
+                !($activeIds['buy'][$row->getBuyOrderId()] ?? false) &&
+                $this->isStillHealthy($this->buyPlaced, $row->getId()) &&
+                $this->isFilled($row->getBuyOrderId()) &&
+                $this->buyPlaced->setNextState($row->getId())
             ) {
-                $output->writeln("{$this->now()}\t({$row->id}) Buy order {$row->buy_order_id} on {$row->symbol} pair filled.");
+                $output->writeln(sprintf(
+                    "%s\t(%d) Buy order %d on %s pair filled.",
+                    $this->now(),
+                    $row->getId(),
+                    $row->getBuyOrderId(),
+                    $row->getSymbol()
+                ));
             }
         }
         foreach ($this->sellPlaced->getHealthyRecords() as $row) {
             if ($this->shutdown->isShutdownModeEnabled()) {
                 break;
             }
-            if (   !\array_key_exists($row->sell_order_id, $activeIds['sell'])
-                && $this->isStillHealthy($this->sellPlaced, $row->id)
-                && $this->isFilled($row->sell_order_id)
-                && $this->sellPlaced->setNextState($row->id)
+            if (
+                !($activeIds['sell'][$row->getSellOrderId()] ?? false) &&
+                $this->isStillHealthy($this->sellPlaced, $row->getId()) &&
+                $this->isFilled($row->getSellOrderId()) &&
+                $this->sellPlaced->setNextState($row->getId())
             ) {
-                $output->writeln("{$this->now()}\t({$row->id}) Sell order {$row->sell_order_id} on {$row->symbol} pair filled.");
+                $output->writeln(sprintf(
+                    "%s\t(%d) Sell order %d on %s pair filled.",
+                    $this->now(),
+                    $row->getId(),
+                    $row->getSellOrderId(),
+                    $row->getSymbol()
+                ));
             }
         }
     }
@@ -126,10 +135,6 @@ final class Rest extends Command
      * By performing a redundant call to our db we can save ourselves a
      * curl request which is more important than the reduction of db calls
      * in order to preserve rate limits on exchange.
-     *
-     * @param AbstractAction $resource
-     * @param $id
-     * @return bool
      */
     private function isStillHealthy(AbstractAction $resource, int $id): bool
     {

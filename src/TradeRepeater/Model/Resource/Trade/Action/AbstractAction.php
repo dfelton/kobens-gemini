@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action;
 
 use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
+use Kobens\Gemini\TradeRepeater\Model\Trade;
 use Zend\Db\Adapter\Adapter;
-use Zend\Db\Sql\Select;
-use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Adapter\Driver\ConnectionInterface;
+use Zend\Db\TableGateway\TableGateway;
 
 abstract class AbstractAction
 {
@@ -20,54 +20,30 @@ abstract class AbstractAction
 
     protected ConnectionInterface $connection;
 
+    protected \Kobens\Gemini\TradeRepeater\Model\Resource\Trade $tradeResource;
+
     public function __construct(
         Adapter $adapter
     ) {
         $this->adapter = $adapter;
         $this->connection = $adapter->getDriver()->getConnection();
         $this->table = new TableGateway('trade_repeater', $adapter);
+        $this->tradeResource = new \Kobens\Gemini\TradeRepeater\Model\Resource\Trade($adapter);
     }
 
-    abstract protected function isHealthy(\ArrayObject $record): bool;
+    abstract protected function isHealthy(Trade $record): bool;
 
-    protected function getRecords(): \Zend\Db\ResultSet\ResultSetInterface
-    {
-        return $this->table->select(function(Select $select) {
-            $select->where->equalTo('is_enabled', 1);
-            $select->where->equalTo('is_error', 0);
-            $select->where->equalTo('status', static::STATUS_CURRENT);
-        });
-    }
-
-    /**
-     * @return \Generator
-     */
     public function getHealthyRecords(): \Generator
     {
-        foreach ($this->getRecords() as $record) {
-            if ($this->isHealthy($record)) {
-                yield $record;
-            }
+        $trades = $this->tradeResource->getActiveByStatus(static::STATUS_CURRENT);
+        foreach ($trades as $trade) {
+            yield $trade;
         }
     }
 
-    /**
-     * @param int $id
-     * @throws \Exception
-     * @return \ArrayObject
-     */
-    public function getRecord(int $id, bool $forUpdate = false): \ArrayObject
+    public function getRecord(int $id, bool $forUpdate = false): Trade
     {
-        $sql = 'SELECT * FROM trade_repeater WHERE id = :id';
-        if ($forUpdate) {
-            $sql .= ' FOR UPDATE';
-        }
-        /** @var \Zend\Db\ResultSet\ResultSet $rows */
-        $rows = $this->adapter->query($sql, ['id' => $id]);
-        if ($rows->count() !== 1) {
-            throw new \Exception ("Order ID Not Found");
-        }
-        return $rows->current();
+        return $this->tradeResource->getById($id, $forUpdate);
     }
 
     /**
@@ -75,7 +51,7 @@ abstract class AbstractAction
      * @throws \Exception
      * @return \ArrayObject
      */
-    public function getHealthyRecord(int $id, bool $forUpdate = false): \ArrayObject
+    public function getHealthyRecord(int $id, bool $forUpdate = false): Trade
     {
         $record = $this->getRecord($id, $forUpdate);
         if (!$this->isHealthy($record)) {
@@ -86,5 +62,4 @@ abstract class AbstractAction
         }
         return $record;
     }
-
 }

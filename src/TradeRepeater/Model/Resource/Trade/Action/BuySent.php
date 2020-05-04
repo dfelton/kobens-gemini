@@ -4,22 +4,24 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action;
 
+use Kobens\Gemini\TradeRepeater\Model\Trade;
+
 final class BuySent extends AbstractAction implements BuySentInterface
 {
-    const STATUS_CURRENT = 'BUY_SENT';
-    const STATUS_NEXT    = 'BUY_PLACED';
+    public const STATUS_CURRENT = 'BUY_SENT';
+    public const STATUS_NEXT    = 'BUY_PLACED';
 
-    protected function isHealthy(\ArrayObject $record): bool
+    protected function isHealthy(Trade $trade): bool
     {
-        return $record->status === self::STATUS_CURRENT
-            && $record->is_enabled === '1'
-            && $record->is_error === '0'
-            && \is_string($record->buy_client_order_id)
-            && \strlen($record->buy_client_order_id) > 0
-            && $record->buy_order_id === null
-            && $record->sell_client_order_id === null
-            && $record->sell_order_id === null
-            && $record->meta === null;
+        return
+            $trade->getStatus() === self::STATUS_CURRENT &&
+            $trade->isEnabled() === 1 &&
+            $trade->isError() === 0 &&
+            $trade->getBuyClientOrderId() &&
+            $trade->getBuyOrderId() === null &&
+            $trade->getSellClientOrderId() === null &&
+            $trade->getSellOrderId() === null &&
+            $trade->getMeta() === null;
     }
 
     public function setNextState(int $id, string $buyOrderId, string $buyPrice): void
@@ -33,7 +35,7 @@ final class BuySent extends AbstractAction implements BuySentInterface
                     'status' => self::STATUS_NEXT,
                     'meta' => \json_encode(['buy_price' => $buyPrice])
                 ],
-                ['id' => $record->id]
+                ['id' => $record->getId()]
             );
             $this->connection->commit();
         } catch (\Exception $e) {
@@ -47,14 +49,14 @@ final class BuySent extends AbstractAction implements BuySentInterface
         $this->connection->beginTransaction();
         try {
             $record = $this->getRecord($id, true);
-            $meta = $record->meta === null ? [] : \json_decode($record->meta, true);
+            $meta = $record->getMeta() === null ? [] : \json_decode($record->getMeta(), true);
             $meta['error'] = $message;
             $this->table->update(
                 [
                     'meta' => \json_encode($meta),
                     'is_error' => 1,
                 ],
-                ['id' => $id]
+                ['id' => $record->getId()]
             );
             $this->connection->commit();
         } catch (\Exception $e) {

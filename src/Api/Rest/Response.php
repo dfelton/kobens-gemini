@@ -6,7 +6,7 @@ namespace Kobens\Gemini\Api\Rest;
 
 final class Response implements ResponseInterface
 {
-    private int $body;
+    private string $body;
 
     private int $responseCode;
 

@@ -12,6 +12,7 @@ use Kobens\Gemini\Exception\MaxIterationsException;
 use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
 use Kobens\Gemini\Exception\Api\Reason\SystemException;
 use Kobens\Gemini\Exchange\Currency\Pair;
+use Kobens\Gemini\TradeRepeater\Model\Trade;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyFilledInterface;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellSentInterface;
 use Symfony\Component\Console\Command\Command;
@@ -90,24 +91,31 @@ final class Seller extends Command
     private function mainLoop(InputInterface $input, OutputInterface $output): bool
     {
         $placedOrders = false;
+        /** @var Trade $row */
         foreach ($this->buyFilled->getHealthyRecords() as $row) {
             if ($this->shutdown->isShutdownModeEnabled()) {
                 break;
             }
 
-            $sellClientOrderId = 'repeater_'.$row->id.'_sell_'.\microtime(true);
-            $this->buyFilled->setNextState($row->id, $sellClientOrderId);
+            $sellClientOrderId = 'repeater_' . $row->getId() . '_sell_' . \microtime(true);
+            $this->buyFilled->setNextState($row->getId(), $sellClientOrderId);
 
             if (true == $msg = $this->place($input, $output, $row, $sellClientOrderId)) {
-                $this->sellSent->setNextState($row->id, $msg->order_id, $msg->price);
+                $this->sellSent->setNextState($row->getId(), $msg->order_id, $msg->price);
                 $output->writeln(\sprintf(
                     "%s\t(%d) Sell Order ID %s placed on %s pair for amount of %s at rate of %s",
-                    $this->now(), $row->id, $msg->order_id, $msg->symbol, $msg->original_amount, $msg->price
+                    $this->now(),
+                    $row->getId(),
+                    $msg->order_id,
+                    $msg->symbol,
+                    $msg->original_amount,
+                    $msg->price
                 ));
-                if ($msg->price !== $row->sell_price) {
+                if ($msg->price !== $row->getSellPrice()) {
                     $output->writeln(\sprintf(
                         "%s\t\t<fg=yellow>(original sell price: %s)</>",
-                        $this->now(), $row->sell_price
+                        $this->now(),
+                        $row->getSellPrice()
                     ));
                 }
                 $placedOrders;
@@ -116,40 +124,38 @@ final class Seller extends Command
         return $placedOrders;
     }
 
-    private function place(InputInterface $input, OutputInterface $output, \ArrayObject $row, string $sellClientOrderId): ?\stdClass
+    private function place(InputInterface $input, OutputInterface $output, Trade $row, string $sellClientOrderId): ?\stdClass
     {
         $msg = null;
         try {
             $msg = $this->forceMaker->place(
-                Pair::getInstance($row->symbol), 'sell', $row->sell_amount, $row->sell_price, $sellClientOrderId
+                Pair::getInstance($row->getSymbol()),
+                'sell',
+                $row->getSellAmount(),
+                $row->getSellPrice(),
+                $sellClientOrderId
             );
         } catch (ConnectionException $e) {
-            $this->buyFilled->resetState($row->id);
+            $this->buyFilled->resetState($row->getId());
             $output->writeln("<fg=red>{$this->now()}\tConnection Exception Occurred.</>");
 
-        } catch (MaintenanceException $e) {
-            $this->buyReady->resetState($row->id);
-            $output->buyFilled("<fg=red>{$this->now()}\t ({$row->symbol}) $e->getMessage()");
-            $output->writeln("<fg=red>{$this->now()}\tSleeping ".self::EXCEPTION_DELAY." seconds...</>");
-            $this->sleep(self::EXCEPTION_DELAY, $this->sleeper, $this->shutdown);
-
-        } catch (SystemException $e) {
-            $this->buyFilled->resetState($row->id);
-            $output->writeln("<fg=red>{$this->now()}\t ({$row->symbol}) $e->getMessage()");
-            $output->writeln("<fg=red>{$this->now()}\tSleeping ".self::EXCEPTION_DELAY." seconds...</>");
+        } catch (MaintenanceException | SystemException $e) {
+            $this->buyFilled->resetState($row->getId());
+            $output->writeln("<fg=red>{$this->now()}\t ({$row->getSymbol()}) $e->getMessage()");
+            $output->writeln("<fg=red>{$this->now()}\tSleeping " . self::EXCEPTION_DELAY . " seconds...</>");
             $this->sleep(self::EXCEPTION_DELAY, $this->sleeper, $this->shutdown);
 
         } catch (MaxIterationsException $e) {
-            $this->buyFilled->resetState($row->id);
+            $this->buyFilled->resetState($row->getId());
             $output->writeln(\sprintf(
                 "<fg=red>%s\tMax iterations reached for attempting ForceMaker on %s pair for price of %s.</>",
-                $this->now(), $row->symbol, $row->sell_price
+                $this->now(), $row->getSymbol(), $row->getSellPrice()
             ));
             $output->writeln("<fg=red>{$this->now()}\tSleeping {$input->getOption('maxIterationsDelay')} seconds...</>");
             $this->sleep((int) $input->getOption('maxIterationsDelay'), $this->sleeper, $this->shutdown);
 
         } catch (\Exception $e) {
-            $this->sellSent->setErrorState($row->id, \get_class($e)."::{$e->getMessage()}");
+            $this->sellSent->setErrorState($row->getId(), \get_class($e)."::{$e->getMessage()}");
             throw $e;
         }
         return $msg;
