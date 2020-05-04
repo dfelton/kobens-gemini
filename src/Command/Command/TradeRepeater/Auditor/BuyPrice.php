@@ -13,6 +13,7 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
 use Kobens\Gemini\Command\Command\TradeRepeater\SleeperTrait;
 use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
 use Kobens\Gemini\Exception\Api\Reason\SystemException;
+use Kobens\Gemini\TradeRepeater\Model\Trade;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyPlacedInterface;
 use Kobens\Math\PercentDifference;
 use Kobens\Math\BasicCalculator\Compare;
@@ -20,8 +21,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Adapter\Driver\ConnectionInterface;
+use Zend\Db\TableGateway\TableGateway;
 
 final class BuyPrice extends Command
 {
@@ -88,13 +89,7 @@ final class BuyPrice extends Command
                 $output->writeln("{$this->now()}\tRecords examined. Sleeping $sleep seconds.");
                 $this->sleep($sleep, $this->sleeper, $this->shutdown);
 
-            } catch (ConnectionException $e) {
-                $this->exceptionDelay($output, $e);
-
-            } catch (MaintenanceException $e) {
-                $this->exceptionDelay($output, $e);
-
-            } catch (SystemException $e) {
+            } catch (ConnectionException | MaintenanceException | SystemException $e) {
                 $this->exceptionDelay($output, $e);
 
             } catch (\Exception $e) {
@@ -116,51 +111,54 @@ final class BuyPrice extends Command
 
     private function mainLoop(OutputInterface $output): void
     {
-        $rows = $this->buyPlaced->getHealthyRecords();
-        foreach ($rows as $row) {
+        foreach ($this->buyPlaced->getHealthyRecords() as $row) {
             if ($this->shouldReset($row)) {
-                $data = $this->cancelOrder->cancel($row->buy_order_id);
-
-                $this->connection->beginTransaction();
-                $row = $this->buyPlaced->getRecord($row->id, true);
-
-                if ($data->is_cancelled === true && $data->executed_amount === '0') {
-                    $output->writeln("{$this->now()}\tResetting {$row->id}");
-                    $this->table->update(
-                        [
-                            'status' => 'BUY_READY',
-                            'buy_order_id' => null,
-                            'buy_client_order_id' => null,
-                            'meta' => null,
-                        ],
-                        ['id' => $row->id]
-                    );
-                } else {
-                    $output->writeln("{$this->now()}\tERROR occurred with {$row->id}");
-                    $meta = \json_decode($row->meta, true);
-                    $meta['error_description'] = 'Unexpected result when cancelling order in '.self::class;
-                    $meta['cancel_order_json'] = \json_encode($data);
-                    $this->table->update(
-                        [
-                            'is_error' => 1,
-                            'meta' => \json_encode($meta),
-                        ],
-                        ['id' => $row->id]
-                    );
-                }
-
-                $this->connection->commit();
+                $this->resetTrade($row, $output);
             }
         }
     }
 
-    private function shouldReset(\ArrayObject $row): bool
+    private function resetTrade(Trade $row, OutputInterface $output): void
     {
-        $meta = \json_decode($row->meta);
-        return $row->buy_price !== $meta->buy_price
-            && \time() - \strtotime($row->updated_at) > self::MIN_AGE
-            && $this->isSpreadOverThreshold($row->symbol, $meta->buy_price)
-            && $this->orderStatus->getStatus($row->buy_order_id)->executed_amount === '0'
+        $data = $this->cancelOrder->cancel($row->getBuyOrderId());
+        $this->connection->beginTransaction();
+        $row = $this->buyPlaced->getRecord($row->getId(), true);
+
+        if ($data->is_cancelled === true && $data->executed_amount === '0') {
+            $output->writeln("{$this->now()}\tResetting {$row->getId()}");
+            $this->table->update(
+                [
+                    'status' => 'BUY_READY',
+                    'buy_order_id' => null,
+                    'buy_client_order_id' => null,
+                    'meta' => null,
+                ],
+                ['id' => $row->getId()]
+            );
+        } else {
+            $output->writeln("{$this->now()}\tERROR occurred with {$row->getId()}");
+            $meta = \json_decode($row->meta, true);
+            $meta['error_description'] = 'Unexpected result when cancelling order in ' . self::class;
+            $meta['cancel_order_json'] = \json_encode($data);
+            $this->table->update(
+                [
+                    'is_error' => 1,
+                    'meta' => \json_encode($meta),
+                ],
+                ['id' => $row->getId()]
+            );
+        }
+
+        $this->connection->commit();
+    }
+
+    private function shouldReset(Trade $row): bool
+    {
+        $meta = \json_decode($row->getMeta());
+        return $row->getBuyPrice() !== $meta->buy_price
+            && \time() - \strtotime($row->getUpdatedAt()) > self::MIN_AGE
+            && $this->isSpreadOverThreshold($row->getSymbol(), $meta->buy_price)
+            && $this->orderStatus->getStatus($row->getBuyOrderId())->executed_amount === '0'
         ;
     }
 

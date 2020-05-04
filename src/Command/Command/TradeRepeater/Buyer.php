@@ -12,6 +12,7 @@ use Kobens\Gemini\Exception\MaxIterationsException;
 use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
 use Kobens\Gemini\Exception\Api\Reason\SystemException;
 use Kobens\Gemini\Exchange\Currency\Pair;
+use Kobens\Gemini\TradeRepeater\Model\Trade;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyReadyInterface;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuySentInterface;
 use Symfony\Component\Console\Command\Command;
@@ -90,6 +91,7 @@ final class Buyer extends Command
     private function mainLoop(InputInterface $input, OutputInterface $output): bool
     {
         $placedOrders = false;
+        /** @var Trade $row */
         foreach ($this->buyReady->getHealthyRecords() as $row) {
             if ($this->shutdown->isShutdownModeEnabled()) {
                 break;
@@ -99,10 +101,15 @@ final class Buyer extends Command
             $this->buyReady->setNextState($row->id, $buyClientOrderId);
 
             if (true == $msg = $this->place($input, $output, $row, $buyClientOrderId)) {
-                $this->buySent->setNextState($row->id, $msg->order_id, $msg->price);
+                $this->buySent->setNextState($row->getId(), $msg->order_id, $msg->price);
                 $output->writeln(\sprintf(
                     "%s\t(%d) Buy Order ID %s placed on %s pair for amount of %s at rate of %s",
-                    $this->now(), $row->id, $msg->order_id, $msg->symbol, $msg->original_amount, $msg->price
+                    $this->now(),
+                    $row->getId(),
+                    $msg->order_id,
+                    $msg->symbol,
+                    $msg->original_amount,
+                    $msg->price
                 ));
                 if ($msg->price !== $row->buy_price) {
                     $output->writeln(\sprintf(
@@ -116,32 +123,31 @@ final class Buyer extends Command
         return $placedOrders;
     }
 
-    private function place(InputInterface $input, OutputInterface $output, \ArrayObject $row, string $buyClientOrderId): ?\stdClass
+    private function place(InputInterface $input, OutputInterface $output, Trade $row, string $buyClientOrderId): ?\stdClass
     {
         $msg = null;
         try {
-            $msg = $this->forceMaker->place(Pair::getInstance($row->symbol), 'buy', $row->buy_amount, $row->buy_price, $buyClientOrderId);
+            $msg = $this->forceMaker->place(
+                Pair::getInstance($row->getSymbol()),
+                'buy',
+                $row->getBuyAmount(),
+                $row->getBuyPrice(), $buyClientOrderId
+            );
         } catch (ConnectionException $e) {
-            $this->buyReady->resetState($row->id);
+            $this->buyReady->resetState($row->getId());
             $output->writeln("<fg=red>{$this->now()}\tConnection Exception Occurred.</>");
 
-        } catch (MaintenanceException $e) {
-            $this->buyReady->resetState($row->id);
-            $output->writeln("<fg=red>{$this->now()}\t ({$row->symbol}) $e->getMessage()");
-            $output->writeln("<fg=red>{$this->now()}\tSleeping ".self::EXCEPTION_DELAY." seconds...</>");
-            $this->sleep(self::EXCEPTION_DELAY, $this->sleeper, $this->shutdown);
-
-        } catch (SystemException $e) {
-            $this->buyReady->resetState($row->id);
+        } catch (MaintenanceException | SystemException $e) {
+            $this->buyReady->resetState($row->getId());
             $output->writeln("<fg=red>{$this->now()}\t ({$row->symbol}) $e->getMessage()");
             $output->writeln("<fg=red>{$this->now()}\tSleeping ".self::EXCEPTION_DELAY." seconds...</>");
             $this->sleep(self::EXCEPTION_DELAY, $this->sleeper, $this->shutdown);
 
         } catch (MaxIterationsException $e) {
-            $this->buyReady->resetState($row->id);
+            $this->buyReady->resetState($row->getId());
             $output->writeln(\sprintf(
                 "<fg=red>%s\tMax iterations reached for attempting ForceMaker on %s pair for price of %s.</>",
-                $this->now(), $row->symbol, $row->buy_price
+                $this->now(), $row->getSymbol(), $row->getBuyPrice()
             ));
             $output->writeln("<fg=red>{$this->now()}\tSleeping {$input->getOption('maxIterationsDelay')} seconds...</>");
             $this->sleep((int) $input->getOption('maxIterationsDelay'), $this->sleeper, $this->shutdown);
@@ -157,5 +163,4 @@ final class Buyer extends Command
     {
         return (new \DateTime())->format('Y-m-d H:i:s');
     }
-
 }

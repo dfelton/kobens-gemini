@@ -79,12 +79,12 @@ final class Trade
         return $this->id;
     }
 
-    public function getIsEnabled(): int
+    public function isEnabled(): int
     {
         return $this->isEnabled;
     }
 
-    public function getIsError(): int
+    public function isError(): int
     {
         return $this->isError;
     }
@@ -109,7 +109,7 @@ final class Trade
         return $this->buyPrice;
     }
 
-    public function getAmount(): string
+    public function getSellAmount(): string
     {
         return $this->sellAmount;
     }

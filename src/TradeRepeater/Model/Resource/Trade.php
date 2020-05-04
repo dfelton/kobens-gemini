@@ -4,23 +4,32 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\TradeRepeater\Model\Resource;
 
+use Kobens\Gemini\Exception\TradeRepeater\RecordNotFoundException;
+use Kobens\Gemini\TradeRepeater\Model\Trade as TradeModel;
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
 
 final class Trade
 {
+    private const SELECT_LIMIT = 1000;
+
     private TableGateway $table;
 
+    private Adapter $adapter;
+
     public function __construct(
-        \Zend\Db\Adapter\Adapter $adapter
+        Adapter $adapter
     ) {
+        $this->adapter = $adapter;
         $this->table = new TableGateway('trade_repeater', $adapter);
     }
 
-    public function insert(\Kobens\Gemini\TradeRepeater\Model\Trade $trade): void
+    public function create(TradeModel $trade): void
     {
         $this->table->insert([
-            'is_enabled' => $trade->getIsEnabled(),
-            'is_error' => $trade->getIsError(),
+            'is_enabled' => $trade->isEnabled(),
+            'is_error' => $trade->isError(),
             'status' => $trade->getStatus(),
             'symbol' => $trade->getSymbol(),
             'buy_client_order_id' => $trade->getBuyClientOrderId(),
@@ -34,5 +43,78 @@ final class Trade
             'note' => $trade->getNote(),
             'meta' => $trade->getMeta(),
         ]);
+    }
+
+    public function getActiveByStatus(string $status): \Generator
+    {
+        $offset = 0;
+        $ids = $this->getActiveByStatusIds($status);
+        do {
+            $results = $this->table->select(function(Select $select) use ($ids, $offset)
+            {
+                $select->where->in('id', $ids);
+                $select->limit(self::SELECT_LIMIT);
+                $select->offset($offset);
+            });
+            if ($results->count()) {
+                foreach ($results as $data) {
+                    yield $this->getTradeModel($data);
+                }
+            }
+            $offset += self::SELECT_LIMIT;
+        } while ($results->count());
+    }
+
+    private function getActiveByStatusIds(string $status): array
+    {
+        $sql = 'SELECT id FROM trade_repeater WHERE is_enabled = 1 AND is_error = 0 AND status = :status';
+        /** @var \Zend\Db\ResultSet\ResultSet $rows */
+        $rows = $this->adapter->query($sql, ['status' => $status]);
+        $ids = [];
+        if ($rows->count()) {
+            foreach ($rows as $row) {
+                $ids[] = (int) $row['id'];
+            }
+        }
+        return $ids;
+    }
+
+    public function getById(int $id, bool $forUpdate = false): TradeModel
+    {
+        $sql = 'SELECT * FROM trade_repeater WHERE id = :id';
+        if ($forUpdate) {
+            $sql .= ' FOR UPDATE';
+        }
+        /** @var \Zend\Db\ResultSet\ResultSet $rows */
+        $rows = $this->adapter->query($sql, ['id' => $id]);
+        if ($rows->count() !== 1) {
+            throw new RecordNotFoundException(sprintf(
+                'Trade record "%d" not found.',
+                $id
+            ));
+        }
+        return $this->getTradeModel($rows->current());
+    }
+
+    private function getTradeModel(array $data): TradeModel
+    {
+        return new TradeModel(
+            (int) $data['id'],
+            (int) $data['is_enabled'],
+            (int) $data['is_error'],
+            (string) $data['status'],
+            (string) $data['symbol'],
+            (string) $data['buy_amount'],
+            (string) $data['buy_price'],
+            (string) $data['buy_client_order_id'],
+            (string) $data['buy_order_id'],
+            (string) $data['sell_amount'],
+            (string) $data['sell_price'],
+            (string) $data['sell_client_order_id'],
+            (string) $data['sell_order_id'],
+            (string) $data['note'],
+            (string) $data['meta'],
+            (string) $data['updated_at']
+        );
     }
 }

@@ -114,16 +114,16 @@ final class WebSocket extends Command
     {
         switch (true) {
             case $msg['type'] === 'subscription_ack':
-                $output->writeln($this->now()."\tSubscription acknowledged.");
+                $output->writeln($this->now() . "\tSubscription acknowledged.");
                 break;
             case $msg['type'] === 'heartbeat':
-                $output->writeln($this->now()."\tHeartbeat Received");
+                $output->writeln($this->now() . "\tHeartbeat Received");
                 break;
             case $msg['type'] === 'fill' && $msg['remaining_amount'] !== '0':
                 $output->writeln(\sprintf(
                     "%s\t<fg=yellow>Partial</> fill of <fg=%s>%s</> order %s. Executed <fg=yellow>%s</>. Remaining amount: <fg=yellow>%s</>",
                     $this->now(),
-                    $msg['side']==='buy'?'green':'red',
+                    $msg['side'] === 'buy' ? 'green' : 'red',
                     $msg['side'],
                     $msg['order_id'],
                     $msg['executed_amount'],
@@ -136,13 +136,29 @@ final class WebSocket extends Command
                     switch ($msg['side']) {
                         case 'buy':
                             if ($this->buyPlaced->setNextState($repeaterId)) {
-                                $output->writeln($this->now()."\t($repeaterId) <fg=green>Buy</> order {$msg['order_id']} on {$msg['symbol']} pair for {$msg['original_amount']} at price of {$msg['price']} filled.");
+                                $output->writeln(sprintf(
+                                    "%s\t(%d) <fg=green>Buy</> order %d on %s pair for %s at price of %s filled.",
+                                    $this->now(),
+                                    $repeaterId,
+                                    $msg['order_id'],
+                                    $msg['symbol'],
+                                    $msg['original_amount'],
+                                    $msg['price']
+                                ));
                             }
                             break;
 
                         case 'sell':
                             if ($this->sellPlaced->setNextState($repeaterId)) {
-                                $output->writeln($this->now()."\t($repeaterId) <fg=red>Sell</> order {$msg['order_id']} on {$msg['symbol']} pair for {$msg['original_amount']} at price of {$msg['price']} filled.");
+                                $output->writeln(sprintf(
+                                    "%s\t(%d) <fg=red>Sell</> order %d on %s pair for %s at price of %s filled.",
+                                    $this->now(),
+                                    $repeaterId,
+                                    $msg['order_id'],
+                                    $msg['symbol'],
+                                    $msg['original_amount'],
+                                    $msg['price']
+                                ));
                             }
                             break;
 
@@ -169,7 +185,7 @@ final class WebSocket extends Command
 
     private function getUrl(): string
     {
-        return 'wss://'.$this->host->getHost().'/v1/order/events?eventTypeFilter=fill';
+        return 'wss://' . $this->host->getHost() . '/v1/order/events?eventTypeFilter=fill';
     }
 
     private function getHeaders(): array

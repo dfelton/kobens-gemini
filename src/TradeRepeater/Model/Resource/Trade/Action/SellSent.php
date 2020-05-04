@@ -4,20 +4,23 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action;
 
+use Kobens\Gemini\TradeRepeater\Model\Trade;
+
 final class SellSent extends AbstractAction implements SellSentInterface
 {
-    const STATUS_CURRENT = 'SELL_SENT';
-    const STATUS_NEXT    = 'SELL_PLACED';
+    public const STATUS_CURRENT = 'SELL_SENT';
+    public const STATUS_NEXT    = 'SELL_PLACED';
 
-    protected function isHealthy(\ArrayObject $record): bool
+    protected function isHealthy(Trade $trade): bool
     {
-        return $record->status === self::STATUS_CURRENT
-            && $record->is_enabled === '1'
-            && $record->is_error === '0'
-            && $record->buy_client_order_id !== null
-            && $record->buy_order_id !== null
-            && $record->sell_client_order_id !== null
-            && $record->sell_order_id === null;
+        return
+            $trade->getStatus() === self::STATUS_CURRENT &&
+            $trade->isEnabled() === 1 &&
+            $trade->isError() === 0 &&
+            $trade->getBuyClientOrderId() &&
+            $trade->getBuyOrderId() &&
+            $trade->getSellClientOrderId() &&
+            $trade->getSellOrderId() === null;
     }
 
     public function setNextState(int $id, string $orderId, string $price): void
@@ -25,7 +28,7 @@ final class SellSent extends AbstractAction implements SellSentInterface
         $this->connection->beginTransaction();
         try {
             $record = $this->getHealthyRecord($id, true);
-            $meta = \json_decode($record['meta'], true);
+            $meta = \json_decode($record->getMeta(), true);
             $meta['sell_price'] = $price;
             $this->table->update(
                 [
@@ -47,7 +50,7 @@ final class SellSent extends AbstractAction implements SellSentInterface
         $this->connection->beginTransaction();
         try {
             $record = $this->getRecord($id, true);
-            $meta = \json_decode($record->meta, true);
+            $meta = \json_decode($record->getMeta(), true);
             $meta['error'] = $message;
             $this->table->update(
                 [

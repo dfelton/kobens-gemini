@@ -5,21 +5,23 @@ declare(strict_types=1);
 namespace Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action;
 
 use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
+use Kobens\Gemini\TradeRepeater\Model\Trade;
 
 final class SellPlaced extends AbstractAction implements SellPlacedInterface
 {
     const STATUS_CURRENT = 'SELL_PLACED';
     const STATUS_NEXT    = 'SELL_FILLED';
 
-    protected function isHealthy(\ArrayObject $record): bool
+    protected function isHealthy(Trade $trade): bool
     {
-        return $record->status === self::STATUS_CURRENT
-            && $record->is_enabled === '1'
-            && $record->is_error === '0'
-            && $record->buy_client_order_id !== null
-            && $record->buy_order_id !== null
-            && $record->sell_client_order_id !== null
-            && $record->sell_order_id !== null;
+        return
+            $trade->getStatus() === self::STATUS_CURRENT &&
+            $trade->isEnabled() === 1 &&
+            $trade->isError() === 0 &&
+            $trade->getBuyClientOrderId() &&
+            $trade->getBuyOrderId() &&
+            $trade->getSellClientOrderId() &&
+            $trade->getSellOrderId();
     }
 
     public function setNextState(int $id): bool
@@ -29,7 +31,7 @@ final class SellPlaced extends AbstractAction implements SellPlacedInterface
             $record = $this->getHealthyRecord($id, true);
             $this->table->update(
                 ['status' => self::STATUS_NEXT],
-                ['id' => $record->id]
+                ['id' => $record->getId()]
             );
             $this->connection->commit();
         } catch (UnhealthyStateException $e) {

@@ -4,20 +4,23 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action;
 
+use Kobens\Gemini\TradeRepeater\Model\Trade;
+
 final class SellFilled extends AbstractAction implements SellFilledInterface
 {
-    const STATUS_CURRENT = 'SELL_FILLED';
-    const STATUS_NEXT    = 'BUY_READY';
+    public const STATUS_CURRENT = 'SELL_FILLED';
+    public const STATUS_NEXT    = 'BUY_READY';
 
-    protected function isHealthy(\ArrayObject $record): bool
+    protected function isHealthy(Trade $trade): bool
     {
-        return $record->status === self::STATUS_CURRENT
-            && $record->is_enabled === '1'
-            && $record->is_error === '0'
-            && $record->buy_client_order_id !== null
-            && $record->buy_order_id !== null
-            && $record->sell_client_order_id !== null
-            && $record->sell_order_id !== null;
+        return
+            $trade->getStatus() === self::STATUS_CURRENT &&
+            $trade->isEnabled() === 1 &&
+            $trade->isError() === 0 &&
+            $trade->getBuyClientOrderId() &&
+            $trade->getBuyOrderId() &&
+            $trade->getSellClientOrderId() &&
+            $trade->getSellOrderId();
     }
 
     public function setNextState(int $id): void
@@ -35,7 +38,7 @@ final class SellFilled extends AbstractAction implements SellFilledInterface
                     'note' => null,
                     'meta' => null,
                 ],
-                ['id' => $record->id]
+                ['id' => $record->getId()]
             );
             $this->connection->commit();
         } catch (\Exception $e) {
