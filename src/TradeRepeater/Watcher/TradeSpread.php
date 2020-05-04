@@ -54,8 +54,8 @@ final class TradeSpread
             : 'N/A';
 
         $scale = self::getScale($bid ?? '0', $ask ?? '0', $spread);
-        $bid = (string) number_format((float) $bid, $scale);
-        $ask = (string) number_format((float) $ask, $scale);
+        $bid = (string) number_format((float) $bid, $scale, '.', '');
+        $ask = (string) number_format((float) $ask, $scale, '.', '');
         $spread = (string) number_format((float) $spread, $scale);
         $length = self::getLength($bid, $ask, $spread);
         $bid = str_pad($bid, $length+2, ' ', STR_PAD_LEFT);
