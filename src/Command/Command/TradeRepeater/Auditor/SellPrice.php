@@ -156,7 +156,7 @@ final class SellPrice extends Command
     private function shouldReset(Trade $row): bool
     {
         $meta = \json_decode($row->getMeta());
-        return $row->sell_price !== $meta->sell_price
+        return $row->getSellPrice() !== $meta->sell_price
             && \time() - \strtotime($row->getUpdatedAt()) > self::MIN_AGE
             && $this->isSpreadOverThreshold($row->getSymbol(), $meta->sell_price)
             && $this->orderStatus->getStatus($row->getSellOrderId())->executed_amount === '0'
