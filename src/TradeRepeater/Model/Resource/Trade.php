@@ -45,6 +45,10 @@ final class Trade
         ]);
     }
 
+    /**
+     * @see TradeModel
+     * @yield TradeModel
+     */
     public function getActiveByStatus(string $status): \Generator
     {
         $ids = $this->getActiveByStatusIds($status);
