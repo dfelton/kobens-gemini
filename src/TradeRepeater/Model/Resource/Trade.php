@@ -47,8 +47,11 @@ final class Trade
 
     public function getActiveByStatus(string $status): \Generator
     {
-        $offset = 0;
         $ids = $this->getActiveByStatusIds($status);
+        if (!$ids) {
+            return;
+        }
+        $offset = 0;
         do {
             $results = $this->table->select(function(Select $select) use ($ids, $offset)
             {
@@ -96,25 +99,25 @@ final class Trade
         return $this->getTradeModel($rows->current());
     }
 
-    private function getTradeModel(array $data): TradeModel
+    private function getTradeModel(\ArrayObject $data): TradeModel
     {
         return new TradeModel(
             (int) $data['id'],
             (int) $data['is_enabled'],
             (int) $data['is_error'],
-            (string) $data['status'],
-            (string) $data['symbol'],
-            (string) $data['buy_amount'],
-            (string) $data['buy_price'],
-            (string) $data['buy_client_order_id'],
-            (string) $data['buy_order_id'],
-            (string) $data['sell_amount'],
-            (string) $data['sell_price'],
-            (string) $data['sell_client_order_id'],
-            (string) $data['sell_order_id'],
-            (string) $data['note'],
-            (string) $data['meta'],
-            (string) $data['updated_at']
+            $data['status'],
+            $data['symbol'],
+            $data['buy_amount'],
+            $data['buy_price'],
+            $data['sell_amount'],
+            $data['sell_price'],
+            $data['buy_client_order_id'],
+            (int) $data['buy_order_id'] ?: null,
+            $data['sell_client_order_id'],
+            (int) $data['sell_order_id'] ?: null,
+            $data['note'],
+            $data['meta'],
+            $data['updated_at']
         );
     }
 }

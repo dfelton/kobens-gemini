@@ -19,11 +19,11 @@ final class Archive implements ArchiveInterface
     public function addArchive(
         string $symbol,
         string $buyClientOrderId,
-        string $buyOrderId,
+        int $buyOrderId,
         string $buyAmount,
         string $buyPrice,
         string $sellClientOrderId,
-        string $sellOrderId,
+        int $sellOrderId,
         string $sellAmount,
         string $sellPrice
     ): void

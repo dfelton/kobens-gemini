@@ -35,7 +35,10 @@ abstract class AbstractAction
 
     public function getHealthyRecords(): \Generator
     {
-        yield $this->tradeResource->getActiveByStatus(static::STATUS_CURRENT);
+        $trades = $this->tradeResource->getActiveByStatus(static::STATUS_CURRENT);
+        foreach ($trades as $trade) {
+            yield $trade;
+        }
     }
 
     public function getRecord(int $id, bool $forUpdate = false): Trade

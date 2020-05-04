@@ -26,11 +26,11 @@ final class Trade
 
     private ?string $buyClientOrderId;
 
-    private ?string $buyOrderId;
+    private ?int $buyOrderId;
 
     private ?string $sellClientOrderId;
 
-    private ?string $sellOrderId;
+    private ?int $sellOrderId;
 
     private ?string $note;
 
@@ -49,9 +49,9 @@ final class Trade
         string $sellAmount,
         string $sellPrice,
         string $buyClientOrderId = null,
-        string $buyOrderId = null,
+        int $buyOrderId = null,
         string $sellClientOrderId = null,
-        string $sellOrderId = null,
+        int $sellOrderId = null,
         string $note = null,
         string $meta = null,
         string $updatedAt = null
@@ -124,7 +124,7 @@ final class Trade
         return $this->buyClientOrderId;
     }
 
-    public function getBuyOrderId(): ?string
+    public function getBuyOrderId(): ?int
     {
         return $this->buyOrderId;
     }
@@ -134,7 +134,7 @@ final class Trade
         return $this->sellClientOrderId;
     }
 
-    public function getSellOrderId(): ?string
+    public function getSellOrderId(): ?int
     {
         return $this->sellOrderId;
     }

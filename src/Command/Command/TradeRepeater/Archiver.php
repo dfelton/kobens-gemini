@@ -73,23 +73,24 @@ final class Archiver extends Command
 
     private function mainLoop(OutputInterface $output): void
     {
+        /** @var \Kobens\Gemini\TradeRepeater\Model\Trade $row */
         foreach ($this->sellFilled->getHealthyRecords() as $row) {
-            $meta = \json_decode($row->meta);
+            $meta = \json_decode($row->getMeta());
             $this->connection->beginTransaction();
             $this->archive->addArchive(
-                $row->symbol,
-                $row->buy_client_order_id,
-                $row->buy_order_id,
-                $row->buy_amount,
-                $meta->buy_price,
-                $row->sell_client_order_id,
-                $row->sell_order_id,
-                $row->sell_amount,
-                $meta->sell_price
+                $row->getSymbol(),
+                $row->getBuyClientOrderId(),
+                $row->getBuyOrderId(),
+                $row->getBuyAmount(),
+                (string) $meta->buy_price,
+                $row->getSellClientOrderId(),
+                $row->getSellOrderId(),
+                $row->getSellAmount(),
+                (string) $meta->sell_price
             );
-            $this->sellFilled->setNextState($row->id);
+            $this->sellFilled->setNextState($row->getId());
             $this->connection->commit();
-            $output->writeln($this->now()."\t({$row->id}) archived and moved to BUY_READY state.");
+            $output->writeln($this->now()."\t({$row->getId()}) archived and moved to BUY_READY state.");
         }
     }
 

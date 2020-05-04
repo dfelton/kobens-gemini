@@ -15,6 +15,7 @@ use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\Model\Trade;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyReadyInterface;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuySentInterface;
+use Kobens\Math\BasicCalculator\Compare;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -97,8 +98,8 @@ final class Buyer extends Command
                 break;
             }
 
-            $buyClientOrderId = 'repeater_'.$row->id.'_buy_'.\microtime(true);
-            $this->buyReady->setNextState($row->id, $buyClientOrderId);
+            $buyClientOrderId = 'repeater_' . $row->getId() . '_buy_' . \microtime(true);
+            $this->buyReady->setNextState($row->getId(), $buyClientOrderId);
 
             if (true == $msg = $this->place($input, $output, $row, $buyClientOrderId)) {
                 $this->buySent->setNextState($row->getId(), $msg->order_id, $msg->price);
@@ -111,10 +112,11 @@ final class Buyer extends Command
                     $msg->original_amount,
                     $msg->price
                 ));
-                if ($msg->price !== $row->buy_price) {
+                if (Compare::getResult($msg->price, $row->getBuyPrice()) !== Compare::EQUAL) {
                     $output->writeln(\sprintf(
                         "%s\t\t<fg=yellow>(original buy price: %s)</>",
-                        $this->now(), $row->buy_price
+                        $this->now(),
+                        $row->getBuyPrice()
                     ));
                 }
                 $placedOrders = true;

@@ -46,10 +46,14 @@ final class TradeSpread
             $percent = $percent . '00';
         }
 
-        $sellSpread = Subtract::getResult($ask, $data->getPriceResult($symbol)->getAsk());
-        $bidSpread = Subtract::getResult($data->getPriceResult($symbol)->getBid(), $bid);
+        $sellSpread = $ask
+            ? Subtract::getResult($ask, $data->getPriceResult($symbol)->getAsk())
+            : 'N/A';
+        $bidSpread = $bid
+            ? Subtract::getResult($data->getPriceResult($symbol)->getBid(), $bid)
+            : 'N/A';
 
-        $scale = self::getScale($bid, $ask, $spread);
+        $scale = self::getScale($bid ?? '0', $ask ?? '0', $spread);
         $bid = (string) number_format((float) $bid, $scale);
         $ask = (string) number_format((float) $ask, $scale);
         $spread = (string) number_format((float) $spread, $scale);
