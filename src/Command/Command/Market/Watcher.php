@@ -34,11 +34,11 @@ final class Watcher extends Command
 
     private bool $bookIsOpen = false;
 
-    private string $ask;
+    private ?string $ask = null;
 
-    private string $bid;
+    private ?string $bid = null;
 
-    private string $spread;
+    private ?string $spread = null;
 
     private int $lastOutput = 0;
 
