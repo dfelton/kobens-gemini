@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7cf3e9e90a3df24f52574b844867aae9",
+    "content-hash": "5a77d8c4d2c243ffe1b587919575224a",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1029,17 +1029,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-core.git",
-                "reference": "6d973804c55fcfeb9345bba9c501bafb05a488bc"
+                "reference": "aee618afdb294ec68d247fe3388c45906bfd4eee"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dfelton/kobens-core/zipball/6d973804c55fcfeb9345bba9c501bafb05a488bc",
-                "reference": "6d973804c55fcfeb9345bba9c501bafb05a488bc",
+                "url": "https://api.github.com/repos/dfelton/kobens-core/zipball/aee618afdb294ec68d247fe3388c45906bfd4eee",
+                "reference": "aee618afdb294ec68d247fe3388c45906bfd4eee",
                 "shasum": ""
             },
             "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
                 "monolog/monolog": "2.0.0-beta1",
-                "php": "^7.2 || ^7.3",
+                "php": "^7.4",
                 "symfony/console": "^4.2",
                 "zendframework/zend-cache": "^2.8",
                 "zendframework/zend-config": "^3.2",
@@ -1069,7 +1071,7 @@
                 "source": "https://github.com/dfelton/kobens-core/tree/master",
                 "issues": "https://github.com/dfelton/kobens-core/issues"
             },
-            "time": "2019-12-29T22:06:14+00:00"
+            "time": "2020-05-10T20:34:37+00:00"
         },
         {
             "name": "kobens/kobens-currency",
@@ -2076,6 +2078,7 @@
                 "psr-6",
                 "zf"
             ],
+            "abandoned": "laminas/laminas-cache",
             "time": "2019-08-29T20:27:15+00:00"
         },
         {
@@ -2136,6 +2139,7 @@
                 "config",
                 "zf"
             ],
+            "abandoned": "laminas/laminas-config",
             "time": "2019-08-08T20:21:16+00:00"
         },
         {
@@ -2194,6 +2198,7 @@
                 "db",
                 "zf"
             ],
+            "abandoned": "laminas/laminas-db",
             "time": "2019-02-25T12:07:35+00:00"
         },
         {
@@ -2248,6 +2253,7 @@
                 "events",
                 "zf2"
             ],
+            "abandoned": "laminas/laminas-eventmanager",
             "time": "2019-10-18T07:10:41+00:00"
         },
         {
@@ -2316,6 +2322,7 @@
                 "servicemanager",
                 "zf"
             ],
+            "abandoned": "laminas/laminas-servicemanager",
             "time": "2018-12-22T06:05:09+00:00"
         },
         {
@@ -2362,6 +2369,7 @@
                 "stdlib",
                 "zf"
             ],
+            "abandoned": "laminas/laminas-stdlib",
             "time": "2019-02-07T05:36:36+00:00"
         }
     ],
@@ -3994,13 +4002,13 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.3",
+        "php": "^7.4",
         "ext-curl": "*",
         "ext-json": "*",
         "ext-mbstring": "*"
     },
     "platform-dev": [],
     "platform-overrides": {
-        "php": "7.3.2"
+        "php": "7.4"
     }
 }
