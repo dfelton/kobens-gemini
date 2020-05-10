@@ -19,9 +19,9 @@ final class BuyLogger extends Command
      */
     protected static $defaultName = 'taxes:buy-logger';
 
-    private TableGateway $tblBuyLog;
+    private ?TableGateway $tblBuyLog = null;
 
-    private TableGateway $tblTradeHistory;
+    private ?TableGateway $tblTradeHistory = null;
 
     private string $symbol;
 
