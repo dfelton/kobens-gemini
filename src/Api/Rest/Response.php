@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Api\Rest;
 
+/**
+ * Class Response
+ * @package Kobens\Gemini\Api\Rest
+ * @deprecated
+ * @see \Kobens\Core\Http\ResponseInterface
+ */
 final class Response implements ResponseInterface
 {
     private string $body;
