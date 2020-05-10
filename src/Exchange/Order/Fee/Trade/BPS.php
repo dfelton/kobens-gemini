@@ -31,7 +31,7 @@ final class BPS
         // Market Fee Schedule - Don't even fucking consider charging for that; dicks for hinting it
     ];
 
-    private static self $instance;
+    private static ?self $instance = null;
 
     private function __construct() { }
 
