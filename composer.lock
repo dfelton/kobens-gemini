@@ -1029,12 +1029,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-core.git",
-                "reference": "aee618afdb294ec68d247fe3388c45906bfd4eee"
+                "reference": "08a42623e18fd75ef964ba633e98822a08fbde6f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dfelton/kobens-core/zipball/aee618afdb294ec68d247fe3388c45906bfd4eee",
-                "reference": "aee618afdb294ec68d247fe3388c45906bfd4eee",
+                "url": "https://api.github.com/repos/dfelton/kobens-core/zipball/08a42623e18fd75ef964ba633e98822a08fbde6f",
+                "reference": "08a42623e18fd75ef964ba633e98822a08fbde6f",
                 "shasum": ""
             },
             "require": {
@@ -1071,7 +1071,7 @@
                 "source": "https://github.com/dfelton/kobens-core/tree/master",
                 "issues": "https://github.com/dfelton/kobens-core/issues"
             },
-            "time": "2020-05-10T20:34:37+00:00"
+            "time": "2020-05-10T20:49:59+00:00"
         },
         {
             "name": "kobens/kobens-currency",
@@ -3987,6 +3987,7 @@
                 "escaper",
                 "zf"
             ],
+            "abandoned": "laminas/laminas-escaper",
             "time": "2019-09-05T20:05:53+00:00"
         }
     ],
