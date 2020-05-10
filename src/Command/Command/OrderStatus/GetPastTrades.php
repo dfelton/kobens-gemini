@@ -86,9 +86,9 @@ final class GetPastTrades extends Command
 
     private function getFormattedDate(int $timestampms): string
     {
-        $date = $timestampms/1000;
-        $date = \explode('.', $date);
-        return \date('Y-m-d H:i:s', $date[0]) . (isset($date[1]) ? '.'.$date[1] : '');
+        $date = $timestampms / 1000;
+        $date = \explode('.', (string) $date);
+        return \date('Y-m-d H:i:s', (int) $date[0]) . (isset($date[1]) ? '.' . $date[1] : '');
     }
 
     private function getFormattedAmount(string $amount): string
