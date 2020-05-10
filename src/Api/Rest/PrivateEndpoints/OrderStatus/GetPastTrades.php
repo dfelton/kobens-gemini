@@ -13,9 +13,9 @@ final class GetPastTrades extends AbstractPrivateRequest implements GetPastTrade
 
     private string $symbol;
 
-    private int $timestampms;
+    private ?int $timestampms;
 
-    private int $limitTrades;
+    private ?int $limitTrades;
 
     public function getTrades(string $symbol, int $timestampms = null, int $limitTrades = null): array
     {
@@ -34,10 +34,10 @@ final class GetPastTrades extends AbstractPrivateRequest implements GetPastTrade
     protected function getPayload(): array
     {
         $payload = ['symbol' => $this->symbol];
-        if (!\is_null($this->timestampms)) {
+        if ($this->timestampms !== null) {
             $payload['timestamp'] = $this->timestampms;
         }
-        if (!\is_null($this->limitTrades)) {
+        if ($this->limitTrades !== null) {
             $payload['limit_trades'] = $this->limitTrades;
         }
         return $payload;
