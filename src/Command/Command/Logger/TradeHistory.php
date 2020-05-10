@@ -29,7 +29,7 @@ final class TradeHistory extends Command
     private const MIN_DELAY      = 60;
     private const MAX_DELAY      = 600;
 
-    private TableGateway $table;
+    private ?TableGateway $table = null;
 
     private GetPastTradesInterface $pastTrades;
 
@@ -207,5 +207,4 @@ final class TradeHistory extends Command
     {
         return (new \DateTime())->format('Y-m-d H:i:s');
     }
-
 }
