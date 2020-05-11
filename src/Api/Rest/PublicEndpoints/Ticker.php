@@ -18,7 +18,7 @@ final class Ticker implements TickerInterface
 
     public function getData(string $symbol): \stdClass
     {
-        $response = $this->request->makeRequest(self::URL_PATH . $symbol);
+        $response = $this->request->getResponse(self::URL_PATH . $symbol);
         return \json_decode($response->getBody());
     }
 

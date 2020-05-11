@@ -18,7 +18,7 @@ final class TickerV2 implements TickerV2Interface
 
     public function getData(string $symbol): \stdClass
     {
-        $response = $this->request->makeRequest(self::URL_PATH . $symbol);
+        $response = $this->request->getResponse(self::URL_PATH . $symbol);
         return \json_decode($response->getBody());
     }
 }

@@ -9,6 +9,7 @@ use Kobens\Core\Exception\Http\CurlException;
 use Kobens\Core\Exception\Http\RequestTimeoutException;
 use Kobens\Core\Http\CurlInterface;
 use Kobens\Core\Http\Request\ThrottlerInterface;
+use Kobens\Gemini\Api\Helper\ResponseHandler;
 use Kobens\Gemini\Api\HostInterface;
 use Kobens\Core\Http\ResponseInterface;
 use Kobens\Gemini\Exception;
@@ -35,6 +36,8 @@ final class Request implements RequestInterface
 
     private LoggerInterface $logger;
 
+    private ResponseHandler $handler;
+
     public function __construct(
         HostInterface $hostInterface,
         ThrottlerInterface $throttlerInterface,
@@ -45,6 +48,7 @@ final class Request implements RequestInterface
         $this->host = $hostInterface;
         $this->throttler = $throttlerInterface;
         $this->logger = $logger;
+        $this->handler = new ResponseHandler();
     }
 
     /**
@@ -56,7 +60,7 @@ final class Request implements RequestInterface
      * @throws RequestTimeoutException
      * @throws ResourceMovedException
      */
-    public function makeRequest(string $urlPath): ResponseInterface
+    public function getResponse(string $urlPath): ResponseInterface
     {
         $i = 0;
         $response = null;
@@ -80,50 +84,8 @@ final class Request implements RequestInterface
         if (!$response) {
             throw new Exception('Max Iterations Reached');
         }
-        $this->handle($response);
+        $this->handler->handleResponse($response);
         return $response;
-    }
-
-    private function handle(ResponseInterface $response): void
-    {
-        $body = @\json_decode($response->getBody()); // 504 responses come back as HTML
-        switch (true) {
-            case $body instanceof \stdClass && ($body->result ?? null) === 'error' && $body->reason ?? null:
-                $className = "\Kobens\Gemini\Exception\Api\Reason\{$body->reason}Exception";
-                if (!\class_exists($className)) {
-                    $className = \Kobens\Gemini\Exception::class;
-                }
-                throw new $className(
-                    $body->message,
-                    $response->getResponseCode(),
-                    new \Exception(\json_encode($response))
-                );
-            case $response->getResponseCode() === 0:
-                throw new ConnectionException(\sprintf(
-                    'Unable to establish a connection with "%s"',
-                    $this->host->getHost(),
-                    new \Exception(\json_encode($response))
-                ));
-            case $response->getResponseCode() >= 300 && $response->getResponseCode() < 400:
-                throw new ResourceMovedException(
-                    'Resource Has Moved',
-                    $response->getResponseCode(),
-                    new \Exception(\json_encode($response))
-                );
-            case $response->getResponseCode() === 408:
-                throw new RequestTimeoutException(
-                    \sprintf('%s timed out interacting with server.', static::class),
-                    new \Exception(\json_encode($response))
-                );
-            case $response->getResponseCode() >= 500:
-                throw new InvalidResponseException(
-                    $response->getBody(),
-                    $response->getResponseCode(),
-                    new \Exception(\json_encode($response))
-                );
-            default:
-                break;
-        }
     }
 
     private function getConfig(): array

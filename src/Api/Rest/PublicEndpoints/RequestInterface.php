@@ -8,5 +8,5 @@ use Kobens\Core\Http\ResponseInterface;
 
 interface RequestInterface
 {
-    public function makeRequest(string $urlPath): ResponseInterface;
+    public function getResponse(string $urlPath): ResponseInterface;
 }
