@@ -87,7 +87,21 @@ $privateThrottlerInterface = new Throttler(
     $hostInterface->getHost().'::private'
 );
 
-$tickerInterface = new Ticker($hostInterface, $publicThrottlerInterface);
+$logger = new \Monolog\Logger('curl');
+$logger->pushHandler(new \Monolog\Handler\StreamHandler($config->getLogDir() . '/curl.log'));
+$curlInterface = new \Kobens\Core\Http\Curl($logger);
+
+$logger = new \Monolog\Logger('request.public');
+$logger->pushHandler(new \Monolog\Handler\StreamHandler($config->getLogDir() . '/request.public.log'));
+
+$publicRequestInterface = new \Kobens\Gemini\Api\Rest\PublicEndpoints\Request(
+    $hostInterface,
+    $publicThrottlerInterface,
+    $curlInterface,
+    $logger
+);
+
+$tickerInterface = new Ticker($publicRequestInterface);
 
 $getPriceInterface = new GetPrice($exchangeInterface, $tickerInterface);
 
