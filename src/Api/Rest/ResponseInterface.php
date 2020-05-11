@@ -10,9 +10,6 @@ namespace Kobens\Gemini\Api\Rest;
  * @deprecated
  * @see \Kobens\Core\Http\ResponseInterface
  */
-interface ResponseInterface extends \JsonSerializable
+interface ResponseInterface extends \Kobens\Core\Http\ResponseInterface
 {
-    public function getBody(): string;
-
-    public function getResponseCode(): int;
 }
