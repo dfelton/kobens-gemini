@@ -4,43 +4,39 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus;
 
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetPastTradesInterface as I;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 
-final class GetPastTrades extends AbstractPrivateRequest implements GetPastTradesInterface
+final class GetPastTrades implements GetPastTradesInterface
 {
     private const URL_PATH = '/v1/mytrades';
 
-    private string $symbol;
+    private RequestInterface $request;
 
-    private ?int $timestampms;
-
-    private ?int $limitTrades;
+    public function __construct(
+        RequestInterface $requestInterface
+    ) {
+        $this->request = $requestInterface;
+    }
 
     public function getTrades(string $symbol, int $timestampms = null, int $limitTrades = null): array
     {
-        $this->symbol = $symbol;
-        $this->timestampms = $timestampms;
-        $this->limitTrades = $limitTrades >= I::LIMIT_MIN && $limitTrades <= I::LIMIT_MAX
-            ? $limitTrades : null;
-        return \json_decode($this->getResponse()->getBody());
-    }
-
-    protected function getUrlPath(): string
-    {
-        return self::URL_PATH;
-    }
-
-    protected function getPayload(): array
-    {
-        $payload = ['symbol' => $this->symbol];
-        if ($this->timestampms !== null) {
-            $payload['timestamp'] = $this->timestampms;
+        $payload = ['symbol' => $symbol];
+        if ($timestampms !== null) {
+            $payload['timestamp'] = $timestampms;
         }
-        if ($this->limitTrades !== null) {
-            $payload['limit_trades'] = $this->limitTrades;
+        if ($limitTrades !== null) {
+            if ($limitTrades < I::LIMIT_MIN || $limitTrades > I::LIMIT_MAX) {
+                throw new \LogicException(sprintf(
+                    'Limit "%d" is invalid. Must be between "%d" and "%d"',
+                    $limitTrades,
+                    I::LIMIT_MIN,
+                    I::LIMIT_MAX
+                ));
+            }
+            $payload['limit_trades'] = $limitTrades;
         }
-        return $payload;
+        $response = $this->request->getResponse(self::URL_PATH, $payload, [], true);
+        return \json_decode($response->getBody());
     }
-
 }
