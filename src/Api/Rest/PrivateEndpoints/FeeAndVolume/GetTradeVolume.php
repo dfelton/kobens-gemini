@@ -5,23 +5,30 @@ declare(strict_types=1);
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\FeeAndVolume;
 
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 
-final class GetTradeVolume extends AbstractPrivateRequest implements GetTradeVolumeInterface
+final class GetTradeVolume implements GetTradeVolumeInterface
 {
     private const URL_PATH = '/v1/tradevolume';
 
-    public function getVolume(): \stdClass
-    {
-        return \json_decode($this->getResponse()->getBody());
+    private RequestInterface $request;
+    public function __construct(
+        RequestInterface $requestInterface
+    ) {
+        $this->request = $requestInterface;
     }
 
-    protected function getUrlPath(): string
+    /**
+     * @return \stdClass
+     * @throws \Kobens\Core\Exception\ConnectionException
+     * @throws \Kobens\Core\Exception\Http\RequestTimeoutException
+     * @throws \Kobens\Gemini\Exception
+     * @throws \Kobens\Gemini\Exception\InvalidResponseException
+     * @throws \Kobens\Gemini\Exception\ResourceMovedException
+     */
+    public function getVolume(): array
     {
-        return self::URL_PATH;
-    }
-
-    protected function getPayload(): array
-    {
-        return [];
+        $response = $this->request->getResponse(self::URL_PATH, [], [], true);
+        return \json_decode($response->getBody());
     }
 }

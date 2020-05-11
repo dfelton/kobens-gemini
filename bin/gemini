@@ -132,6 +132,7 @@ $getAvailableBalancesInterface = new GetAvailableBalances($hostInterface, $priva
 $getNotionalBalancesInterface = new GetNotionalBalances($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
 $orderStatusInterface = new OrderStatus($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
 $getNotionalVolumeInterface = new GetNotionalVolume($privateRequestInterface);
+$getTradeVolumeInterface = new \Kobens\Gemini\Api\Rest\PrivateEndpoints\FeeAndVolume\GetTradeVolume($privateRequestInterface);
 
 $archiveInterface = new Archive();
 $buyFilledInterface = new BuyFilled($adapter);
@@ -279,6 +280,7 @@ $app->add(new \Kobens\Gemini\Command\Command\Market\Watcher($exchangeInterface, 
 
 // TODO: Use Auditor Key
 $app->add(new \Kobens\Gemini\Command\Command\FeeAndVolume\GetNotionalVolume($getNotionalVolumeInterface));
+$app->add(new \Kobens\Gemini\Command\Command\FeeAndVolume\GetTradeVolume($getTradeVolumeInterface));
 
 // TODO: This Command should use a unique KeyInterface, with no Trading Authority
 $app->add(new \Kobens\Gemini\Command\Command\OrderStatus\BookKeeper(
