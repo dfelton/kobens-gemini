@@ -124,7 +124,7 @@ $stopLimitInterface = new StopLimit($privateRequestInterface);
 $limitInterface = new Limit($privateRequestInterface);
 $makerOrCancelInterface = new MakerOrCancel($privateRequestInterface);
 
-$cancelAllActiveOrdersInterface = new CancelAllActiveOrders($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+$cancelAllActiveOrdersInterface = new CancelAllActiveOrders($privateRequestInterface);
 $cancelOrderInterface = new CancelOrder($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
 $getPastTradesInterface = new GetPastTrades($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
 $getActiveOrdersInterface = new GetActiveOrders($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
