@@ -5,12 +5,23 @@ declare(strict_types=1);
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder;
 
 use Kobens\Exchange\PairInterface;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 
-final class Limit extends AbstractNewOrder implements LimitInterface
+final class Limit implements LimitInterface
 {
+    private const URL_PATH = '/v1/order/new';
+
+    private RequestInterface $request;
+
+    public function __construct(
+        RequestInterface $requestInterface
+    ) {
+        $this->request = $requestInterface;
+    }
+
     public function place(PairInterface $pair, string $side, string $amount, string $price, string $clientOrderId = null): \stdClass
     {
-        $this->payload = [
+        $payload = [
             'type' => 'exchange limit',
             'symbol' => $pair->getSymbol(),
             'amount' => $amount,
@@ -18,8 +29,9 @@ final class Limit extends AbstractNewOrder implements LimitInterface
             'side'   => $side,
         ];
         if ($clientOrderId) {
-            $this->payload['client_order_id'] = $clientOrderId;
+            $payload['client_order_id'] = $clientOrderId;
         };
-        return \json_decode($this->getResponse()->getBody());
+        $response = $this->request->getResponse(self::URL_PATH, $payload);
+        return \json_decode($response->getBody());
     }
 }
