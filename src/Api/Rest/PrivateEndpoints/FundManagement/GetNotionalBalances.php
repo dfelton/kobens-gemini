@@ -4,20 +4,32 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement;
 
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 use Kobens\Gemini\Exception;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetNotionalBalances\Balance;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetNotionalBalances\BalanceInterface;
 
-final class GetNotionalBalances extends AbstractPrivateRequest implements GetNotionalBalancesInterface
+final class GetNotionalBalances implements GetNotionalBalancesInterface
 {
+    private const URL_PATH = '/v1/notionalbalances/usd';
+
+    private RequestInterface $request;
+
+    public function __construct(
+        RequestInterface $requestInterface
+    ) {
+        $this->request = $requestInterface;
+    }
+
     /**
      * @return BalanceInterface[]
      */
     public function getBalances(): array
     {
+        $response = $this->request->getResponse(self::URL_PATH, [], [], true);
         $balances = [];
-        foreach (json_decode($this->getResponse()->getBody()) as $c) {
+        foreach (json_decode($response->getBody()) as $c) {
             $balances[$c->currency] = new Balance(
                 $c->currency,
                 $c->amount,
@@ -33,8 +45,9 @@ final class GetNotionalBalances extends AbstractPrivateRequest implements GetNot
 
     public function getBalance(string $currency): BalanceInterface
     {
+        $response = $this->request->getResponse(self::URL_PATH, [], [], true);
         $currency = strtoupper($currency);
-        $arr = json_decode($this->getResponse()->getBody());
+        $arr = json_decode($response->getBody());
         /** @var \stdClass $c */
         foreach ($arr as $c) {
             if ($currency === $c->currency) {
@@ -50,15 +63,5 @@ final class GetNotionalBalances extends AbstractPrivateRequest implements GetNot
             }
         }
         throw new Exception("No Currency '%s' found.");
-    }
-
-    protected function getUrlPath(): string
-    {
-        return '/v1/notionalbalances/usd';
-    }
-
-    protected function getPayload(): array
-    {
-        return [];
     }
 }
