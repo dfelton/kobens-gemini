@@ -6,6 +6,11 @@ namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder;
 
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest;
 
+/**
+ * Class AbstractNewOrder
+ * @package Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder
+ * @deprecated
+ */
 abstract class AbstractNewOrder extends AbstractPrivateRequest implements NewOrderInterface
 {
     private const URL_PATH = '/v1/order/new';
