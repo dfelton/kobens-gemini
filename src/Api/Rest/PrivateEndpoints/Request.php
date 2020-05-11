@@ -4,19 +4,26 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints;
 
+use Kobens\Core\Exception\Http\CurlException;
+use Kobens\Core\Http\CurlInterface;
 use Kobens\Core\Http\Request\ThrottlerInterface;
 use Kobens\Gemini\Api\HostInterface;
 use Kobens\Gemini\Api\KeyInterface;
 use Kobens\Gemini\Api\NonceInterface;
 use Kobens\Gemini\Api\Helper\ResponseHandler;
-use Kobens\Gemini\Api\Rest\Response;
-use Kobens\Gemini\Api\Rest\ResponseInterface;
+use Kobens\Core\Http\Response;
+use Kobens\Core\Http\ResponseInterface;
+use Kobens\Gemini\Exception;
+use Psr\Log\LoggerInterface;
 
 /**
- *
+ * Class Request
+ * @package Kobens\Gemini\Api\Rest\PrivateEndpoints
  */
 final class Request implements RequestInterface
 {
+    private const MAX_ITERATIONS = 10;
+
     private KeyInterface $key;
 
     private NonceInterface $nonce;
@@ -27,64 +34,92 @@ final class Request implements RequestInterface
 
     private ResponseHandler $responseHandler;
 
+    private CurlInterface $curl;
+
+    private LoggerInterface $logger;
+
+    /**
+     * Request constructor.
+     * @param HostInterface $hostInterface
+     * @param ThrottlerInterface $throttlerInterface
+     * @param KeyInterface $keyInterface
+     * @param NonceInterface $nonceInterface
+     * @param CurlInterface $curlInterface
+     */
     public function __construct(
         HostInterface $hostInterface,
         ThrottlerInterface $throttlerInterface,
         KeyInterface $keyInterface,
         NonceInterface $nonceInterface,
-        ResponseHandler $responseHandler
+        CurlInterface $curlInterface,
+        LoggerInterface $loggerInterface
     ) {
         $this->host = $hostInterface;
         $this->key = $keyInterface;
         $this->nonce = $nonceInterface;
         $this->throttler = $throttlerInterface;
-        $this->responseHandler = $responseHandler;
+        $this->responseHandler = new ResponseHandler();
+        $this->curl = $curlInterface;
+        $this->logger = $loggerInterface;
     }
 
-    public function getResponse(string $urlPath): ResponseInterface
+    /**
+     * @param string $urlPath
+     * @param array $payload
+     * @param array $config
+     * @param bool $autoRetry
+     * @return ResponseInterface
+     * @throws CurlException
+     * @throws Exception
+     * @throws Exception\InvalidResponseException
+     * @throws Exception\ResourceMovedException
+     * @throws \Kobens\Core\Exception\ConnectionException
+     * @throws \Kobens\Core\Exception\Http\RequestTimeoutException
+     */
+    public function getResponse(string $urlPath, array $payload = [], array $config = [], bool $autoRetry = false): ResponseInterface
     {
         $this->throttler->throttle();
 
-        $ch = \curl_init();
+        $config[CURLOPT_CONNECTTIMEOUT] = $config[CURLOPT_CONNECTTIMEOUT] ?? 60;
+        $config[CURLOPT_TIMEOUT] = $config[CURLOPT_TIMEOUT] ?? 120;
+        $config[CURLOPT_POST] = true;
 
-        \curl_setopt($ch, CURLOPT_URL, 'https://' . $this->host->getHost() . $urlPath);
-        \curl_setopt($ch, CURLOPT_HTTPHEADER, $this->getRequestHeaders($urlPath));
-        \curl_setopt($ch, CURLOPT_POST, static::CURL_POST);
-        \curl_setopt($ch, CURLOPT_RETURNTRANSFER, self::CURL_RETURNTRANSFER);
-        \curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, self::CURL_CONNECTTIMEOUT);
-        \curl_setopt($ch, CURLOPT_TIMEOUT, self::CURL_TIMEOUT);
-
-        $data = [
-            'body' => (string) \curl_exec($ch),
-            'response_code' => (int) \curl_getinfo($ch, CURLINFO_RESPONSE_CODE),
-            'curl_errno' => \curl_errno($ch),
-            'curl_error' => \curl_error($ch),
-            'curlinfo_connect_time' => \curl_getinfo($ch, CURLINFO_CONNECT_TIME),
-            'curlinfo_total_time' => \curl_getinfo($ch, CURLINFO_TOTAL_TIME),
-        ];
-
-        \curl_close($ch);
-
-        if ($data['curl_errno'] !== CURLE_OK) {
-            foreach ($data as $k => $v) {
-                if (@json_encode([$k => $v]) === false) {
-                    unset($data[$k]);
+        $response = null;
+        $i = 0;
+        do {
+            ++$i;
+            try {
+                $config[CURLOPT_HTTPHEADER] = $this->getRequestHeaders($urlPath, $payload);
+                $response = $this->curl->request(
+                    'https://' . $this->host->getHost() . $urlPath,
+                    $config
+                );
+            } catch (CurlException $e) {
+                if (!$autoRetry) {
+                    throw $e;
                 }
+                $this->logger->warning(\implode(
+                    PHP_EOL,
+                    [
+                        $e->getMessage(),
+                        $e->getTraceAsString(),
+                    ]
+                ));
             }
-
-            $json = (string) json_encode($data);
-            throw new \Exception(
-                'Curl Error',
-                $data['curl_errno'],
-                $json ? new \Exception($json) : null
-            );
+        } while (!$response && $autoRetry && ++$i < self::MAX_ITERATIONS);
+        if (!$response) {
+            throw new Exception('Max Iterations Reached');
         }
-
-        return new Response($data['body'], $data['response_code']);
+        $this->responseHandler->handleResponse($response);
+        return $response;
     }
-    }
 
-    final protected function getRequestHeaders(string $urlPath, array $payload): array
+    /**
+     * @param string $urlPath
+     * @param array $payload
+     * @return array|string[]
+     */
+    final private function getRequestHeaders(string $urlPath, array $payload): array
     {
         $base64Payload = \base64_encode(\json_encode(\array_merge(
             $payload,
