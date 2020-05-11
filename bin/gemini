@@ -122,7 +122,7 @@ $forceMakerInterface = new ForceMaker($privateRequestInterface, $getPriceInterfa
 $immediateOrCancelInterface = new ImmediateOrCancel($privateRequestInterface);
 $stopLimitInterface = new StopLimit($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
 $limitInterface = new Limit($privateRequestInterface);
-$makerOrCancelInterface = new MakerOrCancel($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+$makerOrCancelInterface = new MakerOrCancel($privateRequestInterface);
 
 $cancelAllActiveOrdersInterface = new CancelAllActiveOrders($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
 $cancelOrderInterface = new CancelOrder($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
