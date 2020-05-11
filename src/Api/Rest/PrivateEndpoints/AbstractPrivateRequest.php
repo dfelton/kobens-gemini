@@ -10,6 +10,11 @@ use Kobens\Gemini\Api\KeyInterface;
 use Kobens\Gemini\Api\NonceInterface;
 use Kobens\Gemini\Api\Rest\AbstractRequest;
 
+/**
+ * Class AbstractPrivateRequest
+ * @package Kobens\Gemini\Api\Rest\PrivateEndpoints
+ * @deprecated
+ */
 abstract class AbstractPrivateRequest extends AbstractRequest
 {
     private KeyInterface $key;

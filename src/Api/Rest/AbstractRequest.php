@@ -12,6 +12,11 @@ use Kobens\Gemini\Exception\InvalidResponseException;
 use Kobens\Gemini\Exception\LogicException;
 use Kobens\Gemini\Exception\ResourceMovedException;
 
+/**
+ * Class AbstractRequest
+ * @package Kobens\Gemini\Api\Rest
+ * @deprecated
+ */
 abstract class AbstractRequest
 {
     private const   CURL_CONNECTTIMEOUT = 60;
