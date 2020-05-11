@@ -21,7 +21,7 @@ class GetActiveOrders implements GetActiveOrdersInterface
 
     public function getOrders(): array
     {
-        $response = $this->request->getResponse(self::getUrlPath(), [], [], true);
+        $response = $this->request->getResponse(self::URL_PATH, [], [], true);
         return \json_decode($response->getBody());
     }
 }

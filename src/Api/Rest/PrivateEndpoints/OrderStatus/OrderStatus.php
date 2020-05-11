@@ -21,7 +21,7 @@ class OrderStatus implements OrderStatusInterface
 
     public function getStatus(int $orderId): \stdClass
     {
-        $response = $this->request->getResponse(self::URL_PATH, ['order_id', $orderId], [], true);
+        $response = $this->request->getResponse(self::URL_PATH, ['order_id' => $orderId], [], true);
         return \json_decode($response->getBody());
     }
 }
