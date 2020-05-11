@@ -6,7 +6,7 @@ namespace Kobens\Gemini\Api\Helper;
 
 use Kobens\Core\Exception\ConnectionException;
 use Kobens\Core\Exception\Http\RequestTimeoutException;
-use Kobens\Gemini\Api\Rest\ResponseInterface;
+use Kobens\Core\Http\ResponseInterface;
 use Kobens\Gemini\Exception\InvalidResponseException;
 use Kobens\Gemini\Exception\ResourceMovedException;
 
