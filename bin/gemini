@@ -127,7 +127,7 @@ $makerOrCancelInterface = new MakerOrCancel($privateRequestInterface);
 $cancelAllActiveOrdersInterface = new CancelAllActiveOrders($privateRequestInterface);
 $cancelOrderInterface = new CancelOrder($privateRequestInterface);
 $getPastTradesInterface = new GetPastTrades($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
-$getActiveOrdersInterface = new GetActiveOrders($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+$getActiveOrdersInterface = new GetActiveOrders($privateRequestInterface);
 $getAvailableBalancesInterface = new GetAvailableBalances($privateRequestInterface);
 $getNotionalBalancesInterface = new GetNotionalBalances($privateRequestInterface);
 $orderStatusInterface = new OrderStatus($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
@@ -189,7 +189,16 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor\Rest(
     $shutdownInterface,
     $buyPlacedInterface,
     $sellPlacedInterface,
-    new GetActiveOrders($hostInterface, $privateThrottlerInterface, $restFillMonitorKey, $nonceInterface),
+    new GetActiveOrders(
+        new \Kobens\Gemini\Api\Rest\PrivateEndpoints\Request(
+            $hostInterface,
+            $privateThrottlerInterface,
+            $restFillMonitorKey,
+            $nonceInterface,
+            $curlInterface,
+            $loggerRequestPrivate
+        )
+    ),
     new OrderStatus($hostInterface, $privateThrottlerInterface, $restFillMonitorKey, $nonceInterface),
     $sleeperInterface
 ));
