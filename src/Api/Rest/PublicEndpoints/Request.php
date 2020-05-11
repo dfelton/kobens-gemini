@@ -46,7 +46,8 @@ final class Request
         $i = 0;
         do {
             try {
-                return $this->curl->request($urlPath);
+                $this->throttler->throttle();
+                return $this->curl->request($this->host->getHost() . $urlPath);
             } catch (CurlException $e) {
                 $this->logger->warning(implode(
                     PHP_EOL,
