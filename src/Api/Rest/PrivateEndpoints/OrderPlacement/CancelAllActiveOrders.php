@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement;
 
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 
 final class CancelAllActiveOrders implements CancelAllActiveOrdersInterface

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder;
 
 use Kobens\Exchange\PairInterface;
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 
 final class StopLimit implements StopLimitInterface
