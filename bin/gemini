@@ -117,7 +117,7 @@ $tickerInterface = new Ticker($publicRequestInterface);
 
 $getPriceInterface = new GetPrice($exchangeInterface, $tickerInterface);
 
-$fillOrKillInterface = new FillOrKill($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+$fillOrKillInterface = new FillOrKill($privateRequestInterface);
 $forceMakerInterface = new ForceMaker($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface, $getPriceInterface);
 $immediateOrCancelInterface = new ImmediateOrCancel($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
 $stopLimitInterface = new StopLimit($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
