@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus;
 
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 
 class OrderStatus implements OrderStatusInterface
@@ -22,6 +21,12 @@ class OrderStatus implements OrderStatusInterface
     public function getStatus(int $orderId): \stdClass
     {
         $response = $this->request->getResponse(self::URL_PATH, ['order_id' => $orderId], [], true);
+        return \json_decode($response->getBody());
+    }
+
+    public function getStatusByClientOrderId(string $clientOrderId): array
+    {
+        $response = $this->request->getResponse(self::URL_PATH, ['client_order_id' => $clientOrderId], [], true);
         return \json_decode($response->getBody());
     }
 }

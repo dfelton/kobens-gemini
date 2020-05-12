@@ -8,6 +8,7 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class OrderStatus extends Command
@@ -26,26 +27,50 @@ final class OrderStatus extends Command
     protected function configure()
     {
         $this->setDescription('Fetch the status for an individual order');
-        $this->addArgument('order_id', InputArgument::REQUIRED, 'Exchange order id to fetch data for');
+        $this->addOption('order_id', 'o', InputOption::VALUE_OPTIONAL, 'Order Id');
+        $this->addOption('client_order_id', 'c', InputOption::VALUE_OPTIONAL, 'Client Order Id');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $data = $this->status->getStatus((int) $input->getArgument('order_id'));
-        $data = \get_object_vars($data);
-
-        $keyLength = 0;
-        foreach (\array_keys($data) as $key) {
-            if (\strlen($key) > $keyLength) {
-                $keyLength = \strlen($key);
-            }
+        $orderId = ((int) $input->getOption('order_id')) ?: null;
+        $clientOrderId = $input->getOption('client_order_id');
+        if ($orderId !== null && $clientOrderId !== null) {
+            $output->writeln('<fg=red>Must provide either "order_id" or "client_order_id", not both.');
+            return;
+        } elseif ($orderId === null && $clientOrderId === null) {
+            $output->writeln('<fg=red>Must provide either "order_id" or "client_order_id".');
+            return;
         }
-        foreach ($data as $key => $val) {
-            $key = \ucwords(\str_replace('_', ' ', $key));
-            $key = \str_pad($key, $keyLength, ' ', STR_PAD_RIGHT);
-            if ($val !== []) {
-                $output->writeln("$key\t{$this->getFormattedVal($val)}");
+
+        $data = $orderId !== null
+            ? $this->status->getStatus((int) $orderId)
+            : $this->status->getStatusByClientOrderId($clientOrderId);
+
+
+        if (!is_array($data)) {
+            $data = [$data];
+        } elseif (count($data) > 1) {
+            $output->writeln(sprintf('Orders matching client_order_id "%s"', $clientOrderId));
+        }
+
+        foreach ($data as $order) {
+            $order = \get_object_vars($order);
+
+            $keyLength = 0;
+            foreach (\array_keys($order) as $key) {
+                if (\strlen($key) > $keyLength) {
+                    $keyLength = \strlen($key);
+                }
             }
+            foreach ($order as $key => $val) {
+                $key = \ucwords(\str_replace('_', ' ', $key));
+                $key = \str_pad($key, $keyLength, ' ', STR_PAD_RIGHT);
+                if ($val !== []) {
+                    $output->writeln("$key\t{$this->getFormattedVal($val)}");
+                }
+            }
+            $output->writeln(PHP_EOL);
         }
     }
 
