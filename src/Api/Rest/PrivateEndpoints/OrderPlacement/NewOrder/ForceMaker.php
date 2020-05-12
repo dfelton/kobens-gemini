@@ -63,7 +63,7 @@ final class ForceMaker implements ForceMakerInterface
             $response = $this->request->getResponse(self::URL_PATH, $payload);
             $orderData = \json_decode($response->getBody());
             if ($orderData->is_cancelled === true && $orderData->reason === 'MakerOrCancelWouldTake') {
-                $payload['price'] = $this->getNewPrice($pair, $price);
+                $payload['price'] = $this->getNewPrice($pair, $price, $side);
             } elseif ($orderData->is_cancelled === true) {
                 throw new \Exception(
                     $orderData->reason,
