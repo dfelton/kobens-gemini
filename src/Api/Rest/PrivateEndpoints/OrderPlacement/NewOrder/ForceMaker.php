@@ -10,6 +10,7 @@ use Kobens\Gemini\Api\HostInterface;
 use Kobens\Gemini\Api\KeyInterface;
 use Kobens\Gemini\Api\NonceInterface;
 use Kobens\Gemini\Api\Market\GetPriceInterface;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 use Kobens\Gemini\Exception\MaxIterationsException;
 
 /**
@@ -23,35 +24,35 @@ use Kobens\Gemini\Exception\MaxIterationsException;
  * and order is successfully placed or in which case the maximum allowed iterations
  * have been reached.
  */
-final class ForceMaker extends AbstractNewOrder implements ForceMakerInterface
+final class ForceMaker implements ForceMakerInterface
 {
+    private const URL_PATH = '/v1/order/new';
     private const MAX_ITERATIONS = 100;
 
     private GetPriceInterface $getPrice;
 
+    private RequestInterface $request;
+
     public function __construct(
-        HostInterface $hostInterface,
-        ThrottlerInterface $throttlerInterface,
-        KeyInterface $keyInterface,
-        NonceInterface $nonceInterface,
+        RequestInterface $requestInterface,
         GetPriceInterface $getPriceInterface
     ) {
         $this->getPrice = $getPriceInterface;
-        parent::__construct($hostInterface, $throttlerInterface, $keyInterface, $nonceInterface);
+        $this->request = $requestInterface;
     }
 
     public function place(PairInterface $pair, string $side, string $amount, string $price, string $clientOrderId = null): \stdClass
     {
-        $this->payload = [
-            'type' => 'exchange limit',
+        $payload = [
+            'type'    => 'exchange limit',
             'options' => ['maker-or-cancel'],
-            'symbol' => $pair->getSymbol(),
-            'amount' => $amount,
-            'price'  => $price,
-            'side'   => $side,
+            'symbol'  => $pair->getSymbol(),
+            'amount'  => $amount,
+            'price'   => $price,
+            'side'    => $side,
         ];
         if ($clientOrderId) {
-            $this->payload['client_order_id'] = $clientOrderId;
+            $payload['client_order_id'] = $clientOrderId;
         };
 
         $iterations = 0;
@@ -59,15 +60,15 @@ final class ForceMaker extends AbstractNewOrder implements ForceMakerInterface
         $orderData = null;
         do {
             ++$iterations;
-            $response = $this->getResponse();
+            $response = $this->request->getResponse(self::URL_PATH, $payload);
             $orderData = \json_decode($response->getBody());
             if ($orderData->is_cancelled === true && $orderData->reason === 'MakerOrCancelWouldTake') {
-                $this->payload['price'] = $this->getNewPrice($pair, $price);
+                $payload['price'] = $this->getNewPrice($pair, $price, $side);
             } elseif ($orderData->is_cancelled === true) {
                 throw new \Exception(
                     $orderData->reason,
-                    null, new
-                    \Exception($response->getBody(), $response->getResponseCode())
+                    null,
+                    new \Exception($response->getBody(), $response->getResponseCode())
                 );
             } else {
                 $isPlaced = true;
@@ -79,9 +80,9 @@ final class ForceMaker extends AbstractNewOrder implements ForceMakerInterface
         return $orderData;
     }
 
-    private function getNewPrice(PairInterface $pair, string $priceLimit): string
+    private function getNewPrice(PairInterface $pair, string $priceLimit, string $side): string
     {
-        switch ($this->payload['side']) {
+        switch ($side) {
             case 'buy':
                 $ask = $this->getPrice->getAsk($pair->getSymbol());
                 // If lowest ask is above what we are willing to bid, maker will place if we act now
@@ -99,7 +100,7 @@ final class ForceMaker extends AbstractNewOrder implements ForceMakerInterface
                 if ( (float) $priceLimit > (float) $bid) {
                     $newPrice = $priceLimit;
                 } else {
-                    // Get smallest inrement possible from current bid price
+                    // Get smallest increment possible from current bid price
                     $newPrice = \bcadd($bid, $pair->getMinPriceIncrement(), $pair->getQuote()->getScale());
                 }
                 break;
@@ -109,5 +110,4 @@ final class ForceMaker extends AbstractNewOrder implements ForceMakerInterface
         }
         return $newPrice;
     }
-
 }

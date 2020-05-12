@@ -4,28 +4,29 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus;
 
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 
-class OrderStatus extends AbstractPrivateRequest implements OrderStatusInterface
+class OrderStatus implements OrderStatusInterface
 {
     const URL_PATH = '/v1/order/status';
 
-    private int $orderId;
+    private RequestInterface $request;
+
+    public function __construct(
+        RequestInterface $requestInterface
+    ) {
+        $this->request = $requestInterface;
+    }
 
     public function getStatus(int $orderId): \stdClass
     {
-        $this->orderId = $orderId;
-        return \json_decode($this->getResponse()->getBody());
+        $response = $this->request->getResponse(self::URL_PATH, ['order_id' => $orderId], [], true);
+        return \json_decode($response->getBody());
     }
 
-    protected function getUrlPath(): string
+    public function getStatusByClientOrderId(string $clientOrderId): array
     {
-        return self::URL_PATH;
+        $response = $this->request->getResponse(self::URL_PATH, ['client_order_id' => $clientOrderId], [], true);
+        return \json_decode($response->getBody());
     }
-
-    protected function getPayload(): array
-    {
-        return ['order_id' => $this->orderId];
-    }
-
 }

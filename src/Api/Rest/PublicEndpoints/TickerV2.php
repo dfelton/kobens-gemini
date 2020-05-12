@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Api\Rest\PublicEndpoints;
 
-final class TickerV2 extends AbstractPublicRequest implements TickerV2Interface
+final class TickerV2 implements TickerV2Interface
 {
     private const URL_PATH = '/v2/ticker/';
 
-    private string $symbol;
+    private RequestInterface $request;
+
+    public function __construct(
+        RequestInterface $request
+    ) {
+        $this->request = $request;
+    }
 
     public function getData(string $symbol): \stdClass
     {
-        $this->symbol = $symbol;
-        return \json_decode($this->getResponse()->getBody());
-    }
-
-    protected function getUrlPath(): string
-    {
-        return self::URL_PATH . $this->symbol;
+        $response = $this->request->getResponse(self::URL_PATH . $symbol);
+        return \json_decode($response->getBody());
     }
 }

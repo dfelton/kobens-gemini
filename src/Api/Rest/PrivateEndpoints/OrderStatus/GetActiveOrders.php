@@ -5,24 +5,23 @@ declare(strict_types=1);
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus;
 
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 
-class GetActiveOrders extends AbstractPrivateRequest implements GetActiveOrdersInterface
+class GetActiveOrders implements GetActiveOrdersInterface
 {
     protected const URL_PATH = '/v1/orders';
 
+    private RequestInterface $request;
+
+    public function __construct(
+        RequestInterface $requestInterface
+    ) {
+        $this->request = $requestInterface;
+    }
+
     public function getOrders(): array
     {
-        return \json_decode($this->getResponse()->getBody());
+        $response = $this->request->getResponse(self::URL_PATH, [], [], true);
+        return \json_decode($response->getBody());
     }
-
-    protected function getUrlPath(): string
-    {
-        return self::URL_PATH;
-    }
-
-    protected function getPayload(): array
-    {
-        return [];
-    }
-
 }

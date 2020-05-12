@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder;
 
 use Kobens\Exchange\PairInterface;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 
 /**
  * This order will only add liquidity to the order book.
@@ -12,11 +13,21 @@ use Kobens\Exchange\PairInterface;
  * If that happens, the response back from the API will indicate that the order has already been canceled ("is_cancelled": true in JSON).
  * Note: some other exchanges call this option "post-only".
  */
-final class MakerOrCancel extends AbstractNewOrder implements MakerOrCancelInterface
+final class MakerOrCancel implements MakerOrCancelInterface
 {
+    private const URL_PATH = '/v1/order/new';
+
+    private RequestInterface $request;
+
+    public function __construct(
+        RequestInterface $requestInterface
+    ) {
+        $this->request = $requestInterface;
+    }
+
     public function place(PairInterface $pair, string $side, string $amount, string $price, string $clientOrderId = null): \stdClass
     {
-        $this->payload = [
+        $payload = [
             'type' => 'exchange limit',
             'options' => ['maker-or-cancel'],
             'symbol' => $pair->getSymbol(),
@@ -25,8 +36,9 @@ final class MakerOrCancel extends AbstractNewOrder implements MakerOrCancelInter
             'side'   => $side,
         ];
         if ($clientOrderId) {
-            $this->payload['client_order_id'] = $clientOrderId;
+            $payload['client_order_id'] = $clientOrderId;
         };
-        return \json_decode($this->getResponse()->getBody());
+        $response = $this->request->getResponse(self::URL_PATH, $payload);
+        return \json_decode($response->getBody());
     }
 }

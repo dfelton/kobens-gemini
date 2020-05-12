@@ -7,4 +7,6 @@ namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus;
 interface OrderStatusInterface
 {
     public function getStatus(int $orderId): \stdClass;
+
+    public function getStatusByClientOrderId(string $clientOrderId): array;
 }

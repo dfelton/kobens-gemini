@@ -5,20 +5,23 @@ declare(strict_types=1);
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder;
 
 use Kobens\Exchange\PairInterface;
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 
-final class StopLimit extends AbstractPrivateRequest implements StopLimitInterface
+final class StopLimit implements StopLimitInterface
 {
     private const URL_PATH = '/v1/order/new';
 
-    /**
-     * @var array
-     */
-    protected array $payload = [];
+    private RequestInterface $request;
+
+    public function __construct(
+        RequestInterface $requestInterface
+    ) {
+        $this->request = $requestInterface;
+    }
 
     public function place(PairInterface $pair, string $side, string $amount, string $price, string $stopPrice, string $clientOrderId = null): \stdClass
     {
-        $this->payload = [
+        $payload = [
             'type' => 'exchange stop limit',
             'symbol' => $pair->getSymbol(),
             'amount' => $amount,
@@ -27,25 +30,9 @@ final class StopLimit extends AbstractPrivateRequest implements StopLimitInterfa
             'side'   => $side,
         ];
         if ($clientOrderId) {
-            $this->payload['client_order_id'] = $clientOrderId;
+            $payload['client_order_id'] = $clientOrderId;
         };
-        return \json_decode($this->getResponse()->getBody());
+        $response = $this->request->getResponse(self::URL_PATH, $payload);
+        return \json_decode($response->getBody());
     }
-
-    final protected function getUrlPath(): string
-    {
-        return self::URL_PATH;
-    }
-
-    /**
-     * It is up to the concrete class to set this prior to calling getResponse()
-     *
-     * {@inheritDoc}
-     * @see \Kobens\Gemini\Api\Rest\PrivateEndpoints\AbstractPrivateRequest::getPayload()
-     */
-    final protected function getPayload(): array
-    {
-        return $this->payload;
-    }
-
 }
