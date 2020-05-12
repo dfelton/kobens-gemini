@@ -6,6 +6,8 @@ namespace Kobens\Gemini\Command\Command\OrderStatus;
 
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetPastTradesInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Helper\TableRows;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -26,10 +28,10 @@ final class GetPastTrades extends Command
     protected function configure()
     {
         $this->setDescription('Fetches trade data since a given timestamp');
-        $this->addOption('symbol',    's', InputOption::VALUE_OPTIONAL, 'Trading Symbol', 'btcusd');
-        $this->addOption('limit',     'l', InputOption::VALUE_OPTIONAL, 'Trades to fetch (limit 500)', 10);
+        $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Trading Symbol', 'btcusd');
+        $this->addOption('limit', 'l', InputOption::VALUE_OPTIONAL, 'Trades to fetch (limit 500)', 10);
         $this->addOption('timestamp', 't', InputOption::VALUE_OPTIONAL, 'Timestamp to fetch time since (default is most recent trades).');
-        $this->addOption('raw',       'r', InputOption::VALUE_OPTIONAL, 'Whether or not to output raw response data or not', false);
+        $this->addOption('raw', 'r', InputOption::VALUE_OPTIONAL, 'Whether or not to output raw response data or not', false);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -40,48 +42,55 @@ final class GetPastTrades extends Command
         if ($input->getOption('raw') !== false) {
             $output->writeln(\json_encode($data));
         } else {
+            $table = null;
             foreach ($data as $i => $trade) {
                 if ($i === 0 || $i % 50 === 0) {
-                    $this->outputHeaders($output);
+                    if ($table instanceof Table) {
+                        $table->render();
+                    }
+                    $table = $this->getTable($output);
                 }
-                $this->outputTrade($output, $trade);
+                $table->addRow($this->getRow($trade));
+            }
+            if ($table instanceof Table) {
+                $table->render();
             }
         }
     }
 
-    private function outputTrade(OutputInterface $output, \stdClass $trade): void
+    private function getTable(OutputInterface $output): Table
     {
-        $output->writeln(\sprintf(
-            "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
-            $trade->price. (\strlen($trade->price) < 8 ? "\t" : ''),
+        $table = new Table($output);
+        $table->setHeaders([
+            'Price',
+            'Amount',
+            'TimestampMS',
+            'Date',
+            'Time',
+            'Side',
+            'Type',
+            'Fee',
+            'Fee Amount',
+            'Transaction ID',
+            'Order ID',
+        ]);
+        return $table;
+    }
+
+    private function getRow(\stdClass $trade): array
+    {
+        return [
+            $trade->price,
             $this->getFormattedAmount($trade->amount),
             $trade->timestampms,
             $this->getFormattedDate($trade->timestampms),
             $trade->type === 'Buy' ? '<fg=green>Buy</>' : '<fg=red>Sell</>',
             $trade->aggressor ? '<fg=red>Taker</>' : '<fg=green>Maker</>',
             $trade->fee_currency,
-            $trade->fee_amount . (\strlen($trade->fee_amount) <= 7 ? "\t":''),
+            $trade->fee_amount,
             $trade->tid,
-            $trade->order_id
-        ));
-    }
-
-    private function outputHeaders(OutputInterface $output): void
-    {
-        $output->write(\sprintf(
-            "\n%s\t\t%s\t\t%s\t%s       %s\t\t%s\t%s\t%s\t%s\t%s\t%s\n",
-            '<options=underscore>Price</>',
-            '<options=underscore>Amount</>',
-            '<options=underscore>TimestampMS</>',
-            '<options=underscore>Date</>',
-            '<options=underscore>Time</>',
-            '<options=underscore>Side</>',
-            '<options=underscore>Type</>',
-            '<options=underscore>Fee</>',
-            '<options=underscore>Fee Amount</>',
-            '<options=underscore>Transaction ID</>',
-            '<options=underscore>Order ID</>'
-        ));
+            $trade->order_id,
+        ];
     }
 
     private function getFormattedDate(int $timestampms): string
