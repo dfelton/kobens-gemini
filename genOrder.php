@@ -56,7 +56,9 @@ $quote = $pair->getQuote();
 
 $orders = $result->getPricePoints();
 
+$outputDebug = true;
 if ($action === 'buy' || $action === 'sell') {
+    $outputDebug = false;
     $funds = $getAvailableBalances->getBalance(
         ($action === 'buy' ? $pair->getQuote()->getSymbol() : $base->getSymbol())
     );
@@ -88,6 +90,10 @@ if ($action === 'buy' || $action === 'sell') {
             exit(1);
         }
     }
+}
+
+if (!$outputDebug) {
+    exit(0);
 }
 
 /** @var PricePoint $first */
