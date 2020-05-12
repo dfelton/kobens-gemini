@@ -42,7 +42,7 @@ final class GetPastTrades extends Command
         } else {
             foreach ($data as $i => $trade) {
                 if ($i === 0 || $i % 50 === 0) {
-                    $this->outputHeaders($output, $symbol);
+                    $this->outputHeaders($output);
                 }
                 $this->outputTrade($output, $trade);
             }
@@ -66,7 +66,7 @@ final class GetPastTrades extends Command
         ));
     }
 
-    private function outputHeaders(OutputInterface $output, string $symbol): void
+    private function outputHeaders(OutputInterface $output): void
     {
         $output->write(\sprintf(
             "\n%s\t\t%s\t\t%s\t%s       %s\t\t%s\t%s\t%s\t%s\t%s\t%s\n",
