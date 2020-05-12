@@ -30,14 +30,18 @@ final class GetPastTrades extends Command
         $this->setDescription('Fetches trade data since a given timestamp');
         $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Trading Symbol', 'btcusd');
         $this->addOption('limit', 'l', InputOption::VALUE_OPTIONAL, 'Trades to fetch (limit 500)', 10);
-        $this->addOption('timestamp', 't', InputOption::VALUE_OPTIONAL, 'Timestamp to fetch time since (default is most recent trades).');
+        $this->addOption('timestamp', 't', InputOption::VALUE_OPTIONAL, 'Timestamp (supports ms timestamp) to fetch time since (default is most recent trades).');
         $this->addOption('raw', 'r', InputOption::VALUE_OPTIONAL, 'Whether or not to output raw response data or not', false);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $symbol = $input->getOption('symbol');
-        $data = $this->trades->getTrades($symbol, $input->getOption('timestamp'), $input->getOption('limit'));
+        $timestamp = $input->getOption('timestamp');
+        $timestamp = $timestamp === null ? null : (int) $timestamp;
+        $limit = $input->getOption('limit');
+        $limit = $limit === null ? null : (int) $limit;
+        $data = $this->trades->getTrades($symbol, $timestamp, $limit);
 
         if ($input->getOption('raw') !== false) {
             $output->writeln(\json_encode($data));
@@ -66,13 +70,13 @@ final class GetPastTrades extends Command
             'Amount',
             'TimestampMS',
             'Date',
-            'Time',
             'Side',
             'Type',
             'Fee',
             'Fee Amount',
             'Transaction ID',
             'Order ID',
+            'Client Order ID',
         ]);
         return $table;
     }
@@ -90,6 +94,7 @@ final class GetPastTrades extends Command
             $trade->fee_amount,
             $trade->tid,
             $trade->order_id,
+            $trade->client_order_id,
         ];
     }
 
