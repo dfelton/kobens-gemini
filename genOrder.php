@@ -36,6 +36,13 @@ $sellAfterGain =  '0.025';
 $result = PricePointGenerator::get($pair, $buy, $start, $end, $increment, $sellAfterGain, $save);
 
 $config = Config::getInstance();
+
+$loggerCurl = new \Monolog\Logger('curl');
+$loggerCurl->pushHandler(new \Monolog\Handler\StreamHandler($config->getLogDir() . '/curl.log'));
+
+$loggerRequestPrivate = new \Monolog\Logger('request.private');
+$loggerRequestPrivate->pushHandler(new \Monolog\Handler\StreamHandler($config->getLogDir() . '/request.private.log'));
+
 $hostInterface = new Host($config->get('gemini')->api->host);
 $privateThrottlerInterface = new Throttler(
     new MariaDb(new \Zend\Db\Adapter\Adapter($config->get('database')->toArray())),
@@ -46,8 +53,16 @@ $keyInterface = new Key(
     $config->get('gemini')->api->key->secret_key
 );
 $nonceInterface = new Nonce();
-$makerOrCancel = new MakerOrCancel($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
-$getAvailableBalances = new GetAvailableBalances($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+$privateRequestInterface = new \Kobens\Gemini\Api\Rest\PrivateEndpoints\Request(
+    $hostInterface,
+    $privateThrottlerInterface,
+    $keyInterface,
+    $nonceInterface,
+    new \Kobens\Core\Http\Curl($loggerCurl),
+    $loggerRequestPrivate
+);
+$makerOrCancel = new MakerOrCancel($privateRequestInterface);
+$getAvailableBalances = new GetAvailableBalances($privateRequestInterface);
 
 unset($config, $keyInterface, $hostInterface, $privateThrottlerInterface, $nonceInterface);
 
