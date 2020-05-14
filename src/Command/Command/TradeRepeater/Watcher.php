@@ -53,18 +53,28 @@ final class Watcher extends Command
             ),
             self::REFRESH_DEFAULT
         );
+        $this->addOption(
+            'loop',
+            'l',
+            InputOption::VALUE_OPTIONAL,
+            'Enable looping and continuous output',
+            false
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $sleep = $this->getRefreshRate($input);
         $symbol = Pair::getInstance($input->getOption('symbol'))->getSymbol();
-        $loop = true;
-        while ($loop) {
+        $loop = $input->getOption('loop');
+        $loop = $loop === false ? false : true;
+        do {
             try {
                 $this->main($output, $symbol);
-                $this->sleeper->sleep($sleep, function() {});
                 $this->data->reset();
+                if ($loop) {
+                    $this->sleeper->sleep($sleep, static function(){});
+                }
             } catch (\Throwable $e) {
                 $loop = false;
                 do {
@@ -80,7 +90,7 @@ final class Watcher extends Command
                     }
                 } while ($e instanceof \Throwable);
             }
-        }
+        } while ($loop);
     }
 
     private function main(OutputInterface $output, string $symbol): void
