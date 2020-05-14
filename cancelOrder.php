@@ -12,19 +12,15 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelOrder;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetActiveOrders;
 
 
-
-$symbol = 'btcusd';
-$side   = '';
-$amount = '';
-
+$symbol    = 'btcusd';
+$side      = '';
+$amount    = '';
 $priceFrom = '';
 $priceTo   = '';
 
 
-
 $abort = false;
 $orderIds = [];
-
 $config = Config::getInstance();
 $hostInterface = new Host($config->get('gemini')->api->host);
 $privateThrottlerInterface = new Throttler(
@@ -36,8 +32,20 @@ $keyInterface = new Key(
     $config->get('gemini')->api->key->secret_key
 );
 $nonceInterface = new Nonce();
-$activeOrders = new GetActiveOrders($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
-$cancelOrder = new CancelOrder($hostInterface, $privateThrottlerInterface, $keyInterface, $nonceInterface);
+$loggerCurl = new \Monolog\Logger('curl');
+$loggerCurl->pushHandler(new \Monolog\Handler\StreamHandler($config->getLogDir() . '/curl.log'));
+$loggerRequestPrivate = new \Monolog\Logger('request.private');
+$loggerRequestPrivate->pushHandler(new \Monolog\Handler\StreamHandler($config->getLogDir() . '/request.private.log'));
+$privateRequestInterface = new \Kobens\Gemini\Api\Rest\PrivateEndpoints\Request(
+    $hostInterface,
+    $privateThrottlerInterface,
+    $keyInterface,
+    $nonceInterface,
+    new \Kobens\Core\Http\Curl($loggerCurl),
+    $loggerRequestPrivate
+);
+$activeOrders = new GetActiveOrders($privateRequestInterface);
+$cancelOrder = new CancelOrder($privateRequestInterface);
 unset ($nonceInterface, $keyInterface, $privateThrottlerInterface, $hostInterface, $config);
 
 foreach ($activeOrders->getOrders() as $order) {
