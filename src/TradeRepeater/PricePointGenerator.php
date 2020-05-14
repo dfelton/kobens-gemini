@@ -27,24 +27,27 @@ final class PricePointGenerator
      * @param string $increment
      * @param string $sellAfterGain
      * @param string $saveAmount
+     * @param bool $byPassMinOrderSize
      * @throws \Exception
      * @return Result
      */
-    public static function get(PairInterface $pair, string $buyAmount, string $priceStart, string $priceEnd, string $increment, string $sellAfterGain, string $saveAmount = '0'): Result
+    public static function get(PairInterface $pair, string $buyAmount, string $priceStart, string $priceEnd, string $increment, string $sellAfterGain, string $saveAmount = '0', $byPassMinOrderSize = false): Result
     {
         $sellAmount = Subtract::getResult($buyAmount, $saveAmount);
-        if (Compare::getResult($pair->getMinOrderSize(), $buyAmount) === Compare::LEFT_GREATER_THAN) {
-            throw new Exception(sprintf(
-                'Buy amount "%s" is invalid. Minimum order size is "%s".',
-                $buyAmount,
-                $pair->getMinOrderSize()
-            ));
-        } elseif (Compare::getResult($pair->getMinOrderSize(), $sellAmount) === Compare::LEFT_GREATER_THAN) {
-            throw new Exception(sprintf(
-                'Sell amount "%s" is invalid. Minimum order size is "%s".',
-                $sellAmount,
-                $pair->getMinOrderSize()
-            ));
+        if (!$byPassMinOrderSize) {
+            if (Compare::getResult($pair->getMinOrderSize(), $buyAmount) === Compare::LEFT_GREATER_THAN) {
+                throw new Exception(sprintf(
+                    'Buy amount "%s" is invalid. Minimum order size is "%s".',
+                    $buyAmount,
+                    $pair->getMinOrderSize()
+                ));
+            } elseif (Compare::getResult($pair->getMinOrderSize(), $sellAmount) === Compare::LEFT_GREATER_THAN) {
+                throw new Exception(sprintf(
+                    'Sell amount "%s" is invalid. Minimum order size is "%s".',
+                    $sellAmount,
+                    $pair->getMinOrderSize()
+                ));
+            }
         }
         $orders = [];
         $quote = $pair->getQuote();
