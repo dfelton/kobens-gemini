@@ -132,7 +132,7 @@ final class Watcher extends Command
             $data[] = TradeSpread::getTable($output, $this->data, $symbol);
             $data[] = MarketSpread::getTable($output, $this->data, $symbol);
         } catch (\Kobens\Gemini\Exception $e) {
-            $data[] = (new Table())->addRow([$e->getMessage()]);
+            $data[] = (new Table($output))->addRow([$e->getMessage()]);
         }
         return $data;
     }
