@@ -40,6 +40,7 @@ final class GetNotionalBalances implements GetNotionalBalancesInterface
                 $c->availableForWithdrawalNotional
             );
         }
+        ksort($balances);
         return $balances;
     }
 
