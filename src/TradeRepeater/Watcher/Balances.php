@@ -16,15 +16,17 @@ final class Balances
         $table->setHeaders([
             'Currency',
             'Amount',
-            'Amount Available',
-            'Amount Notional USD',
+            'Amount Notional',
+            'Available',
+            'Available Notional'
         ]);
         foreach ($balances as $balance) {
             $table->addRow([
                 $balance->getCurrency(),
                 $balance->getAmount(),
-                $balance->getAvailable(),
                 $balance->getAmountNotional(),
+                $balance->getAvailable(),
+                $balance->getAvailableNotional(),
             ]);
         }
         return $table;
