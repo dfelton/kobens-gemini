@@ -66,7 +66,7 @@ final class Watcher extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->init($input, $output);
+        $this->init($input);
 
         while (true) {
             $time = \time();
@@ -75,9 +75,10 @@ final class Watcher extends Command
                 $bid = $this->book->getBidPrice();
                 $spread = $this->book->getSpread();
             } catch (ClosedBookException $e) {
-                if (   $this->bookIsOpen === true
-                    || $this->hasReportedClosedBook === false
-                    || $time % 30 === 0
+                if (
+                    $this->bookIsOpen === true ||
+                    $this->hasReportedClosedBook === false ||
+                    $time % 30 === 0
                 ) {
                     $this->hasReportedClosedBook = true;
                     $this->bookIsOpen = false;
@@ -109,7 +110,7 @@ final class Watcher extends Command
         }
     }
 
-    private function init(InputInterface $input, OutputInterface $output): void
+    private function init(InputInterface $input): void
     {
         $this->symbol = $input->getOption('symbol');
         $this->refreshRate = (int) $input->getOption('refresh');
