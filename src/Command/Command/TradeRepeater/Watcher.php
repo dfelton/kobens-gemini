@@ -136,5 +136,4 @@ final class Watcher extends Command
         }
         return $data;
     }
-
 }
