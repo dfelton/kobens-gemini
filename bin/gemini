@@ -282,8 +282,8 @@ unset($buyAuditorKey, $buyAuditorRequestInterface);
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Watcher(
     new Data(
         $getActiveOrdersInterface,
-        $getPriceInterface,
-        $getNotionalBalancesInterface
+        $getNotionalBalancesInterface,
+        $getPriceInterface
     ),
     $sleeperInterface
 ));

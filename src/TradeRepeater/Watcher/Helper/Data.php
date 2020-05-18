@@ -17,29 +17,29 @@ final class Data implements DataInterface
     private array $priceResult = [];
 
     /**
-     * @var \stdClass[]
+     * @var \stdClass[]|null
      */
     private ?array $orders = null;
-
-    private GetActiveOrdersInterface $activeOrders;
-
-    private GetPriceInterface $price;
-
-    private GetNotionalBalancesInterface $notionalBalance;
 
     /**
      * @var \Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetNotionalBalances\BalanceInterface[]
      */
     private ?array $notionalBalances = null;
 
+    private GetActiveOrdersInterface $activeOrders;
+
+    private GetNotionalBalancesInterface $notionalBalance;
+
+    private GetPriceInterface $price;
+
     public function __construct(
         GetActiveOrdersInterface $getActiveOrdersInterface,
-        GetPriceInterface $getPriceInterface,
-        GetNotionalBalancesInterface $getNotionalBalancesInterface
+        GetNotionalBalancesInterface $getNotionalBalancesInterface,
+        GetPriceInterface $getPriceInterface
     ) {
         $this->activeOrders = $getActiveOrdersInterface;
-        $this->price = $getPriceInterface;
         $this->notionalBalance = $getNotionalBalancesInterface;
+        $this->price = $getPriceInterface;
     }
 
     public function reset(): void
@@ -67,6 +67,7 @@ final class Data implements DataInterface
         }
         return $this->orders;
     }
+
 
     /**
      * @return \Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetNotionalBalances\BalanceInterface[]
