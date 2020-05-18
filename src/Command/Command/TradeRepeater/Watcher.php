@@ -82,7 +82,7 @@ final class Watcher extends Command
                         'Code: ' . $e->getCode(),
                         'Class: ' . \get_class($e),
                         'Message: ' . $e->getMessage(),
-                        "Strace:\n" . $e->getTraceAsString(),
+                        "Trace:\n" . $e->getTraceAsString(),
                     ]);
                     $e = $e->getPrevious();
                     if ($e instanceof \Throwable) {
