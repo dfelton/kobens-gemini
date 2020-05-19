@@ -32,12 +32,9 @@ final class AccountNotionalBalance
         $investedUsd = self::formatVal($investedUsd);
         $amount = self::formatVal($amount);
         $table = new Table($output);
-        $table
-            ->setRows([
-                ['Account Notional Balance USD:', "$ <fg=green>$amount</>"],
-                ['USD Invested', "$ $investedUsd"],
-                ['Difference', "$ <fg=$diffFormat>$diff</>"],
-            ]);
+        $table->setHeaderTitle('Account');
+        $table->setHeaders(['Notional Balance', 'USD Invested', 'Difference']);
+        $table->addRow(["$ <fg=green>$amount</>", "$ $investedUsd", "$ <fg=$diffFormat>$diff</>"]);
         return $table;
     }
 

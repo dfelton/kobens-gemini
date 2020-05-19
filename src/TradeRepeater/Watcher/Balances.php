@@ -13,6 +13,7 @@ final class Balances
     {
         $table = new Table($output);
         $balances = $data->getNotionalBalances();
+        $table->setHeaderTitle('Balances');
         $table->setHeaders([
             'Currency',
             'Amount',
