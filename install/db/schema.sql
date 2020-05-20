@@ -1,4 +1,5 @@
 
+-- TODO: Really need an install command that supports our other modules too
 
 DROP TABLE IF EXISTS `trade_repeater`;
 CREATE TABLE `trade_repeater` (
@@ -192,7 +193,8 @@ CREATE TABLE IF NOT EXISTS `taxes_zecusd_sell_log` (
 
 
 --
--- TODO: This (schema) originates from kobens-core and doesn't belong in the kobens-gemini
+-- TODO: This (schema) originates from kobens-core and doesn't belong in the kobens-gemini.
+-- Note: Can optionally put throttler into it's own database if desired. See env/config.sample.xml
 --
 DROP TABLE IF EXISTS `throttler`;
 CREATE TABLE `throttler` (

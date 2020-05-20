@@ -54,6 +54,22 @@
         <password>bar</password>
         <database>foobar</database>
     </database>
+    <kobens>
+        <core>
+            <throttler>
+                <adapter>
+                    <mariadb>
+                        <driver>pdo_mysql</driver>
+                        <hostname>127.0.0.1</hostname>
+                        <port>3306</port>
+                        <username>foo</username>
+                        <password>bar</password>
+                        <database>foobar</database>
+                    </mariadb>
+                </adapter>
+            </throttler>
+        </core>
+    </kobens>
     <php>
         <timezone>America/Chicago</timezone>
     </php>
