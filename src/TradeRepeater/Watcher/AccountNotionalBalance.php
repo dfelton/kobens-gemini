@@ -33,7 +33,7 @@ final class AccountNotionalBalance
         $amount = self::formatVal($amount);
         $table = new Table($output);
         $table->setHeaderTitle('Account');
-        $table->setHeaders(['Notional Balance', 'USD Invested', 'Difference']);
+        $table->setHeaders(['Notional Balance', '    USD Invested', '      Difference']);
         $table->addRow(["$ <fg=green>$amount</>", "$ $investedUsd", "$ <fg=$diffFormat>$diff</>"]);
         return $table;
     }
@@ -41,7 +41,7 @@ final class AccountNotionalBalance
     private static function formatVal(string $val): string
     {
         $val = (string) \number_format((float) $val, 2);
-        $val = str_pad($val, 10, ' ', STR_PAD_LEFT);
+        $val = str_pad($val, 14, ' ', STR_PAD_LEFT);
         return $val;
     }
 }
