@@ -14,4 +14,4 @@ jobs:
       - run: sudo apt update
       - run: sudo docker-php-ext-install bcmath
       - run: composer install -n --prefer-dist
-      - run: ./vendor/bin/phpunit
+      - run: ./vendor/bin/phpunit ./test/Unit
