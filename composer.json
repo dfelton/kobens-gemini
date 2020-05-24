@@ -34,6 +34,7 @@
         "ext-bcmath": "*",
         "ext-curl": "*",
         "ext-json": "*",
+        "ext-bcmath": "*",
         "ext-mbstring": "*",
         "amphp/websocket-client": "dev-master",
         "kobens/kobens-core": "dev-master",
