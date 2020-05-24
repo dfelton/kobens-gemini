@@ -90,8 +90,7 @@ final class PricePointGenerator
                 $sellAmount,
                 $sellPrice,
                 MaxApiMakerBps::get(),
-                ApiMakerHoldBps::get(),
-                $hasVariablePriceIncrement
+                ApiMakerHoldBps::get()
             );
             // "Potentially" in the wording here because fees are variable, and we assume the worst
             if (Compare::getResult($pricePoint->getProfitQuote(), '0') === Compare::RIGHT_GREATER_THAN) {
