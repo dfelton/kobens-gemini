@@ -28,11 +28,14 @@ final class PricePoint
     private string $holdBps;
 
     /**
+     * PricePoint constructor.
+     *
      * @param string $buyAmount
      * @param string $buyPrice
      * @param string $sellAmount
      * @param string $sellPrice
      * @param string $bps
+     * @param string $holdBps
      */
     public function __construct(
         string $buyAmount,
