@@ -15,4 +15,4 @@ jobs:
       - run: sudo docker-php-ext-install bcmath
       - run: composer install -n --prefer-dist
       - run: ./vendor/bin/phpunit ./test/Unit
-      - run: ./vendor/bin/phpcs ./src
+      - run: ./vendor/bin/phpcs --colors --report-width=200 --standard=PSR12 --exclude=PSR12.Files.FileHeader,Generic.Files.LineLength ./src
