@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\TradeRepeater;
 
+use Kobens\Currency\CurrencyInterface;
 use Kobens\Exchange\PairInterface;
 use Kobens\Gemini\Exception;
 use Kobens\Gemini\Exchange\Order\Fee\ApiMakerHoldBps;
@@ -50,45 +51,15 @@ final class PricePointGenerator
             }
         }
         $orders = [];
-        $quote = $pair->getQuote();
-
-        // TODO: remove this once issues mentioned in constructor are addressed.
-        if ($pair->getSymbol() !== 'btcusd') {
-            throw new \Exception(\sprintf('"%s" is not yet compatible with any pairs other than "btcusd".', self::class));
-        }
-        $hasVariablePriceIncrement = false;
-
+        $variableIncrement = false;
         while (Compare::getResult($priceStart, $priceEnd) !== Compare::RIGHT_LESS_THAN) {
-            /**
-             * Determine the sell price based off
-             *      - Gain goal
-             *      - Quote minimum price increment
-             *
-             * If the exact sell price for the desired "sell after gain" were to result in a value that does not
-             * comply with the minimum price increment of the quote asset, then round down the exact sell price for the quote
-             * asset to the nearest minimum increment amount, and then increment the quote price increment by the minimum
-             * allowed amount.
-             */
-            $precision = \strlen(\substr($sellAfterGain, \strpos($sellAfterGain, '.') + 1)) * $quote->getScale();
-
-            $sellPriceExact = \bcmul($priceStart, $sellAfterGain, $precision);
-            $sellPriceExact .= \str_repeat('0', $precision - \strlen(\substr($sellPriceExact, \strpos($sellPriceExact, '.') + 1)));
-
-            $sellPriceRoundedDown = \bcadd($sellPriceExact, '0', 2) . \str_repeat('0', $precision - 2);
-
-            if ($sellPriceExact === $sellPriceRoundedDown) {
-                $sellPrice = \bcadd($sellPriceRoundedDown, '.00', 2);
-            } else {
-                $sellPrice = \bcadd($sellPriceRoundedDown, '.01', 2);
-                $hasVariablePriceIncrement = true;
-            }
-            $sellPrice = \bcadd($priceStart, $sellPrice, $quote->getScale());
-
+            $sellData = self::getSellPrice($priceStart, $sellAfterGain, $pair->getQuote());
+            $variableIncrement = $variableIncrement || $sellData['variable'];
             $pricePoint = new PricePoint(
                 $buyAmount,
                 $priceStart,
                 $sellAmount,
-                $sellPrice,
+                $sellData['sell_price'],
                 MaxApiMakerBps::get(),
                 ApiMakerHoldBps::get()
             );
@@ -107,6 +78,39 @@ final class PricePointGenerator
             $priceStart = Add::getResult($priceStart, $increment);
         }
 
-        return new Result($orders, $hasVariablePriceIncrement);
+        return new Result($orders, $variableIncrement);
+    }
+
+    private static function getSellPrice(string $priceStart, string $sellAfterGain, CurrencyInterface $quote): array
+    {
+        /**
+         * Determine the sell price based off
+         *      - Gain goal
+         *      - Quote minimum price increment
+         *
+         * If the exact sell price for the desired "sell after gain" were to result in a value that does not
+         * comply with the minimum price increment of the quote asset, then round down the exact sell price for the quote
+         * asset to the nearest minimum increment amount, and then increment the quote price increment by the minimum
+         * allowed amount.
+         */
+        $precision = \strlen(\substr($sellAfterGain, \strpos($sellAfterGain, '.') + 1)) * $quote->getScale();
+
+        $sellPriceExact = \bcmul($priceStart, $sellAfterGain, $precision);
+        $sellPriceExact .= \str_repeat('0',  $precision - \strlen(\substr($sellPriceExact, \strpos($sellPriceExact, '.') + 1)));
+
+        $sellPriceRoundedDown = \bcadd($sellPriceExact, '0', 2) . \str_repeat('0', $precision - 2);
+
+        if ($sellPriceExact === $sellPriceRoundedDown) {
+            $sellPrice = \bcadd($sellPriceRoundedDown, '.00', 2);
+            $hasVariablePriceIncrement = false;
+        } else {
+            $sellPrice = \bcadd($sellPriceRoundedDown, '.01', 2);
+            $hasVariablePriceIncrement = true;
+        }
+        $sellPrice = \bcadd($priceStart, $sellPrice, $quote->getScale());
+        return [
+            'sell_price' => $sellPrice,
+            'variable' => $hasVariablePriceIncrement,
+        ];
     }
 }
