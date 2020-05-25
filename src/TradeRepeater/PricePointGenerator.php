@@ -63,22 +63,31 @@ final class PricePointGenerator
                 MaxApiMakerBps::get(),
                 ApiMakerHoldBps::get()
             );
-            // "Potentially" in the wording here because fees are variable, and we assume the worst
-            if (Compare::getResult($pricePoint->getProfitQuote(), '0') === Compare::RIGHT_GREATER_THAN) {
-                throw new Exception('Params yield potential quote currency losses');
-            } elseif (Compare::getResult($pricePoint->getProfitBase(), '0') === Compare::RIGHT_GREATER_THAN) {
-                throw new Exception('Params yield potential base currency losses.');
-            } elseif (
-                Compare::getResult($pricePoint->getProfitQuote(), '0') === Compare::EQUAL &&
-                Compare::getResult($pricePoint->getProfitBase(), '0') === Compare::EQUAL
-            ) {
-                throw new Exception('Params yield potentially no gains.');
-            }
+            self::validateHasGains($pricePoint);
             $orders[] = $pricePoint;
             $priceStart = Add::getResult($priceStart, $increment);
         }
-
         return new Result($orders, $variableIncrement);
+    }
+
+    /**
+     * @param PricePoint $pricePoint
+     * @throws Exception
+     */
+    private static function validateHasGains(PricePoint $pricePoint): void
+    {
+        // "Potentially" in the wording here because fees are variable, and we assume the worst
+        if (Compare::getResult($pricePoint->getProfitQuote(), '0') === Compare::RIGHT_GREATER_THAN) {
+            throw new Exception('Params yield potential quote currency losses');
+        } elseif(Compare::getResult($pricePoint->getProfitBase(), '0') === Compare::RIGHT_GREATER_THAN) {
+            throw new Exception('Params yield potential base currency losses.');
+        } elseif (
+            Compare::getResult($pricePoint->getProfitQuote(), '0') === Compare::EQUAL &&
+            Compare::getResult($pricePoint->getProfitBase(), '0') === Compare::EQUAL
+        ) {
+            throw new Exception('Params yield potentially no gains.');
+        }
+
     }
 
     private static function getSellPrice(string $priceStart, string $sellAfterGain, CurrencyInterface $quote): array
