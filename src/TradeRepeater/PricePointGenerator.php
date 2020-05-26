@@ -79,7 +79,7 @@ final class PricePointGenerator
         // "Potentially" in the wording here because fees are variable, and we assume the worst
         if (Compare::getResult($pricePoint->getProfitQuote(), '0') === Compare::RIGHT_GREATER_THAN) {
             throw new Exception('Params yield potential quote currency losses');
-        } elseif(Compare::getResult($pricePoint->getProfitBase(), '0') === Compare::RIGHT_GREATER_THAN) {
+        } elseif (Compare::getResult($pricePoint->getProfitBase(), '0') === Compare::RIGHT_GREATER_THAN) {
             throw new Exception('Params yield potential base currency losses.');
         } elseif (
             Compare::getResult($pricePoint->getProfitQuote(), '0') === Compare::EQUAL &&
@@ -87,7 +87,6 @@ final class PricePointGenerator
         ) {
             throw new Exception('Params yield potentially no gains.');
         }
-
     }
 
     private static function getSellPrice(string $priceStart, string $sellAfterGain, CurrencyInterface $quote): array
@@ -105,7 +104,7 @@ final class PricePointGenerator
         $precision = \strlen(\substr($sellAfterGain, \strpos($sellAfterGain, '.') + 1)) * $quote->getScale();
 
         $sellPriceExact = \bcmul($priceStart, $sellAfterGain, $precision);
-        $sellPriceExact .= \str_repeat('0',  $precision - \strlen(\substr($sellPriceExact, \strpos($sellPriceExact, '.') + 1)));
+        $sellPriceExact .= \str_repeat('0', $precision - \strlen(\substr($sellPriceExact, \strpos($sellPriceExact, '.') + 1)));
 
         $sellPriceRoundedDown = \bcadd($sellPriceExact, '0', 2) . \str_repeat('0', $precision - 2);
 
