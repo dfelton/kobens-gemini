@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\TradeRepeater;
 
-use Kobens\Currency\CurrencyInterface;
 use Kobens\Exchange\PairInterface;
 use Kobens\Gemini\Exception;
 use Kobens\Gemini\Exchange\Order\Fee\ApiMakerHoldBps;
@@ -13,6 +12,7 @@ use Kobens\Gemini\TradeRepeater\PricePointGenerator\PricePoint;
 use Kobens\Gemini\TradeRepeater\PricePointGenerator\Result;
 use Kobens\Math\BasicCalculator\Add;
 use Kobens\Math\BasicCalculator\Compare;
+use Kobens\Math\BasicCalculator\Multiply;
 use Kobens\Math\BasicCalculator\Subtract;
 
 final class PricePointGenerator
@@ -21,18 +21,18 @@ final class PricePointGenerator
      * FIXME: Implement logic with \Kobens\Exchange\PairInterface::getMinPriceIncrement to verify the increment is valid
      * FIXME: Implement logic with \Kobens\Exchange\PairInterface::getMinPriceIncrement to verify the buy start price is valid
      *
-     * @param PairInterface $pair
-     * @param string $buyAmount
-     * @param string $priceStart
-     * @param string $priceEnd
-     * @param string $increment
-     * @param string $sellAfterGain
-     * @param string $saveAmount
-     * @param bool $byPassMinOrderSize
-     * @throws \Exception
+     * @param PairInterface $pair Currency Pair which to generate PricePoint models for
+     * @param string $buyAmount Amount of base currency to purchase with each PricePoint
+     * @param string $priceStart Quote currency buy price which to first generate a PricePoint for
+     * @param string $priceEnd Quote currency buy price which to not generate PricePoint models beyond
+     * @param string $increment Amount Quote currency buy price should be incremented between each PricePoint
+     * @param string $priceChange Multiplier to use to determine Quote currency sell price in relation to a PricePoint's buy price ("1" would result in no price change, "2" result in a 100% gain in price)
+     * @param string $saveAmount Amount of base currency to HODL from the buy order (determines amount to sell in a PricePoint)
+     * @param bool $byPassMinOrderSize Do not throw an exception for min order size violations.
      * @return Result
+     * @throws \Exception
      */
-    public static function get(PairInterface $pair, string $buyAmount, string $priceStart, string $priceEnd, string $increment, string $sellAfterGain, string $saveAmount = '0', $byPassMinOrderSize = false): Result
+    public static function get(PairInterface $pair, string $buyAmount, string $priceStart, string $priceEnd, string $increment, string $priceChange, string $saveAmount = '0', $byPassMinOrderSize = false): Result
     {
         $sellAmount = Subtract::getResult($buyAmount, $saveAmount);
         if (!$byPassMinOrderSize) {
@@ -42,8 +42,8 @@ final class PricePointGenerator
         $variableIncrement = false;
         $price = $priceStart;
         while (Compare::getResult($price, $priceEnd) !== Compare::RIGHT_LESS_THAN) {
-            $sellData = self::getSellPrice($price, $sellAfterGain, $pair->getQuote());
-            $variableIncrement = $variableIncrement || $sellData['variable'];
+            $sellData = self::getSellPrice($price, $priceChange, $pair);
+            $variableIncrement = $variableIncrement || $sellData['isExact'];
             $pricePoint = new PricePoint(
                 $buyAmount,
                 $price,
@@ -106,30 +106,24 @@ final class PricePointGenerator
      * allowed amount.
      *
      * @param string $priceStart
-     * @param string $sellAfterGain
-     * @param CurrencyInterface $quote
+     * @param string $priceChange
+     * @param PairInterface $pair
      * @return array
      */
-    private static function getSellPrice(string $priceStart, string $sellAfterGain, CurrencyInterface $quote): array
+    private static function getSellPrice(string $priceStart, string $priceChange, PairInterface $pair): array
     {
-        $precision = \strlen(\substr($sellAfterGain, \strpos($sellAfterGain, '.') + 1)) * $quote->getScale();
-
-        $sellPriceExact = \bcmul($priceStart, $sellAfterGain, $precision);
-        $sellPriceExact .= \str_repeat('0', $precision - \strlen(\substr($sellPriceExact, \strpos($sellPriceExact, '.') + 1)));
-
-        $sellPriceRoundedDown = \bcadd($sellPriceExact, '0', 2) . \str_repeat('0', $precision - 2);
-
-        if ($sellPriceExact === $sellPriceRoundedDown) {
-            $sellPrice = \bcadd($sellPriceRoundedDown, '.00', 2);
-            $hasVariablePriceIncrement = false;
+        $exact = Multiply::getResult($priceStart, $priceChange);
+        $roundedDown = \bcadd($exact, '0', $pair->getQuote()->getScale());
+        if (Compare::getResult($exact, $roundedDown) === Compare::EQUAL) {
+            $sellPrice = $exact;
+            $isExact = true;
         } else {
-            $sellPrice = \bcadd($sellPriceRoundedDown, '.01', 2);
-            $hasVariablePriceIncrement = true;
+            $sellPrice = Add::getResult($roundedDown, $pair->getMinPriceIncrement());
+            $isExact = false;
         }
-        $sellPrice = \bcadd($priceStart, $sellPrice, $quote->getScale());
         return [
             'sell_price' => $sellPrice,
-            'variable' => $hasVariablePriceIncrement,
+            'isExact' => $isExact,
         ];
     }
 }

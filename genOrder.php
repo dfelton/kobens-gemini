@@ -31,7 +31,7 @@ $end    = '';
 $action = '';
 
 $increment     =  '2.50';
-$sellAfterGain =  '0.025';
+$sellAfterGain =  '1.025';
 
 $result = PricePointGenerator::get($pair, $buy, $start, $end, $increment, $sellAfterGain, $save, true);
 
