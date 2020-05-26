@@ -36,28 +36,17 @@ final class PricePointGenerator
     {
         $sellAmount = Subtract::getResult($buyAmount, $saveAmount);
         if (!$byPassMinOrderSize) {
-            if (Compare::getResult($pair->getMinOrderSize(), $buyAmount) === Compare::LEFT_GREATER_THAN) {
-                throw new Exception(sprintf(
-                    'Buy amount "%s" is invalid. Minimum order size is "%s".',
-                    $buyAmount,
-                    $pair->getMinOrderSize()
-                ));
-            } elseif (Compare::getResult($pair->getMinOrderSize(), $sellAmount) === Compare::LEFT_GREATER_THAN) {
-                throw new Exception(sprintf(
-                    'Sell amount "%s" is invalid. Minimum order size is "%s".',
-                    $sellAmount,
-                    $pair->getMinOrderSize()
-                ));
-            }
+            self::validateOrderSize($pair, $buyAmount, $sellAmount);
         }
         $orders = [];
         $variableIncrement = false;
-        while (Compare::getResult($priceStart, $priceEnd) !== Compare::RIGHT_LESS_THAN) {
-            $sellData = self::getSellPrice($priceStart, $sellAfterGain, $pair->getQuote());
+        $price = $priceStart;
+        while (Compare::getResult($price, $priceEnd) !== Compare::RIGHT_LESS_THAN) {
+            $sellData = self::getSellPrice($price, $sellAfterGain, $pair->getQuote());
             $variableIncrement = $variableIncrement || $sellData['variable'];
             $pricePoint = new PricePoint(
                 $buyAmount,
-                $priceStart,
+                $price,
                 $sellAmount,
                 $sellData['sell_price'],
                 MaxApiMakerBps::get(),
@@ -65,9 +54,26 @@ final class PricePointGenerator
             );
             self::validateHasGains($pricePoint);
             $orders[] = $pricePoint;
-            $priceStart = Add::getResult($priceStart, $increment);
+            $price = Add::getResult($price, $increment);
         }
         return new Result($orders, $variableIncrement);
+    }
+
+    private static function validateOrderSize(PairInterface $pair, string $buyAmount, string $sellAmount): void
+    {
+        if (Compare::getResult($pair->getMinOrderSize(), $buyAmount) === Compare::LEFT_GREATER_THAN) {
+            throw new Exception(sprintf(
+                'Buy amount "%s" is invalid. Minimum order size is "%s".',
+                $buyAmount,
+                $pair->getMinOrderSize()
+            ));
+        } elseif (Compare::getResult($pair->getMinOrderSize(), $sellAmount) === Compare::LEFT_GREATER_THAN) {
+            throw new Exception(sprintf(
+                'Sell amount "%s" is invalid. Minimum order size is "%s".',
+                $sellAmount,
+                $pair->getMinOrderSize()
+            ));
+        }
     }
 
     /**
@@ -89,18 +95,23 @@ final class PricePointGenerator
         }
     }
 
+    /**
+     * Determine the sell price based off
+     *      - Gain goal
+     *      - Quote minimum price increment
+     *
+     * If the exact sell price for the desired "sell after gain" were to result in a value that does not
+     * comply with the minimum price increment of the quote asset, then round down the exact sell price for the quote
+     * asset to the nearest minimum increment amount, and then increment the quote price increment by the minimum
+     * allowed amount.
+     *
+     * @param string $priceStart
+     * @param string $sellAfterGain
+     * @param CurrencyInterface $quote
+     * @return array
+     */
     private static function getSellPrice(string $priceStart, string $sellAfterGain, CurrencyInterface $quote): array
     {
-        /**
-         * Determine the sell price based off
-         *      - Gain goal
-         *      - Quote minimum price increment
-         *
-         * If the exact sell price for the desired "sell after gain" were to result in a value that does not
-         * comply with the minimum price increment of the quote asset, then round down the exact sell price for the quote
-         * asset to the nearest minimum increment amount, and then increment the quote price increment by the minimum
-         * allowed amount.
-         */
         $precision = \strlen(\substr($sellAfterGain, \strpos($sellAfterGain, '.') + 1)) * $quote->getScale();
 
         $sellPriceExact = \bcmul($priceStart, $sellAfterGain, $precision);
