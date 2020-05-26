@@ -1,18 +1,32 @@
-# PHP CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-php/ for more details
-#
 version: 2
 jobs:
   build:
     docker:
       - image: circleci/php:7.4.5-cli
-
     steps:
       - checkout
-
       - run: sudo apt update
       - run: sudo docker-php-ext-install bcmath
+      - restore_cache:
+          keys:
+            - composer-v1-{{ checksum "composer.lock" }}
+            - composer-v1-
       - run: composer install -n --prefer-dist
+      - save_cache:
+          key: composer-v1-{{ checksum "composer.lock" }}
+          paths:
+            - vendor
+  test:
+    docker:
+      - image: circleci/php:7.4.5-cli
+    steps:
+      - checkout
       - run: ./vendor/bin/phpunit ./test/Unit
       - run: ./vendor/bin/phpcs --colors --report-width=200 --standard=PSR12 --exclude=PSR12.Files.FileHeader,Generic.Files.LineLength ./src
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - test
