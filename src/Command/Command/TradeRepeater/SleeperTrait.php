@@ -16,8 +16,7 @@ trait SleeperTrait
     {
         $sleeper->sleep(
             $sleepTime,
-            function() use ($shutdown)
-            {
+            function () use ($shutdown) {
                 return $shutdown->isShutdownModeEnabled();
             }
         );

@@ -27,11 +27,11 @@ final class StopLimit extends Command
 
     final protected function configure()
     {
-        $this->addArgument('side',          InputArgument::REQUIRED, 'buy|sell');
-        $this->addArgument('symbol',        InputArgument::REQUIRED);
-        $this->addArgument('amount',        InputArgument::REQUIRED);
-        $this->addArgument('price',         InputArgument::REQUIRED);
-        $this->addArgument('stop_price',    InputArgument::REQUIRED);
+        $this->addArgument('side', InputArgument::REQUIRED, 'buy|sell');
+        $this->addArgument('symbol', InputArgument::REQUIRED);
+        $this->addArgument('amount', InputArgument::REQUIRED);
+        $this->addArgument('price', InputArgument::REQUIRED);
+        $this->addArgument('stop_price', InputArgument::REQUIRED);
         $this->addArgument('clientOrderId', InputArgument::OPTIONAL);
     }
 
@@ -70,13 +70,13 @@ final class StopLimit extends Command
                 $str = "<fg=green>true</>";
                 break;
 
-            case $value === false;
-            $str = "<fg=red>false</>";
-            break;
+            case $value === false:
+                $str = "<fg=red>false</>";
+                break;
 
-            case \is_numeric($value);
-            $str = "<fg=yellow>$value</>";
-            break;
+            case \is_numeric($value):
+                $str = "<fg=yellow>$value</>";
+                break;
 
             case \is_array($value):
                 $str = PHP_EOL;

@@ -88,5 +88,4 @@ final class BookKeeper extends Command
             $output->writeln('Resuming operations');
         }
     }
-
 }

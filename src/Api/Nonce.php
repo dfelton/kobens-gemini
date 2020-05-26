@@ -12,4 +12,3 @@ class Nonce implements NonceInterface
         return $microtime[1] . substr($microtime[0], 2);
     }
 }
-

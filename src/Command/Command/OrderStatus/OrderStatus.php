@@ -80,10 +80,10 @@ final class OrderStatus extends Command
             case $val === true:
                 $str = "<fg=green>true</>";
                 break;
-            case $val === false;
+            case $val === false:
                 $str = "<fg=red>false</>";
                 break;
-            case \is_numeric($val);
+            case \is_numeric($val):
                 $str = "<fg=yellow>$val</>";
                 break;
             case \is_array($val):

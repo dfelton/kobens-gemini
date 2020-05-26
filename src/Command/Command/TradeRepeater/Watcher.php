@@ -24,7 +24,7 @@ final class Watcher extends Command
     private const REFRESH_MIN = 5;
     private const REFRESH_MAX = 3600;
 
-    static protected $defaultName = 'trade-repeater:watcher';
+    protected static $defaultName = 'trade-repeater:watcher';
 
     private SleeperInterface $sleeper;
 
@@ -74,7 +74,8 @@ final class Watcher extends Command
                 $this->main($output, $symbol);
                 $this->data->reset();
                 if ($loop) {
-                    $this->sleeper->sleep($sleep, static function(){});
+                    $this->sleeper->sleep($sleep, static function () {
+                    });
                 }
             } catch (\Throwable $e) {
                 $loop = false;

@@ -17,10 +17,10 @@ abstract class AbstractNewOrder extends Command
 
     final protected function configure()
     {
-        $this->addArgument('side',          InputArgument::REQUIRED, 'buy|sell');
-        $this->addArgument('symbol',        InputArgument::REQUIRED);
-        $this->addArgument('amount',        InputArgument::REQUIRED);
-        $this->addArgument('price',         InputArgument::REQUIRED);
+        $this->addArgument('side', InputArgument::REQUIRED, 'buy|sell');
+        $this->addArgument('symbol', InputArgument::REQUIRED);
+        $this->addArgument('amount', InputArgument::REQUIRED);
+        $this->addArgument('price', InputArgument::REQUIRED);
         $this->addArgument('clientOrderId', InputArgument::OPTIONAL);
     }
 
@@ -58,11 +58,11 @@ abstract class AbstractNewOrder extends Command
                 $str = "<fg=green>true</>";
                 break;
 
-            case $value === false;
+            case $value === false:
                 $str = "<fg=red>false</>";
                 break;
 
-            case \is_numeric($value);
+            case \is_numeric($value):
                 $str = "<fg=yellow>$value</>";
                 break;
 

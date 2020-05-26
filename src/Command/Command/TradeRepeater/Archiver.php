@@ -90,7 +90,7 @@ final class Archiver extends Command
             );
             $this->sellFilled->setNextState($row->getId());
             $this->connection->commit();
-            $output->writeln($this->now()."\t({$row->getId()}) archived and moved to BUY_READY state.");
+            $output->writeln($this->now() . "\t({$row->getId()}) archived and moved to BUY_READY state.");
         }
     }
 

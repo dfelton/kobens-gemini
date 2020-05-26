@@ -16,7 +16,7 @@ use Zend\Cache\Storage\StorageInterface;
  */
 final class BookKeeper implements BookKeeperInterface
 {
-    const REQUEST_URI = '/v1/order/events';
+    private const REQUEST_URI = '/v1/order/events';
 
     protected StorageInterface $cache;
 
@@ -40,8 +40,7 @@ final class BookKeeper implements BookKeeperInterface
 
     public function openBook(): void
     {
-        Loop::run(function ()
-        {
+        Loop::run(function () {
             /** @var \Amp\Websocket\Client\Connection $connection */
             /** @var \Amp\Websocket\Message $message */
             $connection = yield \Amp\Websocket\Client\connect(
@@ -60,7 +59,7 @@ final class BookKeeper implements BookKeeperInterface
 
     protected function getUrl(): string
     {
-        return 'wss://'.$this->host->getHost().self::REQUEST_URI;
+        return 'wss://' . $this->host->getHost() . self::REQUEST_URI;
     }
 
     protected function getHeaders(): array
@@ -77,5 +76,4 @@ final class BookKeeper implements BookKeeperInterface
             'X-GEMINI-SIGNATURE' => $signature,
         ];
     }
-
 }

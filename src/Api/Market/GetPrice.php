@@ -89,5 +89,4 @@ class GetPrice implements GetPriceInterface
             'ask' => $book->getAskPrice()
         ];
     }
-
 }

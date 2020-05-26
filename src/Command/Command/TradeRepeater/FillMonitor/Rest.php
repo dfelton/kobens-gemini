@@ -63,10 +63,8 @@ final class Rest extends Command
             try {
                 $this->mainLoop($output);
                 $this->sleep(60, $this->sleeper, $this->shutdown);
-
             } catch (ConnectionException | MaintenanceException | SystemException $e) {
                 $this->exceptionDelay($output, $e);
-
             } catch (\Exception $e) {
                 $this->shutdown->enableShutdownMode($e);
             }
@@ -78,7 +76,7 @@ final class Rest extends Command
     {
         $output->writeln([
             "<fg=red>{$this->now()}\t{$e->getMessage()}</>",
-            "<fg=red>{$this->now()}\tSleeping ".self::EXCEPTION_DELAY." seconds</>"
+            "<fg=red>{$this->now()}\tSleeping " . self::EXCEPTION_DELAY . " seconds</>"
         ]);
         $this->sleep(self::EXCEPTION_DELAY, $this->sleeper, $this->shutdown);
     }

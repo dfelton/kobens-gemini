@@ -112,7 +112,7 @@ final class GetPastTrades extends Command
             $amount[1] = \str_pad($amount[1], 8, '0', STR_PAD_RIGHT);
             $amount = \implode('.', $amount);
         } else {
-            $amount .= $amount.'.00000000';
+            $amount .= $amount . '.00000000';
         }
         return $amount;
     }

@@ -52,9 +52,14 @@ final class TradeHistory extends Command
     {
         $this->setDescription('Maintains The trading history for a specified symbol.');
         $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Symbol to fetch history for.', self::DEFAULT_SYMBOL);
-        $this->addOption('delay',  'd', InputOption::VALUE_OPTIONAL, \sprintf(
+        $this->addOption(
+            'delay',
+            'd',
+            InputOption::VALUE_OPTIONAL,
+            \sprintf(
                 'Time in seconds to delay between requests when up to date. (%d - %d)',
-                self::MIN_DELAY, self::MAX_DELAY
+                self::MIN_DELAY,
+                self::MAX_DELAY
             ),
             self::DEFAULT_DELAY
         );
@@ -73,8 +78,11 @@ final class TradeHistory extends Command
         while (!$this->shutdown->isShutdownModeEnabled()) {
             $pageFirstTimestampms = $timestampms;
 
-            $output->writeln(\sprintf("\n%s\tFetching page %d (%s)",
-                $this->now(), $timestampms, \gmdate("Y-m-d H:i:s", (int) \substr((string) $timestampms, 0, 10))
+            $output->writeln(\sprintf(
+                "\n%s\tFetching page %d (%s)",
+                $this->now(),
+                $timestampms,
+                \gmdate("Y-m-d H:i:s", (int) \substr((string) $timestampms, 0, 10))
             ));
 
             try {
@@ -128,7 +136,9 @@ final class TradeHistory extends Command
                 } else {
                     $output->write(\sprintf(
                         "\n%s\t<fg=green>Trade History for %s pair is up to date. Sleeping for %d seconds...</>\n",
-                        $this->now(), $this->symbol, $this->delay
+                        $this->now(),
+                        $this->symbol,
+                        $this->delay
                     ));
                     \sleep($this->delay);
                 }
@@ -182,8 +192,7 @@ final class TradeHistory extends Command
     private function getLastTradeTimestampMs(): int
     {
         /** @var \Zend\Db\ResultSet\ResultSet $rows */
-        $rows = $this->getTable()->select(function (Select $select)
-        {
+        $rows = $this->getTable()->select(function (Select $select) {
             $select->columns(['timestampms']);
             $select->order('timestampms DESC');
             $select->limit(1);
@@ -198,7 +207,7 @@ final class TradeHistory extends Command
     private function getTable(): TableGateway
     {
         if (!$this->table) {
-            $this->table = new TableGateway('trade_history_'.$this->symbol, Db::getAdapter());
+            $this->table = new TableGateway('trade_history_' . $this->symbol, Db::getAdapter());
         }
         return $this->table;
     }

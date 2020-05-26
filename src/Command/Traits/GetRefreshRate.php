@@ -19,7 +19,6 @@ trait GetRefreshRate
                     Arg::MIN_VALUE,
                     Arg::DEFAULT
                 ));
-
             }
             $refreshRate = Arg::DEFAULT;
         }

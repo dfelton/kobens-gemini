@@ -138,24 +138,23 @@ final class Seller extends Command
         } catch (ConnectionException $e) {
             $this->buyFilled->resetState($row->getId());
             $output->writeln("<fg=red>{$this->now()}\tConnection Exception Occurred.</>");
-
         } catch (MaintenanceException | SystemException $e) {
             $this->buyFilled->resetState($row->getId());
             $output->writeln("<fg=red>{$this->now()}\t ({$row->getSymbol()}) $e->getMessage()");
             $output->writeln("<fg=red>{$this->now()}\tSleeping " . self::EXCEPTION_DELAY . " seconds...</>");
             $this->sleep(self::EXCEPTION_DELAY, $this->sleeper, $this->shutdown);
-
         } catch (MaxIterationsException $e) {
             $this->buyFilled->resetState($row->getId());
             $output->writeln(\sprintf(
                 "<fg=red>%s\tMax iterations reached for attempting ForceMaker on %s pair for price of %s.</>",
-                $this->now(), $row->getSymbol(), $row->getSellPrice()
+                $this->now(),
+                $row->getSymbol(),
+                $row->getSellPrice()
             ));
             $output->writeln("<fg=red>{$this->now()}\tSleeping {$input->getOption('maxIterationsDelay')} seconds...</>");
             $this->sleep((int) $input->getOption('maxIterationsDelay'), $this->sleeper, $this->shutdown);
-
         } catch (\Exception $e) {
-            $this->sellSent->setErrorState($row->getId(), \get_class($e)."::{$e->getMessage()}");
+            $this->sellSent->setErrorState($row->getId(), \get_class($e) . "::{$e->getMessage()}");
             throw $e;
         }
         return $msg;

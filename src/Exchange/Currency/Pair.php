@@ -93,6 +93,4 @@ final class Pair extends CurrencyPair implements PairInterface
                 return parent::__get($name);
         }
     }
-
 }
-

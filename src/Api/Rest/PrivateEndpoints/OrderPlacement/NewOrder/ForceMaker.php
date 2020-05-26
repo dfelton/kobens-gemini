@@ -86,7 +86,7 @@ final class ForceMaker implements ForceMakerInterface
             case 'buy':
                 $ask = $this->getPrice->getAsk($pair->getSymbol());
                 // If lowest ask is above what we are willing to bid, maker will place if we act now
-                if ( (float) $priceLimit < (float) $ask) {
+                if ((float) $priceLimit < (float) $ask) {
                     $newPrice = $priceLimit;
                 } else {
                     // Get smallest decrement possible from current ask price
@@ -97,7 +97,7 @@ final class ForceMaker implements ForceMakerInterface
             case 'sell':
                 $bid = $this->getPrice->getBid($pair->getSymbol());
                 // If highest bid is above what we are willing to ask, maker will place if we act now
-                if ( (float) $priceLimit > (float) $bid) {
+                if ((float) $priceLimit > (float) $bid) {
                     $newPrice = $priceLimit;
                 } else {
                     // Get smallest increment possible from current bid price

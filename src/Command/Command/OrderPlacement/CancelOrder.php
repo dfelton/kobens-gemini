@@ -28,7 +28,7 @@ final class CancelOrder extends Command
     {
         $this->setDescription('Cancel an individual open order on the Gemini exchange.');
         $this->addArgument('order_id', InputArgument::REQUIRED, 'Order id on exchange.');
-        $this->addOption('raw' , 'r', InputOption::VALUE_OPTIONAL, 'Output raw response data', false);
+        $this->addOption('raw', 'r', InputOption::VALUE_OPTIONAL, 'Output raw response data', false);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
