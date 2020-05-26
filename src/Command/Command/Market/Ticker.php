@@ -39,8 +39,8 @@ final class Ticker extends Command
 
         $output->write(PHP_EOL);
 
-        $output->writeln("<options=bold>Symbol:</>\t\t".strtoupper($symbol));
-        unset ($symbol);
+        $output->writeln("<options=bold>Symbol:</>\t\t" . strtoupper($symbol));
+        unset($symbol);
 
         $output->writeln("<options=bold>Bid:</>\t\t<fg=green>{$data->bid}</>");
         $output->writeln("<options=bold>Ask:</>\t\t<fg=red>{$data->ask}</>");

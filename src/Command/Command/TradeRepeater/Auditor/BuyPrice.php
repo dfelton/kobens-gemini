@@ -88,10 +88,8 @@ final class BuyPrice extends Command
                 $this->mainLoop($output);
                 $output->writeln("{$this->now()}\tRecords examined. Sleeping $sleep seconds.");
                 $this->sleep($sleep, $this->sleeper, $this->shutdown);
-
             } catch (ConnectionException | MaintenanceException | SystemException $e) {
                 $this->exceptionDelay($output, $e);
-
             } catch (\Exception $e) {
                 $this->shutdown->enableShutdownMode($e);
             }
@@ -104,7 +102,7 @@ final class BuyPrice extends Command
     {
         $output->writeln([
             "<fg=red>{$this->now()}\t{$e->getMessage()}</>",
-            "<fg=red>{$this->now()}\tSleeping ".self::EXCEPTION_DELAY." seconds</>"
+            "<fg=red>{$this->now()}\tSleeping " . self::EXCEPTION_DELAY . " seconds</>"
         ]);
         $this->sleep(self::EXCEPTION_DELAY, $this->sleeper, $this->shutdown);
     }

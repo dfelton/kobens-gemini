@@ -57,7 +57,9 @@ abstract class AbstractAction
         if (!$this->isHealthy($record)) {
             throw new UnhealthyStateException(\sprintf(
                 "Trade record '%d' is not healthy for '%s'. Current State: %s",
-                $id, static::class, \json_encode($record)
+                $id,
+                static::class,
+                \json_encode($record)
             ));
         }
         return $record;

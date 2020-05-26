@@ -17,10 +17,10 @@ abstract class AbstractNewOrder extends Command
 
     final protected function configure()
     {
-        $this->addArgument('side',          InputArgument::REQUIRED, 'buy|sell');
-        $this->addArgument('symbol',        InputArgument::REQUIRED);
-        $this->addArgument('amount',        InputArgument::REQUIRED);
-        $this->addArgument('price',         InputArgument::REQUIRED);
+        $this->addArgument('side', InputArgument::REQUIRED, 'buy|sell');
+        $this->addArgument('symbol', InputArgument::REQUIRED);
+        $this->addArgument('amount', InputArgument::REQUIRED);
+        $this->addArgument('price', InputArgument::REQUIRED);
         $this->addArgument('clientOrderId', InputArgument::OPTIONAL);
     }
 

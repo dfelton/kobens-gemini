@@ -53,14 +53,14 @@ final class Result
     {
         $this->pricePoints[] = $pricePoint;
 
-        $this->totalBuyFees     = Add::getResult($this->totalBuyFees,     $pricePoint->getBuyFee());
-        $this->totalBuyFeeHold  = Add::getResult($this->totalBuyFeeHold,  $pricePoint->getBuyFeeHold());
-        $this->totalBuyQuote    = Add::getResult($this->totalBuyQuote,    $pricePoint->getBuyAmountQuote());
-        $this->totalBuyBase     = Add::getResult($this->totalBuyBase,     $pricePoint->getBuyAmountBase());
-        $this->totalSellBase    = Add::getResult($this->totalSellBase,    $pricePoint->getSellAmountBase());
-        $this->totalSellFees    = Add::getResult($this->totalSellFees,    $pricePoint->getSellFee());
-        $this->totalSellQuote   = Add::getResult($this->totalSellQuote,   $pricePoint->getSellAmountQuote());
-        $this->totalProfitBase  = Add::getResult($this->totalProfitBase,  $pricePoint->getProfitBase());
+        $this->totalBuyFees     = Add::getResult($this->totalBuyFees, $pricePoint->getBuyFee());
+        $this->totalBuyFeeHold  = Add::getResult($this->totalBuyFeeHold, $pricePoint->getBuyFeeHold());
+        $this->totalBuyQuote    = Add::getResult($this->totalBuyQuote, $pricePoint->getBuyAmountQuote());
+        $this->totalBuyBase     = Add::getResult($this->totalBuyBase, $pricePoint->getBuyAmountBase());
+        $this->totalSellBase    = Add::getResult($this->totalSellBase, $pricePoint->getSellAmountBase());
+        $this->totalSellFees    = Add::getResult($this->totalSellFees, $pricePoint->getSellFee());
+        $this->totalSellQuote   = Add::getResult($this->totalSellQuote, $pricePoint->getSellAmountQuote());
+        $this->totalProfitBase  = Add::getResult($this->totalProfitBase, $pricePoint->getProfitBase());
         $this->totalProfitQuote = Add::getResult($this->totalProfitQuote, $pricePoint->getProfitQuote());
     }
 

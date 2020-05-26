@@ -33,11 +33,10 @@ final class CapitalGains extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $table = new TableGateway('taxes_'.$input->getArgument('symbol').'_sell_log', Db::getAdapter());
+        $table = new TableGateway('taxes_' . $input->getArgument('symbol') . '_sell_log', Db::getAdapter());
 
         /** @var \Zend\Db\ResultSet\ResultSetInterface $rows */
-        $rows = $table->select(function (Select $select)
-        {
+        $rows = $table->select(function (Select $select) {
             $select->where->notIn('tid', (new Select('taxes_form8949'))->columns(['tid']));
             $select->order('tid ASC');
         });
@@ -48,12 +47,10 @@ final class CapitalGains extends Command
                 $allTime = Add::getResult($allTime, $transaction['gain_or_loss']);
             }
         }
-        $output->writeln('All Time Capital Gain / Loss: '. $allTime);
+        $output->writeln('All Time Capital Gain / Loss: ' . $allTime);
     }
 
     protected function getTradeRecord(int $tid): array
     {
-
     }
-
 }

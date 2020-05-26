@@ -87,7 +87,7 @@ final class WebSocket extends Command
 
     private function main(OutputInterface $output): \Closure
     {
-        return function() use ($output) {
+        return function () use ($output) {
             /** @var \Amp\Websocket\Client\Connection $connection */
             /** @var \Amp\Websocket\Message $message */
             $connection = yield \Amp\Websocket\Client\connect(
@@ -169,7 +169,7 @@ final class WebSocket extends Command
                 }
                 break;
             default:
-                throw new \Exception('Unhandled Message: '.\json_encode($msg));
+                throw new \Exception('Unhandled Message: ' . \json_encode($msg));
         }
     }
 

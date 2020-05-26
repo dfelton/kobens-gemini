@@ -20,7 +20,8 @@ final class TradeSpread
         $ask = $bid = null;
         foreach ($data->getOrdersData() as $order) {
             if ($order->symbol === $symbol) {
-                if ($order->side === 'sell'
+                if (
+                    $order->side === 'sell'
                 ) {
                     if ($ask === null || Compare::getResult($ask, $order->price) === Compare::RIGHT_LESS_THAN) {
                         $ask = $order->price;
@@ -41,7 +42,6 @@ final class TradeSpread
             $percent[0] = \ltrim($percent[0], '0') ?: '0';
             $percent = $percent[0] . '.' . \substr($percent[1], 2);
             $percent = \rtrim(\rtrim($percent, '0'), '.');
-
         } else {
             $percent = $percent . '00';
         }
@@ -58,9 +58,9 @@ final class TradeSpread
         $ask = (string) number_format((float) $ask, $scale, '.', '');
         $spread = (string) number_format((float) $spread, $scale);
         $length = self::getLength($bid, $ask, $spread);
-        $bid = str_pad($bid, $length+2, ' ', STR_PAD_LEFT);
-        $ask = str_pad($ask, $length+2, ' ', STR_PAD_LEFT);
-        $spread = str_pad($spread, $length+2, ' ', STR_PAD_LEFT);
+        $bid = str_pad($bid, $length + 2, ' ', STR_PAD_LEFT);
+        $ask = str_pad($ask, $length + 2, ' ', STR_PAD_LEFT);
+        $spread = str_pad($spread, $length + 2, ' ', STR_PAD_LEFT);
         $percent = str_pad($percent, $length, ' ', STR_PAD_LEFT);
 
 
@@ -89,7 +89,7 @@ final class TradeSpread
         return $table;
     }
 
-    private static function getScale(string ... $values): int
+    private static function getScale(string ...$values): int
     {
         $scale = 0;
         $prev = $values[0] ?? '0';
@@ -103,7 +103,7 @@ final class TradeSpread
         return $scale;
     }
 
-    private static function getLength(string ... $values): int
+    private static function getLength(string ...$values): int
     {
         $length = 0;
         foreach ($values as $value) {

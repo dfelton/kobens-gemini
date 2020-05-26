@@ -88,10 +88,8 @@ final class SellPrice extends Command
                 $this->mainLoop($output);
                 $output->writeln("{$this->now()}\tRecords examined. Sleeping $sleep seconds.");
                 $this->sleep($sleep, $this->sleeper, $this->shutdown);
-
             } catch (ConnectionException | MaintenanceException | SystemException $e) {
                 $this->exceptionDelay($output, $e);
-
             } catch (\Exception $e) {
                 $this->shutdown->enableShutdownMode($e);
             }

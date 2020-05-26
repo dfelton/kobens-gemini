@@ -57,8 +57,7 @@ final class Trade
         }
         $offset = 0;
         do {
-            $results = $this->table->select(function(Select $select) use ($ids, $offset)
-            {
+            $results = $this->table->select(function (Select $select) use ($ids, $offset) {
                 $select->where->in('id', $ids);
                 $select->limit(self::SELECT_LIMIT);
                 $select->offset($offset);

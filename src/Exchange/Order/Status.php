@@ -27,10 +27,9 @@ class Status implements StatusInterface
 
     public function isFilled(array $metaData): bool
     {
-         if (!isset($metaData['is_live']) || !isset($metaData['remaining_amount'])) {
+        if (!isset($metaData['is_live']) || !isset($metaData['remaining_amount'])) {
             throw new Exception('Metadata missing required keys.');
         }
         return $metaData['is_live'] === false && $metaData['remaining_amount'] === '0';
     }
-
 }

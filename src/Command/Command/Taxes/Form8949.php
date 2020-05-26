@@ -54,18 +54,18 @@ final class Form8949 extends Command
 
         $i = 0;
         foreach ($this->getData($input) as $row) {
-            if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE && ($i===0 || $i % 50 === 0)) {
+            if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE && ($i === 0 || $i % 50 === 0)) {
                 $this->outputHeaders($output);
             }
 
-            $capitalGains['assetsSold']    = Add::getResult($capitalGains['assetsSold'],    $row['amount']);
+            $capitalGains['assetsSold']    = Add::getResult($capitalGains['assetsSold'], $row['amount']);
             $capitalGains['totalProceeds'] = Add::getResult($capitalGains['totalProceeds'], $row['proceeds']);
 
             if ($this->isLongTerm($row['buy_date'], $row['sell_date'])) {
                 ++$capitalGains['long_count'];
                 $capitalGains['long_capital_gain'] = Add::getResult($capitalGains['long_capital_gain'], $row['capital_gain']);
-                $capitalGains['long_cost_basis']   = Add::getResult($capitalGains['long_cost_basis'],   $row['cost_basis']);
-                $capitalGains['long_proceeds']     = Add::getResult($capitalGains['long_proceeds'],     $row['proceeds']);
+                $capitalGains['long_cost_basis']   = Add::getResult($capitalGains['long_cost_basis'], $row['cost_basis']);
+                $capitalGains['long_proceeds']     = Add::getResult($capitalGains['long_proceeds'], $row['proceeds']);
                 if ($capitalGains['long_date_purchase'] === null || \strtotime($capitalGains['long_date_purchase']) > \strtotime($row['buy_date'])) {
                     $capitalGains['long_date_purchase'] = $row['buy_date'];
                 }
@@ -75,8 +75,8 @@ final class Form8949 extends Command
             } else {
                 ++$capitalGains['short_count'];
                 $capitalGains['short_capital_gain'] = Add::getResult($capitalGains['short_capital_gain'], $row['capital_gain']);
-                $capitalGains['short_cost_basis']   = Add::getResult($capitalGains['short_cost_basis'],   $row['cost_basis']);
-                $capitalGains['short_proceeds']     = Add::getResult($capitalGains['short_proceeds'],     $row['proceeds']);
+                $capitalGains['short_cost_basis']   = Add::getResult($capitalGains['short_cost_basis'], $row['cost_basis']);
+                $capitalGains['short_proceeds']     = Add::getResult($capitalGains['short_proceeds'], $row['proceeds']);
                 if ($capitalGains['short_date_purchase'] === null || \strtotime($capitalGains['short_date_purchase']) > \strtotime($row['buy_date'])) {
                     $capitalGains['short_date_purchase'] = $row['buy_date'];
                 }
@@ -87,11 +87,11 @@ final class Form8949 extends Command
 
             if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                 $output->write(\str_pad(\sprintf('%s Bitcoin', $row['amount']), 26, ' ', STR_PAD_RIGHT));
-                $output->write(\str_pad(\substr($row['buy_date'],0,10),         16, ' ', STR_PAD_RIGHT));
-                $output->write(\str_pad(\substr($row['sell_date'],0,10),        16, ' ', STR_PAD_RIGHT));
-                $output->write(\str_pad($row['proceeds'],                       24, ' ', STR_PAD_RIGHT));
-                $output->write(\str_pad($row['cost_basis'],                     24, ' ', STR_PAD_RIGHT));
-                $output->write($row['capital_gain']."\n");
+                $output->write(\str_pad(\substr($row['buy_date'], 0, 10), 16, ' ', STR_PAD_RIGHT));
+                $output->write(\str_pad(\substr($row['sell_date'], 0, 10), 16, ' ', STR_PAD_RIGHT));
+                $output->write(\str_pad($row['proceeds'], 24, ' ', STR_PAD_RIGHT));
+                $output->write(\str_pad($row['cost_basis'], 24, ' ', STR_PAD_RIGHT));
+                $output->write($row['capital_gain'] . "\n");
             }
 
             $i++;
@@ -99,24 +99,24 @@ final class Form8949 extends Command
 
         $output->write("\n");
         $output->write("<options=bold>Short Term</>\n");
-        $output->write(\sprintf("Trades:\t\t%d\n",      $capitalGains['short_count']));
-        $output->write(\sprintf("Cost Basis:\t%s\n",    $capitalGains['short_cost_basis']));
-        $output->write(\sprintf("Proceeds:\t%s\n",      $capitalGains['short_proceeds']));
+        $output->write(\sprintf("Trades:\t\t%d\n", $capitalGains['short_count']));
+        $output->write(\sprintf("Cost Basis:\t%s\n", $capitalGains['short_cost_basis']));
+        $output->write(\sprintf("Proceeds:\t%s\n", $capitalGains['short_proceeds']));
         $output->write(\sprintf("Capital Gains:\t%s\n", $capitalGains['short_capital_gain']));
         $output->write(\sprintf("Date Purchase:\t%s\n", $capitalGains['short_date_purchase']));
-        $output->write(\sprintf("Date Sell:\t%s\n",     $capitalGains['short_date_sale']));
+        $output->write(\sprintf("Date Sell:\t%s\n", $capitalGains['short_date_sale']));
         $output->write("\n");
 
         $output->write("<options=bold>Long Term</>\n");
-        $output->write(\sprintf("Trades:\t\t%d\n",      $capitalGains['long_count']));
-        $output->write(\sprintf("Cost Basis:\t%s\n",    $capitalGains['long_cost_basis']));
-        $output->write(\sprintf("Proceeds:\t%s\n",      $capitalGains['long_proceeds']));
+        $output->write(\sprintf("Trades:\t\t%d\n", $capitalGains['long_count']));
+        $output->write(\sprintf("Cost Basis:\t%s\n", $capitalGains['long_cost_basis']));
+        $output->write(\sprintf("Proceeds:\t%s\n", $capitalGains['long_proceeds']));
         $output->write(\sprintf("Capital Gains:\t%s\n", $capitalGains['long_capital_gain']));
         $output->write(\sprintf("Date Purchase:\t%s\n", $capitalGains['long_date_purchase']));
-        $output->write(\sprintf("Date Sell:\t%s\n",     $capitalGains['long_date_sale']));
+        $output->write(\sprintf("Date Sell:\t%s\n", $capitalGains['long_date_sale']));
         $output->write("\n");
 
-        $output->write(\sprintf("Total Proceeds:\t\t%s\n",  $capitalGains['totalProceeds']));
+        $output->write(\sprintf("Total Proceeds:\t\t%s\n", $capitalGains['totalProceeds']));
         $output->write(\sprintf("Total Assets Sold:\t%s\n", $capitalGains['assetsSold']));
         $output->write("\n");
     }
@@ -132,19 +132,18 @@ final class Form8949 extends Command
     private function outputHeaders(OutputInterface $output): void
     {
         $output->write("\n");
-        $output->write(\str_pad("<options=underscore>Description of Property</>", 26+23, ' ', STR_PAD_RIGHT));
-        $output->write(\str_pad("<options=underscore>Date Acquired</>",           16+23, ' ', STR_PAD_RIGHT));
-        $output->write(\str_pad("<options=underscore>Date Sold</>",               16+23, ' ', STR_PAD_RIGHT));
-        $output->write(\str_pad("<options=underscore>Proceeds</>",                24+23, ' ', STR_PAD_RIGHT));
-        $output->write(\str_pad("<options=underscore>Cost Basis</>",              24+23, ' ', STR_PAD_RIGHT));
-        $output->write(         "<options=underscore>Gain or Loss</>");
+        $output->write(\str_pad("<options=underscore>Description of Property</>", 26 + 23, ' ', STR_PAD_RIGHT));
+        $output->write(\str_pad("<options=underscore>Date Acquired</>", 16 + 23, ' ', STR_PAD_RIGHT));
+        $output->write(\str_pad("<options=underscore>Date Sold</>", 16 + 23, ' ', STR_PAD_RIGHT));
+        $output->write(\str_pad("<options=underscore>Proceeds</>", 24 + 23, ' ', STR_PAD_RIGHT));
+        $output->write(\str_pad("<options=underscore>Cost Basis</>", 24 + 23, ' ', STR_PAD_RIGHT));
+        $output->write("<options=underscore>Gain or Loss</>");
         $output->write("\n");
     }
 
     private function getData(InputInterface $input): \Zend\Db\ResultSet\ResultSetInterface
     {
-        return $this->getTable()->select(function(Select $select) use ($input)
-        {
+        return $this->getTable()->select(function (Select $select) use ($input) {
             $select->join(
                 ['buyHistory' => "trade_history_{$this->symbol}"],
                 "buyHistory.tid = taxes_{$this->symbol}_sell_log.buy_tid",
@@ -162,8 +161,8 @@ final class Form8949 extends Command
                 ]
             );
             $year = (int) $input->getArgument('year');
-            $select->where->greaterThanOrEqualTo('saleHistory.trade_date', $year.'-01-01 00:00:00.000');
-            $select->where->lessThan('saleHistory.trade_date', ($year + 1).'-01-01 00:00:00.000');
+            $select->where->greaterThanOrEqualTo('saleHistory.trade_date', $year . '-01-01 00:00:00.000');
+            $select->where->lessThan('saleHistory.trade_date', ($year + 1) . '-01-01 00:00:00.000');
             $select->order([
                 "taxes_{$this->symbol}_sell_log.sell_tid ASC",
                 "taxes_{$this->symbol}_sell_log.buy_tid ASC"

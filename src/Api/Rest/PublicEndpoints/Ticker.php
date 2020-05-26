@@ -21,5 +21,4 @@ final class Ticker implements TickerInterface
         $response = $this->request->getResponse(self::URL_PATH . $symbol);
         return \json_decode($response->getBody());
     }
-
 }

@@ -101,5 +101,4 @@ final class Request implements RequestInterface
             ]
         ];
     }
-
 }

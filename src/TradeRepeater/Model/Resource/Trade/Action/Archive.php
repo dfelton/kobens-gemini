@@ -26,8 +26,7 @@ final class Archive implements ArchiveInterface
         int $sellOrderId,
         string $sellAmount,
         string $sellPrice
-    ): void
-    {
+    ): void {
         $this->table->insert([
             'symbol'               => $symbol,
             'buy_client_order_id'  => $buyClientOrderId,

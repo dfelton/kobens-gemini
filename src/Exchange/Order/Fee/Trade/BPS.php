@@ -33,7 +33,9 @@ final class BPS
 
     private static ?self $instance = null;
 
-    private function __construct() { }
+    private function __construct()
+    {
+    }
 
     public static function getInstance(): BPS
     {
@@ -60,5 +62,4 @@ final class BPS
         }
         throw new \LogicException(\sprintf("Unhandled Fee. Amount '%s', Fee '%s'", $feeAmount, $feeAmount));
     }
-
 }

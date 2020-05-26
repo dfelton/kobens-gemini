@@ -51,7 +51,7 @@ final class Response implements ResponseInterface
         $this->notional30DayVolume = (string) $obj->notional_30d_volume;
 
         $days = [];
-        array_walk($obj->notional_1d_volume, function(\stdClass $day) use (&$days) {
+        array_walk($obj->notional_1d_volume, function (\stdClass $day) use (&$days) {
             $days[] = new OneDayVolume($day->date, (string) $day->notional_volume);
         });
         $this->notional1DayVolume = $days;

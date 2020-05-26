@@ -15,12 +15,11 @@ trait Traits
         if (!$output->isQuiet()) {
             $output->writeln([
                 $this->getNow(),
-                'Error Class:'.\get_class($e),
-                'Error Message:'.$e->getMessage(),
-                'Error Code:'.$e->getCode(),
+                'Error Class:' . \get_class($e),
+                'Error Message:' . $e->getMessage(),
+                'Error Code:' . $e->getCode(),
             ]);
         }
         $this->sleep($output, 10);
     }
-
 }

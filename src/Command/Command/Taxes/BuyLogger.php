@@ -35,10 +35,9 @@ final class BuyLogger extends Command
         $this->symbol = $input->getOption('symbol');
         do {
             /** @var \Zend\Db\ResultSet\ResultSetInterface $rows */
-            $rows = $this->getTradeHistoryTable()->select(function (Select $select)
-            {
+            $rows = $this->getTradeHistoryTable()->select(function (Select $select) {
                 $select->columns(['tid','amount']);
-                $select->where->notIn('tid', (new Select('taxes_'.$this->symbol.'_buy_log'))->columns(['tid']));
+                $select->where->notIn('tid', (new Select('taxes_' . $this->symbol . '_buy_log'))->columns(['tid']));
                 $select->where->equalTo('type', 'buy');
                 $select->order('tid ASC');
                 $select->limit(10000);
@@ -63,7 +62,7 @@ final class BuyLogger extends Command
     private function getTradeHistoryTable(): TableGateway
     {
         if (!$this->tblTradeHistory) {
-            $this->tblTradeHistory = new TableGateway('trade_history_'.$this->symbol, Db::getAdapter());
+            $this->tblTradeHistory = new TableGateway('trade_history_' . $this->symbol, Db::getAdapter());
         }
         return $this->tblTradeHistory;
     }

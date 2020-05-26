@@ -17,11 +17,11 @@ final class BookKeeper extends AbstractKeeper
     private int $socketSequence;
 
     protected array $params = [
-        'heartbeat'=> 'true',
-        'trades'   => 'false',
-        'auctions' => 'false',
-        'bids'     => 'true',
-        'offers'   => 'true'
+        'heartbeat' => 'true',
+        'trades'    => 'false',
+        'auctions'  => 'false',
+        'bids'      => 'true',
+        'offers'    => 'true'
     ];
 
     public function openBook(): void
@@ -35,14 +35,14 @@ final class BookKeeper extends AbstractKeeper
         try {
             $this->util->checkPulse();
             throw new Exception('Can only open closed book.');
-        } catch (ClosedBookException $e) { }
+        } catch (ClosedBookException $e) {
+        }
     }
 
     private function getRunClosure(): \Closure
     {
         $websocketUrl = $this->getWebSocketUrl();
-        return function () use ($websocketUrl)
-        {
+        return function () use ($websocketUrl) {
             /** @var \Amp\Websocket\Client\Rfc6455Connection $connection */
             /** @var \Amp\Websocket\Message $message */
             $connection = yield \Amp\Websocket\Client\connect($websocketUrl);
@@ -93,5 +93,4 @@ final class BookKeeper extends AbstractKeeper
         }
         return \rtrim($str, '&');
     }
-
 }

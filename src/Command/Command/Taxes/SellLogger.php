@@ -61,7 +61,6 @@ final class SellLogger extends Command
         do {
             $rows = $this->getSellRecordsToLog();
             foreach ($rows as $sell) {
-
                 $buyIds = [];
                 $sellRemaining = $sell['amount'];
 
@@ -157,13 +156,11 @@ final class SellLogger extends Command
                         unset($sellFeePercent);
                         unset($logAmount);
                         unset($buy);
-
                     } while (Compare::getResult($sellRemaining, '0') !== Compare::EQUAL);
 
                     $output->writeln(\sprintf('Commiting data for sale of transaction id %s', $sell['tid']));
 
                     $conn->commit();
-
                 } catch (\Exception $e) {
                     $conn->rollback();
                     throw $e;
@@ -176,8 +173,7 @@ final class SellLogger extends Command
 
     private function getNextBuyForSale(array $omitTransactionIds = []): array
     {
-        $rows = $this->getBuyLogTable()->select(function (Select $select) use ($omitTransactionIds)
-        {
+        $rows = $this->getBuyLogTable()->select(function (Select $select) use ($omitTransactionIds) {
             $select->where->notEqualTo('amount_remaining', '0');
             if ($omitTransactionIds !== []) {
                 $select->where->notIn('tid', $omitTransactionIds);
@@ -191,8 +187,7 @@ final class SellLogger extends Command
                 $data = (array) $row;
                 break;
             }
-            $rows = $this->getTradeHistoryTable()->select(function(Select $select) use ($data)
-            {
+            $rows = $this->getTradeHistoryTable()->select(function (Select $select) use ($data) {
                 $select->where->equalTo('tid', $data['tid']);
             });
             foreach ($rows as $row) {
@@ -207,9 +202,8 @@ final class SellLogger extends Command
     private function getSellRecordsToLog(): \Zend\Db\ResultSet\ResultSetInterface
     {
         /** @var \Zend\Db\ResultSet\ResultSetInterface $rows */
-        $rows = $this->getTradeHistoryTable()->select(function (Select $select)
-        {
-            $select->where->notIn('tid', (new Select('taxes_'.$this->symbol.'_sell_log'))->columns(['sell_tid']));
+        $rows = $this->getTradeHistoryTable()->select(function (Select $select) {
+            $select->where->notIn('tid', (new Select('taxes_' . $this->symbol . '_sell_log'))->columns(['sell_tid']));
             $select->where->equalTo('type', 'sell');
             $select->order('tid ASC');
             $select->limit(100);
@@ -220,7 +214,7 @@ final class SellLogger extends Command
     private function getSellLogTable(): TableGateway
     {
         if (!$this->tblSellLog) {
-            $this->tblSellLog = new TableGateway('taxes_'.$this->symbol.'_sell_log', Db::getAdapter());
+            $this->tblSellLog = new TableGateway('taxes_' . $this->symbol . '_sell_log', Db::getAdapter());
         }
         return $this->tblSellLog;
     }
@@ -228,7 +222,7 @@ final class SellLogger extends Command
     private function getBuyLogTable(): TableGateway
     {
         if (!$this->tblBuyLog) {
-            $this->tblBuyLog = new TableGateway('taxes_'.$this->symbol.'_buy_log', Db::getAdapter());
+            $this->tblBuyLog = new TableGateway('taxes_' . $this->symbol . '_buy_log', Db::getAdapter());
         }
         return $this->tblBuyLog;
     }
@@ -236,9 +230,8 @@ final class SellLogger extends Command
     private function getTradeHistoryTable(): TableGateway
     {
         if (!$this->tblTradeHistory) {
-            $this->tblTradeHistory = new TableGateway('trade_history_'.$this->symbol, Db::getAdapter());
+            $this->tblTradeHistory = new TableGateway('trade_history_' . $this->symbol, Db::getAdapter());
         }
         return $this->tblTradeHistory;
     }
-
 }

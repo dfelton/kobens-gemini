@@ -35,19 +35,19 @@ final class Exchange extends AbstractExchange
      */
     public function placeOrder(string $side, string $symbol, string $amount, string $price): string
     {
-        throw new \Exception(__METHOD__.' is currently deprecated.');
+        throw new \Exception(__METHOD__ . ' is currently deprecated.');
         return '';
     }
 
     public function getActiveOrderIds(): array
     {
-        throw new \Exception(__METHOD__.' is currently deprecated.');
+        throw new \Exception(__METHOD__ . ' is currently deprecated.');
         return [];
     }
 
     public function getOrderMetaData(string $orderId): array
     {
-        throw new \Exception(__METHOD__.' is currently deprecated.');
+        throw new \Exception(__METHOD__ . ' is currently deprecated.');
         return [];
     }
 

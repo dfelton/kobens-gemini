@@ -28,7 +28,7 @@ class GetAvailableBalances implements GetAvailableBalancesInterface
                 return $balance;
             }
         }
-        throw new \Exception('No balance for '.$currency);
+        throw new \Exception('No balance for ' . $currency);
     }
 
     /**
