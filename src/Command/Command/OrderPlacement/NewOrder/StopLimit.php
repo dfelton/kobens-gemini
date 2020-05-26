@@ -70,13 +70,13 @@ final class StopLimit extends Command
                 $str = "<fg=green>true</>";
                 break;
 
-            case $value === false;
-            $str = "<fg=red>false</>";
-            break;
+            case $value === false:
+                $str = "<fg=red>false</>";
+                break;
 
-            case \is_numeric($value);
-            $str = "<fg=yellow>$value</>";
-            break;
+            case \is_numeric($value):
+                $str = "<fg=yellow>$value</>";
+                break;
 
             case \is_array($value):
                 $str = PHP_EOL;

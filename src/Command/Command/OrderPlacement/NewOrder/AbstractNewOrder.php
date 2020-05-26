@@ -58,11 +58,11 @@ abstract class AbstractNewOrder extends Command
                 $str = "<fg=green>true</>";
                 break;
 
-            case $value === false;
+            case $value === false:
                 $str = "<fg=red>false</>";
                 break;
 
-            case \is_numeric($value);
+            case \is_numeric($value):
                 $str = "<fg=yellow>$value</>";
                 break;
 
