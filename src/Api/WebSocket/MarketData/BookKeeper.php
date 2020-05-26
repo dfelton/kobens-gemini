@@ -12,7 +12,7 @@ use Kobens\Gemini\Exception\Api\WebSocket\SocketSequenceException;
 
 final class BookKeeper extends AbstractKeeper
 {
-    const API_PATH = '/v1/marketdata/';
+    private const API_PATH = '/v1/marketdata/';
 
     private int $socketSequence;
 

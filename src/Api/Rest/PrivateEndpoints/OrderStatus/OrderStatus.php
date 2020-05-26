@@ -8,7 +8,7 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 
 class OrderStatus implements OrderStatusInterface
 {
-    const URL_PATH = '/v1/order/status';
+    private const URL_PATH = '/v1/order/status';
 
     private RequestInterface $request;
 

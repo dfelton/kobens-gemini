@@ -12,7 +12,7 @@ use Zend\Db\TableGateway\TableGateway;
 
 abstract class AbstractAction
 {
-    const STATUS_CURRENT = '';
+    protected const STATUS_CURRENT = '';
 
     protected TableGateway $table;
 

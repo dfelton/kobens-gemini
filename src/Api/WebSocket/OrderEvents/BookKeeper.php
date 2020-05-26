@@ -16,7 +16,7 @@ use Zend\Cache\Storage\StorageInterface;
  */
 final class BookKeeper implements BookKeeperInterface
 {
-    const REQUEST_URI = '/v1/order/events';
+    private const REQUEST_URI = '/v1/order/events';
 
     protected StorageInterface $cache;
 
