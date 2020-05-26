@@ -10,7 +10,7 @@ use Kobens\Gemini\TradeRepeater\Model\Trade;
 final class SellPlaced extends AbstractAction implements SellPlacedInterface
 {
     protected const STATUS_CURRENT = 'SELL_PLACED';
-    private   const STATUS_NEXT    = 'SELL_FILLED';
+    private const STATUS_NEXT      = 'SELL_FILLED';
 
     protected function isHealthy(Trade $trade): bool
     {
