@@ -69,5 +69,16 @@
             "kobens/*": "source",
             "*": "dist"
         }
+    },
+    "scripts": {
+        "test": [
+            "phpunit test/Unit"
+        ],
+        "fmt-check": [
+            "phpcs --standard=PSR12 --exclude=PSR12.Files.FileHeader,Generic.Files.LineLength --cache src"
+        ],
+        "fmt": [
+            "phpcbf --standard=PSR12 src"
+        ]
     }
 }
