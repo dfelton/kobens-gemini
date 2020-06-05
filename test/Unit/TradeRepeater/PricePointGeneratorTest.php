@@ -122,7 +122,6 @@ class PricePointGeneratorTest extends TestCase
         string $sellAfterGain
     ): void {
         $pricePoints = PricePointGenerator::get($pair, $buyAmount, $priceStart, $priceEnd, $increment, $sellAfterGain)->getPricePoints();
-        /** @var PricePoint $last */
         $last = \end($pricePoints);
         $this->assertSame($expectedBuyPrice,  $last->getBuyPrice());
         $this->assertSame($expectedSellPrice, $last->getSellPrice());
