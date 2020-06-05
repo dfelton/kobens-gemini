@@ -43,7 +43,7 @@ final class PricePointGenerator
         $price = $priceStart;
         while (Compare::getResult($price, $priceEnd) !== Compare::RIGHT_LESS_THAN) {
             $sellData = self::getSellPrice($price, $priceChange, $pair);
-            $variableIncrement = $variableIncrement || $sellData['isExact'];
+            $variableIncrement = $variableIncrement || ($sellData['isExact'] === false);
             $pricePoint = new PricePoint(
                 $buyAmount,
                 $price,
@@ -59,6 +59,12 @@ final class PricePointGenerator
         return new Result($orders, $variableIncrement);
     }
 
+    /**
+     * @param PairInterface $pair
+     * @param string $buyAmount
+     * @param string $sellAmount
+     * @throws Exception
+     */
     private static function validateOrderSize(PairInterface $pair, string $buyAmount, string $sellAmount): void
     {
         if (Compare::getResult($pair->getMinOrderSize(), $buyAmount) === Compare::LEFT_GREATER_THAN) {

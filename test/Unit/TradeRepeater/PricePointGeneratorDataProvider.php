@@ -19,8 +19,16 @@ class PricePointGeneratorDataProvider
                 '10',
                 '33',
                 '2.5',
-                '0.025',
+                '1.025',
             ]
+        ];
+    }
+
+    public function setsHasVariablePriceIncrementCorrectly(): array
+    {
+        return [
+            [Pair::getInstance('btcusd'), '1', '2.5', '10', '2.5', '1.025', true],
+            [Pair::getInstance('btcusd'), '1', '10', '100', '10', '1.025', false],
         ];
     }
 }
