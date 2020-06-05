@@ -72,7 +72,7 @@
     },
     "scripts": {
         "test": [
-            "phpunit test/Unit"
+            "phpunit -v test/Unit"
         ],
         "fmt-check": [
             "phpcs --standard=PSR12 --exclude=PSR12.Files.FileHeader,Generic.Files.LineLength --cache src"
