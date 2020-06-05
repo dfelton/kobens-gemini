@@ -16,5 +16,5 @@ jobs:
           key: composer-v1-{{ checksum "composer.lock" }}
           paths:
             - vendor
-      - run: ./vendor/bin/phpunit ./test/Unit
+      - run: ./vendor/bin/phpunit -v ./test/Unit
       - run: ./vendor/bin/phpcs --colors --report-width=200 --standard=PSR12 --exclude=PSR12.Files.FileHeader,Generic.Files.LineLength ./src
