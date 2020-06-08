@@ -2,3 +2,6 @@
 /vendor
 /composer.phar
 /var/emergency_shutdown*
+
+/checkOrdersData.php
+
