@@ -10,6 +10,7 @@ use Kobens\Gemini\Api\Key;
 use Kobens\Gemini\Api\Nonce;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelOrder;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetActiveOrders;
+use Kobens\Math\BasicCalculator\Compare;
 
 
 $symbol    = 'btcusd';
@@ -51,9 +52,9 @@ unset ($nonceInterface, $keyInterface, $privateThrottlerInterface, $hostInterfac
 foreach ($activeOrders->getOrders() as $order) {
     if (   $order->symbol === $symbol
         && $order->side === $side
-        && $order->original_amount === $amount
-        && (float) $order->price >= (float) $priceFrom
-        && (float) $order->price <= (float) $priceTo
+        && Compare::getResult($order->original_amount, $amount) === Compare::EQUAL
+        && \in_array(Compare::getResult($order->price, $priceFrom), [Compare::EQUAL, Compare::LEFT_GREATER_THAN])
+        && \in_array(Compare::getResult($order->price, $priceTo), [Compare::EQUAL, Compare::LEFT_LESS_THAN])
     ) {
         if ($order->executed_amount === '0') {
             $orderIds[] = $order->order_id;
