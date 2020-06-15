@@ -45,7 +45,7 @@ $loggerRequestPrivate->pushHandler(new \Monolog\Handler\StreamHandler($config->g
 
 $hostInterface = new Host($config->get('gemini')->api->host);
 $privateThrottlerInterface = new Throttler(
-    new MariaDb(new \Zend\Db\Adapter\Adapter($config->get('database')->toArray())),
+    new MariaDb(new \Zend\Db\Adapter\Adapter($config->get('kobens')->core->throttler->adapter->mariadb->toArray())),
     $hostInterface->getHost().'::private'
 );
 $keyInterface = new Key(
