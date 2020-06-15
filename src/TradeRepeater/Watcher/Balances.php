@@ -18,16 +18,16 @@ final class Balances
             'Currency',
             'Amount',
             'Available',
-            'Amount Notional',
-            'Available Notional'
+//            'Amount Notional',
+//            'Available Notional'
         ]);
         foreach ($balances as $balance) {
             $table->addRow([
                 $balance->getCurrency(),
                 $balance->getAmount(),
                 $balance->getAvailable(),
-                $balance->getAmountNotional(),
-                $balance->getAvailableNotional(),
+//                $balance->getAmountNotional(),
+//                $balance->getAvailableNotional(),
             ]);
         }
         return $table;
