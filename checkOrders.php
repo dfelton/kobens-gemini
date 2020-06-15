@@ -25,7 +25,7 @@ $getOrders = new GetActiveOrders(
     new \Kobens\Gemini\Api\Rest\PrivateEndpoints\Request(
         $hostInterface,
         new Throttler(
-            new MariaDb(new \Zend\Db\Adapter\Adapter($config->get('database')->toArray())),
+            new MariaDb(new \Zend\Db\Adapter\Adapter($config->get('kobens')->core->throttler->adapter->mariadb->toArray())),
             $hostInterface->getHost().'::private'
         ),
         new Key(
