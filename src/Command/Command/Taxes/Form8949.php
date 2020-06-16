@@ -21,7 +21,7 @@ final class Form8949 extends Command
 
     private string $symbol;
 
-    private TableGateway $table;
+    private ?TableGateway $table = null;
 
     protected function configure()
     {
