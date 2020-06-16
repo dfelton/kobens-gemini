@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class GetActiveOrders extends Command
 {
-    protected static $defaultName = 'order-status:get-active';
+    protected static $defaultName = 'order:status:active';
 
     private HostInterface $host;
 

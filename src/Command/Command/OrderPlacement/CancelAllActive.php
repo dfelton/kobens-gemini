@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class CancelAllActive extends Command
 {
-    protected static $defaultName = 'order-placement:cancel-all';
+    protected static $defaultName = 'order:cancel:all';
 
     private CancelAllActiveOrdersInterface $cancel;
 

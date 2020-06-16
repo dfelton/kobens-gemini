@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class OrderStatus extends Command
 {
-    protected static $defaultName = 'order-status:get-status';
+    protected static $defaultName = 'order:status';
 
     private OrderStatusInterface $status;
 

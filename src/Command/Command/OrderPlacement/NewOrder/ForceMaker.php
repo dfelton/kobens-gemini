@@ -9,7 +9,7 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\NewOrderInte
 
 final class ForceMaker extends AbstractNewOrder
 {
-    protected static $defaultName = 'order-placement:new-order:force-maker';
+    protected static $defaultName = 'order:new:force-maker';
 
     private ForceMakerInterface $forceMaker;
 

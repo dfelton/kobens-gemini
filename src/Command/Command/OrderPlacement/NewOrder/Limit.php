@@ -9,7 +9,7 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\NewOrderInte
 
 final class Limit extends AbstractNewOrder
 {
-    protected static $defaultName = 'order-placement:new-order:limit';
+    protected static $defaultName = 'order:new:limit';
 
     private LimitInterface $limitOrder;
 

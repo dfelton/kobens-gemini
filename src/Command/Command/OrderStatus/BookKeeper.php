@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class BookKeeper extends Command
 {
-    protected static $defaultName = 'order-status:book-keeper';
+    protected static $defaultName = 'order:status:book-keeper';
 
     private BookKeeperInterface $book;
 

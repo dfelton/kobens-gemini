@@ -9,7 +9,7 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\NewOrderInte
 
 final class FillOrKill extends AbstractNewOrder
 {
-    protected static $defaultName = 'order-placement:new-order:fill-or-kill';
+    protected static $defaultName = 'order:new:fill-or-kill';
 
     private FillOrKillInterface $fillOrKill;
 

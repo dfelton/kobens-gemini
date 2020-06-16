@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class CancelOrder extends Command
 {
-    protected static $defaultName = 'order-placement:cancel';
+    protected static $defaultName = 'order:cancel';
 
     private CancelOrderInterface $cancel;
 

@@ -9,7 +9,7 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\NewOrderInte
 
 final class MakerOrCancel extends AbstractNewOrder
 {
-    protected static $defaultName = 'order-placement:new-order:maker-or-cancel';
+    protected static $defaultName = 'order:new:maker-or-cancel';
 
     private MakerOrCancelInterface $makerOrCancel;
 

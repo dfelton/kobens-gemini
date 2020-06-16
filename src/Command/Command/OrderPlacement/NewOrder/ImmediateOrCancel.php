@@ -9,7 +9,7 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\NewOrderInte
 
 final class ImmediateOrCancel extends AbstractNewOrder
 {
-    protected static $defaultName = 'order-placement:new-order:immediate-or-cancel';
+    protected static $defaultName = 'order:new:immediate-or-cancel';
 
     private ImmediateOrCancelInterface $immediateOrCancel;
 

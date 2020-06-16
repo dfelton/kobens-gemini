@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class GetPastTrades extends Command
 {
-    protected static $defaultName = 'order-status:get-trades';
+    protected static $defaultName = 'order:status:trades';
 
     private GetPastTradesInterface $trades;
 

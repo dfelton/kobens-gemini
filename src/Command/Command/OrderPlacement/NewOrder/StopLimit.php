@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class StopLimit extends Command
 {
-    protected static $defaultName = 'order-placement:new-order:stop-limit';
+    protected static $defaultName = 'order:new:stop-limit';
 
     private StopLimitInterface $stopLimitOrder;
 
