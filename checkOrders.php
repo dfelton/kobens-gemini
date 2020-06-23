@@ -11,7 +11,7 @@ use Kobens\Math\BasicCalculator\Compare;
 
 require __DIR__.'/bootstrap.php';
 
-$checks = require __DIR__.'/checkOrdersData.php';
+$checks = require __DIR__.'/_checkOrdersData.php';
 
 $config = Config::getInstance();
 $hostInterface = new Host($config->get('gemini')->api->host);
@@ -50,11 +50,20 @@ foreach ($checks as $i => $check) {
     }
 }
 
+$totalOrders = [];
 foreach ($getOrders->getOrders() as $order) {
     foreach ($orderBatches as $symbol => $pricePoints) {
         if ($order->symbol !== $symbol) {
             break;
         }
+
+        if (!($totalOrders[$symbol] ?? false)) {
+            $totalOrders[$symbol] = [
+                'sell' => 0,
+                'buy' => 0,
+            ];
+        }
+
         /** @var \Kobens\Gemini\TradeRepeater\PricePointGenerator\PricePoint $pricePoint */
         foreach ($pricePoints as $i => $pricePoint) {
             if ($order->side === 'buy') {
@@ -63,6 +72,7 @@ foreach ($getOrders->getOrders() as $order) {
                     Compare::getResult($pricePoint->getBuyPrice(), $order->price) === Compare::EQUAL
                 ) {
                     unset($orderBatches[$symbol][$i]);
+                    ++$totalOrders[$symbol]['buy'];
                 }
             } elseif ($order->side === 'sell') {
                 if (
@@ -70,6 +80,7 @@ foreach ($getOrders->getOrders() as $order) {
                     Compare::getResult($pricePoint->getSellPrice(), $order->price) === Compare::EQUAL
                 ) {
                     unset($orderBatches[$symbol][$i]);
+                    ++$totalOrders[$symbol]['sell'];
                 }
             }
         }
@@ -79,6 +90,7 @@ foreach ($getOrders->getOrders() as $order) {
 $totalMissing = 0;
 foreach ($orderBatches as $symbol => $pricePoints) {
     if ($pricePoints) {
+        $totalOrders[$symbol] = 0;
         $checkPassed = false;
         echo "Missing $symbol orders:\n";
         foreach ($pricePoints as $pricePoint) {
@@ -89,5 +101,12 @@ foreach ($orderBatches as $symbol => $pricePoints) {
     }
 }
 
-echo $totalMissing === 0 ? "All expected orders found.\n" : "Total of $totalMissing expected orders found to be missing.\n";
+if ($totalMissing !== 0) {
+    echo "Total of $totalMissing expected orders found to be missing.\n";
+    exit;
+}
+echo "All expected orders found.\n";
+foreach ($totalOrders as $symbol => $orderCount) {
+    echo "\n$symbol:\n\t{$totalOrders[$symbol]['sell']} sell orders\n\t{$totalOrders[$symbol]['buy']} buy orders\n";
+}
 

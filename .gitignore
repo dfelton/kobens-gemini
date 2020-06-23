@@ -3,5 +3,5 @@
 /composer.phar
 /var/emergency_shutdown*
 
-/checkOrdersData.php
+/_checkOrdersData.php
 
