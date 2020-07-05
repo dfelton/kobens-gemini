@@ -14,10 +14,10 @@ use Kobens\Math\BasicCalculator\Compare;
 
 
 $symbol    = 'btcusd';
-$side      = '';
-$amount    = '';
-$priceFrom = '';
-$priceTo   = '';
+$side      = 'buy';
+$amount    = '1';
+$priceFrom = '0.01';
+$priceTo   = '0.01';
 
 
 $abort = false;
@@ -81,7 +81,7 @@ if (   isset($_SERVER['argv'][1]) && $_SERVER['argv'][1] === 'confirm'
     \sleep(10);
     foreach ($orderIds as $orderId) {
         $response = $cancelOrder->cancel($orderId);
-        echo "Order ID {$response->order_id} at price of {$response->price} cancelled.\n";
+        echo "$side order {$response->order_id} of {$response->original_amount} $symbol @ {$response->price} cancelled.\n";
     }
 } else {
     echo "Cancellation confirmation not detected. No action taken\n";
