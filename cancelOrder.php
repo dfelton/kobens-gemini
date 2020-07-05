@@ -14,10 +14,10 @@ use Kobens\Math\BasicCalculator\Compare;
 
 
 $symbol    = 'btcusd';
-$side      = 'buy';
-$amount    = '1';
-$priceFrom = '0.01';
-$priceTo   = '0.01';
+$side      = '';
+$amount    = '';
+$priceFrom = '';
+$priceTo   = '';
 
 
 $abort = false;
