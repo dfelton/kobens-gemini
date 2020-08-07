@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Command\Command\FeeAndVolume;
 
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\FeeAndVolume\GetNotionalVolumeInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\FeeAndVolume\GetTradeVolumeInterface;
-use Kobens\Gemini\Helper\NotionalVolumeTable;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

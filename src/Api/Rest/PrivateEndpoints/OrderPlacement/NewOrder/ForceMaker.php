@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder;
 
-use Kobens\Core\Http\Request\ThrottlerInterface;
 use Kobens\Exchange\PairInterface;
-use Kobens\Gemini\Api\HostInterface;
-use Kobens\Gemini\Api\KeyInterface;
-use Kobens\Gemini\Api\NonceInterface;
 use Kobens\Gemini\Api\Market\GetPriceInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 use Kobens\Gemini\Exception\MaxIterationsException;

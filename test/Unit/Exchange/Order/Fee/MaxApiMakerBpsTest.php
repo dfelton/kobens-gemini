@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kobens\GeminiTest\Unit\Exchange\Order\Fee;
+namespace KobensTest\Gemini\Unit\Exchange\Order\Fee;
 
 use Kobens\Gemini\Exchange\Order\Fee\MaxApiMakerBps;
 use PHPUnit\Framework\TestCase;
