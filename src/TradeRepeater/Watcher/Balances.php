@@ -2,7 +2,6 @@
 
 namespace Kobens\Gemini\TradeRepeater\Watcher;
 
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetNotionalBalances;
 use Kobens\Gemini\TradeRepeater\Watcher\Helper\DataInterface;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;

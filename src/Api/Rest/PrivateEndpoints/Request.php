@@ -11,7 +11,6 @@ use Kobens\Gemini\Api\HostInterface;
 use Kobens\Gemini\Api\KeyInterface;
 use Kobens\Gemini\Api\NonceInterface;
 use Kobens\Gemini\Api\Helper\ResponseHandler;
-use Kobens\Core\Http\Response;
 use Kobens\Core\Http\ResponseInterface;
 use Kobens\Gemini\Exception;
 use Psr\Log\LoggerInterface;
