@@ -117,7 +117,9 @@ final class WebSocket extends Command
                 $output->writeln($this->now() . "\tSubscription acknowledged.");
                 break;
             case $msg['type'] === 'heartbeat':
-                $output->writeln($this->now() . "\tHeartbeat Received");
+                if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                    $output->writeln($this->now() . "\tHeartbeat Received");
+                }
                 break;
             case $msg['type'] === 'fill' && $msg['remaining_amount'] !== '0':
                 $output->writeln(\sprintf(
