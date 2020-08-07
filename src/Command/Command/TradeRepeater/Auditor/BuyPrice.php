@@ -86,7 +86,9 @@ final class BuyPrice extends Command
         while (!$this->shutdown->isShutdownModeEnabled()) {
             try {
                 $this->mainLoop($output);
-                $output->writeln("{$this->now()}\tRecords examined. Sleeping $sleep seconds.");
+                if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                    $output->writeln("{$this->now()}\tRecords examined. Sleeping $sleep seconds.");
+                }
                 $this->sleep($sleep, $this->sleeper, $this->shutdown);
             } catch (ConnectionException | MaintenanceException | SystemException $e) {
                 $this->exceptionDelay($output, $e);
