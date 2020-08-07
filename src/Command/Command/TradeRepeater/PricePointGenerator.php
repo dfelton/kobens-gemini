@@ -14,19 +14,19 @@ use Symfony\Component\Console\Input\InputArgument;
 final class PricePointGenerator extends Command
 {
     protected static $defaultName = 'trade-repeater:price-point-generator';
-    
+
     /**
      * @var TableGatewayInterface
      */
     private $table;
-    
+
     public function __construct(
         TableGatewayInterface $table
     ) {
         $this->table = $table;
         parent::__construct();
     }
-    
+
     protected function configure()
     {
         $this->addArgument('symbol', InputArgument::REQUIRED, 'Trading Pair Symbol');
@@ -38,21 +38,21 @@ final class PricePointGenerator extends Command
         $this->addArgument('save_amount', InputArgument::OPTIONAL, 'Save Amount', 0);
         $this->addArgument('is_enabled', InputArgument::OPTIONAL, 'Is Enabled', 1);
     }
-    
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $pair = Pair::getInstance($input->getArgument('symbol'));
         $results = Generator::get(
-            $pair, 
-            (string) $input->getArgument('buy_amount'), 
-            (string) $input->getArgument('buy_price_start'), 
+            $pair,
+            (string) $input->getArgument('buy_amount'),
+            (string) $input->getArgument('buy_price_start'),
             (string) $input->getArgument('buy_price_end'),
             (string) $input->getArgument('increment'),
             (string) $input->getArgument('sell_after_gain'),
             (string) $input->getArgument('save_amount'),
         );
         $isEnabled = (int) $input->getArgument('is_enabled');
-        
+
         foreach ($results->getPricePoints() as $position) {
             if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                 $output->writeln(sprintf(
