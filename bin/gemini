@@ -41,6 +41,7 @@ use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellFilled;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellPlaced;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellSent;
 use Kobens\Gemini\TradeRepeater\Watcher\Helper\Data;
+use Zend\Db\TableGateway\TableGateway;
 
 require \dirname(__DIR__).'/bootstrap.php';
 
@@ -149,6 +150,8 @@ $sellSentInterface = new SellSent($adapter);
 $app = new \Symfony\Component\Console\Application($composer->name, $composer->version);
 
 // TODO: All TradeRepeater classes will need to use Kobens\Gemini\Api\Rest\* objects that have their own KeyInterface per TradeRepeater to avoid Nonce clashing
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\PricePointGenerator(new TableGateway('trade_repeater', $adapter)));
+
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Buyer(
     $shutdownInterface,
     $buyReadyInterface,
