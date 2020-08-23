@@ -92,11 +92,13 @@ if ($action === 'buy' || $action === 'sell') {
     }
 
     for ($i = 0, $j = \count($orders); $i < $j; $i++) {
+        $clientOrderId = 'trade_repeater_' . $action . '_' . ((string) microtime(true));
         $r = $makerOrCancel->place(
             $pair,
             $action,
             $action === 'buy' ? $orders[$i]->getBuyAmountBase() : $orders[$i]->getSellAmountBase(),
-            $action === 'buy' ? $orders[$i]->getBuyPrice() : $orders[$i]->getSellPrice()
+            $action === 'buy' ? $orders[$i]->getBuyPrice() : $orders[$i]->getSellPrice(),
+            $clientOrderId
         );
         if ($r->is_live) {
             echo "order {$r->order_id} {$r->side} {$r->symbol} {$r->original_amount} @ {$r->price}\n";
