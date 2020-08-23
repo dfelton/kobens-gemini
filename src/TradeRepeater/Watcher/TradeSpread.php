@@ -19,7 +19,11 @@ final class TradeSpread
     {
         $ask = $bid = null;
         foreach ($data->getOrdersData() as $order) {
-            if ($order->symbol === $symbol) {
+            if (
+                $order->symbol === $symbol &&
+                ($order->client_order_id ?? null) &&
+                strpos($order->client_order_id, 'trade_repeater_') === 0
+            ) {
                 if (
                     $order->side === 'sell'
                 ) {
