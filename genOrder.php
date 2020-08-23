@@ -92,7 +92,7 @@ if ($action === 'buy' || $action === 'sell') {
     }
 
     for ($i = 0, $j = \count($orders); $i < $j; $i++) {
-        $clientOrderId = 'trade_repeater_' . $action . '_' . ((string) microtime(true));
+        $clientOrderId = 'trade_repeater_' . $action . '_' . $pair->getSymbol() . ((string) microtime(true));
         $r = $makerOrCancel->place(
             $pair,
             $action,
