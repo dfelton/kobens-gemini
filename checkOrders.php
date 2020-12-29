@@ -52,6 +52,12 @@ foreach ($checks as $i => $check) {
 
 $totalOrders = [];
 foreach ($getOrders->getOrders() as $order) {
+    if (
+        !($order->client_order_id ?? null) ||
+        strpos($order->client_order_id, 'trade_repeater_') !== 0
+    ) {
+        continue;
+    }
     foreach ($orderBatches as $symbol => $pricePoints) {
         if ($order->symbol !== $symbol) {
             break;
