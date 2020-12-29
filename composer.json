@@ -37,7 +37,7 @@
         "ext-mbstring": "*",
         "amphp/websocket-client": "dev-master",
         "kobens/kobens-core": "dev-master",
-        "kobens/kobens-currency": "^2.1",
+        "kobens/kobens-currency": "^2.3",
         "kobens/kobens-exchange": "dev-master",
         "kobens/kobens-math": "dev-master",
         "symfony/console": "^4.2",
