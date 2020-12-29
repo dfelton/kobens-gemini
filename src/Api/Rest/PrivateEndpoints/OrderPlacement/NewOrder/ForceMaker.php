@@ -8,6 +8,9 @@ use Kobens\Exchange\PairInterface;
 use Kobens\Gemini\Api\Market\GetPriceInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 use Kobens\Gemini\Exception\MaxIterationsException;
+use Kobens\Math\BasicCalculator\Add;
+use Kobens\Math\BasicCalculator\Compare;
+use Kobens\Math\BasicCalculator\Subtract;
 
 /**
  * @see \Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\MakerOrCancel
@@ -81,24 +84,16 @@ final class ForceMaker implements ForceMakerInterface
         switch ($side) {
             case 'buy':
                 $ask = $this->getPrice->getAsk($pair->getSymbol());
-                // If lowest ask is above what we are willing to bid, maker will place if we act now
-                if ((float) $priceLimit < (float) $ask) {
-                    $newPrice = $priceLimit;
-                } else {
-                    // Get smallest decrement possible from current ask price
-                    $newPrice = \bcsub($ask, $pair->getMinPriceIncrement(), $pair->getQuote()->getScale());
-                }
+                $newPrice = Compare::getResult($priceLimit, $ask) === Compare::LEFT_LESS_THAN
+                    ? $priceLimit
+                    : Subtract::getResult($ask, $pair->getMinPriceIncrement());
                 break;
 
             case 'sell':
                 $bid = $this->getPrice->getBid($pair->getSymbol());
-                // If highest bid is above what we are willing to ask, maker will place if we act now
-                if ((float) $priceLimit > (float) $bid) {
-                    $newPrice = $priceLimit;
-                } else {
-                    // Get smallest increment possible from current bid price
-                    $newPrice = \bcadd($bid, $pair->getMinPriceIncrement(), $pair->getQuote()->getScale());
-                }
+                $newPrice = Compare::getResult($priceLimit, $bid) === Compare::LEFT_GREATER_THAN
+                    ? $priceLimit
+                    : Add::getResult($bid, $pair->getMinPriceIncrement());
                 break;
 
             default:
