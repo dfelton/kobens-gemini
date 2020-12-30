@@ -14,13 +14,11 @@ use Kobens\Math\BasicCalculator\Add;
 use Kobens\Math\BasicCalculator\Compare;
 use Kobens\Math\BasicCalculator\Multiply;
 use Kobens\Math\BasicCalculator\Subtract;
+use Kobens\Math\IsEvenlyDivisible;
 
 final class PricePointGenerator
 {
     /**
-     * FIXME: Implement logic with \Kobens\Exchange\PairInterface::getMinPriceIncrement to verify the increment is valid
-     * FIXME: Implement logic with \Kobens\Exchange\PairInterface::getMinPriceIncrement to verify the buy start price is valid
-     *
      * @param PairInterface $pair Currency Pair which to generate PricePoint models for
      * @param string $buyAmount Amount of base currency to purchase with each PricePoint
      * @param string $priceStart Quote currency buy price which to first generate a PricePoint for
@@ -38,6 +36,10 @@ final class PricePointGenerator
         if (!$byPassMinOrderSize) {
             self::validateOrderSize($pair, $buyAmount, $sellAmount);
         }
+
+        self::validatePriceStart($pair, $priceStart);
+        self::validatePriceIncrement($pair, $increment);
+
         $orders = [];
         $variableIncrement = false;
         $price = $priceStart;
@@ -68,16 +70,49 @@ final class PricePointGenerator
     private static function validateOrderSize(PairInterface $pair, string $buyAmount, string $sellAmount): void
     {
         if (Compare::getResult($pair->getMinOrderSize(), $buyAmount) === Compare::LEFT_GREATER_THAN) {
-            throw new Exception(sprintf(
+            throw new \InvalidArgumentException(sprintf(
                 'Buy amount "%s" is invalid. Minimum order size is "%s".',
                 $buyAmount,
                 $pair->getMinOrderSize()
             ));
         } elseif (Compare::getResult($pair->getMinOrderSize(), $sellAmount) === Compare::LEFT_GREATER_THAN) {
-            throw new Exception(sprintf(
+            throw new \InvalidArgumentException(sprintf(
                 'Sell amount "%s" is invalid. Minimum order size is "%s".',
                 $sellAmount,
                 $pair->getMinOrderSize()
+            ));
+        }
+    }
+
+    private static function validatePriceStart(PairInterface $pair, string $priceStart): void
+    {
+        $compare = Compare::getResult($priceStart, $pair->getMinOrderSize());
+        if ($compare === Compare::EQUAL) {
+            return;
+        }
+        if ($compare === Compare::LEFT_LESS_THAN) {
+            throw new \InvalidArgumentException(sprintf(
+                'Start price of "%s" is invalid. Minimum start price is "%s".',
+                $priceStart,
+                $pair->getMinOrderSize()
+            ));
+        }
+        if (IsEvenlyDivisible::getResult($priceStart, $pair->getMinPriceIncrement()) === false) {
+            throw new \InvalidArgumentException(sprintf(
+                'Invalid start price of "%s". Start price must be evenly divisible by "%s".',
+                $priceStart,
+                $pair->getMinPriceIncrement()
+            ));
+        }
+    }
+
+    private static function validatePriceIncrement(PairInterface $pair, string $increment): void
+    {
+        if (IsEvenlyDivisible::getResult($increment, $pair->getMinPriceIncrement()) === false) {
+            throw new \InvalidArgumentException(\sprintf(
+                'Price increment of "%s" is invalid. Price increment must be evenly divisible by "%s".',
+                $increment,
+                $pair->getMinPriceIncrement()
             ));
         }
     }
@@ -90,7 +125,7 @@ final class PricePointGenerator
     {
         // "Potentially" in the wording here because fees are variable, and we assume the worst
         if (Compare::getResult($pricePoint->getProfitQuote(), '0') === Compare::RIGHT_GREATER_THAN) {
-            throw new Exception('Params yield potential quote currency losses');
+            throw new Exception('Params yield potential quote currency losses.');
         } elseif (Compare::getResult($pricePoint->getProfitBase(), '0') === Compare::RIGHT_GREATER_THAN) {
             throw new Exception('Params yield potential base currency losses.');
         } elseif (
@@ -119,7 +154,11 @@ final class PricePointGenerator
     private static function getSellPrice(string $priceStart, string $priceChange, PairInterface $pair): array
     {
         $exact = Multiply::getResult($priceStart, $priceChange);
-        $roundedDown = \bcadd($exact, '0', $pair->getQuote()->getScale());
+        $scale = strpos($pair->getMinPriceIncrement(), '.') === false
+            ? 0
+            : strlen(explode('.', $pair->getMinPriceIncrement())[1]);
+        $roundedDown = \bcadd($exact, '0', $scale);
+
         if (Compare::getResult($exact, $roundedDown) === Compare::EQUAL) {
             $sellPrice = $exact;
             $isExact = true;
