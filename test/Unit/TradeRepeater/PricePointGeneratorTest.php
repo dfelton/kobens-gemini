@@ -29,7 +29,7 @@ class PricePointGeneratorTest extends TestCase
 
     public function testBasicCompositionIsCorrect(): void
     {
-        $result = PricePointGenerator::get(Pair::getInstance('btcusd'), '0.00014', '2.5', '5', '2.5', '0.025', '0.000003');
+        $result = PricePointGenerator::get(Pair::getInstance('btcusd'), '0.00014', '2.5', '5', '2.5', '1.025', '0.000003');
 
         $this->assertSame('0.00028',      $result->getTotalBuyBase(),     'Failed asserting total base currency buy amount is correct.');
         $this->assertSame('0.00000105',   $result->getTotalBuyFees(),     'Failed asserting total buy fees is correct.');
@@ -91,7 +91,7 @@ class PricePointGeneratorTest extends TestCase
 
     public function testPriceIncrementsCorrectly(): void
     {
-        $pricePoints = PricePointGenerator::get(Pair::getInstance('btcusd'), '1', '2.5', '10', '2.5', '0.025')->getPricePoints();
+        $pricePoints = PricePointGenerator::get(Pair::getInstance('btcusd'), '1', '2.5', '10', '2.5', '1.025')->getPricePoints();
         $buyPrices = ['2.5', '5', '7.5', '10'];
         $sellPrices = ['2.57', '5.13', '7.69', '10.25'];
         foreach ($pricePoints as $i => $pricePoint) {
@@ -102,7 +102,6 @@ class PricePointGeneratorTest extends TestCase
 
     /**
      * @dataProvider \KobensTest\Gemini\Unit\TradeRepeater\PricePointGeneratorDataProvider::priceEndsCorrectly
-     * @see \KobensTest\Gemini\Unit\TradeRepeater\PricePointGeneratorDataProvider::priceEndsCorrectly()
      * @param string $expectedBuyPrice
      * @param string $expectedSellPrice
      * @param PairInterface $pair
@@ -123,21 +122,35 @@ class PricePointGeneratorTest extends TestCase
         string $sellAfterGain
     ): void {
         $pricePoints = PricePointGenerator::get($pair, $buyAmount, $priceStart, $priceEnd, $increment, $sellAfterGain)->getPricePoints();
-        /** @var PricePoint $last */
         $last = \end($pricePoints);
         $this->assertSame($expectedBuyPrice,  $last->getBuyPrice());
         $this->assertSame($expectedSellPrice, $last->getSellPrice());
     }
 
-    public function testSetsHasVariablePriceIncrementCorrectly(): void
+    /**
+     * @dataProvider \KobensTest\Gemini\Unit\TradeRepeater\PricePointGeneratorDataProvider::setsHasVariablePriceIncrementCorrectly
+     * @param PairInterface $pair
+     * @param string $buyAmount
+     * @param string $priceStart
+     * @param string $priceEnd
+     * @param string $increment
+     * @param string $priceChange
+     * @param string $expectedResult
+     */
+    public function testSetsHasVariablePriceIncrementCorrectly(
+        PairInterface $pair,
+        string $buyAmount,
+        string $priceStart,
+        string $priceEnd,
+        string $increment,
+        string $priceChange,
+        bool $expectedResult
+    ): void
     {
         $this->assertSame(
-            true,
-            PricePointGenerator::get(Pair::getInstance('btcusd'), '1', '2.5', '10', '2.5', '0.025')->hasVariablePriceIncrementPercent()
-        );
-        $this->assertSame(
-            false,
-            PricePointGenerator::get(Pair::getInstance('btcusd'), '1', '10', '100', '10', '0.025')->hasVariablePriceIncrementPercent()
+            $expectedResult,
+            PricePointGenerator::get($pair, $buyAmount, $priceStart, $priceEnd, $increment, $priceChange)->hasVariablePriceIncrementPercent(),
+            'Failed asserting variable price increment was set correctly'
         );
     }
 }
