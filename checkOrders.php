@@ -102,7 +102,7 @@ foreach ($orderBatches as $symbol => $pricePoints) {
         foreach ($pricePoints as $pricePoint) {
             ++$totalMissing;
             echo 'Buy:  ', $pricePoint->getBuyAmountBase(), ' @ ', $pricePoint->getBuyPrice(),
-                "\nSell: ", $pricePoint->getSellAmountBase(), ' @ ', $pricePoint->getSellPrice(), "\n\n";
+                "\tSell: ", $pricePoint->getSellAmountBase(), ' @ ', $pricePoint->getSellPrice(), "\n";
         }
     }
 }
