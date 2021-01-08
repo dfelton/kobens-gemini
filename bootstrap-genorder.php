@@ -86,8 +86,7 @@ class GenOrder
         string $increment,
         string $sellAfterGain,
         string $action = null
-    ): void
-    {
+    ): void {
         $result = PricePointGenerator::get($this->pair, $buy, $start, $end, $increment, $sellAfterGain, $save, true);
 
         $base = $this->pair->getBase();
