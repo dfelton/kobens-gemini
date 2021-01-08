@@ -290,7 +290,8 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Watcher(
         $getNotionalBalancesInterface,
         $getPriceInterface
     ),
-    $sleeperInterface
+    $sleeperInterface,
+    $getPriceInterface
 ));
 
 

@@ -78,7 +78,10 @@ final class TradeSpread
         $table
             ->setHeaders(
                 [
-                    new TableCell('<options=underscore>Trader Data</>', ['colspan' => 2]),
+                    new TableCell(
+                        sprintf('<options=underscore>Trader Data</> %s', strtoupper($symbol)),
+                        ['colspan' => 2]
+                    ),
                     '<options=underscore>Market Spread</>',
                 ]
             )
