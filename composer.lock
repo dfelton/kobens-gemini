@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7da0222e524a4e09a9ef6c103875260e",
+    "content-hash": "2c89c2141983886d8d05af77a2dcdbd0",
     "packages": [
         {
             "name": "amphp/amp",
@@ -684,20 +684,20 @@
         },
         {
             "name": "amphp/websocket",
-            "version": "v1.0.0-rc1",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/websocket.git",
-                "reference": "52b85af9657a4d674c8ae4210187eaf95d8c5e03"
+                "reference": "6752ecfcb4deba23b95ab3fbd0d427326fcac564"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/websocket/zipball/52b85af9657a4d674c8ae4210187eaf95d8c5e03",
-                "reference": "52b85af9657a4d674c8ae4210187eaf95d8c5e03",
+                "url": "https://api.github.com/repos/amphp/websocket/zipball/6752ecfcb4deba23b95ab3fbd0d427326fcac564",
+                "reference": "6752ecfcb4deba23b95ab3fbd0d427326fcac564",
                 "shasum": ""
             },
             "require": {
-                "amphp/amp": "^2",
+                "amphp/amp": "^2.2",
                 "amphp/byte-stream": "^1.6.1",
                 "amphp/socket": "^1",
                 "cash/lrucache": "^1",
@@ -705,8 +705,9 @@
             },
             "require-dev": {
                 "amphp/php-cs-fixer-config": "dev-master",
-                "amphp/phpunit-util": "^1.1",
-                "phpunit/phpunit": "^7"
+                "amphp/phpunit-util": "^1.1.2",
+                "phpunit/phpunit": "^8 || ^7",
+                "vimeo/psalm": "^3.11@dev"
             },
             "suggest": {
                 "ext-zlib": "Required for compression"
@@ -726,19 +727,20 @@
             ],
             "authors": [
                 {
-                    "name": "Bob Weinand",
-                    "email": "bobwei9@hotmail.com"
-                },
-                {
                     "name": "Aaron Piotrowski",
                     "email": "aaron@trowski.com"
                 },
                 {
                     "name": "Niklas Keller",
                     "email": "me@kelunik.com"
+                },
+                {
+                    "name": "Bob Weinand",
+                    "email": "bobwei9@hotmail.com"
                 }
             ],
             "description": "Shared code for websocket servers and clients.",
+            "homepage": "https://github.com/amphp/websocket",
             "keywords": [
                 "amp",
                 "amphp",
@@ -747,20 +749,26 @@
                 "non-blocking",
                 "websocket"
             ],
-            "time": "2019-08-06T16:55:52+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/amphp",
+                    "type": "github"
+                }
+            ],
+            "time": "2020-11-13T05:54:54+00:00"
         },
         {
             "name": "amphp/websocket-client",
-            "version": "dev-master",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/websocket-client.git",
-                "reference": "fc1a4b7803f3387e3c7648439548847e7792673e"
+                "reference": "173b54137cdcd4288702f615f05c1029e613ba37"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/websocket-client/zipball/fc1a4b7803f3387e3c7648439548847e7792673e",
-                "reference": "fc1a4b7803f3387e3c7648439548847e7792673e",
+                "url": "https://api.github.com/repos/amphp/websocket-client/zipball/173b54137cdcd4288702f615f05c1029e613ba37",
+                "reference": "173b54137cdcd4288702f615f05c1029e613ba37",
                 "shasum": ""
             },
             "require": {
@@ -819,13 +827,7 @@
                 "non-blocking",
                 "websocket"
             ],
-            "funding": [
-                {
-                    "url": "https://github.com/amphp",
-                    "type": "github"
-                }
-            ],
-            "time": "2020-08-30T19:22:43+00:00"
+            "time": "2020-07-05T17:36:04+00:00"
         },
         {
             "name": "amphp/windows-registry",
@@ -4262,7 +4264,6 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "amphp/websocket-client": 20,
         "kobens/kobens-core": 20,
         "kobens/kobens-exchange": 20
     },
