@@ -97,7 +97,11 @@ final class SellPrice extends Command
             }
         }
 
-        $output->writeln("\n<fg=red>{$this->now()}\tShutdown signal detected.\n");
+        $output->writeln(sprintf(
+            "<fg=red>%s\tShutdown signal detected - %s",
+            $this->now(),
+            self::class
+        ));
     }
 
     private function exceptionDelay(OutputInterface $output, \Exception $e)
