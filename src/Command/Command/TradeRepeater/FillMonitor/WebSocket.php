@@ -117,9 +117,6 @@ final class WebSocket extends Command
     private function processMessage(array $msg, OutputInterface $output): void
     {
         switch (true) {
-            case $msg['type'] === 'subscription_ack':
-                $output->writeln($this->now() . "\tSubscription acknowledged.");
-                break;
             case $msg['type'] === 'heartbeat':
                 if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                     $output->writeln($this->now() . "\tHeartbeat Received");
@@ -173,6 +170,13 @@ final class WebSocket extends Command
                             break;
                     }
                 }
+                break;
+            case $msg['type'] === 'subscription_ack':
+                $output->writeln(sprintf(
+                    "%s\tSubscription acknowledged - %s",
+                    $this->now(),
+                    self::class
+                ));
                 break;
             default:
                 throw new \Exception('Unhandled Message: ' . \json_encode($msg));
