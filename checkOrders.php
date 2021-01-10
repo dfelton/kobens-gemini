@@ -61,7 +61,7 @@ function examineOrders(array &$orderBatches): array
     foreach (getActiveOrders()->getOrders() as $order) {
         if (
             !($order->client_order_id ?? null) ||
-            strpos($order->client_order_id, 'trade_repeater_') !== 0
+            strpos($order->client_order_id, 'repeater_') !== 0
         ) {
             continue;
         }
