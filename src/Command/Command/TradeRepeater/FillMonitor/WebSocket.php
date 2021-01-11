@@ -17,6 +17,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Kobens\Gemini\TradeRepeater\Model\GetRecordIdInterface;
 
 final class WebSocket extends Command
 {
@@ -38,6 +39,8 @@ final class WebSocket extends Command
 
     private SleeperInterface $sleeper;
 
+    private GetRecordIdInterface $getRecordId;
+
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,
         HostInterface $hostInterface,
@@ -45,7 +48,8 @@ final class WebSocket extends Command
         NonceInterface $nonceInterface,
         BuyPlacedInterface $buyPlacedInterface,
         SellPlacedInterface $sellPlacedInterface,
-        SleeperInterface $sleeperInterface
+        SleeperInterface $sleeperInterface,
+        GetRecordIdInterface $getRecordId
     ) {
         $this->shutdown = $shutdownInterface;
         $this->host = $hostInterface;
@@ -54,6 +58,7 @@ final class WebSocket extends Command
         $this->buyPlaced = $buyPlacedInterface;
         $this->sellPlaced = $sellPlacedInterface;
         $this->sleeper = $sleeperInterface;
+        $this->getRecordId = $getRecordId;
         parent::__construct();
     }
 
@@ -149,15 +154,15 @@ final class WebSocket extends Command
 
     private function processCompletedTradeRepeaterOrder(array $msg, OutputInterface $output): void
     {
-        $repeaterId = $this->getRecordId($msg['client_order_id']);
+        $id = $this->getRecordId->get($msg['client_order_id']);
         if (
-            ($msg['side'] === 'buy' && $this->buyPlaced->setNextState($repeaterId)) ||
-            ($msg['side'] === 'sell' && $this->sellPlaced->setNextState($repeaterId))
+            ($msg['side'] === 'buy' && $this->buyPlaced->setNextState($id)) ||
+            ($msg['side'] === 'sell' && $this->sellPlaced->setNextState($id))
         ) {
             $output->writeln(sprintf(
                 "%s\t(%d) <fg=%s>%s</> order %d on %s pair for %s at price of %s filled.",
                 $this->now(),
-                $repeaterId,
+                $id,
                 $msg['side'] === 'buy' ? 'green' : 'red',
                 ucwords($msg['side']),
                 $msg['order_id'],
@@ -168,24 +173,6 @@ final class WebSocket extends Command
         } elseif (!in_array($msg['side'], ['buy','sell'])) {
             throw new \Exception("Unhandled side '{$msg['side']}'");
         }
-    }
-
-    private function getRecordId(string $clientOrderId): int
-    {
-        $recordId = null;
-        if (\strpos($clientOrderId, 'repeater_') === 0) {
-            $parts = \explode('_', $clientOrderId);
-            if (preg_match("/^[0-9]$/", ($parts[1] ?? '')) == 1) {
-                $recordId = (int) $parts[1];
-            }
-        }
-        if ($recordId === null || $recordId === 0) {
-            throw new \Exception(sprintf(
-                'Client Order ID "%s" is expected to be a Trade Repeater record, but contains invalid Record ID or one can not be found.',
-                $clientOrderId
-            ));
-        }
-        return $recordId;
     }
 
     private function getUrl(): string

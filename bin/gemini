@@ -42,6 +42,7 @@ use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellPlaced;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellSent;
 use Kobens\Gemini\TradeRepeater\Watcher\Helper\Data;
 use Zend\Db\TableGateway\TableGateway;
+use Kobens\Gemini\TradeRepeater\Model\GetRecordId;
 
 require \dirname(__DIR__).'/bootstrap.php';
 
@@ -183,7 +184,8 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor\WebSocket
     $nonceInterface,
     $buyPlacedInterface,
     $sellPlacedInterface,
-    $sleeperInterface
+    $sleeperInterface,
+    new GetRecordId()
 ));
 
 $restFillMonitorKey = new Key(
