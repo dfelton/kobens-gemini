@@ -23,6 +23,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Adapter\Driver\ConnectionInterface;
 use Zend\Db\TableGateway\TableGateway;
+use Kobens\Gemini\TradeRepeater\Model\Trade\ShouldResetBuyInterface;
 
 final class BuyPrice extends Command
 {
@@ -51,6 +52,8 @@ final class BuyPrice extends Command
 
     private SleeperInterface $sleeper;
 
+    private ShouldResetBuyInterface $shouldResetBuy;
+
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,
         BuyPlacedInterface $buyPlacedInterface,
@@ -58,7 +61,8 @@ final class BuyPrice extends Command
         OrderStatusInterface $orderStatusInterface,
         CancelOrderInterface $cancelOrderInterface,
         \Zend\Db\Adapter\Adapter $adapter,
-        SleeperInterface $sleeperInterface
+        SleeperInterface $sleeperInterface,
+        ShouldResetBuyInterface $shouldResetBuyInterface
     ) {
         $this->shutdown = $shutdownInterface;
         $this->buyPlaced = $buyPlacedInterface;
@@ -68,6 +72,7 @@ final class BuyPrice extends Command
         $this->connection = $adapter->getDriver()->getConnection();
         $this->table = new TableGateway('trade_repeater', $adapter);
         $this->sleeper = $sleeperInterface;
+        $this->shouldResetBuy = $shouldResetBuyInterface;
         parent::__construct();
     }
 
@@ -115,9 +120,10 @@ final class BuyPrice extends Command
 
     private function mainLoop(OutputInterface $output): void
     {
-        foreach ($this->buyPlaced->getHealthyRecords() as $row) {
-            if ($this->shouldReset($row)) {
-                $this->resetTrade($row, $output);
+        /** @var Trade $trade */
+        foreach ($this->buyPlaced->getHealthyRecords() as $trade) {
+            if ($this->shouldResetBuy->get($trade)) {
+                $this->resetTrade($trade, $output);
             }
         }
     }
@@ -154,22 +160,6 @@ final class BuyPrice extends Command
         }
 
         $this->connection->commit();
-    }
-
-    private function shouldReset(Trade $row): bool
-    {
-        $meta = \json_decode($row->getMeta());
-        return $row->getBuyPrice() !== $meta->buy_price
-            && \time() - \strtotime($row->getUpdatedAt()) > self::MIN_AGE
-            && $this->isSpreadOverThreshold($row->getSymbol(), $meta->buy_price)
-            && $this->orderStatus->getStatus($row->getBuyOrderId())->executed_amount === '0'
-        ;
-    }
-
-    private function isSpreadOverThreshold(string $symbol, string $bid): bool
-    {
-        $difference = PercentDifference::getResult($bid, $this->getPrice->getBid($symbol));
-        return Compare::getResult($difference, self::MIN_SPREAD) === Compare::LEFT_GREATER_THAN;
     }
 
     private function now(): string
