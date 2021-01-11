@@ -44,6 +44,7 @@ use Kobens\Gemini\TradeRepeater\Watcher\Helper\Data;
 use Zend\Db\TableGateway\TableGateway;
 use Kobens\Gemini\TradeRepeater\Model\GetRecordId;
 use Kobens\Gemini\TradeRepeater\Model\Trade\ShouldResetBuy;
+use Kobens\Gemini\TradeRepeater\Watcher\Profits;
 
 require \dirname(__DIR__).'/bootstrap.php';
 
@@ -295,7 +296,8 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Watcher(
         $getPriceInterface
     ),
     $sleeperInterface,
-    $getPriceInterface
+    $getPriceInterface,
+    new Profits($adapter)
 ));
 
 

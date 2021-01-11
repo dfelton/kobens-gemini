@@ -19,6 +19,7 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Kobens\Gemini\TradeRepeater\Watcher\Profits;
 
 final class Watcher extends Command
 {
@@ -34,14 +35,18 @@ final class Watcher extends Command
 
     private GetPriceInterface $getPrice;
 
+    private Profits $profits;
+
     public function __construct(
         Data $data,
         SleeperInterface $sleeperInterface,
-        GetPriceInterface $getPrice
+        GetPriceInterface $getPrice,
+        Profits $profits
     ) {
         $this->data = $data;
         $this->sleeper = $sleeperInterface;
         $this->getPrice = $getPrice;
+        $this->profits = $profits;
         parent::__construct();
     }
 
@@ -188,6 +193,7 @@ final class Watcher extends Command
                 }
             }
             $data[] = Balances::getTable($output, $this->data, $showNotional, $showAvailable, $showAvailableNotional);
+            $data[] = $this->profits->get($output);
             if ($input->getOption('price')) {
                 $tblPrice = new Table($output);
                 $tblPrice->setHeaders(['Asset Pair', 'Asking Price']);
