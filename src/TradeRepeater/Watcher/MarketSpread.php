@@ -30,7 +30,7 @@ final class MarketSpread
         $table
             ->setHeaders(
                 [
-                    new TableCell('<options=underscore>Market Data</>', ['colspan' => 2])
+                    new TableCell(sprintf('<options=underscore>Market Data</> %s', $symbol), ['colspan' => 2])
                 ]
             )
             ->setRows(

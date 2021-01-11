@@ -17,6 +17,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Kobens\Gemini\TradeRepeater\Model\GetRecordIdInterface;
 
 final class WebSocket extends Command
 {
@@ -38,6 +39,8 @@ final class WebSocket extends Command
 
     private SleeperInterface $sleeper;
 
+    private GetRecordIdInterface $getRecordId;
+
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,
         HostInterface $hostInterface,
@@ -45,7 +48,8 @@ final class WebSocket extends Command
         NonceInterface $nonceInterface,
         BuyPlacedInterface $buyPlacedInterface,
         SellPlacedInterface $sellPlacedInterface,
-        SleeperInterface $sleeperInterface
+        SleeperInterface $sleeperInterface,
+        GetRecordIdInterface $getRecordId
     ) {
         $this->shutdown = $shutdownInterface;
         $this->host = $hostInterface;
@@ -54,6 +58,7 @@ final class WebSocket extends Command
         $this->buyPlaced = $buyPlacedInterface;
         $this->sellPlaced = $sellPlacedInterface;
         $this->sleeper = $sleeperInterface;
+        $this->getRecordId = $getRecordId;
         parent::__construct();
     }
 
@@ -82,7 +87,11 @@ final class WebSocket extends Command
                 $this->shutdown->enableShutdownMode($e);
             }
         }
-        $output->writeln("\n<fg=red>{$this->now()}\tShutdown signal detected.\n");
+        $output->writeln(sprintf(
+            "<fg=red>%s\tShutdown signal detected - %s",
+            $this->now(),
+            self::class
+        ));
     }
 
     private function main(OutputInterface $output): \Closure
@@ -113,76 +122,57 @@ final class WebSocket extends Command
     private function processMessage(array $msg, OutputInterface $output): void
     {
         switch (true) {
-            case $msg['type'] === 'subscription_ack':
-                $output->writeln($this->now() . "\tSubscription acknowledged.");
-                break;
             case $msg['type'] === 'heartbeat':
                 if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                    $output->writeln($this->now() . "\tHeartbeat Received");
+                    $output->writeln(sprintf(
+                        "%s\tHeartbeat Received - %s",
+                        $this->now(),
+                        self::class
+                    ));
                 }
                 break;
-            case $msg['type'] === 'fill' && $msg['remaining_amount'] !== '0':
-                $output->writeln(\sprintf(
-                    "%s\t<fg=yellow>Partial</> fill of <fg=%s>%s</> order %s. Executed <fg=yellow>%s</>. Remaining amount: <fg=yellow>%s</>",
+
+            case $msg['type'] === 'fill' && $msg['remaining_amount'] === '0' && strpos($msg['client_order_id'] ?? '', 'repeater_') === 0:
+                $this->processCompletedTradeRepeaterOrder($msg, $output);
+                break;
+
+            case $msg['type'] === 'fill' && (($msg['client_order_id'] ?? null) === null || $msg['remaining_amount'] !== '0'):
+                // no action necessary
+                break;
+
+            case $msg['type'] === 'subscription_ack':
+                $output->writeln(sprintf(
+                    "%s\tSubscription acknowledged - %s",
                     $this->now(),
-                    $msg['side'] === 'buy' ? 'green' : 'red',
-                    $msg['side'],
-                    $msg['order_id'],
-                    $msg['executed_amount'],
-                    $msg['remaining_amount']
+                    self::class
                 ));
-                break;
-            case $msg['type'] === 'fill' && $msg['remaining_amount'] === '0' && \array_key_exists('client_order_id', $msg):
-                $repeaterId = $this->getRecordId($msg['client_order_id']);
-                if ($repeaterId) {
-                    switch ($msg['side']) {
-                        case 'buy':
-                            if ($this->buyPlaced->setNextState($repeaterId)) {
-                                $output->writeln(sprintf(
-                                    "%s\t(%d) <fg=green>Buy</> order %d on %s pair for %s at price of %s filled.",
-                                    $this->now(),
-                                    $repeaterId,
-                                    $msg['order_id'],
-                                    $msg['symbol'],
-                                    $msg['original_amount'],
-                                    $msg['price']
-                                ));
-                            }
-                            break;
-
-                        case 'sell':
-                            if ($this->sellPlaced->setNextState($repeaterId)) {
-                                $output->writeln(sprintf(
-                                    "%s\t(%d) <fg=red>Sell</> order %d on %s pair for %s at price of %s filled.",
-                                    $this->now(),
-                                    $repeaterId,
-                                    $msg['order_id'],
-                                    $msg['symbol'],
-                                    $msg['original_amount'],
-                                    $msg['price']
-                                ));
-                            }
-                            break;
-
-                        default:
-                            throw new \Exception("Unhandled side '{$msg['side']}'");
-                            break;
-                    }
-                }
                 break;
             default:
                 throw new \Exception('Unhandled Message: ' . \json_encode($msg));
         }
     }
 
-    private function getRecordId(string $clientOrderId): ?int
+    private function processCompletedTradeRepeaterOrder(array $msg, OutputInterface $output): void
     {
-        $recordId = null;
-        if (\strpos($clientOrderId, 'repeater_') === 0) {
-            $parts = \explode('_', $clientOrderId);
-            $recordId = (int) $parts[1];
+        $id = $this->getRecordId->get($msg['client_order_id']);
+        if (
+            ($msg['side'] === 'buy' && $this->buyPlaced->setNextState($id)) ||
+            ($msg['side'] === 'sell' && $this->sellPlaced->setNextState($id))
+        ) {
+            $output->writeln(sprintf(
+                "%s\t(%d) <fg=%s>%s</> order %d on %s pair for %s at price of %s filled.",
+                $this->now(),
+                $id,
+                $msg['side'] === 'buy' ? 'green' : 'red',
+                ucwords($msg['side']),
+                $msg['order_id'],
+                $msg['symbol'],
+                $msg['original_amount'],
+                $msg['price']
+            ));
+        } elseif (!in_array($msg['side'], ['buy','sell'])) {
+            throw new \Exception("Unhandled side '{$msg['side']}'");
         }
-        return $recordId;
     }
 
     private function getUrl(): string

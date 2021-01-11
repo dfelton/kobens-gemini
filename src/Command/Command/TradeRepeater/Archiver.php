@@ -68,7 +68,11 @@ final class Archiver extends Command
                 $this->shutdown->enableShutdownMode($e);
             }
         }
-        $output->writeln("\n<fg=red>{$this->now()}\tShutdown signal detected.\n");
+        $output->writeln(sprintf(
+            "<fg=red>%s\tShutdown signal detected - %s",
+            $this->now(),
+            self::class
+        ));
     }
 
     private function mainLoop(OutputInterface $output): void

@@ -62,16 +62,16 @@ final class PricePointGenerator extends Command
                     $position->getSellAmountBase(),
                     $position->getSellPrice()
                 ));
-                $this->table->insert([
-                    'is_enabled' => $isEnabled,
-                    'status' => 'BUY_READY',
-                    'symbol' => $pair->getSymbol(),
-                    'buy_amount' => $position->getBuyAmountBase(),
-                    'buy_price' => $position->getBuyPrice(),
-                    'sell_amount' => $position->getSellAmountBase(),
-                    'sell_price' => $position->getSellPrice(),
-                ]);
             }
+            $this->table->insert([
+                'is_enabled' => $isEnabled,
+                'status' => 'BUY_READY',
+                'symbol' => $pair->getSymbol(),
+                'buy_amount' => $position->getBuyAmountBase(),
+                'buy_price' => $position->getBuyPrice(),
+                'sell_amount' => $position->getSellAmountBase(),
+                'sell_price' => $position->getSellPrice(),
+            ]);
         }
         if ($output->getVerbosity() >= OutputInterface::VERBOSITY_NORMAL) {
             $output->writeln(sprintf(

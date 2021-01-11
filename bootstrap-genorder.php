@@ -115,7 +115,7 @@ class GenOrder
             }
 
             for ($i = 0, $j = \count($orders); $i < $j; $i++) {
-                $clientOrderId = 'trade_repeater_' . $action . '_' . $this->pair->getSymbol() . ((string) microtime(true));
+                $clientOrderId = 'repeater_' . $action . '_' . $this->pair->getSymbol() . ((string) microtime(true));
                 $r = $this->makerOrCancel->place(
                     $this->pair,
                     $action,

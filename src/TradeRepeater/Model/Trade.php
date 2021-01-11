@@ -38,6 +38,26 @@ final class Trade
 
     private ?string $updatedAt;
 
+    /**
+     * FIXME: ID last, as it has a default value
+     *
+     * @param int $id
+     * @param int $isEnabled
+     * @param int $isError
+     * @param string $status
+     * @param string $symbol
+     * @param string $buyAmount
+     * @param string $buyPrice
+     * @param string $sellAmount
+     * @param string $sellPrice
+     * @param string $buyClientOrderId
+     * @param int $buyOrderId
+     * @param string $sellClientOrderId
+     * @param int $sellOrderId
+     * @param string $note
+     * @param string $meta
+     * @param string $updatedAt
+     */
     public function __construct(
         int $id = null,
         int $isEnabled,

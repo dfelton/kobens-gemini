@@ -32,6 +32,7 @@
     "require": {
         "php": "^7.4",
         "ext-bcmath": "*",
+        "ext-ctype": "*",
         "ext-curl": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
