@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Kobens\Gemini\TradeRepeater\Model\GetRecordIdInterface;
+use Kobens\Gemini\Exchange\Currency\Pair;
 
 final class WebSocket extends Command
 {
@@ -160,15 +161,18 @@ final class WebSocket extends Command
             ($msg['side'] === 'sell' && $this->sellPlaced->setNextState($id))
         ) {
             $output->writeln(sprintf(
-                "%s\t(%d) <fg=%s>%s</> order %d on %s pair for %s at price of %s filled.",
+                "%s\t(%d)\t<fg=%s>%s_FILLED</>\tOrder ID %d\t%s %s @ %s %s/%s",
                 $this->now(),
                 $id,
                 $msg['side'] === 'buy' ? 'green' : 'red',
-                ucwords($msg['side']),
+                strtoupper($msg['side']),
                 $msg['order_id'],
-                $msg['symbol'],
                 $msg['original_amount'],
-                $msg['price']
+                strtoupper(Pair::getInstance($msg['symbol'])->getBase()->getSymbol()),
+                $msg['price'],
+                strtoupper(Pair::getInstance($msg['symbol'])->getQuote()->getSymbol()),
+                strtoupper(Pair::getInstance($msg['symbol'])->getBase()->getSymbol()),
+
             ));
         } elseif (!in_array($msg['side'], ['buy','sell'])) {
             throw new \Exception("Unhandled side '{$msg['side']}'");

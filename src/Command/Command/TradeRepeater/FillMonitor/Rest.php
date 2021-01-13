@@ -19,6 +19,7 @@ use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellPlacedInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Kobens\Gemini\Exchange\Currency\Pair;
 
 final class Rest extends Command
 {
@@ -103,11 +104,15 @@ final class Rest extends Command
                 $this->buyPlaced->setNextState($row->getId())
             ) {
                 $output->writeln(sprintf(
-                    "%s\t(%d) Buy order %d on %s pair filled.",
+                    "%s\t(%d)\t<fg=green>BUY_FILLED</>\tOrder ID %d\t%s %s @ %s %s/%s",
                     $this->now(),
                     $row->getId(),
                     $row->getBuyOrderId(),
-                    $row->getSymbol()
+                    $row->getBuyAmount(),
+                    strtoupper(Pair::getInstance($row->getSymbol())->getBase()->getSymbol()),
+                    json_decode($row->getMeta())->buy_price,
+                    strtoupper(Pair::getInstance($row->getSymbol())->getQuote()->getSymbol()),
+                    strtoupper(Pair::getInstance($row->getSymbol())->getBase()->getSymbol()),
                 ));
             }
         }
@@ -122,11 +127,15 @@ final class Rest extends Command
                 $this->sellPlaced->setNextState($row->getId())
             ) {
                 $output->writeln(sprintf(
-                    "%s\t(%d) Sell order %d on %s pair filled.",
+                    "%s\t(%d)\t<fg=red>SELL_FILLED</>\tOrder ID %d\t%s %s @ %s %s/%s",
                     $this->now(),
                     $row->getId(),
                     $row->getSellOrderId(),
-                    $row->getSymbol()
+                    $row->getSellAmount(),
+                    strtoupper(Pair::getInstance($row->getSymbol())->getBase()->getSymbol()),
+                    json_decode($row->getMeta())->sell_price,
+                    strtoupper(Pair::getInstance($row->getSymbol())->getQuote()->getSymbol()),
+                    strtoupper(Pair::getInstance($row->getSymbol())->getBase()->getSymbol()),
                 ));
             }
         }
