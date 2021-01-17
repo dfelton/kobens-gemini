@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\TradeRepeater\Watcher;
 
-use Symfony\Component\Console\Helper\Table;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Db\Adapter\Adapter;
-use Zend\Db\Sql\Select;
-use Symfony\Component\Console\Output\OutputInterface;
+use Kobens\Gemini\Api\Market\GetPriceInterface;
+use Kobens\Gemini\Exchange\Currency\Pair;
+use Kobens\Math\BasicCalculator\Add;
+use Kobens\Math\BasicCalculator\Compare;
 use Kobens\Math\BasicCalculator\Multiply;
 use Kobens\Math\BasicCalculator\Subtract;
-use Kobens\Gemini\Exchange\Currency\Pair;
-use Kobens\Math\BasicCalculator\Compare;
-use Kobens\Math\BasicCalculator\Add;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Helper\Table;
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\TableGateway\TableGateway;
+use Zend\Db\Sql\Select;
 use Symfony\Component\Console\Helper\TableCell;
 
 final class Profits
@@ -22,26 +23,33 @@ final class Profits
 
     private Adapter $adapter;
 
+    private GetPriceInterface $getPrice;
+
     public function __construct(
-        Adapter $adapter
+        Adapter $adapter,
+        GetPriceInterface $getPrice
     ) {
         $this->adapter = $adapter;
         $this->table = new TableGateway('trade_repeater_archive', $adapter);
+        $this->getPrice = $getPrice;
     }
 
     public function get(OutputInterface $output): Table
     {
         $profits = $this->getData();
         $table = new Table($output);
-        $table->setHeaders(
-            [
-                new TableCell(sprintf('Profits Since %s', $profits['date']), ['colspan' => 2])
-            ]
-        );
+        $table->setColumnMaxWidth(0, 10);
+        $table->setHeaderTitle(sprintf('Profits Since %s', $profits['date']));
+        $table->setHeaders(['Asset', 'Amount', 'Amount Notional']);
 
+        $totalNotional = '0';
         foreach ($profits['profits'] as $symbol => $amount) {
-            $table->addRow([$symbol, $amount]);
+            $notional = $this->getNotional($symbol, $amount);
+            $table->addRow([strtoupper($symbol), $amount, $notional]);
+            $totalNotional = Add::getResult($totalNotional, $notional);
         }
+        $table->addRow([new TableCell('------------------------------', ['colspan' => 3])]);
+        $table->addRow([new TableCell('<fg=green>Total Notional</>', ['colspan' => 2]), '$' . number_format((float)$totalNotional, 2)]);
         return $table;
     }
 
@@ -108,5 +116,12 @@ final class Profits
         }
 
         return $result;
+    }
+
+    private function getNotional(string $symbol, string $amount): string
+    {
+        return $symbol === 'usd'
+            ? $amount
+            : Multiply::getResult($amount, $this->getPrice->getBid($symbol . 'usd'));
     }
 }
