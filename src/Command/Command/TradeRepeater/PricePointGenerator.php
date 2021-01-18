@@ -41,7 +41,7 @@ final class PricePointGenerator extends Command
         $this->addArgument('sell_after_gain', InputArgument::REQUIRED, 'Sell After Gain (1 = same price as purchase, 2 = 100% gain from purchase price)');
         $this->addArgument('save_amount', InputArgument::OPTIONAL, 'Save Amount', 0);
         $this->addArgument('is_enabled', InputArgument::OPTIONAL, 'Is Enabled', 1);
-        $this->addOption('create', 'c', InputOption::VALUE_OPTIONAL, 'Create records (if omitted, will simply report summary)',  0);
+        $this->addOption('create', 'c', InputOption::VALUE_OPTIONAL, 'Create records (if omitted, will simply report summary)', 0);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

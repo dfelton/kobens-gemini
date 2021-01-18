@@ -126,7 +126,7 @@ final class TradeSpread
 
         $totalOrderCount = str_pad((string) $totalOrderCount, $length + 2, ' ', STR_PAD_LEFT);
 
-        $buyCount = str_pad($buyCount . ' (' . $buyCountPercent . '%)' , $length + 2, ' ', STR_PAD_LEFT);
+        $buyCount = str_pad($buyCount . ' (' . $buyCountPercent . '%)', $length + 2, ' ', STR_PAD_LEFT);
         $sellCount = str_pad($sellCount . ' (' . $sellCountPercent . '%)', $length + 2, ' ', STR_PAD_LEFT);
 
         $scale = self::getScale($sellMinSpread, $bidMaxSpread, $sellMaxSpread, $bidMinSpread);

@@ -172,7 +172,6 @@ final class WebSocket extends Command
                 $msg['price'],
                 strtoupper(Pair::getInstance($msg['symbol'])->getQuote()->getSymbol()),
                 strtoupper(Pair::getInstance($msg['symbol'])->getBase()->getSymbol()),
-
             ));
         } elseif (!in_array($msg['side'], ['buy','sell'])) {
             throw new \Exception("Unhandled side '{$msg['side']}'");
