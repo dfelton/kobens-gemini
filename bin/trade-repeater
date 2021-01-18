@@ -8,7 +8,13 @@ then
 else
     echo Starting trade repeater
 
-    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:fill-monitor-rest &
+    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:fill-monitor-rest --buy=1 --pair=linkusd &
+    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:fill-monitor-rest --sell=1 --pair=linkusd &
+    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:fill-monitor-rest --buy=1 --pair=ethusd &
+    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:fill-monitor-rest --sell=1 --pair=ethusd &
+    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:fill-monitor-rest --buy=1 --pair=zecusd &
+    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:fill-monitor-rest --sell=1 --pair=zecusd &
+
     php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:fill-monitor-websocket &
 
     php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:buyer &

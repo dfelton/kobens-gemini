@@ -7,7 +7,6 @@ namespace Kobens\Gemini\Api\Helper;
 use Kobens\Core\Exception\ConnectionException;
 use Kobens\Core\Exception\Http\RequestTimeoutException;
 use Kobens\Core\Http\ResponseInterface;
-use Kobens\Gemini\Exception\InvalidResponseException;
 use Kobens\Gemini\Exception\ResourceMovedException;
 use Kobens\Http\Exception\Status\ServerErrorException;
 use Kobens\Http\Exception\Status\ServerError\BadGatewayException;
@@ -28,7 +27,7 @@ final class ResponseHandler
         $body = @\json_decode($response->getBody()); // 504 responses come back as HTML
         switch (true) {
             case $body instanceof \stdClass && ($body->result ?? null) === 'error' && $body->reason ?? null:
-                $className = "\Kobens\Gemini\Exception\Api\Reason\{$body->reason}Exception";
+                $className = '\\Kobens\\Gemini\\Exception\\Api\\Reason\\' . $body->reason . 'Exception';
                 if (!\class_exists($className)) {
                     $className = \Kobens\Gemini\Exception::class;
                 }
@@ -61,7 +60,7 @@ final class ResponseHandler
             case $response->getResponseCode() === 504:
                 throw new $this->responseCodeMap[$response->getResponseCode()](
                     null,
-                    $response->getResponseCode(),
+                    (int) $response->getResponseCode(),
                     new \Exception(\json_encode($response))
                 );
 

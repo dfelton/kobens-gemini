@@ -13,13 +13,18 @@ use Kobens\Gemini\Command\Command\TradeRepeater\SleeperTrait;
 use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
 use Kobens\Gemini\Exception\Api\Reason\SystemException;
 use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
+use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\AbstractAction;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyPlacedInterface;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellPlacedInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Gemini\Exchange\Currency\Pair;
+use Kobens\Exchange\PairInterface;
+use Kobens\Gemini\TradeRepeater\Model\Trade;
+use Kobens\Math\BasicCalculator\Subtract;
+use Kobens\Math\BasicCalculator\Add;
 
 final class Rest extends Command
 {
@@ -58,12 +63,49 @@ final class Rest extends Command
         parent::__construct();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function configure(): void
     {
+        $this->addOption('buy', 'b', InputOption::VALUE_OPTIONAL, 'Audit Buy Orders', '0');
+        $this->addOption('sell', 's', InputOption::VALUE_OPTIONAL, 'Audit Sell Orders', '0');
+        $this->addOption('pair', 'p', InputOption::VALUE_OPTIONAL, 'Pair to audit. Default to all');
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $buyAudit = $input->getOption('buy') === '1';
+        $sellAudit = $input->getOption('sell') === '1';
+        $pair = $input->getOption('pair')
+            ? Pair::getInstance($input->getOption('pair'))
+            : null;
+
         while ($this->shutdown->isShutdownModeEnabled() === false) {
+            $time = Subtract::getResult('0', (string) microtime(true));
             try {
-                $this->mainLoop($output);
-                $this->sleep(60, $this->sleeper, $this->shutdown);
+                $output->writeln(sprintf(
+                    "%s\tAUDIT START\t%s (%s)",
+                    $this->now(),
+                    ($pair === null) ? 'all pairs' : $pair->getSymbol(),
+                    (
+                        ($buyAudit ? '<fg=green>buy</>' : '') .
+                        ($buyAudit && $sellAudit ? ' and ' : '') .
+                        ($sellAudit ? '<fg=red>sell</>' : '')
+                    )
+                ));
+                $this->mainLoop($output, $buyAudit, $sellAudit, $pair);
+                $time = Add::getResult($time, (string) microtime(true));
+                $output->writeln(sprintf(
+                    "%s\tAUDIT END\t%s (%s) completed in %s seconds",
+                    $this->now(),
+                    ($pair === null) ? 'all pairs' : $pair->getSymbol(),
+                    (
+                        ($buyAudit ? '<fg=green>buy</>' : '') .
+                        ($buyAudit && $sellAudit ? ' and ' : '') .
+                        ($sellAudit ? '<fg=red>sell</>' : '')
+                    ),
+                    $time
+                ));
+                $this->sleep(600, $this->sleeper, $this->shutdown);
+
             } catch (ConnectionException | MaintenanceException | SystemException $e) {
                 $this->exceptionDelay($output, $e);
             } catch (\Exception $e) {
@@ -75,6 +117,7 @@ final class Rest extends Command
             $this->now(),
             self::class
         ));
+        return 0;
     }
 
     private function exceptionDelay(OutputInterface $output, \Exception $e)
@@ -89,15 +132,27 @@ final class Rest extends Command
     /**
      * @param OutputInterface $output
      */
-    private function mainLoop(OutputInterface $output): void
+    private function mainLoop(OutputInterface $output, bool $buyOrders = false, bool $sellOrders = false, PairInterface $pair = null): void
     {
         /** @var \Kobens\Gemini\TradeRepeater\Model\Trade $row */
         $activeIds = $this->getActiveOrderIds();
+        if ($buyOrders) {
+            $this->iterateBuyOrders($output, $activeIds, $pair);
+        }
+        if ($sellOrders) {
+            $this->iterateSellOrders($output, $activeIds, $pair);
+        }
+    }
+
+    private function iterateBuyOrders(OutputInterface $output, array $activeIds, PairInterface $pair = null): void
+    {
+        /** @var Trade $row */
         foreach ($this->buyPlaced->getHealthyRecords() as $row) {
             if ($this->shutdown->isShutdownModeEnabled()) {
                 break;
             }
             if (
+                ($pair === null || ($pair->getSymbol() === $row->getSymbol())) &&
                 !($activeIds['buy'][$row->getBuyOrderId()] ?? false) &&
                 $this->isStillHealthy($this->buyPlaced, $row->getId()) &&
                 $this->isFilled($row->getBuyOrderId()) &&
@@ -116,32 +171,32 @@ final class Rest extends Command
                 ));
             }
         }
+    }
+
+    private function iterateSellOrders(OutputInterface $output, array $activeIds, PairInterface $pair = null): void
+    {
         foreach ($this->sellPlaced->getHealthyRecords() as $row) {
             if ($this->shutdown->isShutdownModeEnabled()) {
                 break;
             }
-            try {
-                if (
-                    !($activeIds['sell'][$row->getSellOrderId()] ?? false) &&
-                    $this->isStillHealthy($this->sellPlaced, $row->getId()) &&
-                    $this->isFilled($row->getSellOrderId()) &&
-                    $this->sellPlaced->setNextState($row->getId())
-                ) {
-                    $output->writeln(sprintf(
-                        "%s\t(%d)\t<fg=red>SELL_FILLED</>\tOrder ID %d\t%s %s @ %s %s/%s",
-                        $this->now(),
-                        $row->getId(),
-                        $row->getSellOrderId(),
-                        $row->getSellAmount(),
-                        strtoupper(Pair::getInstance($row->getSymbol())->getBase()->getSymbol()),
-                        json_decode($row->getMeta())->sell_price,
-                        strtoupper(Pair::getInstance($row->getSymbol())->getQuote()->getSymbol()),
-                        strtoupper(Pair::getInstance($row->getSymbol())->getBase()->getSymbol()),
-                    ));
-                }
-            } catch(\Kobens\Gemini\Exception\InvalidResponseException $e) {
-                // FIXME: Handle this better
-                continue;
+            if (
+                ($pair === null || ($pair->getSymbol() === $row->getSymbol())) &&
+                !($activeIds['sell'][$row->getSellOrderId()] ?? false) &&
+                $this->isStillHealthy($this->sellPlaced, $row->getId()) &&
+                $this->isFilled($row->getSellOrderId()) &&
+                $this->sellPlaced->setNextState($row->getId())
+            ) {
+                $output->writeln(sprintf(
+                    "%s\t(%d)\t<fg=red>SELL_FILLED</>\tOrder ID %d\t%s %s @ %s %s/%s",
+                    $this->now(),
+                    $row->getId(),
+                    $row->getSellOrderId(),
+                    $row->getSellAmount(),
+                    strtoupper(Pair::getInstance($row->getSymbol())->getBase()->getSymbol()),
+                    json_decode($row->getMeta())->sell_price,
+                    strtoupper(Pair::getInstance($row->getSymbol())->getQuote()->getSymbol()),
+                    strtoupper(Pair::getInstance($row->getSymbol())->getBase()->getSymbol()),
+                ));
             }
         }
     }
