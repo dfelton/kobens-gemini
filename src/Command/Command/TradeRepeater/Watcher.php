@@ -13,13 +13,13 @@ use Kobens\Gemini\TradeRepeater\Watcher\AccountNotionalBalance;
 use Kobens\Gemini\TradeRepeater\Watcher\Balances;
 use Kobens\Gemini\TradeRepeater\Watcher\Helper\Data;
 use Kobens\Gemini\TradeRepeater\Watcher\MarketSpread;
+use Kobens\Gemini\TradeRepeater\Watcher\Profits;
 use Kobens\Gemini\TradeRepeater\Watcher\TradeSpread;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Gemini\TradeRepeater\Watcher\Profits;
 
 final class Watcher extends Command
 {

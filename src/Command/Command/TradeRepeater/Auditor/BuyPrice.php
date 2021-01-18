@@ -5,25 +5,23 @@ declare(strict_types=1);
 namespace Kobens\Gemini\Command\Command\TradeRepeater\Auditor;
 
 use Kobens\Core\EmergencyShutdownInterface;
-use Kobens\Core\SleeperInterface;
 use Kobens\Core\Exception\ConnectionException;
+use Kobens\Core\SleeperInterface;
 use Kobens\Gemini\Api\Market\GetPriceInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelOrderInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
 use Kobens\Gemini\Command\Command\TradeRepeater\SleeperTrait;
 use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
 use Kobens\Gemini\Exception\Api\Reason\SystemException;
-use Kobens\Gemini\TradeRepeater\Model\Trade;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyPlacedInterface;
-use Kobens\Math\PercentDifference;
-use Kobens\Math\BasicCalculator\Compare;
+use Kobens\Gemini\TradeRepeater\Model\Trade;
+use Kobens\Gemini\TradeRepeater\Model\Trade\ShouldResetBuyInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Adapter\Driver\ConnectionInterface;
 use Zend\Db\TableGateway\TableGateway;
-use Kobens\Gemini\TradeRepeater\Model\Trade\ShouldResetBuyInterface;
 
 final class BuyPrice extends Command
 {
@@ -92,7 +90,12 @@ final class BuyPrice extends Command
             try {
                 $this->mainLoop($output);
                 if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                    $output->writeln("{$this->now()}\tRecords examined. Sleeping $sleep seconds.");
+                    $output->writeln(sprintf(
+                        "%s\t%s\tRecords examined. Sleeping %d seconds.",
+                        $this->now(),
+                        self::class,
+                        $sleep
+                    ));
                 }
                 $this->sleep($sleep, $this->sleeper, $this->shutdown);
             } catch (ConnectionException | MaintenanceException | SystemException $e) {

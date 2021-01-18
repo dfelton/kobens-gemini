@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2c89c2141983886d8d05af77a2dcdbd0",
+    "content-hash": "af6373fa15de9110404f9f814c6c31aa",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1185,6 +1185,41 @@
                 "issues": "https://github.com/dfelton/kobens-exchange/issues"
             },
             "time": "2020-12-29T18:13:48+00:00"
+        },
+        {
+            "name": "kobens/kobens-http",
+            "version": "0.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dfelton/kobens-http.git",
+                "reference": "bbd56408ec13cd42bb29b8ad941a0d4fb3ec0027"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dfelton/kobens-http/zipball/bbd56408ec13cd42bb29b8ad941a0d4fb3ec0027",
+                "reference": "bbd56408ec13cd42bb29b8ad941a0d4fb3ec0027",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Kobens\\Http\\": "src"
+                }
+            },
+            "license": [
+                "GNU GPLv3"
+            ],
+            "authors": [
+                {
+                    "name": "Darren Felton",
+                    "email": "darren_felton@hotmail.com"
+                }
+            ],
+            "support": {
+                "source": "https://github.com/dfelton/kobens-http/tree/0.0.4",
+                "issues": "https://github.com/dfelton/kobens-http/issues"
+            },
+            "time": "2021-01-18T00:19:54+00:00"
         },
         {
             "name": "kobens/kobens-math",
@@ -4272,6 +4307,7 @@
     "platform": {
         "php": "^7.4",
         "ext-bcmath": "*",
+        "ext-ctype": "*",
         "ext-curl": "*",
         "ext-json": "*",
         "ext-mbstring": "*"
@@ -4280,5 +4316,5 @@
     "platform-overrides": {
         "php": "7.4"
     },
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.0.0"
 }

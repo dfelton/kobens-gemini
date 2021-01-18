@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
 use Kobens\Core\EmergencyShutdownInterface;
-use Kobens\Core\SleeperInterface;
 use Kobens\Core\Exception\ConnectionException;
+use Kobens\Core\SleeperInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\ForceMakerInterface;
-use Kobens\Gemini\Exception\MaxIterationsException;
 use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
 use Kobens\Gemini\Exception\Api\Reason\SystemException;
+use Kobens\Gemini\Exception\MaxIterationsException;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\Model\Trade;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyReadyInterface;
@@ -70,17 +70,10 @@ final class Buyer extends Command
         if ($delay < 5) {
             $delay = 5;
         }
-        $reportSleep = true;
         while ($this->shutdown->isShutdownModeEnabled() === false) {
             try {
                 if (!$this->mainLoop($input, $output)) {
-                    if ($reportSleep) {
-                        $output->writeln("{$this->now()}\tBuy orders up to date. Sleeping...");
-                        $reportSleep = false;
-                    }
                     $this->sleep($delay, $this->sleeper, $this->shutdown);
-                } else {
-                    $reportSleep = true;
                 }
             } catch (\Exception $e) {
                 $this->shutdown->enableShutdownMode($e);
@@ -108,13 +101,15 @@ final class Buyer extends Command
             if (true == $msg = $this->place($input, $output, $row, $buyClientOrderId)) {
                 $this->buySent->setNextState($row->getId(), $msg->order_id, $msg->price);
                 $output->writeln(\sprintf(
-                    "%s\t(%d) Buy Order ID %s placed on %s pair for amount of %s at rate of %s",
+                    "%s\t(%d)\t<fg=green>BUY</>_PLACED</>\tOrder ID %s\t%s %s @ %s %s/%s",
                     $this->now(),
                     $row->getId(),
                     $msg->order_id,
-                    $msg->symbol,
                     $msg->original_amount,
-                    $msg->price
+                    strtoupper(Pair::getInstance($msg->symbol)->getBase()->getSymbol()),
+                    $msg->price,
+                    strtoupper(Pair::getInstance($msg->symbol)->getQuote()->getSymbol()),
+                    strtoupper(Pair::getInstance($msg->symbol)->getBase()->getSymbol()),
                 ));
                 if (Compare::getResult($msg->price, $row->getBuyPrice()) !== Compare::EQUAL) {
                     $output->writeln(\sprintf(

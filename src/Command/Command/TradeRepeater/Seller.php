@@ -19,6 +19,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Kobens\Math\BasicCalculator\Compare;
 
 /**
  * TODO: implement a pid file so this command cannot be ran more than once process at a time.
@@ -69,17 +70,10 @@ final class Seller extends Command
         if ($delay < 5) {
             $delay = 5;
         }
-        $reportSleep = true;
         while (!$this->shutdown->isShutdownModeEnabled()) {
             try {
                 if (!$this->mainLoop($input, $output)) {
-                    if ($reportSleep) {
-                        $output->writeln("{$this->now()}\tSell orders up to date. Sleeping...");
-                        $reportSleep = false;
-                    }
                     $this->sleep($delay, $this->sleeper, $this->shutdown);
-                } else {
-                    $reportSleep = true;
                 }
             } catch (\Exception $e) {
                 $this->shutdown->enableShutdownMode($e);
@@ -107,15 +101,17 @@ final class Seller extends Command
             if (true == $msg = $this->place($input, $output, $row, $sellClientOrderId)) {
                 $this->sellSent->setNextState($row->getId(), $msg->order_id, $msg->price);
                 $output->writeln(\sprintf(
-                    "%s\t(%d) Sell Order ID %s placed on %s pair for amount of %s at rate of %s",
+                    "%s\t(%d)\t<fg=red>SELL</>_PLACED\tOrder ID %s\t%s %s @ %s %s/%s",
                     $this->now(),
                     $row->getId(),
                     $msg->order_id,
-                    $msg->symbol,
                     $msg->original_amount,
-                    $msg->price
+                    strtoupper(Pair::getInstance($msg->symbol)->getBase()->getSymbol()),
+                    $msg->price,
+                    strtoupper(Pair::getInstance($msg->symbol)->getQuote()->getSymbol()),
+                    strtoupper(Pair::getInstance($msg->symbol)->getBase()->getSymbol()),
                 ));
-                if ($msg->price !== $row->getSellPrice()) {
+                if (Compare::getResult($msg->price, $row->getSellPrice()) !== Compare::EQUAL) {
                     $output->writeln(\sprintf(
                         "%s\t\t<fg=yellow>(original sell price: %s)</>",
                         $this->now(),

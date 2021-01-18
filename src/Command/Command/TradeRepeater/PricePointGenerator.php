@@ -2,13 +2,18 @@
 
 namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Zend\Db\TableGateway\TableGatewayInterface;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\PricePointGenerator as Generator;
+use Kobens\Gemini\TradeRepeater\PricePointGenerator\PricePoint;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Zend\Db\TableGateway\TableGatewayInterface;
+use Kobens\Gemini\TradeRepeater\PricePointGenerator\Result;
+use Symfony\Component\Console\Helper\Table;
+use Kobens\Math\BasicCalculator\Add;
 
 final class PricePointGenerator extends Command
 {
@@ -36,12 +41,13 @@ final class PricePointGenerator extends Command
         $this->addArgument('sell_after_gain', InputArgument::REQUIRED, 'Sell After Gain (1 = same price as purchase, 2 = 100% gain from purchase price)');
         $this->addArgument('save_amount', InputArgument::OPTIONAL, 'Save Amount', 0);
         $this->addArgument('is_enabled', InputArgument::OPTIONAL, 'Is Enabled', 1);
+        $this->addOption('create', 'c', InputOption::VALUE_OPTIONAL, 'Create records (if omitted, will simply report summary)', 0);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $pair = Pair::getInstance($input->getArgument('symbol'));
-        $results = Generator::get(
+        $result = Generator::get(
             $pair,
             (string) $input->getArgument('buy_amount'),
             (string) $input->getArgument('buy_price_start'),
@@ -51,8 +57,52 @@ final class PricePointGenerator extends Command
             (string) $input->getArgument('save_amount'),
         );
         $isEnabled = (int) $input->getArgument('is_enabled');
+        if ($input->getOption('create') === '1') {
+            $this->create($output, $pair, $result, $isEnabled);
+        } else {
+            $this->summarize($output, $pair, $result);
+        }
+        return 0;
+    }
 
-        foreach ($results->getPricePoints() as $position) {
+    private function summarize(OutputInterface $output, Pair $pair, Result $result): void
+    {
+        $base = $pair->getBase();
+        $quote = $pair->getQuote();
+        $table = new Table($output);
+        $table->setHeaderTitle('Price Point Summary');
+        $table->addRow(['Order Count', \count($result->getPricePoints())]);
+        $table->addRow([
+            \sprintf('%s Buy Amount', strtoupper($base->getSymbol())),
+            $result->getTotalBuyBase(),
+        ]);
+        $table->addRow([
+            sprintf('%s Amount w/ Fees', strtoupper($quote->getSymbol())),
+            Add::getResult($result->getTotalBuyFeesHold(), $result->getTotalBuyQuote()),
+        ]);
+        $table->addRow([
+            sprintf('%s Sell Amount', strtoupper($base->getSymbol())),
+            $result->getTotalSellBase(),
+        ]);
+        $table->addRow([
+            sprintf('%s Total Profits', strtoupper($base->getSymbol())),
+            $result->getTotalProfitBase(),
+        ]);
+        $table->addRow([
+            sprintf('%s Total Profits', strtoupper($quote->getSymbol())),
+            $result->getTotalProfitQuote(),
+        ]);
+        $table->render();
+    }
+
+
+    /**
+     * @param OutputInterface $output
+     * @param PricePoint[] $pricePoints
+     */
+    private function create(OutputInterface $output, Pair $pair, Result $result, bool $isEnabled): void
+    {
+        foreach ($result->getPricePoints() as $position) {
             if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                 $output->writeln(sprintf(
                     "Inserting %s record for %s buy amount at %s price.\tSell %s at %s price.",
@@ -76,7 +126,7 @@ final class PricePointGenerator extends Command
         if ($output->getVerbosity() >= OutputInterface::VERBOSITY_NORMAL) {
             $output->writeln(sprintf(
                 'Total of %d records inserted for the %s pair.',
-                count($results->getPricePoints()),
+                count($result->getPricePoints()),
                 $pair->getSymbol()
             ));
         }
