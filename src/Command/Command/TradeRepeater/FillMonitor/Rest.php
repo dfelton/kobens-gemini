@@ -120,23 +120,28 @@ final class Rest extends Command
             if ($this->shutdown->isShutdownModeEnabled()) {
                 break;
             }
-            if (
-                !($activeIds['sell'][$row->getSellOrderId()] ?? false) &&
-                $this->isStillHealthy($this->sellPlaced, $row->getId()) &&
-                $this->isFilled($row->getSellOrderId()) &&
-                $this->sellPlaced->setNextState($row->getId())
-            ) {
-                $output->writeln(sprintf(
-                    "%s\t(%d)\t<fg=red>SELL_FILLED</>\tOrder ID %d\t%s %s @ %s %s/%s",
-                    $this->now(),
-                    $row->getId(),
-                    $row->getSellOrderId(),
-                    $row->getSellAmount(),
-                    strtoupper(Pair::getInstance($row->getSymbol())->getBase()->getSymbol()),
-                    json_decode($row->getMeta())->sell_price,
-                    strtoupper(Pair::getInstance($row->getSymbol())->getQuote()->getSymbol()),
-                    strtoupper(Pair::getInstance($row->getSymbol())->getBase()->getSymbol()),
-                ));
+            try {
+                if (
+                    !($activeIds['sell'][$row->getSellOrderId()] ?? false) &&
+                    $this->isStillHealthy($this->sellPlaced, $row->getId()) &&
+                    $this->isFilled($row->getSellOrderId()) &&
+                    $this->sellPlaced->setNextState($row->getId())
+                ) {
+                    $output->writeln(sprintf(
+                        "%s\t(%d)\t<fg=red>SELL_FILLED</>\tOrder ID %d\t%s %s @ %s %s/%s",
+                        $this->now(),
+                        $row->getId(),
+                        $row->getSellOrderId(),
+                        $row->getSellAmount(),
+                        strtoupper(Pair::getInstance($row->getSymbol())->getBase()->getSymbol()),
+                        json_decode($row->getMeta())->sell_price,
+                        strtoupper(Pair::getInstance($row->getSymbol())->getQuote()->getSymbol()),
+                        strtoupper(Pair::getInstance($row->getSymbol())->getBase()->getSymbol()),
+                    ));
+                }
+            } catch(\Kobens\Gemini\Exception\InvalidResponseException $e) {
+                // FIXME: Handle this better
+                continue;
             }
         }
     }

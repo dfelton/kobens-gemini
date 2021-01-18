@@ -136,7 +136,7 @@ $getPastTradesInterface = new GetPastTrades($privateRequestInterface);
 $getActiveOrdersInterface = new GetActiveOrders($privateRequestInterface);
 $getAvailableBalancesInterface = new GetAvailableBalances($privateRequestInterface);
 $getNotionalBalancesInterface = new GetNotionalBalances($privateRequestInterface);
-$orderStatusInterface = new OrderStatus($privateRequestInterface);
+$orderStatusInterface = new OrderStatus($loggerRequestPrivate, $privateRequestInterface);
 $getNotionalVolumeInterface = new GetNotionalVolume($privateRequestInterface);
 $getTradeVolumeInterface = new \Kobens\Gemini\Api\Rest\PrivateEndpoints\FeeAndVolume\GetTradeVolume($privateRequestInterface);
 
@@ -208,7 +208,7 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor\Rest(
     $buyPlacedInterface,
     $sellPlacedInterface,
     new GetActiveOrders($restFillMonitorRequestInterface),
-    new OrderStatus($restFillMonitorRequestInterface),
+    new OrderStatus($loggerRequestPrivate, $restFillMonitorRequestInterface),
     $sleeperInterface
 ));
 unset($restFillMonitorKey, $restFillMonitorRequestInterface);
@@ -258,7 +258,7 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Auditor\SellPrice(
     $shutdownInterface,
     $sellPlacedInterface,
     $getPriceInterface,
-    new OrderStatus($sellAuditorRequestInterface),
+    new OrderStatus($loggerRequestPrivate, $sellAuditorRequestInterface),
     new CancelOrder($sellAuditorRequestInterface),
     $adapter,
     $sleeperInterface
@@ -282,7 +282,7 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Auditor\BuyPrice(
     $shutdownInterface,
     $buyPlacedInterface,
     $getPriceInterface,
-    new OrderStatus($buyAuditorRequestInterface),
+    new OrderStatus($loggerRequestPrivate, $buyAuditorRequestInterface),
     new CancelOrder($buyAuditorRequestInterface),
     $adapter,
     $sleeperInterface,
@@ -297,7 +297,7 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Watcher(
     ),
     $sleeperInterface,
     $getPriceInterface,
-    new Profits($adapter)
+    new Profits($adapter, $getPriceInterface)
 ));
 
 

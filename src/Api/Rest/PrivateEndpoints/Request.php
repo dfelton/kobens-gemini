@@ -7,11 +7,11 @@ namespace Kobens\Gemini\Api\Rest\PrivateEndpoints;
 use Kobens\Core\Exception\Http\CurlException;
 use Kobens\Core\Http\CurlInterface;
 use Kobens\Core\Http\Request\ThrottlerInterface;
+use Kobens\Core\Http\ResponseInterface;
 use Kobens\Gemini\Api\HostInterface;
 use Kobens\Gemini\Api\KeyInterface;
 use Kobens\Gemini\Api\NonceInterface;
 use Kobens\Gemini\Api\Helper\ResponseHandler;
-use Kobens\Core\Http\ResponseInterface;
 use Kobens\Gemini\Exception;
 use Psr\Log\LoggerInterface;
 
@@ -63,6 +63,12 @@ final class Request implements RequestInterface
     }
 
     /**
+     * FIXME: Re-assess where to put $this->responseHandler->handleResponse().
+     * It is probably better to reside directly in the try statement, and we
+     * don't throw an exception ourselves, but catch more types. Also, ResponseHandler
+     * should throw something else for 500 range response codes.
+     *
+     *
      * @param string $urlPath
      * @param array $payload
      * @param array $config
