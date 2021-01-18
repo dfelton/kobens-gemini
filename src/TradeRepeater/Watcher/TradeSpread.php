@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\TradeRepeater\Watcher;
 
+use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\Watcher\Helper\DataInterface;
 use Kobens\Math\BasicCalculator\Add;
 use Kobens\Math\BasicCalculator\Compare;
 use Kobens\Math\BasicCalculator\Divide;
+use Kobens\Math\BasicCalculator\Multiply;
 use Kobens\Math\BasicCalculator\Subtract;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
@@ -18,8 +20,9 @@ final class TradeSpread
     public static function getTable(OutputInterface $output, DataInterface $data, string $symbol): Table
     {
         $askMin = $askMax = $bidMin = $bidMax = '';
-        $sellCount = 0;
-        $buyCount = 0;
+        $sellCount = $buyCount = 0;
+        $totalBuy = $totalSell = '0';
+        /** @var \stdClass $order */
         foreach ($data->getOrdersData() as $order) {
             if (
                 $order->symbol === $symbol &&
@@ -29,6 +32,7 @@ final class TradeSpread
                 if (
                     $order->side === 'sell'
                 ) {
+                    $totalSell = Add::getResult($totalSell, $order->original_amount);
                     ++$sellCount;
                     if ($askMax === '' || $askMin === '') {
                         $askMax = $order->price;
@@ -42,6 +46,7 @@ final class TradeSpread
                         $askMax = $order->price;
                     }
                 } elseif ($order->side === 'buy') {
+                    $totalBuy = Add::getResult($totalBuy, $order->original_amount);
                     ++$buyCount;
                     if ($bidMin === '' || $bidMax === '') {
                         $bidMax = $bidMin = $order->price;
@@ -87,6 +92,8 @@ final class TradeSpread
             $bidMin ?? '0',
             $askMin ?? '0',
             $askMax ?? '0',
+            $totalBuy,
+            $totalSell,
             $spread
         );
         $bidMax = (string) number_format((float) $bidMax, $scale, '.', '');
@@ -94,20 +101,36 @@ final class TradeSpread
         $askMin = (string) number_format((float) $askMin, $scale, '.', '');
         $askMax = (string) number_format((float) $askMax, $scale, '.', '');
         $spread = (string) number_format((float) $spread, $scale);
+        $orderRange = Subtract::getResult($askMax, $bidMin);
+
+        $totalOrderCount = $buyCount + $sellCount;
+        $buyCountPercent = Multiply::getResult(Divide::getResult((string) $buyCount, (string) $totalOrderCount, 2), '100', 2);
+        $sellCountPercent = Multiply::getResult(Divide::getResult((string) $sellCount, (string) $totalOrderCount, 2), '100', 2);
+
         $length = self::getLength($bidMax, $bidMax, $askMin, $askMax, $spread);
 
 
+        $scale = self::getScale($totalBuy, $totalSell);
+        $totalBuy = (string) number_format((float) $totalBuy, $scale);
+        $totalSell = (string) number_format((float) $totalSell, $scale);
+
+        $orderRange = str_pad($orderRange, $length + 2, ' ', STR_PAD_LEFT);
         $bidMax = str_pad($bidMax, $length + 2, ' ', STR_PAD_LEFT);
         $bidMin = str_pad($bidMin, $length + 2, ' ', STR_PAD_LEFT);
         $askMax = str_pad($askMax, $length + 2, ' ', STR_PAD_LEFT);
         $askMin = str_pad($askMin, $length + 2, ' ', STR_PAD_LEFT);
         $spread = str_pad($spread, $length + 2, ' ', STR_PAD_LEFT);
         $percent = str_pad($percent, $length, ' ', STR_PAD_LEFT);
-        $buyCount = str_pad((string) $buyCount, $length + 2, ' ', STR_PAD_LEFT);
-        $sellCount = str_pad((string) $sellCount, $length + 2, ' ', STR_PAD_LEFT);
+        $totalBuy = str_pad($totalBuy, $length + 2, ' ', STR_PAD_LEFT);
+        $totalSell = str_pad($totalSell, $length + 2, ' ', STR_PAD_LEFT);
 
+        $totalOrderCount = str_pad((string) $totalOrderCount, $length + 2, ' ', STR_PAD_LEFT);
+
+        $buyCount = str_pad($buyCount . ' (' . $buyCountPercent . '%)' , $length + 2, ' ', STR_PAD_LEFT);
+        $sellCount = str_pad($sellCount . ' (' . $sellCountPercent . '%)', $length + 2, ' ', STR_PAD_LEFT);
 
         $scale = self::getScale($sellMinSpread, $bidMaxSpread, $sellMaxSpread, $bidMinSpread);
+
         $sellMinSpread = (string) number_format((float) $sellMinSpread, $scale);
         $sellMaxSpread = (string) number_format((float) $sellMaxSpread, $scale);
         $bidMaxSpread = (string) number_format((float) $bidMaxSpread, $scale);
@@ -118,6 +141,7 @@ final class TradeSpread
         $bidMinSpread = str_pad($bidMinSpread, 13, ' ', STR_PAD_LEFT);
         $bidMaxSpread = str_pad($bidMaxSpread, 13, ' ', STR_PAD_LEFT);
 
+        $quote = strtoupper(Pair::getInstance($symbol)->getQuote()->getSymbol());
         $table = new Table($output);
         $table
             ->setHeaders(
@@ -131,14 +155,18 @@ final class TradeSpread
             )
             ->setRows(
                 [
-                    ['Highest Ask', "<fg=red>$askMax</>", $sellMaxSpread],
-                    ['Lowest Ask', "<fg=red>$askMin</>", $sellMinSpread],
-                    ['Highest Bid', "<fg=green>$bidMax</>", $bidMaxSpread],
-                    ['Lowest Bid', "<fg=green>$bidMin</>", $bidMinSpread],
-                    ['Spread', $spread],
-                    ['Spread', "% $percent"],
-                    ['Sell Count', "<fg=red>$sellCount</>"],
-                    ['BuyCount', "<fg=green>$buyCount</>"],
+                    ['Sell (Highest)', "<fg=red>$askMax</>", $sellMaxSpread],
+                    ['Sell (Lowest)', "<fg=red>$askMin</>", $sellMinSpread],
+                    ['Buy (Highest)', "<fg=green>$bidMax</>", $bidMaxSpread],
+                    ['Buy (Lowest)', "<fg=green>$bidMin</>", $bidMinSpread],
+                    [\sprintf('Spread (%s)', $quote), $spread],
+                    ['Spread (%)', "% $percent"],
+                    ['Order Count (Sell)', $sellCount],
+                    ['Order Count (Buy)', $buyCount],
+                    ['Total Orders', $totalOrderCount],
+                    ['Total Order Amount (Sell)', $totalSell],
+                    ['Total Order Amount (Buy)', $totalBuy],
+                    [sprintf('Order Range %s', $quote), $orderRange],
                 ]
             );
         return $table;
