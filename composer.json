@@ -44,7 +44,7 @@
         "kobens/kobens-core": "dev-master",
         "kobens/kobens-currency": "^2.3",
         "kobens/kobens-exchange": "dev-master",
-        "kobens/kobens-http": "^0.0",
+        "kobens/kobens-http": "dev-master",
         "kobens/kobens-math": "^1.0",
         "symfony/console": "^4.2",
         "zendframework/zend-config": "^3.2",

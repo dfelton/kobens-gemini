@@ -104,7 +104,7 @@ final class Rest extends Command
                     ),
                     $time
                 ));
-                $this->sleep(600, $this->sleeper, $this->shutdown);
+                $this->sleep(3600 + (60 * rand(2, 5)), $this->sleeper, $this->shutdown);
             } catch (ConnectionException | MaintenanceException | SystemException $e) {
                 $this->exceptionDelay($output, $e);
             } catch (\Exception $e) {
