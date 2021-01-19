@@ -67,7 +67,7 @@ final class ResponseHandler
             case $response->getResponseCode() >= 500:
                 throw new ServerErrorException(
                     null,
-                    $response->getResponseCode(),
+                    (int) $response->getResponseCode(),
                     new \Exception(\json_encode($response))
                 );
         }

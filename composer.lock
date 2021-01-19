@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "af6373fa15de9110404f9f814c6c31aa",
+    "content-hash": "8a31e1b7ea326b41199fcc3d4d759626",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1188,18 +1188,19 @@
         },
         {
             "name": "kobens/kobens-http",
-            "version": "0.0.4",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-http.git",
-                "reference": "bbd56408ec13cd42bb29b8ad941a0d4fb3ec0027"
+                "reference": "f3723326a170b61759f34e8884b8788e08110c68"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dfelton/kobens-http/zipball/bbd56408ec13cd42bb29b8ad941a0d4fb3ec0027",
-                "reference": "bbd56408ec13cd42bb29b8ad941a0d4fb3ec0027",
+                "url": "https://api.github.com/repos/dfelton/kobens-http/zipball/f3723326a170b61759f34e8884b8788e08110c68",
+                "reference": "f3723326a170b61759f34e8884b8788e08110c68",
                 "shasum": ""
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -1216,10 +1217,10 @@
                 }
             ],
             "support": {
-                "source": "https://github.com/dfelton/kobens-http/tree/0.0.4",
+                "source": "https://github.com/dfelton/kobens-http/tree/master",
                 "issues": "https://github.com/dfelton/kobens-http/issues"
             },
-            "time": "2021-01-18T00:19:54+00:00"
+            "time": "2021-01-18T06:13:00+00:00"
         },
         {
             "name": "kobens/kobens-math",
@@ -4300,7 +4301,8 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "kobens/kobens-core": 20,
-        "kobens/kobens-exchange": 20
+        "kobens/kobens-exchange": 20,
+        "kobens/kobens-http": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
