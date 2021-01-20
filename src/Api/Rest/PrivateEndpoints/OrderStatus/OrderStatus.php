@@ -8,6 +8,7 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 use Kobens\Http\Exception\Status\ServerError\BadGatewayException;
 use Psr\Log\LoggerInterface;
 use Kobens\Core\Http\ResponseInterface;
+use Kobens\Gemini\Exception\Api\Reason\RateLimitException;
 
 class OrderStatus implements OrderStatusInterface
 {
@@ -46,7 +47,7 @@ class OrderStatus implements OrderStatusInterface
         while (true) {
             try {
                 return $this->request->getResponse(self::URL_PATH, $payload, [], true);
-            } catch (BadGatewayException $e) {
+            } catch (BadGatewayException | RateLimitException $e) {
                 $this->logger->error($e->__toString());
                 if (++$attempts > $this->maxAttempts) {
                     throw new \Exception(
@@ -59,7 +60,7 @@ class OrderStatus implements OrderStatusInterface
                         $e
                     );
                 }
-                usleep(500);
+                sleep(5);
             }
         }
     }
