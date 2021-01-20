@@ -81,29 +81,33 @@ final class Rest extends Command
         while ($this->shutdown->isShutdownModeEnabled() === false) {
             $time = Subtract::getResult('0', (string) microtime(true));
             try {
-                $output->writeln(sprintf(
-                    "%s\tAUDIT START\t%s (%s)",
-                    $this->now(),
-                    ($pair === null) ? 'all pairs' : $pair->getSymbol(),
-                    (
-                        ($buyAudit ? '<fg=green>buy</>' : '') .
-                        ($buyAudit && $sellAudit ? ' and ' : '') .
-                        ($sellAudit ? '<fg=red>sell</>' : '')
-                    )
-                ));
+                if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                    $output->writeln(sprintf(
+                        "%s\tAUDIT START\t%s (%s)",
+                        $this->now(),
+                        ($pair === null) ? 'all pairs' : $pair->getSymbol(),
+                        (
+                            ($buyAudit ? '<fg=green>buy</>' : '') .
+                            ($buyAudit && $sellAudit ? ' and ' : '') .
+                            ($sellAudit ? '<fg=red>sell</>' : '')
+                        )
+                    ));
+                }
                 $this->mainLoop($output, $buyAudit, $sellAudit, $pair);
                 $time = Add::getResult($time, (string) microtime(true));
-                $output->writeln(sprintf(
-                    "%s\tAUDIT END\t%s (%s) completed in %s seconds",
-                    $this->now(),
-                    ($pair === null) ? 'all pairs' : $pair->getSymbol(),
-                    (
-                        ($buyAudit ? '<fg=green>buy</>' : '') .
-                        ($buyAudit && $sellAudit ? ' and ' : '') .
-                        ($sellAudit ? '<fg=red>sell</>' : '')
-                    ),
-                    $time
-                ));
+                if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                    $output->writeln(sprintf(
+                        "%s\tAUDIT END\t%s (%s) completed in %s seconds",
+                        $this->now(),
+                        ($pair === null) ? 'all pairs' : $pair->getSymbol(),
+                        (
+                            ($buyAudit ? '<fg=green>buy</>' : '') .
+                            ($buyAudit && $sellAudit ? ' and ' : '') .
+                            ($sellAudit ? '<fg=red>sell</>' : '')
+                        ),
+                        $time
+                    ));
+                }
                 $this->sleep(3600 + (60 * rand(2, 5)), $this->sleeper, $this->shutdown);
             } catch (ConnectionException | MaintenanceException | SystemException $e) {
                 $this->exceptionDelay($output, $e);
@@ -169,6 +173,7 @@ final class Rest extends Command
                     strtoupper(Pair::getInstance($row->getSymbol())->getBase()->getSymbol()),
                 ));
             }
+            \usleep(250000);
         }
     }
 
