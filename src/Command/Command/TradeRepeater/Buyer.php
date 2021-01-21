@@ -154,7 +154,7 @@ final class Buyer extends Command
             $output->writeln("<fg=red>{$this->now()}\tSleeping {$input->getOption('maxIterationsDelay')} seconds...</>");
             $this->sleep((int) $input->getOption('maxIterationsDelay'), $this->sleeper, $this->shutdown);
         } catch (\Exception $e) {
-            $this->buySent->setErrorState($row->id, \get_class($e) . "::{$e->getMessage()}");
+            $this->buySent->setErrorState($row->getId(), \get_class($e) . "::{$e->getMessage()}");
             throw $e;
         }
         return $msg;
