@@ -26,7 +26,7 @@ final class TradeSpread
         foreach ($data->getOrdersData() as $order) {
             if (
                 $order->symbol === $symbol &&
-                ($order->client_order_id ?? null) &&
+                is_string($order->client_order_id ?? null) &&
                 strpos($order->client_order_id, 'repeater_') === 0
             ) {
                 if (
@@ -61,6 +61,7 @@ final class TradeSpread
                 }
             }
         }
+
         $spread = Subtract::getResult($askMin ?? '0', $bidMax ?? '0');
         $percent = $spread && $bidMax ? Divide::getResult($spread, $bidMax, 6) : '0';
         if (\strpos($percent, '.') !== false) {
@@ -73,6 +74,7 @@ final class TradeSpread
         } else {
             $percent = $percent . '00';
         }
+        $percent . '%';
 
         $sellMinSpread = $askMin
             ? Subtract::getResult($askMin, $data->getPriceResult($symbol)->getAsk())
@@ -92,42 +94,42 @@ final class TradeSpread
             $bidMin ?? '0',
             $askMin ?? '0',
             $askMax ?? '0',
-            $totalBuy,
-            $totalSell,
             $spread
         );
         $bidMax = (string) number_format((float) $bidMax, $scale, '.', '');
         $bidMin = (string) number_format((float) $bidMin, $scale, '.', '');
         $askMin = (string) number_format((float) $askMin, $scale, '.', '');
         $askMax = (string) number_format((float) $askMax, $scale, '.', '');
-        $spread = (string) number_format((float) $spread, $scale);
+        $spread = (string) number_format((float) $spread, $scale, '.', '');
         $orderRange = Subtract::getResult($askMax, $bidMin);
 
         $totalOrderCount = $buyCount + $sellCount;
         $buyCountPercent = Multiply::getResult(Divide::getResult((string) $buyCount, (string) $totalOrderCount, 2), '100', 2);
         $sellCountPercent = Multiply::getResult(Divide::getResult((string) $sellCount, (string) $totalOrderCount, 2), '100', 2);
 
-        $length = self::getLength($bidMax, $bidMax, $askMin, $askMax, $spread);
-
-
         $scale = self::getScale($totalBuy, $totalSell);
         $totalBuy = (string) number_format((float) $totalBuy, $scale);
         $totalSell = (string) number_format((float) $totalSell, $scale);
 
-        $orderRange = str_pad($orderRange, $length + 2, ' ', STR_PAD_LEFT);
-        $bidMax = str_pad($bidMax, $length + 2, ' ', STR_PAD_LEFT);
-        $bidMin = str_pad($bidMin, $length + 2, ' ', STR_PAD_LEFT);
-        $askMax = str_pad($askMax, $length + 2, ' ', STR_PAD_LEFT);
-        $askMin = str_pad($askMin, $length + 2, ' ', STR_PAD_LEFT);
-        $spread = str_pad($spread, $length + 2, ' ', STR_PAD_LEFT);
+        $buyCount = $buyCount . ' (' . $buyCountPercent . '%)';
+        $sellCount = $sellCount . ' (' . $sellCountPercent . '%)';
+
+        $length = self::getLength($bidMax, $bidMax, $askMin, $askMax, $spread, $totalSell, $totalBuy);
+
+        $orderRange = str_pad($orderRange, $length, ' ', STR_PAD_LEFT);
+        $bidMax = str_pad($bidMax, $length, ' ', STR_PAD_LEFT);
+        $bidMin = str_pad($bidMin, $length, ' ', STR_PAD_LEFT);
+        $askMax = str_pad($askMax, $length, ' ', STR_PAD_LEFT);
+        $askMin = str_pad($askMin, $length, ' ', STR_PAD_LEFT);
+        $spread = str_pad($spread, $length, ' ', STR_PAD_LEFT);
         $percent = str_pad($percent, $length, ' ', STR_PAD_LEFT);
-        $totalBuy = str_pad($totalBuy, $length + 2, ' ', STR_PAD_LEFT);
-        $totalSell = str_pad($totalSell, $length + 2, ' ', STR_PAD_LEFT);
+        $totalBuy = str_pad($totalBuy, $length, ' ', STR_PAD_LEFT);
+        $totalSell = str_pad($totalSell, $length, ' ', STR_PAD_LEFT);
 
-        $totalOrderCount = str_pad((string) $totalOrderCount, $length + 2, ' ', STR_PAD_LEFT);
+        $totalOrderCount = str_pad((string) $totalOrderCount, $length, ' ', STR_PAD_LEFT);
 
-        $buyCount = str_pad($buyCount . ' (' . $buyCountPercent . '%)', $length + 2, ' ', STR_PAD_LEFT);
-        $sellCount = str_pad($sellCount . ' (' . $sellCountPercent . '%)', $length + 2, ' ', STR_PAD_LEFT);
+        $buyCount = str_pad($buyCount, $length, ' ', STR_PAD_LEFT);
+        $sellCount = str_pad($sellCount, $length, ' ', STR_PAD_LEFT);
 
         $scale = self::getScale($sellMinSpread, $bidMaxSpread, $sellMaxSpread, $bidMinSpread);
 
@@ -160,7 +162,7 @@ final class TradeSpread
                     ['Buy (Highest)', "<fg=green>$bidMax</>", $bidMaxSpread],
                     ['Buy (Lowest)', "<fg=green>$bidMin</>", $bidMinSpread],
                     [\sprintf('Spread (%s)', $quote), $spread],
-                    ['Spread (%)', "% $percent"],
+                    ['Spread (%)',  $percent],
                     ['Order Count (Sell)', $sellCount],
                     ['Order Count (Buy)', $buyCount],
                     ['Total Orders', $totalOrderCount],

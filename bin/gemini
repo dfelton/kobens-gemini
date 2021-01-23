@@ -289,17 +289,16 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Auditor\BuyPrice(
     new ShouldResetBuy($orderStatusInterface, $getPriceInterface)
 ));
 unset($buyAuditorKey, $buyAuditorRequestInterface);
-$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Watcher(
-    new Data(
-        $getActiveOrdersInterface,
-        $getNotionalBalancesInterface,
-        $getPriceInterface
-    ),
-    $sleeperInterface,
-    $getPriceInterface,
-    new Profits($adapter, $getPriceInterface)
-));
 
+// Repeater CLI Monitoring
+$data = new Data(
+    $getActiveOrdersInterface,
+    $getNotionalBalancesInterface,
+    $getPriceInterface
+);
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\CliMonitor\Account($data, $sleeperInterface, new Profits($adapter, $getPriceInterface)));
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\CliMonitor\Pair($data, $sleeperInterface));
+unset($data);
 
 // $app->add(new \Kobens\Gemini\Command\Command\Taxes\CapitalGains()); // @deprecated
 $app->add(new \Kobens\Gemini\Command\Command\Taxes\BuyLogger());

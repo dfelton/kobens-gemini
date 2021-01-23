@@ -48,8 +48,10 @@ final class Profits
             $table->addRow([strtoupper($symbol), $amount, $notional]);
             $totalNotional = Add::getResult($totalNotional, $notional);
         }
-        $table->addRow([new TableCell('------------------------------', ['colspan' => 3])]);
-        $table->addRow([new TableCell('<fg=green>Total Notional</>', ['colspan' => 2]), '$' . number_format((float)$totalNotional, 2)]);
+        $table->addRow([
+            new TableCell('<fg=green>Total Notional</>', ['colspan' => 2]),
+            '$' . number_format((float)$totalNotional, 2),
+        ]);
         return $table;
     }
 
@@ -106,7 +108,6 @@ final class Profits
         );
 
         $pair = Pair::getInstance($data->symbol);
-
         $result = [];
         if (Compare::getResult('0', $baseProfits) === Compare::RIGHT_GREATER_THAN) {
             $result[$pair->getBase()->getSymbol()] = $baseProfits;
