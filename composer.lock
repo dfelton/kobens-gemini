@@ -1192,12 +1192,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-http.git",
-                "reference": "f3723326a170b61759f34e8884b8788e08110c68"
+                "reference": "9f7518c029bd12e02f8f6592ef05722ffe24467c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dfelton/kobens-http/zipball/f3723326a170b61759f34e8884b8788e08110c68",
-                "reference": "f3723326a170b61759f34e8884b8788e08110c68",
+                "url": "https://api.github.com/repos/dfelton/kobens-http/zipball/9f7518c029bd12e02f8f6592ef05722ffe24467c",
+                "reference": "9f7518c029bd12e02f8f6592ef05722ffe24467c",
                 "shasum": ""
             },
             "default-branch": true,
@@ -1220,7 +1220,7 @@
                 "source": "https://github.com/dfelton/kobens-http/tree/master",
                 "issues": "https://github.com/dfelton/kobens-http/issues"
             },
-            "time": "2021-01-18T06:13:00+00:00"
+            "time": "2021-01-21T20:40:44+00:00"
         },
         {
             "name": "kobens/kobens-math",
