@@ -110,7 +110,8 @@ final class Pair extends Command
      * @param bool $showAvailable
      * @param bool $showAvailableNotional
      */
-    private function main(InputInterface $input, OutputInterface $output): void {
+    private function main(InputInterface $input, OutputInterface $output): void
+    {
         $data = $this->getData($input, $output);
         $time = (new Table($output))->setRows([['Date / Time:', (new \DateTime())->format('Y-m-d H:i:s')]]);
 
