@@ -28,49 +28,54 @@ final class OrderStatus extends Command
         $this->setDescription('Fetch the status for an individual order');
         $this->addOption('order_id', 'o', InputOption::VALUE_OPTIONAL, 'Order Id');
         $this->addOption('client_order_id', 'c', InputOption::VALUE_OPTIONAL, 'Client Order Id');
+        $this->addOption('raw', 'r', InputOption::VALUE_OPTIONAL, 'Output Raw JSON', false);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $orderId = ((int) $input->getOption('order_id')) ?: null;
         $clientOrderId = $input->getOption('client_order_id');
         if ($orderId !== null && $clientOrderId !== null) {
             $output->writeln('<fg=red>Must provide either "order_id" or "client_order_id", not both.');
-            return;
+            return 1;
         } elseif ($orderId === null && $clientOrderId === null) {
             $output->writeln('<fg=red>Must provide either "order_id" or "client_order_id".');
-            return;
+            return 1;
         }
 
         $data = $orderId !== null
             ? $this->status->getStatus((int) $orderId)
             : $this->status->getStatusByClientOrderId($clientOrderId);
 
-
-        if (!is_array($data)) {
-            $data = [$data];
-        } elseif (count($data) > 1) {
-            $output->writeln(sprintf('Orders matching client_order_id "%s"', $clientOrderId));
-        }
-
-        foreach ($data as $order) {
-            $order = \get_object_vars($order);
-
-            $keyLength = 0;
-            foreach (\array_keys($order) as $key) {
-                if (\strlen($key) > $keyLength) {
-                    $keyLength = \strlen($key);
-                }
+        if ($input->getOption('raw') !== false) {
+            $output->writeln(json_encode($data));
+        } else {
+            if (!is_array($data)) {
+                $data = [$data];
+            } elseif (count($data) > 1) {
+                $output->writeln(sprintf('Orders matching client_order_id "%s"', $clientOrderId));
             }
-            foreach ($order as $key => $val) {
-                $key = \ucwords(\str_replace('_', ' ', $key));
-                $key = \str_pad($key, $keyLength, ' ', STR_PAD_RIGHT);
-                if ($val !== []) {
-                    $output->writeln("$key\t{$this->getFormattedVal($val)}");
+
+            foreach ($data as $order) {
+                $order = \get_object_vars($order);
+
+                $keyLength = 0;
+                foreach (\array_keys($order) as $key) {
+                    if (\strlen($key) > $keyLength) {
+                        $keyLength = \strlen($key);
+                    }
                 }
+                foreach ($order as $key => $val) {
+                    $key = \ucwords(\str_replace('_', ' ', $key));
+                    $key = \str_pad($key, $keyLength, ' ', STR_PAD_RIGHT);
+                    if ($val !== []) {
+                        $output->writeln("$key\t{$this->getFormattedVal($val)}");
+                    }
+                }
+                $output->writeln(PHP_EOL);
             }
-            $output->writeln(PHP_EOL);
         }
+        return 0;
     }
 
     private function getFormattedVal($val): string
