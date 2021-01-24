@@ -1,5 +1,18 @@
 #!/bin/bash
 
+ps aux | grep -v grep | grep -q gemini\ market:book-keeper
+if [ $? -eq 1 ]
+then
+    echo Starting book keepers
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s aaveusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s batusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s btcusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s ethusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s linkusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s zecusd &
+fi
+
+
 ps aux | grep -v 'grep\|trade-repeater:watcher' | grep -q gemini\ trade-repeater
 if [ $? -eq 0 ]
 then
@@ -8,13 +21,6 @@ then
 else
     echo Starting trade repeater
 
-    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:fill-monitor-rest --buy=1 --pair=linkusd &
-    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:fill-monitor-rest --sell=1 --pair=linkusd &
-    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:fill-monitor-rest --buy=1 --pair=ethusd &
-    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:fill-monitor-rest --sell=1 --pair=ethusd &
-    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:fill-monitor-rest --buy=1 --pair=zecusd &
-    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:fill-monitor-rest --sell=1 --pair=zecusd &
-
     php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:fill-monitor-websocket &
 
     php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:buyer &
@@ -22,8 +28,8 @@ else
 
     php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:archiver &
 
-    #php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:audit:buy-price &
-    #php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:audit:sell-price &
+    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:fill-monitor-rest --buy=1 &
+    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:fill-monitor-rest --sell=1 &
 
     exit 0
 fi

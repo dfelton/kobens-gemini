@@ -11,58 +11,89 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetNotionalBalances\B
 
 final class Balances
 {
+    /**
+     * @param OutputInterface $output
+     * @param DataInterface $data
+     * @param bool $amountNotional
+     * @param bool $amountAvailable
+     * @param bool $amountAvailableNotional
+     * @return Table
+     */
     public static function getTable(
         OutputInterface $output,
         DataInterface $data,
-        bool $showNotional = false,
-        bool $showAvailable = false,
-        bool $showAvailableNotional = false
+        bool $amount = false,
+        bool $amountNotional = false,
+        bool $amountAvailable = false,
+        bool $amountAvailableNotional = false
     ): Table {
         $table = new Table($output);
         $balances = $data->getNotionalBalances();
         $table->setHeaderTitle('Balances');
-        $table->setHeaders(self::getHeaders($showNotional, $showAvailable, $showAvailableNotional));
+        $table->setHeaders(self::getHeaders($amount, $amountNotional, $amountAvailable, $amountAvailableNotional));
         foreach ($balances as $balance) {
-            $table->addRow(self::getRow($balance, $showNotional, $showAvailable, $showAvailableNotional));
+            $table->addRow(self::getRow($balance, $amount, $amountNotional, $amountAvailable, $amountAvailableNotional));
         }
         return $table;
     }
 
-    private static function getHeaders(bool $showNotional = false, bool $showAvailable = false, bool $showAvailableNotional = false): array
+    /**
+     * @param bool $amount
+     * @param bool $amountNotional
+     * @param bool $available
+     * @param bool $availableNotional
+     * @throws \InvalidArgumentException
+     * @return array
+     */
+    private static function getHeaders(bool $amount = false, bool $amountNotional = false, bool $available = false, bool $availableNotional = false): array
     {
         $headers = [
             'Currency',
-            'Amount',
         ];
-        if ($showNotional) {
+        if ($amount) {
+            $headers[] = 'Amount';
+        }
+        if ($amountNotional) {
             $headers[] = 'Amount Notional';
         }
-        if ($showAvailable) {
+        if ($available) {
             $headers[] = 'Available';
         }
-        if ($showAvailableNotional) {
+        if ($availableNotional) {
             $headers[] = 'Available Notional';
+        }
+        if (count($headers) === 1) {
+            throw new \InvalidArgumentException('Must show at least one column (amount, amount notional, available, or available notional).');
         }
         return $headers;
     }
 
+    /**
+     * @param BalanceInterface $balance
+     * @param bool $amount
+     * @param bool $amountNotional
+     * @param bool $amountAvailable
+     * @param bool $amountAvailableNotional
+     * @return array
+     */
     private static function getRow(
         BalanceInterface $balance,
-        bool $showNotional = false,
-        bool $showAvailable = false,
-        bool $showAvailableNotional = false
+        bool $amount = false,
+        bool $amountNotional = false,
+        bool $amountAvailable = false,
+        bool $amountAvailableNotional = false
     ): array {
         $data = [
             $balance->getCurrency(),
             $balance->getAmount(),
         ];
-        if ($showNotional) {
+        if ($amountNotional) {
             $data[] = $balance->getAmountNotional();
         }
-        if ($showAvailable) {
+        if ($amountAvailable) {
             $data[] = $balance->getAvailable();
         }
-        if ($showAvailableNotional) {
+        if ($amountAvailableNotional) {
             $data[] = $balance->getAvailableNotional();
         }
         return $data;

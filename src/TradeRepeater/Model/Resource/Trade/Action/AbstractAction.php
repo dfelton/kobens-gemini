@@ -48,8 +48,8 @@ abstract class AbstractAction
 
     /**
      * @param int $id
-     * @throws \Exception
-     * @return \ArrayObject
+     * @throws UnhealthyStateException
+     * @return Trade
      */
     public function getHealthyRecord(int $id, bool $forUpdate = false): Trade
     {

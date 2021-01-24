@@ -86,7 +86,7 @@ final class PricePointGenerator
 
     private static function validatePriceStart(PairInterface $pair, string $priceStart): void
     {
-        $compare = Compare::getResult($priceStart, $pair->getMinOrderSize());
+        $compare = Compare::getResult($priceStart, $pair->getMinPriceIncrement());
         if ($compare === Compare::EQUAL) {
             return;
         }

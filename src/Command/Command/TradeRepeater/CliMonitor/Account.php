@@ -2,63 +2,57 @@
 
 declare(strict_types=1);
 
-namespace Kobens\Gemini\Command\Command\TradeRepeater;
+namespace Kobens\Gemini\Command\Command\TradeRepeater\CliMonitor;
 
 use Kobens\Core\Config;
 use Kobens\Core\SleeperInterface;
 use Kobens\Exchange\PairInterface;
-use Kobens\Gemini\Api\Market\GetPriceInterface;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\Watcher\AccountNotionalBalance;
 use Kobens\Gemini\TradeRepeater\Watcher\Balances;
 use Kobens\Gemini\TradeRepeater\Watcher\Helper\Data;
-use Kobens\Gemini\TradeRepeater\Watcher\MarketSpread;
 use Kobens\Gemini\TradeRepeater\Watcher\Profits;
-use Kobens\Gemini\TradeRepeater\Watcher\TradeSpread;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class Watcher extends Command
+final class Account extends Command
 {
+    private const KILL_FILE = '/var/kill_monitor';
+
     private const REFRESH_DEFAULT = 10;
     private const REFRESH_MIN = 5;
     private const REFRESH_MAX = 3600;
 
-    protected static $defaultName = 'trade-repeater:watcher';
+    protected static $defaultName = 'repeater:monitor:account';
 
     private SleeperInterface $sleeper;
 
     private Data $data;
-
-    private GetPriceInterface $getPrice;
 
     private Profits $profits;
 
     public function __construct(
         Data $data,
         SleeperInterface $sleeperInterface,
-        GetPriceInterface $getPrice,
         Profits $profits
     ) {
         $this->data = $data;
         $this->sleeper = $sleeperInterface;
-        $this->getPrice = $getPrice;
         $this->profits = $profits;
         parent::__construct();
     }
 
     protected function configure()
     {
-        $this->setDescription('Monitoring output on trades and the market');
-        $this->addOption('available', 'a', InputOption::VALUE_OPTIONAL, 'Show available for each balance', false);
-        $this->addOption('available_notional', 'A', InputOption::VALUE_OPTIONAL, 'Show available notional for each balance', false);
-        $this->addOption('notional', 'N', InputOption::VALUE_OPTIONAL, 'Show notional amount for each balance', false);
-        $this->addOption('price', 'p', InputOption::VALUE_OPTIONAL, 'Comma separated trading pair(s) to show ask price for');
-        $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Comma separated trading pair(s) to show trade-repeater data for');
-        $this->addOption('market', 'm', InputOption::VALUE_OPTIONAL, 'Show Market Data', false);
+        $this->setDescription('Monitoring: Account Summary');
+        $this->addOption('amount', null, InputOption::VALUE_OPTIONAL, 'Show balance(s) "Amount".', false);
+        $this->addOption('amount-notional', null, InputOption::VALUE_OPTIONAL, 'Show balance(s) "Notional Amount".', false);
+        $this->addOption('available', null, InputOption::VALUE_OPTIONAL, 'Show balance(s) "Amount Available".', false);
+        $this->addOption('available-notional', null, InputOption::VALUE_OPTIONAL, 'Show balance(s) "Amount Available Notional"', false);
+        $this->addOption('disable-loop', 'd', InputOption::VALUE_OPTIONAL, 'Disable continuous output', false);
         $this->addOption(
             'refresh',
             'r',
@@ -70,32 +64,25 @@ final class Watcher extends Command
             ),
             self::REFRESH_DEFAULT
         );
-        $this->addOption(
-            'loop',
-            'l',
-            InputOption::VALUE_OPTIONAL,
-            'Enable looping and continuous output',
-            false
-        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $sleep = $this->getRefreshRate($input);
-        $showMarketData = $input->getOption('market') === false ? false : true;
-        $showNotional = $input->getOption('notional') === false ? false : true;
-        $showAvailable = $input->getOption('available') === false ? false : true;
-        $showAvailableNotional = $input->getOption('available_notional') === false ? false : true;
-        $loop = $input->getOption('loop') === false ? false : true;
+        $amount = $input->getOption('amount') !== false;
+        $amountNotional = $input->getOption('amount-notional') !== false;
+        $amountAvailable = $input->getOption('available') !== false;
+        $amountAvailableNotional = $input->getOption('available-notional') !== false;
+        $loop = $input->getOption('disable-loop') === false;
         do {
             try {
                 $this->main(
                     $input,
                     $output,
-                    $showMarketData,
-                    $showNotional,
-                    $showAvailable,
-                    $showAvailableNotional
+                    $amount,
+                    $amountNotional,
+                    $amountAvailable,
+                    $amountAvailableNotional
                 );
                 $this->data->reset();
                 if ($loop) {
@@ -117,7 +104,7 @@ final class Watcher extends Command
                     }
                 } while ($e instanceof \Throwable);
             }
-        } while ($loop);
+        } while ($loop && !file_exists(Config::getInstance()->getRootDir() . self::KILL_FILE));
     }
 
     /**
@@ -138,19 +125,19 @@ final class Watcher extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @param bool $showMarketData
-     * @param bool $showNotional
-     * @param bool $showAvailable
-     * @param bool $showAvailableNotional
+     * @param bool $amountNotional
+     * @param bool $amountAvailable
+     * @param bool $amountAvailableNotional
      */
     private function main(
         InputInterface $input,
         OutputInterface $output,
-        bool $showMarketData,
-        bool $showNotional,
-        bool $showAvailable,
-        bool $showAvailableNotional
+        bool $amount,
+        bool $amountNotional,
+        bool $amountAvailable,
+        bool $amountAvailableNotional
     ): void {
-        $data = $this->getData($input, $output, $showMarketData, $showNotional, $showAvailable, $showAvailableNotional);
+        $data = $this->getData($input, $output, $amount, $amountNotional, $amountAvailable, $amountAvailableNotional);
         $time = (new Table($output))->setRows([['Date / Time:', (new \DateTime())->format('Y-m-d H:i:s')]]);
 
         $output->write("\e[H\e[J");
@@ -170,38 +157,27 @@ final class Watcher extends Command
     }
 
     /**
+     * @param InputInterface $input
      * @param OutputInterface $output
-     * @param PairInterface[] $pairs
-     * @param bool $showMarketData
+     * @param bool $amount
+     * @param bool $amountNotional
+     * @param bool $amountAvailable
+     * @param bool $amountAvailableNotional
      * @return Table[]
      */
     private function getData(
         InputInterface $input,
         OutputInterface $output,
-        bool $showMarketData,
-        bool $showNotional,
-        bool $showAvailable,
-        bool $showAvailableNotional
+        bool $amount,
+        bool $amountNotional,
+        bool $amountAvailable,
+        bool $amountAvailableNotional
     ): array {
         $data = [];
         try {
             $data[] = AccountNotionalBalance::getTable($output, $this->data, Config::getInstance());
-            foreach ($this->getPairs($input, 'symbol') as $pair) {
-                $data[] = TradeSpread::getTable($output, $this->data, $pair->getSymbol());
-                if ($showMarketData) {
-                    $data[] = MarketSpread::getTable($output, $this->data, $pair->getSymbol());
-                }
-            }
-            $data[] = Balances::getTable($output, $this->data, $showNotional, $showAvailable, $showAvailableNotional);
+            $data[] = Balances::getTable($output, $this->data, $amount, $amountNotional, $amountAvailable, $amountAvailableNotional);
             $data[] = $this->profits->get($output);
-            if ($input->getOption('price')) {
-                $tblPrice = new Table($output);
-                $tblPrice->setHeaders(['Asset Pair', 'Asking Price']);
-                foreach ($this->getPairs($input, 'price') as $pair) {
-                    $tblPrice->addRow([$pair->getSymbol(), $this->getPrice->getAsk($pair->getSymbol())]);
-                }
-                $data[] = $tblPrice;
-            }
         } catch (\Kobens\Gemini\Exception $e) {
             $data[] = (new Table($output))->addRow([$e->getMessage()]);
         }

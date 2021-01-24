@@ -60,14 +60,14 @@ final class ResponseHandler
             case $response->getResponseCode() === 504:
                 throw new $this->responseCodeMap[$response->getResponseCode()](
                     null,
-                    (int) $response->getResponseCode(),
+                    $response->getResponseCode(),
                     new \Exception(\json_encode($response))
                 );
 
             case $response->getResponseCode() >= 500:
                 throw new ServerErrorException(
                     null,
-                    (int) $response->getResponseCode(),
+                    $response->getResponseCode(),
                     new \Exception(\json_encode($response))
                 );
         }
