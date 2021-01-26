@@ -32,6 +32,7 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatus;
 use Kobens\Gemini\Api\Rest\PublicEndpoints\Ticker;
 use Kobens\Gemini\Api\WebSocket\MarketData\BookKeeperFactory;
 use Kobens\Gemini\Api\WebSocket\OrderEvents\BookKeeper;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade as TradeResource;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\Archive;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyFilled;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyPlaced;
@@ -45,6 +46,8 @@ use Zend\Db\TableGateway\TableGateway;
 use Kobens\Gemini\TradeRepeater\Model\GetRecordId;
 use Kobens\Gemini\TradeRepeater\Model\Trade\ShouldResetBuy;
 use Kobens\Gemini\TradeRepeater\Watcher\Profits;
+use Kobens\Gemini\TradeRepeater\Model\Trade\AddAmount;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Update;
 
 require \dirname(__DIR__).'/bootstrap.php';
 
@@ -140,19 +143,26 @@ $orderStatusInterface = new OrderStatus($loggerRequestPrivate, $privateRequestIn
 $getNotionalVolumeInterface = new GetNotionalVolume($privateRequestInterface);
 $getTradeVolumeInterface = new \Kobens\Gemini\Api\Rest\PrivateEndpoints\FeeAndVolume\GetTradeVolume($privateRequestInterface);
 
+$tradeResource = new TradeResource($adapter);
+$updateTrade = new Update($adapter);
+
 $archiveInterface = new Archive();
-$buyFilledInterface = new BuyFilled($adapter);
-$buyPlacedInterface = new BuyPlaced($adapter);
-$buyReadyInterface = new BuyReady($adapter);
-$buySentInterface = new BuySent($adapter);
-$sellFilledInterface = new SellFilled($adapter);
-$sellPlacedInterface = new SellPlaced($adapter);
-$sellSentInterface = new SellSent($adapter);
+$buyFilledInterface = new BuyFilled($adapter, $tradeResource);
+$buyPlacedInterface = new BuyPlaced($adapter, $tradeResource);
+$buyReadyInterface = new BuyReady($adapter, $tradeResource);
+$buySentInterface = new BuySent($adapter, $tradeResource);
+$sellFilledInterface = new SellFilled($adapter, $tradeResource);
+$sellPlacedInterface = new SellPlaced($adapter, $tradeResource);
+$sellSentInterface = new SellSent($adapter, $tradeResource);
 
 
 $app = new \Symfony\Component\Console\Application($composer->name, $composer->version);
 
 // TODO: All TradeRepeater classes will need to use Kobens\Gemini\Api\Rest\* objects that have their own KeyInterface per TradeRepeater to avoid Nonce clashing
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\AddToPosition(
+    new AddAmount($cancelOrderInterface, $getPriceInterface, $orderStatusInterface, $tradeResource, $adapter, $updateTrade),
+    $tradeResource
+));
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\PricePointGenerator(new TableGateway('trade_repeater', $adapter)));
 
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Buyer(
