@@ -6,6 +6,7 @@ namespace Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action;
 
 use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
 use Kobens\Gemini\TradeRepeater\Model\Trade;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade as TradeResource;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Adapter\Driver\ConnectionInterface;
 use Zend\Db\TableGateway\TableGateway;
@@ -20,15 +21,16 @@ abstract class AbstractAction
 
     protected ConnectionInterface $connection;
 
-    protected \Kobens\Gemini\TradeRepeater\Model\Resource\Trade $tradeResource;
+    protected TradeResource $tradeResource;
 
     public function __construct(
-        Adapter $adapter
+        Adapter $adapter,
+        TradeResource $tradeResource
     ) {
         $this->adapter = $adapter;
         $this->connection = $adapter->getDriver()->getConnection();
         $this->table = new TableGateway('trade_repeater', $adapter);
-        $this->tradeResource = new \Kobens\Gemini\TradeRepeater\Model\Resource\Trade($adapter);
+        $this->tradeResource = $tradeResource;
     }
 
     abstract protected function isHealthy(Trade $record): bool;
