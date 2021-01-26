@@ -17,6 +17,12 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\TableGateway\TableGatewayInterface;
+use Zend\Db\TableGateway\TableGateway;
+use Zend\Db\Sql\Select;
+use Kobens\Math\BasicCalculator\Multiply;
+use Kobens\Math\BasicCalculator\Add;
 
 final class Account extends Command
 {
@@ -34,14 +40,18 @@ final class Account extends Command
 
     private Profits $profits;
 
+    private TableGatewayInterface $tblTradeRepeater;
+
     public function __construct(
         Data $data,
         SleeperInterface $sleeperInterface,
-        Profits $profits
+        Profits $profits,
+        Adapter $adapter
     ) {
         $this->data = $data;
         $this->sleeper = $sleeperInterface;
         $this->profits = $profits;
+        $this->tblTradeRepeater = new TableGateway('trade_repeater', $adapter);
         parent::__construct();
     }
 
@@ -115,9 +125,11 @@ final class Account extends Command
         $pairs = [];
         if ($input->getOption($option) !== null) {
             foreach (explode(',', $input->getOption($option)) as $symbol) {
-                $pairs[] = Pair::getInstance(strtolower(trim($symbol)));
+                $symbol = strtolower(trim($symbol));
+                $pairs[$symbol] = Pair::getInstance($symbol);
             }
         }
+        ksort($pairs);
         return $pairs;
     }
 
@@ -139,12 +151,18 @@ final class Account extends Command
     ): void {
         $data = $this->getData($input, $output, $amount, $amountNotional, $amountAvailable, $amountAvailableNotional);
         $time = (new Table($output))->setRows([['Date / Time:', (new \DateTime())->format('Y-m-d H:i:s')]]);
+        $feesReserves = new Table($output);
+        $feesReserves->addRow([
+            'USD Fees Reserve:',
+            $this->getUsdFeeReserve()
+        ]);
 
         $output->write("\e[H\e[J");
         $time->render();
         foreach ($data as $table) {
             $table->render();
         }
+        $feesReserves->render();
     }
 
     private function getRefreshRate(InputInterface $input): int
@@ -182,5 +200,22 @@ final class Account extends Command
             $data[] = (new Table($output))->addRow([$e->getMessage()]);
         }
         return $data;
+    }
+
+    private function getUsdFeeReserve(): string
+    {
+        $records = $this->tblTradeRepeater->select(function (Select $select) {
+            $select->columns(['symbol', 'buy_price', 'buy_amount']);
+        });
+        $total = '0';
+        foreach ($records as $record) {
+            $pair = Pair::getInstance($record->symbol);
+            if ($pair->getQuote()->getSymbol() === 'usd') {
+                $costBasis = Multiply::getResult($record->buy_price, $record->buy_amount);
+                $fees = Multiply::getResult($costBasis, '0.0035'); // TODO: Reference constant
+                $total = Add::getResult($total, $fees);
+            }
+        }
+        return $total;
     }
 }
