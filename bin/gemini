@@ -296,7 +296,7 @@ $data = new Data(
     $getNotionalBalancesInterface,
     $getPriceInterface
 );
-$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\CliMonitor\Account($data, $sleeperInterface, new Profits($adapter, $getPriceInterface)));
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\CliMonitor\Account($data, $sleeperInterface, new Profits($adapter, $getPriceInterface), $adapter));
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\CliMonitor\Pair($data, $sleeperInterface));
 unset($data);
 

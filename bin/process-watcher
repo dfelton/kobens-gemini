@@ -1,0 +1,11 @@
+#!/bin/bash
+
+while true
+do
+clear
+  GEMINI_PROCESSES="$(ps -eo pid,cmd --sort=command | grep -v grep | grep bin/gemini)"
+  echo -e "$GEMINI_PROCESSES\n"
+  echo -n Running Processes:\ 
+  wc -l <<< "$GEMINI_PROCESSES"
+  sleep 5
+done
