@@ -14,14 +14,26 @@ use Kobens\Math\BasicCalculator\Subtract;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Output\OutputInterface;
+use Kobens\Gemini\Command\Command\TradeRepeater\Auditor\BPS;
 
 final class TradeSpread
 {
+    /**
+     * FIXME: $invested is lacking info of orders not live
+     *
+     * @param OutputInterface $output
+     * @param DataInterface $data
+     * @param string $symbol
+     * @return Table
+     */
     public static function getTable(OutputInterface $output, DataInterface $data, string $symbol): Table
     {
         $askMin = $askMax = $bidMin = $bidMax = '';
         $sellCount = $buyCount = 0;
         $totalBuy = $totalSell = '0';
+
+        $invested = '0';
+
         /** @var \stdClass $order */
         foreach ($data->getOrdersData() as $order) {
             if (
@@ -29,6 +41,9 @@ final class TradeSpread
                 is_string($order->client_order_id ?? null) &&
                 strpos($order->client_order_id, 'repeater_') === 0
             ) {
+                $costBasis = Multiply::getResult($order->price, $order->original_amount);
+                $invested = Add::getResult($invested, $costBasis);
+
                 if (
                     $order->side === 'sell'
                 ) {
@@ -46,6 +61,7 @@ final class TradeSpread
                         $askMax = $order->price;
                     }
                 } elseif ($order->side === 'buy') {
+                    $invested = Add::getResult($invested, Multiply::getResult($costBasis, '0.0035')); // TODO: reference a constant
                     $totalBuy = Add::getResult($totalBuy, $order->original_amount);
                     ++$buyCount;
                     if ($bidMin === '' || $bidMax === '') {
@@ -74,7 +90,7 @@ final class TradeSpread
         } else {
             $percent = $percent . '00';
         }
-        $percent . '%';
+        $percent = $percent . ' %';
 
         $sellMinSpread = $askMin
             ? Subtract::getResult($askMin, $data->getPriceResult($symbol)->getAsk())
@@ -114,7 +130,7 @@ final class TradeSpread
         $buyCount = $buyCount . ' (' . $buyCountPercent . '%)';
         $sellCount = $sellCount . ' (' . $sellCountPercent . '%)';
 
-        $length = self::getLength($bidMax, $bidMax, $askMin, $askMax, $spread, $totalSell, $totalBuy);
+        $length = self::getLength($bidMax, $bidMax, $askMin, $askMax, $spread, $totalSell, $totalBuy, $buyCount, $sellCount, $invested);
 
         $orderRange = str_pad($orderRange, $length, ' ', STR_PAD_LEFT);
         $bidMax = str_pad($bidMax, $length, ' ', STR_PAD_LEFT);
@@ -161,14 +177,15 @@ final class TradeSpread
                     ['Sell (Lowest)', "<fg=red>$askMin</>", $sellMinSpread],
                     ['Buy (Highest)', "<fg=green>$bidMax</>", $bidMaxSpread],
                     ['Buy (Lowest)', "<fg=green>$bidMin</>", $bidMinSpread],
-                    [\sprintf('Spread (%s)', $quote), $spread],
-                    ['Spread (%)',  $percent],
+                    [\sprintf('Spread (%s)', $quote), "<fg=yellow>$spread</>"],
+                    ['Spread (%)',  "<fg=yellow>$percent</>"],
                     ['Order Count (Sell)', $sellCount],
                     ['Order Count (Buy)', $buyCount],
                     ['Total Orders', $totalOrderCount],
                     ['Total Order Amount (Sell)', $totalSell],
                     ['Total Order Amount (Buy)', $totalBuy],
                     [sprintf('Order Range %s', $quote), $orderRange],
+                    [sprintf('Invested %s', $quote), $invested],
                 ]
             );
         return $table;

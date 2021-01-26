@@ -76,6 +76,7 @@ final class Profits
                 $profits[$symbol] = Add::getResult($profits[$symbol], $amount);
             }
         }
+        ksort($profits);
         return [
             'date' => $date,
             'profits' => $profits,
