@@ -56,6 +56,9 @@ final class PricePointGenerator
             );
             self::validateHasGains($pricePoint);
             $orders[] = $pricePoint;
+            if (Compare::getResult($increment, '0') === Compare::EQUAL || Compare::getResult($priceStart, $priceEnd) === Compare::EQUAL) {
+                break;
+            }
             $price = Add::getResult($price, $increment);
         }
         return new Result($orders, $variableIncrement);
