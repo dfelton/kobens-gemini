@@ -10,6 +10,9 @@ then
     php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s ethusd &
     php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s linkusd &
     php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s zecusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s ampusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s oxtusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s snxusd &
 fi
 
 
