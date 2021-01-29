@@ -10,7 +10,7 @@ use Kobens\Math\BasicCalculator\Subtract;
 use Kobens\Math\BasicCalculator\Compare;
 use Kobens\Math\BasicCalculator\Add;
 
-final class BaseAfterFees implements BaseAfterFeesInterface
+final class Calculator implements CalculatorInterface
 {
     /**
      * @var
@@ -81,6 +81,8 @@ final class BaseAfterFees implements BaseAfterFeesInterface
         $baseAmount = Subtract::getResult($baseAmount, $baseAmountInDepositFee);
         $lastResult = $result = $this->getResult($baseAmount);
 
+        $i = 0;
+
         while (Compare::getResult($result['quote_amount_remaining'], '0') === Compare::LEFT_GREATER_THAN) {
             $lastResult = $result;
 
@@ -108,6 +110,10 @@ final class BaseAfterFees implements BaseAfterFeesInterface
 
             $baseAmount = Add::getResult($baseAmount, $this->pair->getMinOrderIncrement());
             $result = $this->getResult($baseAmount);
+
+            if (++$i > 100000000) {
+                throw new \Exception ('Maximum Iterations Reached.');
+            }
         }
         $this->baseAmount = $lastResult['base_amount'];
         $this->quoteAmount = $lastResult['quote_amount'];

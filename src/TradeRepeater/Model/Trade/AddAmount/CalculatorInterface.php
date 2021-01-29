@@ -6,7 +6,7 @@ namespace Kobens\Gemini\TradeRepeater\Model\Trade\AddAmount;
 
 use Kobens\Exchange\PairInterface;
 
-interface BaseAfterFeesInterface
+interface CalculatorInterface
 {
     public function getRate(): string;
 

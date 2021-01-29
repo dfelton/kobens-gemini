@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace KobensTest\Gemini\Unit\TradeRepeater\Model\Trade\AddAmount;
 
-use Kobens\Gemini\TradeRepeater\Model\Trade\AddAmount\BaseAfterFees;
+use Kobens\Gemini\TradeRepeater\Model\Trade\AddAmount\Calculator;
 use PHPUnit\Framework\TestCase;
 use Kobens\Gemini\Exchange\Currency\Pair;
 
-class BaseAfterFeesTest extends TestCase
+class CalculatorTest extends TestCase
 {
-    private BaseAfterFees $subject;
+    private Calculator $subject;
 
     /**
      * Pair: BTCUSD
@@ -29,7 +29,7 @@ class BaseAfterFeesTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->subject = new BaseAfterFees(Pair::getInstance('btcusd'), '50', '10');
+        $this->subject = new Calculator(Pair::getInstance('btcusd'), '50', '10');
     }
 
     public function testGetPairReturnsSameValuePassedToConstructor(): void
