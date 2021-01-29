@@ -12,10 +12,10 @@ use Kobens\Math\BasicCalculator\Multiply;
 use Kobens\Math\BasicCalculator\Subtract;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Helper\TableCell;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Sql\Select;
-use Symfony\Component\Console\Helper\TableCell;
 
 final class Profits
 {
@@ -48,6 +48,9 @@ final class Profits
             $table->addRow([strtoupper($symbol), $amount, $notional]);
             $totalNotional = Add::getResult($totalNotional, $notional);
         }
+        $table->addRow([
+            new TableCell('', ['colspan' => 3]),
+        ]);
         $table->addRow([
             new TableCell('<fg=green>Total Notional</>', ['colspan' => 2]),
             '$' . number_format((float)$totalNotional, 2),

@@ -16,6 +16,7 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Kobens\Http\Exception\Status\ServerErrorException;
 
 final class Pair extends Command
 {
@@ -112,7 +113,12 @@ final class Pair extends Command
      */
     private function main(InputInterface $input, OutputInterface $output): void
     {
-        $data = $this->getData($input, $output);
+        try {
+            $data = $this->getData($input, $output);
+        } catch (ServerErrorException $e) {
+            $data = [(new Table($output))->setRows([['Server Error at Exchange']])];
+        }
+
         $time = (new Table($output))->setRows([['Date / Time:', (new \DateTime())->format('Y-m-d H:i:s')]]);
 
         $output->write("\e[H\e[J");

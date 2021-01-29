@@ -23,6 +23,7 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Sql\Select;
 use Kobens\Math\BasicCalculator\Multiply;
 use Kobens\Math\BasicCalculator\Add;
+use Kobens\Http\Exception\Status\ServerErrorException;
 
 final class Account extends Command
 {
@@ -149,8 +150,13 @@ final class Account extends Command
         bool $amountAvailable,
         bool $amountAvailableNotional
     ): void {
-        $data = $this->getData($input, $output, $amount, $amountNotional, $amountAvailable, $amountAvailableNotional);
+        try {
+            $data = $this->getData($input, $output, $amount, $amountNotional, $amountAvailable, $amountAvailableNotional);
+        } catch (ServerErrorException $e) {
+            $data = [(new Table($output))->setRows([['Server Error at Exchange']])];
+        }
         $time = (new Table($output))->setRows([['Date / Time:', (new \DateTime())->format('Y-m-d H:i:s')]]);
+
         $feesReserves = new Table($output);
         $feesReserves->addRow([
             'USD Fees Reserve:',
