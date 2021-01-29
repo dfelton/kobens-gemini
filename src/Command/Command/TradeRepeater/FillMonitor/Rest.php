@@ -10,6 +10,7 @@ use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetActiveOrdersInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
 use Kobens\Gemini\Command\Command\TradeRepeater\SleeperTrait;
+use Kobens\Gemini\Exception\Api\Reason\InvalidNonceException;
 use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
 use Kobens\Gemini\Exception\Api\Reason\SystemException;
 use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
@@ -17,14 +18,14 @@ use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\AbstractAction;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyPlacedInterface;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellPlacedInterface;
+use Kobens\Gemini\TradeRepeater\Model\Trade;
+use Kobens\Exchange\PairInterface;
+use Kobens\Math\BasicCalculator\Add;
+use Kobens\Math\BasicCalculator\Subtract;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Exchange\PairInterface;
-use Kobens\Gemini\TradeRepeater\Model\Trade;
-use Kobens\Math\BasicCalculator\Subtract;
-use Kobens\Math\BasicCalculator\Add;
 
 final class Rest extends Command
 {
@@ -155,12 +156,28 @@ final class Rest extends Command
                 break;
             }
             if (
-                ($pair === null || ($pair->getSymbol() === $row->getSymbol())) &&
-                !($activeIds['buy'][$row->getBuyOrderId()] ?? false) &&
-                $this->isStillHealthy($this->buyPlaced, $row->getId()) &&
-                $this->isFilled($row->getBuyOrderId()) &&
-                $this->buyPlaced->setNextState($row->getId())
+                ($pair !== null && $pair->getSymbol() !== $row->getSymbol()) ||
+                ($activeIds['buy'][$row->getBuyOrderId()] ?? null) ||
+                $this->isStillHealthy($this->buyPlaced, $row->getId()) === false
             ) {
+                continue;
+            }
+
+            $isFilled = null;
+            $i = 0;
+            while ($isFilled == null && $i <= 100) {
+                try {
+                    $isFilled = $this->isFilled($row->getBuyOrderId());
+                } catch (InvalidNonceException $e) {
+                    // shit happens. Have tickets to improve upon this
+                    ++$i;
+                }
+            }
+
+            if ($isFilled === null) {
+                // Logging appropriate. bucking it for later. may be moot with other plans
+                break;
+            } elseif ($isFilled && $this->buyPlaced->setNextState($row->getId())) {
                 $output->writeln(sprintf(
                     "%s\t(%d)\t<fg=green>BUY_FILLED</>\tOrder ID %d\t%s %s @ %s %s/%s",
                     $this->now(),
@@ -173,23 +190,38 @@ final class Rest extends Command
                     strtoupper(Pair::getInstance($row->getSymbol())->getBase()->getSymbol()),
                 ));
             }
-            \usleep(250000);
         }
     }
 
     private function iterateSellOrders(OutputInterface $output, array $activeIds, PairInterface $pair = null): void
     {
+        /** @var Trade $row */
         foreach ($this->sellPlaced->getHealthyRecords() as $row) {
             if ($this->shutdown->isShutdownModeEnabled()) {
                 break;
-            }
-            if (
-                ($pair === null || ($pair->getSymbol() === $row->getSymbol())) &&
-                !($activeIds['sell'][$row->getSellOrderId()] ?? false) &&
-                $this->isStillHealthy($this->sellPlaced, $row->getId()) &&
-                $this->isFilled($row->getSellOrderId()) &&
-                $this->sellPlaced->setNextState($row->getId())
+            } elseif (
+                ($pair !== null && $pair->getSymbol() !== $row->getSymbol()) ||
+                ($activeIds['sell'][$row->getSellOrderId()] ?? null) ||
+                $this->isStillHealthy($this->sellPlaced, $row->getId()) === false
             ) {
+                continue;
+            }
+
+            $isFilled = null;
+            $i = 0;
+            while ($isFilled == null && $i <= 100) {
+                try {
+                    $isFilled = $this->isFilled($row->getSellOrderId());
+                } catch (InvalidNonceException $e) {
+                    // shit happens. Have tickets to improve upon this
+                    ++$i;
+                }
+            }
+
+            if ($isFilled === null) {
+                // Logging appropriate. bucking it for later. may be moot with other plans
+                break;
+            } elseif ($isFilled && $this->sellPlaced->setNextState($row->getId())) {
                 $output->writeln(sprintf(
                     "%s\t(%d)\t<fg=red>SELL_FILLED</>\tOrder ID %d\t%s %s @ %s %s/%s",
                     $this->now(),

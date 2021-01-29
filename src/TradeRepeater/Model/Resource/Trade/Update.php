@@ -51,5 +51,4 @@ final class Update implements UpdateInterface
             ['id' => $id]
         );
     }
-
 }

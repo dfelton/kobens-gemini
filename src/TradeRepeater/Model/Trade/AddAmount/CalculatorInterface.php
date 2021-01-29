@@ -69,5 +69,4 @@ interface CalculatorInterface
      * @return string
      */
     public function getQuoteMakerFeeDeposit(): string;
-
 }

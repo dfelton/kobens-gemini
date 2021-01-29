@@ -6,21 +6,21 @@ namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
 use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Core\SleeperInterface;
+use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\ArchiveInterface;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellFilledInterface;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Update;
+use Kobens\Gemini\TradeRepeater\Model\Trade;
+use Kobens\Gemini\TradeRepeater\Model\Trade\CalculateCompletedProfits;
+use Kobens\Gemini\TradeRepeater\Model\Trade\AddAmount\Calculator;
+use Kobens\Math\BasicCalculator\Add;
+use Kobens\Math\BasicCalculator\Compare;
+use Kobens\Math\BasicCalculator\Multiply;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Adapter\Driver\ConnectionInterface;
-use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Update;
-use Kobens\Gemini\TradeRepeater\Model\Trade;
-use Kobens\Gemini\Exchange\Currency\Pair;
-use Kobens\Gemini\TradeRepeater\Model\Trade\CalculateCompletedProfits;
-use Kobens\Math\BasicCalculator\Multiply;
-use Kobens\Math\BasicCalculator\Add;
-use Kobens\Math\BasicCalculator\Compare;
-use Kobens\Gemini\TradeRepeater\Model\Trade\AddAmount\Calculator;
 
 final class Archiver extends Command
 {
@@ -93,7 +93,6 @@ final class Archiver extends Command
             $meta = \json_decode($row->getMeta());
             $this->connection->beginTransaction();
             try {
-
                 $this->archive->addArchive(
                     $row->getSymbol(),
                     $row->getBuyClientOrderId(),

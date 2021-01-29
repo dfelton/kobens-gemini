@@ -112,7 +112,7 @@ final class Calculator implements CalculatorInterface
             $result = $this->getResult($baseAmount);
 
             if (++$i > 100000000) {
-                throw new \Exception ('Maximum Iterations Reached.');
+                throw new \Exception('Maximum Iterations Reached.');
             }
         }
         $this->baseAmount = $lastResult['base_amount'];
