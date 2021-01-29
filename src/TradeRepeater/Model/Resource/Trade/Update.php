@@ -40,4 +40,15 @@ final class Update implements UpdateInterface
             ['id' => $trade->getId()]
         );
     }
+
+    public function updateAmounts(int $id, string $buyAmount, string $sellAmmount): void
+    {
+        $this->table->update(
+            [
+                'buy_amount' => $buyAmount,
+                'sell_amount' => $sellAmmount,
+            ],
+            ['id' => $id]
+        );
+    }
 }

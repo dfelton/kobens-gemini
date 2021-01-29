@@ -6,8 +6,16 @@ namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
 use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Core\SleeperInterface;
+use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\ArchiveInterface;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellFilledInterface;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Update;
+use Kobens\Gemini\TradeRepeater\Model\Trade;
+use Kobens\Gemini\TradeRepeater\Model\Trade\CalculateCompletedProfits;
+use Kobens\Gemini\TradeRepeater\Model\Trade\AddAmount\Calculator;
+use Kobens\Math\BasicCalculator\Add;
+use Kobens\Math\BasicCalculator\Compare;
+use Kobens\Math\BasicCalculator\Multiply;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -32,18 +40,22 @@ final class Archiver extends Command
 
     private SleeperInterface $sleeper;
 
+    private Update $update;
+
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,
         SellFilledInterface $sellFilledInterface,
         ArchiveInterface $archiveInterface,
         ConnectionInterface $connectionInterface,
-        SleeperInterface $sleeperInterface
+        SleeperInterface $sleeperInterface,
+        Update $update
     ) {
         $this->connection = $connectionInterface;
         $this->archive = $archiveInterface;
         $this->sellFilled = $sellFilledInterface;
         $this->shutdown = $shutdownInterface;
         $this->sleeper = $sleeperInterface;
+        $this->update = $update;
         parent::__construct();
     }
 
@@ -64,7 +76,6 @@ final class Archiver extends Command
                 $this->mainLoop($output);
                 $this->sleep($delay, $this->sleeper, $this->shutdown);
             } catch (\Exception $e) {
-                $this->connection->rollback();
                 $this->shutdown->enableShutdownMode($e);
             }
         }
@@ -81,24 +92,57 @@ final class Archiver extends Command
         foreach ($this->sellFilled->getHealthyRecords() as $row) {
             $meta = \json_decode($row->getMeta());
             $this->connection->beginTransaction();
-            $this->archive->addArchive(
-                $row->getSymbol(),
-                $row->getBuyClientOrderId(),
-                $row->getBuyOrderId(),
-                $row->getBuyAmount(),
-                (string) $meta->buy_price,
-                $row->getSellClientOrderId(),
-                $row->getSellOrderId(),
-                $row->getSellAmount(),
-                (string) $meta->sell_price
-            );
-            $this->sellFilled->setNextState($row->getId());
-            $this->connection->commit();
+            try {
+                $this->archive->addArchive(
+                    $row->getSymbol(),
+                    $row->getBuyClientOrderId(),
+                    $row->getBuyOrderId(),
+                    $row->getBuyAmount(),
+                    (string) $meta->buy_price,
+                    $row->getSellClientOrderId(),
+                    $row->getSellOrderId(),
+                    $row->getSellAmount(),
+                    (string) $meta->sell_price
+                );
+                $this->sellFilled->setNextState($row->getId());
+                $this->processProfits($row);
+
+                $this->connection->commit();
+            } catch (\Error $e) {
+                $this->connection->rollback();
+                throw $e;
+            }
             $output->writeln(sprintf(
                 "%s\t(%d)\t<fg=yellow>ARCHIVED</>",
                 $this->now(),
                 $row->getId()
             ));
+        }
+    }
+
+    /**
+     * TODO: implement plans for other 50% of profits
+     * TODO: would be nice if the $sellAmount was adjusted too... keep ratio fiat/crypto outcome rather than piling on only more fiat
+     *
+     * @param Trade $trade
+     */
+    private function processProfits(Trade $trade): void
+    {
+        $pair = Pair::getInstance($trade->getSymbol());
+        if ($pair->getQuote()->getSymbol() !== 'usd') {
+            return;
+        }
+
+        $usd = CalculateCompletedProfits::get($trade)['usd'];
+
+        // TODO: Plan is 50%, we're doing 95% to start.
+        $reinvestInSamePosition = Multiply::getResult($usd, '0.95');
+        $calculation = new Calculator($pair, $reinvestInSamePosition, $trade->getBuyPrice());
+
+        if (Compare::getResult($calculation->getBaseAmount(), $pair->getMinOrderIncrement()) !== Compare::RIGHT_GREATER_THAN) {
+            $buyAmount = Add::getResult($trade->getBuyAmount(), $calculation->getBaseAmount());
+            $sellAmount = Add::getResult($trade->getSellAmount(), $calculation->getBaseAmount());
+            $this->update->updateAmounts($trade->getId(), $buyAmount, $sellAmount);
         }
     }
 
