@@ -59,7 +59,7 @@ final class ResponseHandler
             case $response->getResponseCode() === 503:
             case $response->getResponseCode() === 504:
                 throw new $this->responseCodeMap[$response->getResponseCode()](
-                    null,
+                    'Server Error',
                     $response->getResponseCode(),
                     new \Exception(\json_encode($response))
                 );
