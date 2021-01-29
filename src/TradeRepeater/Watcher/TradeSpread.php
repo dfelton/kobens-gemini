@@ -14,7 +14,6 @@ use Kobens\Math\BasicCalculator\Subtract;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Gemini\Command\Command\TradeRepeater\Auditor\BPS;
 
 final class TradeSpread
 {
@@ -130,6 +129,11 @@ final class TradeSpread
         $buyCount = $buyCount . ' (' . $buyCountPercent . '%)';
         $sellCount = $sellCount . ' (' . $sellCountPercent . '%)';
 
+        if (strpos($invested, '.') !== false) {
+            $invested = explode('.', $invested);
+            $invested = $invested[0] . '.' . substr($invested[1], 0, 4);
+        }
+
         $length = self::getLength($bidMax, $bidMax, $askMin, $askMax, $spread, $totalSell, $totalBuy, $buyCount, $sellCount, $invested);
 
         $orderRange = str_pad($orderRange, $length, ' ', STR_PAD_LEFT);
@@ -141,6 +145,7 @@ final class TradeSpread
         $percent = str_pad($percent, $length, ' ', STR_PAD_LEFT);
         $totalBuy = str_pad($totalBuy, $length, ' ', STR_PAD_LEFT);
         $totalSell = str_pad($totalSell, $length, ' ', STR_PAD_LEFT);
+        $invested = str_pad($invested, $length, ' ', STR_PAD_LEFT);
 
         $totalOrderCount = str_pad((string) $totalOrderCount, $length, ' ', STR_PAD_LEFT);
 
@@ -154,10 +159,12 @@ final class TradeSpread
         $bidMaxSpread = (string) number_format((float) $bidMaxSpread, $scale);
         $bidMinSpread = (string) number_format((float) $bidMinSpread, $scale);
 
-        $sellMaxSpread = str_pad($sellMaxSpread, 13, ' ', STR_PAD_LEFT);
-        $sellMinSpread = str_pad($sellMinSpread, 13, ' ', STR_PAD_LEFT);
-        $bidMinSpread = str_pad($bidMinSpread, 13, ' ', STR_PAD_LEFT);
-        $bidMaxSpread = str_pad($bidMaxSpread, 13, ' ', STR_PAD_LEFT);
+        $length = self::getLength($sellMaxSpread, $sellMinSpread, $bidMinSpread, $bidMaxSpread);
+
+        $sellMaxSpread = str_pad($sellMaxSpread, $length, ' ', STR_PAD_LEFT);
+        $sellMinSpread = str_pad($sellMinSpread, $length, ' ', STR_PAD_LEFT);
+        $bidMinSpread = str_pad($bidMinSpread, $length, ' ', STR_PAD_LEFT);
+        $bidMaxSpread = str_pad($bidMaxSpread, $length, ' ', STR_PAD_LEFT);
 
         $quote = strtoupper(Pair::getInstance($symbol)->getQuote()->getSymbol());
         $table = new Table($output);
@@ -166,9 +173,8 @@ final class TradeSpread
                 [
                     new TableCell(
                         sprintf('<options=underscore>Trader Data</> %s', strtoupper($symbol)),
-                        ['colspan' => 2]
+                        ['colspan' => 3]
                     ),
-                    '<options=underscore>Market Spread</>',
                 ]
             )
             ->setRows(
