@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Exchange\Order\Fee;
 
-final class ApiMakerHoldBps
+final class ApiMakerHoldBps implements ApiMakerHoldBpsInterface
 {
     /**
      * The BPS the exchange uses for a hold placed on the account
@@ -40,14 +40,15 @@ final class ApiMakerHoldBps
      * While this drastic of a change may seem unlikely, there was indeed
      * a timeframe where Gemini's fee structure was this high.
      */
-    private const API_MAKER_HOLD_BPS = '35';
+    private string $bps;
 
-    private function __construct()
+    public function __construct(string $bps = '35')
     {
+        $this->bps = $bps;
     }
 
-    public static function get(): string
+    public function get(): string
     {
-        return self::API_MAKER_HOLD_BPS;
+        return $this->bps;
     }
 }

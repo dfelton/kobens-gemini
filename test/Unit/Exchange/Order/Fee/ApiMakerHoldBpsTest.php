@@ -11,6 +11,6 @@ class ApiMakerHoldBpsTest extends TestCase
 {
     public function testGet(): void
     {
-        $this->assertSame('35', ApiMakerHoldBps::get());
+        $this->assertSame('35', (new ApiMakerHoldBps())->get());
     }
 }
