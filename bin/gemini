@@ -41,13 +41,20 @@ use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuySent;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellFilled;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellPlaced;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellSent;
-use Kobens\Gemini\TradeRepeater\Watcher\Helper\Data;
+use Kobens\Gemini\TradeRepeater\CliMonitor\Helper\Data;
 use Zend\Db\TableGateway\TableGateway;
 use Kobens\Gemini\TradeRepeater\Model\GetRecordId;
 use Kobens\Gemini\TradeRepeater\Model\Trade\ShouldResetBuy;
-use Kobens\Gemini\TradeRepeater\Watcher\Profits;
+use Kobens\Gemini\TradeRepeater\CliMonitor\Profits;
 use Kobens\Gemini\TradeRepeater\Model\Trade\AddAmount;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Update;
+use Kobens\Gemini\TradeRepeater\PricePointGenerator;
+use Kobens\Gemini\Exchange\Order\Fee\ApiMakerHoldBps;
+use KobensTest\Gemini\Unit\Exchange\Order\Fee\ApiMakerHoldBpsTest;
+use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Processor;
+use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Processor\ReInvest;
+use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Processor\TopWeekly;
+use Kobens\Gemini\Exchange\Order\Maker\RequiredQuote;
 
 require \dirname(__DIR__).'/bootstrap.php';
 
@@ -155,15 +162,17 @@ $sellFilledInterface = new SellFilled($adapter, $tradeResource);
 $sellPlacedInterface = new SellPlaced($adapter, $tradeResource);
 $sellSentInterface = new SellSent($adapter, $tradeResource);
 
+$apiMakerHoldBps = new ApiMakerHoldBps();
 
 $app = new \Symfony\Component\Console\Application($composer->name, $composer->version);
+$addAmount = new AddAmount($cancelOrderInterface, $getPriceInterface, $orderStatusInterface, $tradeResource, $adapter, $updateTrade);
 
 // TODO: All TradeRepeater classes will need to use Kobens\Gemini\Api\Rest\* objects that have their own KeyInterface per TradeRepeater to avoid Nonce clashing
-$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\AddToPosition(
-    new AddAmount($cancelOrderInterface, $getPriceInterface, $orderStatusInterface, $tradeResource, $adapter, $updateTrade),
-    $tradeResource
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\AddToPosition($addAmount, $tradeResource));
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\PricePointGenerator(
+    new TableGateway('trade_repeater', $adapter),
+    new PricePointGenerator($apiMakerHoldBps)
 ));
-$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\PricePointGenerator(new TableGateway('trade_repeater', $adapter)));
 
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Buyer(
     $shutdownInterface,
@@ -249,7 +258,11 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Archiver(
     $archiveInterface,
     $connectionInterface,
     $sleeperInterface,
-    $updateTrade
+    new Processor(new ReInvest($updateTrade), $tradeResource, new TopWeekly($addAmount, $adapter, new RequiredQuote($apiMakerHoldBps), $shutdownInterface))
+));
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Stats\PatchFix($adapter));
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Stats\SevenDayAggregate(
+    new \Kobens\Gemini\TradeRepeater\Stats\SevenDayAggregate\Updater($adapter)
 ));
 
 
