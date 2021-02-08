@@ -1,39 +1,72 @@
 #!/bin/bash
 
-ps aux | grep -v grep | grep -q gemini\ market:book-keeper
-if [ $? -eq 1 ]
-then
-    echo Starting book keepers
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s aaveusd'
+if [ $? -eq 1 ]; then
     php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s aaveusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s batusd'
+if [ $? -eq 1 ]; then
     php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s batusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s btcusd'
+if [ $? -eq 1 ]; then
     php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s btcusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s ethusd'
+if [ $? -eq 1 ]; then
     php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s ethusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s linkusd'
+if [ $? -eq 1 ]; then
     php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s linkusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s zecusd'
+if [ $? -eq 1 ]; then
     php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s zecusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s ampusd'
+if [ $? -eq 1 ]; then
     php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s ampusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s oxtusd'
+if [ $? -eq 1 ]; then
     php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s oxtusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s snxusd'
+if [ $? -eq 1 ]; then
     php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s snxusd &
 fi
 
+ps aux | grep -v grep | grep -q gemini\ repeater:fill-monitor-websocket
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini repeater:fill-monitor-websocket &
+fi
 
-ps aux | grep -v 'grep\|trade-repeater:watcher' | grep -q gemini\ trade-repeater
-if [ $? -eq 0 ]
-then
-    echo Trade repeater already running
-    exit 1
-else
-    echo Starting trade repeater
+ps aux | grep -v grep | grep -q gemini\ repeater:buyer
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini repeater:buyer &
+fi
 
-    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:fill-monitor-websocket &
+ps aux | grep -v grep | grep -q gemini\ repeater:seller
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini repeater:seller &
+fi
 
-    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:buyer &
-    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:seller &
+ps aux | grep -v grep | grep -q gemini\ repeater:archiver
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini repeater:archiver &
+fi
 
-    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:archiver &
-
-    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:fill-monitor-rest --buy=1 &
-    php -n $(dirname $BASH_SOURCE)/gemini trade-repeater:fill-monitor-rest --sell=1 &
-
-    exit 0
+ps aux | grep -v grep | grep -q gemini\ repeater:fill-monitor-rest
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini repeater:fill-monitor-rest &
 fi
 
