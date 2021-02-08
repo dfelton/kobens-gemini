@@ -55,11 +55,12 @@ use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Processor;
 use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Processor\ReInvest;
 use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Processor\TopWeekly;
 use Kobens\Gemini\Exchange\Order\Maker\RequiredQuote;
+use Kobens\Core\ErrorHandler;
 
-require \dirname(__DIR__).'/bootstrap.php';
+require \dirname(__DIR__) . '/bootstrap.php';
 
 try {
-    $json = @\file_get_contents(\dirname(__DIR__).'/composer.json');
+    $json = @\file_get_contents(\dirname(__DIR__) . '/composer.json');
     if ($json === false) {
         throw new \Exception('Unable to read application\'s composer.json file.');
     }
@@ -74,10 +75,13 @@ try {
     exit(1);
 }
 
+error_reporting(E_ALL | E_STRICT);
+set_error_handler([new ErrorHandler(), 'handler']);
+
 $config = Config::getInstance();
 $adapter = Db::getAdapter();
 $connectionInterface = $adapter->getDriver()->getConnection();
-$shutdownInterface = new EmergencyShutdown(\dirname(__DIR__).DIRECTORY_SEPARATOR.'var');
+$shutdownInterface = new EmergencyShutdown(\dirname(__DIR__) . DIRECTORY_SEPARATOR . 'var');
 $exchangeInterface = new Exchange();
 $sleeperInterface = new Sleeper();
 
@@ -96,11 +100,11 @@ $nonceInterface = new Nonce();
 
 $publicThrottlerInterface = new Throttler(
     new MariaDb(new \Zend\Db\Adapter\Adapter($config->get('kobens')->core->throttler->adapter->mariadb->toArray())),
-    $hostInterface->getHost().'::public'
+    $hostInterface->getHost() . '::public'
 );
 $privateThrottlerInterface = new Throttler(
     new MariaDb(new \Zend\Db\Adapter\Adapter($config->get('kobens')->core->throttler->adapter->mariadb->toArray())),
-    $hostInterface->getHost().'::private'
+    $hostInterface->getHost() . '::private'
 );
 
 $logger = new \Monolog\Logger('curl');
