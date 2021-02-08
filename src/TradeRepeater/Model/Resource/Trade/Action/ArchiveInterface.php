@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action;
 
+use Kobens\Gemini\TradeRepeater\Model\Trade;
+
 interface ArchiveInterface
 {
-    public function addArchive(string $symbol, string $buyClientOrderId, int $buyOrderId, string $buyAmount, string $buyPrice, string $sellClientOrderId, int $sellOrderId, string $sellAmount, string $sellPrice): void;
+    public function addArchive(Trade $trade): void;
 }
