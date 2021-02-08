@@ -1038,12 +1038,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-core.git",
-                "reference": "bb3bbbd77708a04b9dd8daf17aa8bc9551097512"
+                "reference": "60bb749737e28c92091d205cb3eca5cd13a398ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dfelton/kobens-core/zipball/bb3bbbd77708a04b9dd8daf17aa8bc9551097512",
-                "reference": "bb3bbbd77708a04b9dd8daf17aa8bc9551097512",
+                "url": "https://api.github.com/repos/dfelton/kobens-core/zipball/60bb749737e28c92091d205cb3eca5cd13a398ab",
+                "reference": "60bb749737e28c92091d205cb3eca5cd13a398ab",
                 "shasum": ""
             },
             "require": {
@@ -1081,7 +1081,7 @@
                 "source": "https://github.com/dfelton/kobens-core/tree/master",
                 "issues": "https://github.com/dfelton/kobens-core/issues"
             },
-            "time": "2021-02-05T20:07:42+00:00"
+            "time": "2021-02-08T19:43:29+00:00"
         },
         {
             "name": "kobens/kobens-currency",
