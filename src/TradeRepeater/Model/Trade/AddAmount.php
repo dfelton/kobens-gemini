@@ -7,18 +7,19 @@ namespace Kobens\Gemini\TradeRepeater\Model\Trade;
 use Kobens\Gemini\Api\Market\GetPriceInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelOrderInterface;
+use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\Model\Trade;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade as TradeResource;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyPlaced as StatusBuyPlaced;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellPlaced as StatusSellPlaced;
-use Kobens\Math\BasicCalculator\Subtract;
-use Kobens\Math\BasicCalculator\Compare;
-use Kobens\Math\BasicCalculator\Divide;
-use Kobens\Math\BasicCalculator\Multiply;
-use Zend\Db\Adapter\Adapter;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\UpdateInterface;
 use Kobens\Math\BasicCalculator\Add;
-use Kobens\Gemini\Exchange\Currency\Pair;
+use Kobens\Math\BasicCalculator\Compare;
+use Kobens\Math\BasicCalculator\Divide;
+use Kobens\Math\BasicCalculator\Subtract;
+use Kobens\Math\BasicCalculator\Multiply;
+use Zend\Db\Adapter\Adapter;
+use Kobens\Gemini\TradeRepeater\Exception\UnsupportedAddAmountStateException;
 
 final class AddAmount
 {
@@ -69,16 +70,21 @@ final class AddAmount
             case StatusBuyPlaced::STATUS_CURRENT:
                 $order = $this->orderStatus->getStatus($trade->getBuyOrderId());
                 if ($this->isBuyOrderReadyToAdd($trade, $order)) {
-                    $amountAdded = $this->addToBuy($trade->getId(), $amount, $trade->getStatus());
+                    $amountAdded = $this->addToBuy(
+                        $trade->getId(),
+                        $amount,
+                        $trade->getStatus(),
+                        \Kobens\Core\Db::isInTransaction() === false
+                    );
                 }
                 break;
 
-//             case StatusSellPlaced::STATUS_CURRENT:
+            case StatusSellPlaced::STATUS_CURRENT:
 //                 $order = $this->orderStatus->getStatus($trade->getSellOrderId());
 //                 break;
 
             default:
-                throw new \Exception(sprintf(
+                throw new UnsupportedAddAmountStateException(sprintf(
                     'Trade Repeater Record "%d" in unsupported state to add amount to. Current state "%s".',
                     $id,
                     $trade->getStatus()
@@ -87,13 +93,15 @@ final class AddAmount
         return $amountAdded;
     }
 
-    private function addToBuy(int $id, string $amount, string $expectedStatus): string
+    private function addToBuy(int $id, string $amount, string $expectedStatus, bool $useTransaction): string
     {
-        $this->adapter->driver->getConnection()->beginTransaction();
+        if ($useTransaction) {
+            $this->adapter->driver->getConnection()->beginTransaction();
+        }
         $trade = $this->tradeResource->getById($id, true);
         $amountAdded = '0';
         try {
-            if ($trade->getStatus() !== $expectedStatus) {
+            if ($trade->getStatus() !== $expectedStatus && $useTransaction) {
                 // Release lock on Trade record even though we cannot add to it.
                 $this->adapter->driver->getConnection()->commit();
             } else {
@@ -109,11 +117,15 @@ final class AddAmount
                         $amount
                     );
                 }
-                $this->adapter->driver->getConnection()->commit();
+                if ($useTransaction) {
+                    $this->adapter->driver->getConnection()->commit();
+                }
                 $amountAdded = $amount;
             }
         } catch (\Exception $e) {
-            $this->adapter->driver->getConnection()->rollback();
+            if ($useTransaction) {
+                $this->adapter->driver->getConnection()->rollback();
+            }
         }
         return $amountAdded;
     }
