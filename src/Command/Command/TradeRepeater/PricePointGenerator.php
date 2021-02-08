@@ -19,22 +19,27 @@ use Kobens\Exchange\PairInterface;
 
 final class PricePointGenerator extends Command
 {
-    protected static $defaultName = 'trade-repeater:price-point-generator';
+    protected static $defaultName = 'repeater:ppg';
 
     /**
      * @var TableGatewayInterface
      */
-    private $table;
+    private TableGatewayInterface $table;
+
+    private Generator $generator;
 
     public function __construct(
-        TableGatewayInterface $table
+        TableGatewayInterface $table,
+        Generator $generator
     ) {
         $this->table = $table;
+        $this->generator = $generator;
         parent::__construct();
     }
 
     protected function configure()
     {
+        $this->setDescription('Price Point Generator.');
         $this->addArgument('symbol', InputArgument::REQUIRED, 'Trading Pair Symbol');
         $this->addArgument('buy_amount', InputArgument::REQUIRED, 'Buy Amount per Order');
         $this->addArgument('buy_price_start', InputArgument::REQUIRED, 'Buy Price Start');
@@ -49,7 +54,8 @@ final class PricePointGenerator extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $pair = Pair::getInstance($input->getArgument('symbol'));
-        $result = Generator::get(
+        $create = $input->getOption('create') === '1';
+        $result = $this->generator->get(
             $pair,
             (string) $input->getArgument('buy_amount'),
             (string) $input->getArgument('buy_price_start'),
@@ -57,6 +63,7 @@ final class PricePointGenerator extends Command
             (string) $input->getArgument('increment'),
             (string) $input->getArgument('sell_after_gain'),
             (string) $input->getArgument('save_amount'),
+            $create === false
         );
         $isEnabled = (int) $input->getArgument('is_enabled');
         if ($input->getOption('create') === '1') {

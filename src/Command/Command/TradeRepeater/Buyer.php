@@ -30,7 +30,7 @@ final class Buyer extends Command
 
     private const EXCEPTION_DELAY = 60;
 
-    protected static $defaultName = 'trade-repeater:buyer';
+    protected static $defaultName = 'repeater:buyer';
 
     private EmergencyShutdownInterface $shutdown;
 
@@ -108,8 +108,8 @@ final class Buyer extends Command
                     $msg->original_amount,
                     strtoupper(Pair::getInstance($msg->symbol)->getBase()->getSymbol()),
                     $msg->price,
-                    strtoupper(Pair::getInstance($msg->symbol)->getQuote()->getSymbol()),
                     strtoupper(Pair::getInstance($msg->symbol)->getBase()->getSymbol()),
+                    strtoupper(Pair::getInstance($msg->symbol)->getQuote()->getSymbol()),
                 ));
                 if (Compare::getResult($msg->price, $row->getBuyPrice()) !== Compare::EQUAL) {
                     $output->writeln(\sprintf(

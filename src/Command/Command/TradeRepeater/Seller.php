@@ -30,7 +30,7 @@ final class Seller extends Command
 
     private const EXCEPTION_DELAY = 60;
 
-    protected static $defaultName = 'trade-repeater:seller';
+    protected static $defaultName = 'repeater:seller';
 
     private BuyFilledInterface $buyFilled;
 
@@ -108,8 +108,8 @@ final class Seller extends Command
                     $msg->original_amount,
                     strtoupper(Pair::getInstance($msg->symbol)->getBase()->getSymbol()),
                     $msg->price,
-                    strtoupper(Pair::getInstance($msg->symbol)->getQuote()->getSymbol()),
                     strtoupper(Pair::getInstance($msg->symbol)->getBase()->getSymbol()),
+                    strtoupper(Pair::getInstance($msg->symbol)->getQuote()->getSymbol()),
                 ));
                 if (Compare::getResult($msg->price, $row->getSellPrice()) !== Compare::EQUAL) {
                     $output->writeln(\sprintf(

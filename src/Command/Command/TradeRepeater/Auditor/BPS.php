@@ -36,7 +36,7 @@ final class BPS extends Command
     private const SLEEP_DELAY = 600;
     private const SLEEP_EXCEPTION_DELAY = 10;
 
-    protected static $defaultName = 'trade-repeater:audit:bps';
+    protected static $defaultName = 'repeater:audit:bps';
 
     private EmergencyShutdownInterface $shutdown;
 

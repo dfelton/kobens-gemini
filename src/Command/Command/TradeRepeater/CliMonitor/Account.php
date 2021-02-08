@@ -8,10 +8,13 @@ use Kobens\Core\Config;
 use Kobens\Core\SleeperInterface;
 use Kobens\Exchange\PairInterface;
 use Kobens\Gemini\Exchange\Currency\Pair;
-use Kobens\Gemini\TradeRepeater\Watcher\AccountNotionalBalance;
-use Kobens\Gemini\TradeRepeater\Watcher\Balances;
-use Kobens\Gemini\TradeRepeater\Watcher\Helper\Data;
-use Kobens\Gemini\TradeRepeater\Watcher\Profits;
+use Kobens\Gemini\TradeRepeater\CliMonitor\AccountNotionalBalance;
+use Kobens\Gemini\TradeRepeater\CliMonitor\Balances;
+use Kobens\Gemini\TradeRepeater\CliMonitor\Helper\Data;
+use Kobens\Gemini\TradeRepeater\CliMonitor\Profits;
+use Kobens\Http\Exception\Status\ServerErrorException;
+use Kobens\Math\BasicCalculator\Add;
+use Kobens\Math\BasicCalculator\Multiply;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,9 +24,6 @@ use Zend\Db\Adapter\Adapter;
 use Zend\Db\TableGateway\TableGatewayInterface;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Sql\Select;
-use Kobens\Math\BasicCalculator\Multiply;
-use Kobens\Math\BasicCalculator\Add;
-use Kobens\Http\Exception\Status\ServerErrorException;
 
 final class Account extends Command
 {
@@ -80,20 +80,14 @@ final class Account extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $sleep = $this->getRefreshRate($input);
-        $amount = $input->getOption('amount') !== false;
-        $amountNotional = $input->getOption('amount-notional') !== false;
-        $amountAvailable = $input->getOption('available') !== false;
-        $amountAvailableNotional = $input->getOption('available-notional') !== false;
+        $args = $this->getArgs($input);
         $loop = $input->getOption('disable-loop') === false;
         do {
             try {
                 $this->main(
                     $input,
                     $output,
-                    $amount,
-                    $amountNotional,
-                    $amountAvailable,
-                    $amountAvailableNotional
+                    $args
                 );
                 $this->data->reset();
                 if ($loop) {
@@ -116,6 +110,16 @@ final class Account extends Command
                 } while ($e instanceof \Throwable);
             }
         } while ($loop && !file_exists(Config::getInstance()->getRootDir() . self::KILL_FILE));
+    }
+
+    private function getArgs(InputInterface $input): array
+    {
+        return [
+            $input->getOption('amount') !== false,
+            $input->getOption('amount-notional') !== false,
+            $input->getOption('available') !== false,
+            $input->getOption('available-notional') !== false,
+        ];
     }
 
     /**
@@ -145,13 +149,10 @@ final class Account extends Command
     private function main(
         InputInterface $input,
         OutputInterface $output,
-        bool $amount,
-        bool $amountNotional,
-        bool $amountAvailable,
-        bool $amountAvailableNotional
+        array $args
     ): void {
         try {
-            $data = $this->getData($input, $output, $amount, $amountNotional, $amountAvailable, $amountAvailableNotional);
+            $data = $this->getData($input, $output, ...$args);
         } catch (ServerErrorException $e) {
             $data = [(new Table($output))->setRows([['Server Error at Exchange']])];
         }
@@ -200,7 +201,9 @@ final class Account extends Command
         $data = [];
         try {
             $data[] = AccountNotionalBalance::getTable($output, $this->data, Config::getInstance());
-            $data[] = Balances::getTable($output, $this->data, $amount, $amountNotional, $amountAvailable, $amountAvailableNotional);
+            if ($amount || $amountNotional || $amountAvailable || $amountAvailableNotional) {
+                $data[] = Balances::getTable($output, $this->data, $amount, $amountNotional, $amountAvailable, $amountAvailableNotional);
+            }
             $data[] = $this->profits->get($output);
         } catch (\Kobens\Gemini\Exception $e) {
             $data[] = (new Table($output))->addRow([$e->getMessage()]);

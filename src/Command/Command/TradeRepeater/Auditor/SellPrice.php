@@ -33,7 +33,7 @@ final class SellPrice extends Command
     private const MIN_AGE    = 1800;  // 30 minutes
     private const MIN_SPREAD = '2';   // Percentage
 
-    protected static $defaultName = 'trade-repeater:audit:sell-price';
+    protected static $defaultName = 'repeater:audit:sell-price';
 
     private EmergencyShutdownInterface $shutdown;
 

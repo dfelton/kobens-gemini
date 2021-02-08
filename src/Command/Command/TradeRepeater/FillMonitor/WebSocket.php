@@ -24,7 +24,7 @@ final class WebSocket extends Command
 {
     use SleeperTrait;
 
-    protected static $defaultName = 'trade-repeater:fill-monitor-websocket';
+    protected static $defaultName = 'repeater:fill-monitor-websocket';
 
     private BuyPlacedInterface $buyPlaced;
 
@@ -170,8 +170,8 @@ final class WebSocket extends Command
                 $msg['original_amount'],
                 strtoupper(Pair::getInstance($msg['symbol'])->getBase()->getSymbol()),
                 $msg['price'],
-                strtoupper(Pair::getInstance($msg['symbol'])->getQuote()->getSymbol()),
                 strtoupper(Pair::getInstance($msg['symbol'])->getBase()->getSymbol()),
+                strtoupper(Pair::getInstance($msg['symbol'])->getQuote()->getSymbol()),
             ));
         } elseif (!in_array($msg['side'], ['buy','sell'])) {
             throw new \Exception("Unhandled side '{$msg['side']}'");
