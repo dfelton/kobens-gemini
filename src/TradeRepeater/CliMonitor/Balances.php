@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Kobens\Gemini\TradeRepeater\Watcher;
+namespace Kobens\Gemini\TradeRepeater\CliMonitor;
 
-use Kobens\Gemini\TradeRepeater\Watcher\Helper\DataInterface;
+use Kobens\Gemini\TradeRepeater\CliMonitor\Helper\DataInterface;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetNotionalBalances\BalanceInterface;

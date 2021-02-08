@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Kobens\Gemini\TradeRepeater\Watcher;
+namespace Kobens\Gemini\TradeRepeater\CliMonitor;
 
 use Kobens\Gemini\Api\Market\GetPriceInterface;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Math\BasicCalculator\Add;
 use Kobens\Math\BasicCalculator\Compare;
+use Kobens\Math\BasicCalculator\Divide;
 use Kobens\Math\BasicCalculator\Multiply;
 use Kobens\Math\BasicCalculator\Subtract;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -55,15 +56,25 @@ final class Profits
             new TableCell('<fg=green>Total Notional</>', ['colspan' => 2]),
             '$' . number_format((float)$totalNotional, 2),
         ]);
+        $dailyAverage = Divide::getResult($totalNotional, $profits['days'], 2);
+        $table->addRow([
+            new TableCell('<fg=green>Daily Average</>', ['colspan' => 2]),
+            '$' . $dailyAverage,
+        ]);
+        $table->addRow([
+            new TableCell('<fg=green>Projected Yearly</>', ['colspan' => 2]),
+            '$' . number_format((float)Multiply::getResult($dailyAverage, '365'), 2),
+        ]);
         return $table;
     }
 
     /**
-     * TODO: Filter by past month
+     * TODO: Add Filter options
      */
     private function getData()
     {
         $results = $this->table->select(function (Select $sql) {
+            $sql->columns(['created_at', 'buy_amount', 'buy_price', 'sell_amount', 'sell_price', 'symbol']);
             $sql->order('created_at ASC');
         });
         $profits = [];
@@ -80,9 +91,11 @@ final class Profits
             }
         }
         ksort($profits);
+
         return [
             'date' => $date,
             'profits' => $profits,
+            'days' => (string) round((time() - strtotime($date)) / (60 * 60 * 24), 2),
         ];
     }
 

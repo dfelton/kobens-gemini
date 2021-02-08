@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Kobens\Gemini\TradeRepeater\Watcher;
+namespace Kobens\Gemini\TradeRepeater\CliMonitor;
 
 use Kobens\Gemini\Exchange\Currency\Pair;
-use Kobens\Gemini\TradeRepeater\Watcher\Helper\DataInterface;
+use Kobens\Gemini\TradeRepeater\CliMonitor\Helper\DataInterface;
 use Kobens\Math\BasicCalculator\Add;
 use Kobens\Math\BasicCalculator\Compare;
 use Kobens\Math\BasicCalculator\Divide;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kobens\Gemini\TradeRepeater\Watcher\Helper;
+namespace Kobens\Gemini\TradeRepeater\CliMonitor\Helper;
 
 use Kobens\Gemini\Api\Market\GetPrice\Result;
 
