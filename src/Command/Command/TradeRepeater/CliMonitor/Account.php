@@ -56,7 +56,7 @@ final class Account extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Monitoring: Account Summary');
         $this->addOption('amount', null, InputOption::VALUE_OPTIONAL, 'Show balance(s) "Amount".', false);
@@ -77,7 +77,7 @@ final class Account extends Command
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $sleep = $this->getRefreshRate($input);
         $args = $this->getArgs($input);
@@ -110,6 +110,7 @@ final class Account extends Command
                 } while ($e instanceof \Throwable);
             }
         } while ($loop && !file_exists(Config::getInstance()->getRootDir() . self::KILL_FILE));
+        return 0;
     }
 
     private function getArgs(InputInterface $input): array

@@ -52,13 +52,13 @@ final class Archiver extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Archives completed sell orders and marks record for next buy.');
         $this->addOption('delay', 'd', InputOption::VALUE_OPTIONAL, 'Delay in seconds between looking for records.', self::DEFAULT_DELAY);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $delay = (int) $input->getOption('delay');
         if ($delay <= 0) {
@@ -77,6 +77,7 @@ final class Archiver extends Command
             $this->now(),
             self::class
         ));
+        return 0;
     }
 
     private function mainLoop(OutputInterface $output): void

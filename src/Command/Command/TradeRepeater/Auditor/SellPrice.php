@@ -71,12 +71,12 @@ final class SellPrice extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addOption('delay', 'd', InputOption::VALUE_OPTIONAL, 'Time in seconds between searching for records.', 600);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $sleep = (int) $input->getOption('delay');
         if ($sleep < 10) {
@@ -102,6 +102,7 @@ final class SellPrice extends Command
             $this->now(),
             self::class
         ));
+        return 0;
     }
 
     private function exceptionDelay(OutputInterface $output, \Exception $e)

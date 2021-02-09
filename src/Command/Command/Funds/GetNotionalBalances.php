@@ -26,13 +26,13 @@ final class GetNotionalBalances extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Returns available notional balances.');
         $this->addOption('currency', 'c', InputOption::VALUE_OPTIONAL, 'Currency to get funds of');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $currency = $input->getOption('currency');
         if ($currency) {
@@ -42,6 +42,7 @@ final class GetNotionalBalances extends Command
                 $this->outputBalance($output, $balance);
             }
         }
+        return 0;
     }
 
     private function outputBalance(OutputInterface $output, BalanceInterface $balance): void

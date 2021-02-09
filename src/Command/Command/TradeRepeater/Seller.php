@@ -57,14 +57,14 @@ final class Seller extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Places sell orders on the exchange for the Gemini Trade Repeater');
         $this->addOption('delay', 'd', InputOption::VALUE_OPTIONAL, 'Delay in seconds to start looking again for new BUY_FILLED orders. Minimum 5 seconds.', 5);
         $this->addOption('maxIterationsDelay', null, InputOption::VALUE_OPTIONAL, 'Delay in seconds to resume operations when a MaxIterationsException occurrs', 5);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $delay = (int) $input->getOption('delay');
         if ($delay < 5) {
@@ -84,6 +84,7 @@ final class Seller extends Command
             $this->now(),
             self::class
         ));
+        return 0;
     }
 
     private function mainLoop(InputInterface $input, OutputInterface $output): bool

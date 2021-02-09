@@ -21,12 +21,12 @@ final class BookKeeper extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Maintains cache of private order book data.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
             $this->book->openBook();
@@ -35,5 +35,6 @@ final class BookKeeper extends Command
             $output->writeln($e->getTraceAsString());
             exit(1);
         }
+        return 0;
     }
 }

@@ -21,8 +21,9 @@ final class GetTradeVolume extends Command
         parent::__construct();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         var_dump($this->volume->getVolume());
+        return 0;
     }
 }

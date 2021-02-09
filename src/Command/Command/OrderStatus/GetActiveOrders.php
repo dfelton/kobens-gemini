@@ -27,15 +27,14 @@ final class GetActiveOrders extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('List all active orders.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $orders = $this->activeOrders->getOrders();
-
         if ($orders === []) {
             $output->writeln(\sprintf(
                 '<fg=red>There are currently no active orders on "%s."</>',
@@ -44,5 +43,6 @@ final class GetActiveOrders extends Command
         } else {
             \Zend\Debug\Debug::dump($orders);
         }
+        return 0;
     }
 }

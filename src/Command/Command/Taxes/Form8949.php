@@ -23,14 +23,14 @@ final class Form8949 extends Command
 
     private ?TableGateway $table = null;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument('year', InputArgument::REQUIRED);
         $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Trading Symbol', 'btcusd');
         $this->setDescription('Generates data for a US Federal Tax Form 8949.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->symbol = Pair::getInstance($input->getOption('symbol'))->getSymbol();
         $capitalGains = [
@@ -119,6 +119,7 @@ final class Form8949 extends Command
         $output->write(\sprintf("Total Proceeds:\t\t%s\n", $capitalGains['totalProceeds']));
         $output->write(\sprintf("Total Assets Sold:\t%s\n", $capitalGains['assetsSold']));
         $output->write("\n");
+        return 0;
     }
 
     private function isLongTerm(string $buyDate, string $sellDate): bool

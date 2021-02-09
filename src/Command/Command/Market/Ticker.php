@@ -24,13 +24,13 @@ final class Ticker extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Outputs details on a market book.');
         $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Trading Pair Symbol', 'btcusd');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $symbol = $input->getOption('symbol');
         $data = $this->ticker->getData($symbol);
@@ -50,5 +50,6 @@ final class Ticker extends Command
         $output->writeln("\t<options=bold>{$quote}</>\t{$data->volume->{$quote}}");
 
         $output->write(PHP_EOL);
+        return 0;
     }
 }

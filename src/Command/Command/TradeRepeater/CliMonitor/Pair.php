@@ -41,7 +41,7 @@ final class Pair extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Monitoring output on trades and the market');
         $this->addOption('pair', 'p', InputOption::VALUE_OPTIONAL, 'Comma separated trading pair(s) to show trade-repeater data for', 'btcusd');
@@ -59,7 +59,7 @@ final class Pair extends Command
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $sleep = $this->getRefreshRate($input);
         $loop = $input->getOption('disable-loop') === false;
@@ -87,6 +87,7 @@ final class Pair extends Command
                 } while ($e instanceof \Throwable);
             }
         } while ($loop && !file_exists(Config::getInstance()->getRootDir() . self::KILL_FILE));
+        return 0;
     }
 
     /**

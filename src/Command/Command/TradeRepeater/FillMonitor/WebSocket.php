@@ -63,13 +63,13 @@ final class WebSocket extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Monitors order fillings for the Gemini Trade Repater');
         $this->addOption('reconnect_delay', 'd', InputOption::VALUE_OPTIONAL, 'Time to wait in seconds (min 5 seconds) between reconnection attempts.', 10);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $reconnectDelay = (int) $input->getOption('reconnect_delay');
         if ($reconnectDelay < 5) {
@@ -93,6 +93,7 @@ final class WebSocket extends Command
             $this->now(),
             self::class
         ));
+        return 0;
     }
 
     private function main(OutputInterface $output): \Closure

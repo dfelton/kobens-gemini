@@ -37,7 +37,7 @@ final class PricePointGenerator extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Price Point Generator.');
         $this->addArgument('symbol', InputArgument::REQUIRED, 'Trading Pair Symbol');

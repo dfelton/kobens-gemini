@@ -37,12 +37,12 @@ final class SellLogger extends Command
 
     private string $symbol;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Trading Pair Symbol', 'btcusd');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $conn = Db::getAdapter()->getDriver()->getConnection();
         $pair = Pair::getInstance($input->getOption('symbol'));
@@ -169,6 +169,7 @@ final class SellLogger extends Command
         } while ($rows->count() > 0);
 
         $output->writeln('Sale Data Generated');
+        return 0;
     }
 
     private function getNextBuyForSale(array $omitTransactionIds = []): array

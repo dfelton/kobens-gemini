@@ -26,12 +26,12 @@ final class CapitalGains extends Command
 
     private string $symbol;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument('symbol', InputArgument::REQUIRED);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $table = new TableGateway('taxes_' . $input->getArgument('symbol') . '_sell_log', Db::getAdapter());
 
@@ -48,6 +48,7 @@ final class CapitalGains extends Command
             }
         }
         $output->writeln('All Time Capital Gain / Loss: ' . $allTime);
+        return 0;
     }
 
     protected function getTradeRecord(int $tid): array

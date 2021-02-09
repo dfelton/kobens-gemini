@@ -22,9 +22,10 @@ final class GetNotionalVolume extends Command
         parent::__construct();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $table = NotionalVolumeTable::getTable($this->volume->getVolume(), $output);
         $table->render();
+        return 0;
     }
 }

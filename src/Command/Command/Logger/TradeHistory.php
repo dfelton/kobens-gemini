@@ -48,7 +48,7 @@ final class TradeHistory extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Maintains The trading history for a specified symbol.');
         $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Symbol to fetch history for.', self::DEFAULT_SYMBOL);
@@ -65,7 +65,7 @@ final class TradeHistory extends Command
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->symbol = $input->getOption('symbol');
         $this->delay  = (int) $input->getOption('delay');
@@ -145,6 +145,7 @@ final class TradeHistory extends Command
             }
         }
         $output->writeln("\n<fg=red>Shutdown Detected</>");
+        return 0;
     }
 
     private function logPageLimitError(int $timestampms): void

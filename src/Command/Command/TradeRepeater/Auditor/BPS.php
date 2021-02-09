@@ -63,7 +63,7 @@ final class BPS extends Command
         parent::__construct();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         while (!$this->shutdown->isShutdownModeEnabled()) {
             try {
@@ -76,6 +76,7 @@ final class BPS extends Command
             }
         }
         $output->writeln("\n<fg=red>{$this->now()}\tShutdown signal detected.\n");
+        return 0;
     }
 
     /**
