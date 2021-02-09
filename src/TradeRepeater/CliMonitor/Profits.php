@@ -44,26 +44,56 @@ final class Profits
         $table->setHeaders(['Asset', 'Amount', 'Amount Notional']);
 
         $totalNotional = '0';
+        $notionals = [];
+        $longestNotional = 0;
+        $longestAmount = 0;
         foreach ($profits['profits'] as $symbol => $amount) {
             $notional = $this->getNotional($symbol, $amount);
-            $table->addRow([strtoupper($symbol), $amount, $notional]);
+
+            $notionals[$symbol] = bcadd($notional, '0', 8);
+            $profits['profits'][$symbol] = bcadd($amount, '0', 8);
+
+            $lenNotional = strlen($notionals[$symbol]);
+            $lenAmount = strlen($profits['profits'][$symbol]);
+            $longestAmount = $lenAmount > $longestAmount ? $lenAmount : $longestAmount;
+            $longestNotional = $lenNotional > $longestNotional ? $lenNotional : $longestNotional;
+
             $totalNotional = Add::getResult($totalNotional, $notional);
         }
+
+        $longestAmount = $longestAmount < 18 ? 18 : $longestAmount;
+        $longestNotional = $longestNotional < 18 ? 18 : $longestNotional;
+
+        foreach (array_keys($notionals) as $symbol) {
+            $row = [
+                strtoupper($symbol),
+                str_pad($profits['profits'][$symbol], $longestAmount, ' ', STR_PAD_LEFT),
+                str_pad($notionals[$symbol], $longestNotional, ' ', STR_PAD_LEFT)
+            ];
+            if ($row[0] === 'USD') {
+                $row[0] = '<fg=green>' . $row[0] . '</>';
+                $row[1] = '<fg=green>' . $row[1] . '</>';
+                $row[2] = '<fg=green>' . $row[2] . '</>';
+            }
+            $table->addRow($row);
+        }
+
+
         $table->addRow([
             new TableCell('', ['colspan' => 3]),
         ]);
         $table->addRow([
             new TableCell('<fg=green>Total Notional</>', ['colspan' => 2]),
-            '$' . number_format((float)$totalNotional, 2),
+            str_pad('$' . number_format((float) $totalNotional, 2), $longestNotional, ' ', STR_PAD_LEFT),
         ]);
         $dailyAverage = Divide::getResult($totalNotional, $profits['days'], 2);
         $table->addRow([
             new TableCell('<fg=green>Daily Average</>', ['colspan' => 2]),
-            '$' . $dailyAverage,
+            str_pad('$' . $dailyAverage, $longestNotional, ' ', STR_PAD_LEFT),
         ]);
         $table->addRow([
             new TableCell('<fg=green>Projected Yearly</>', ['colspan' => 2]),
-            '$' . number_format((float)Multiply::getResult($dailyAverage, '365'), 2),
+            str_pad('$' . number_format((float) Multiply::getResult($dailyAverage, '365'), 2), $longestNotional, ' ', STR_PAD_LEFT),
         ]);
         return $table;
     }

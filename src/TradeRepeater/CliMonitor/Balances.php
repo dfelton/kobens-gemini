@@ -31,8 +31,39 @@ final class Balances
         $balances = $data->getNotionalBalances();
         $table->setHeaderTitle('Balances');
         $table->setHeaders(self::getHeaders($amount, $amountNotional, $amountAvailable, $amountAvailableNotional));
+
+        $data = [];
+        $lengths = [];
         foreach ($balances as $balance) {
-            $table->addRow(self::getRow($balance, $amount, $amountNotional, $amountAvailable, $amountAvailableNotional));
+            $row = self::getRow($balance, $amount, $amountNotional, $amountAvailable, $amountAvailableNotional);
+            foreach ($row as $i => &$val) {
+                if ($i === 0) {
+                    continue;
+                }
+                $val = bcadd($val, '0', 8);
+                $length = strlen($val);
+                if ($length > ($lengths[$i] ?? 0)) {
+                    $lengths[$i] = $i;
+                }
+            }
+            $data[] = $row;
+        }
+
+        foreach ($data as &$row) {
+            $isUsd = $row[0] === 'USD';
+            foreach ($row as $i => &$col) {
+                if ($i !== 0) {
+                    $padLength = $lengths[$i] < 18 ? 18 : $lengths[$i];
+                    $col = str_pad($col, $padLength, ' ', STR_PAD_LEFT);
+                }
+                if ($isUsd) {
+                    $col = '<fg=green>' . $col . '</>';
+                }
+            }
+            if ($row[0] === 'USD') {
+            } else {
+                $table->addRow($row);
+            }
         }
         return $table;
     }
