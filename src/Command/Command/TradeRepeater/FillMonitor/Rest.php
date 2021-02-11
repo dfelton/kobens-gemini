@@ -234,8 +234,8 @@ final class Rest extends Command
                     $row->getSellAmount(),
                     strtoupper(Pair::getInstance($row->getSymbol())->getBase()->getSymbol()),
                     json_decode($row->getMeta())->sell_price,
-                    strtoupper(Pair::getInstance($row->getSymbol())->getQuote()->getSymbol()),
                     strtoupper(Pair::getInstance($row->getSymbol())->getBase()->getSymbol()),
+                    strtoupper(Pair::getInstance($row->getSymbol())->getQuote()->getSymbol()),
                 ));
             }
         }
