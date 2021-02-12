@@ -35,9 +35,21 @@ final class Profits
         $this->getPrice = $getPrice;
     }
 
-    public function get(OutputInterface $output): Table
+    /**
+     * @param OutputInterface $output
+     * @return Table[]
+     */
+    public function get(OutputInterface $output): array
     {
         $profits = $this->getData();
+        return [
+            $this->getTable($output, $profits['all_time']),
+            $this->getTable($output, $profits['past_week']),
+        ];
+    }
+
+    private function getTable(OutputInterface $output, array $profits): Table
+    {
         $table = new Table($output);
         $table->setColumnMaxWidth(0, 10);
         $table->setHeaderTitle(sprintf('Profits Since %s', $profits['date']));
@@ -78,7 +90,6 @@ final class Profits
             $table->addRow($row);
         }
 
-
         $table->addRow([
             new TableCell('', ['colspan' => 3]),
         ]);
@@ -103,29 +114,54 @@ final class Profits
      */
     private function getData()
     {
+        // TODO: isolate into its own method and implement pagination for fetching
         $results = $this->table->select(function (Select $sql) {
-            $sql->columns(['created_at', 'buy_amount', 'buy_price', 'sell_amount', 'sell_price', 'symbol']);
-            $sql->order('created_at ASC');
+            $sql->columns(['buy_amount', 'buy_price', 'sell_amount', 'sell_price', 'sell_fill_timestamp', 'symbol']);
+            $sql->order('sell_fill_timestamp ASC');
+
+            // It is only null for brand new records which the repeater:archiver:fill-time command has not yet processed
+            $sql->where('sell_fill_timestamp IS NOT NULL');
         });
+
         $profits = [];
+        $profitsPastWeek = [];
         $date = null;
+        $timestampOneWeekAgo = time() - 604800;
         foreach ($results as $result) {
             if ($date === null) {
-                $date = $result->created_at;
+                $date = $result->sell_fill_timestamp;
             }
+
             foreach ($this->getProfits($result) as $symbol => $amount) {
                 if (($profits[$symbol] ?? null) === null) {
                     $profits[$symbol] = '0';
                 }
                 $profits[$symbol] = Add::getResult($profits[$symbol], $amount);
+
+                $sellFillTimestamp = strtotime($result->sell_fill_timestamp);
+                if ($sellFillTimestamp > $timestampOneWeekAgo) {
+                    if (($profitsPastWeek[$symbol] ?? null) === null) {
+                        $profitsPastWeek[$symbol] = '0';
+                    }
+                    $profitsPastWeek[$symbol] = Add::getResult($profitsPastWeek[$symbol], $amount);
+                }
             }
         }
+
         ksort($profits);
+        ksort($profitsPastWeek);
 
         return [
-            'date' => $date,
-            'profits' => $profits,
-            'days' => (string) round((time() - strtotime($date)) / (60 * 60 * 24), 2),
+            'all_time' => [
+                'date' => $date,
+                'profits' => $profits,
+                'days' => (string) round((time() - strtotime($date)) / (60 * 60 * 24), 2),
+            ],
+            'past_week' => [
+                'date' => date('Y-m-d H:s:i', $timestampOneWeekAgo),
+                'profits' => $profitsPastWeek,
+                'days' => '7'
+            ]
         ];
     }
 
