@@ -155,6 +155,10 @@ final class PricePointGenerator extends Command
             $pricePoint->getBuyAmountBase()
         ]);
         $table->addRow([
+            sprintf('Required %s for Buy', $pair->getQuote()->getSymbol()),
+            Add::getResult($pricePoint->getBuyAmountQuote(), $pricePoint->getBuyFeeHold())
+        ]);
+        $table->addRow([
             'Amount (Sell)',
             $pricePoint->getSellAmountBase()
         ]);
