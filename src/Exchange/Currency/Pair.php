@@ -99,7 +99,7 @@ final class Pair extends CurrencyPair implements PairInterface
         'uniusd'  => ['base' => 'uni',   'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
 
         // Yearn Finance - https://yearn.finance/
-        'yfiusd'  => ['base' => 'yfi',   'quote' => 'usd', 'minOrderSize' => '0.00001', 'minOrderIncrement' => '0.00000001', 'minPriceIncrement' => '0.01'],
+        'yfiusd'  => ['base' => 'yfi',   'quote' => 'usd', 'minOrderSize' => '0.00001', 'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.01'],
 
         // ZCash
         'zecbch'  => ['base' => 'zec',   'quote' => 'bch', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
