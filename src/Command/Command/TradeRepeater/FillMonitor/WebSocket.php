@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor;
 
+use Amp\Websocket\Client\ConnectionException;
 use Amp\Websocket\Client\Handshake;
+use Amp\Websocket\ClosedException;
 use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Core\SleeperInterface;
 use Kobens\Gemini\Api\HostInterface;
@@ -78,7 +80,7 @@ final class WebSocket extends Command
         while (!$this->shutdown->isShutdownModeEnabled()) {
             try {
                 \Amp\Loop::run($this->main($output));
-            } catch (\Amp\Websocket\Client\ConnectionException $e) {
+            } catch (ConnectionException | ClosedException $e) {
                 $output->writeln([
                     "<fg=red>{$this->now()}\t{$e->getMessage()}</>",
                     "<fg=yellow>{$this->now()}\tSleeping {$reconnectDelay} seconds before next reconnect attempt.</>"
