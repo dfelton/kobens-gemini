@@ -6,12 +6,20 @@ namespace KobensTest\Gemini\Unit\TradeRepeater;
 
 use Kobens\Exchange\PairInterface;
 use Kobens\Gemini\Exchange\Currency\Pair;
+use Kobens\Gemini\Exchange\Order\Fee\ApiMakerHoldBps;
 use Kobens\Gemini\TradeRepeater\PricePointGenerator;
 use Kobens\Gemini\TradeRepeater\PricePointGenerator\PricePoint;
 use PHPUnit\Framework\TestCase;
 
 class PricePointGeneratorTest extends TestCase
 {
+    private PricePointGenerator $ppg;
+
+    protected function setUp(): void
+    {
+        $this->ppg = new PricePointGenerator(new ApiMakerHoldBps());
+    }
+
     public function testOrderPriceIncrementIsEnforcedOnIncrements(): void
     {
         $this->markTestSkipped('Must enforce that order price increment is enforced on increments param.');
@@ -29,7 +37,7 @@ class PricePointGeneratorTest extends TestCase
 
     public function testBasicCompositionIsCorrect(): void
     {
-        $result = PricePointGenerator::get(Pair::getInstance('btcusd'), '0.00014', '2.5', '5', '2.5', '1.025', '0.000003');
+        $result = $this->ppg->get(Pair::getInstance('btcusd'), '0.00014', '2.5', '5', '2.5', '1.025', '0.000003');
 
         $this->assertSame('0.00028',      $result->getTotalBuyBase(),     'Failed asserting total base currency buy amount is correct.');
         $this->assertSame('0.00000105',   $result->getTotalBuyFees(),     'Failed asserting total buy fees is correct.');
@@ -91,7 +99,7 @@ class PricePointGeneratorTest extends TestCase
 
     public function testPriceIncrementsCorrectly(): void
     {
-        $pricePoints = PricePointGenerator::get(Pair::getInstance('btcusd'), '1', '2.5', '10', '2.5', '1.025')->getPricePoints();
+        $pricePoints = $this->ppg->get(Pair::getInstance('btcusd'), '1', '2.5', '10', '2.5', '1.025')->getPricePoints();
         $buyPrices = ['2.5', '5', '7.5', '10'];
         $sellPrices = ['2.57', '5.13', '7.69', '10.25'];
         foreach ($pricePoints as $i => $pricePoint) {
@@ -121,7 +129,7 @@ class PricePointGeneratorTest extends TestCase
         string $increment,
         string $sellAfterGain
     ): void {
-        $pricePoints = PricePointGenerator::get($pair, $buyAmount, $priceStart, $priceEnd, $increment, $sellAfterGain)->getPricePoints();
+        $pricePoints = $this->ppg->get($pair, $buyAmount, $priceStart, $priceEnd, $increment, $sellAfterGain)->getPricePoints();
         $last = \end($pricePoints);
         $this->assertSame($expectedBuyPrice,  $last->getBuyPrice());
         $this->assertSame($expectedSellPrice, $last->getSellPrice());
@@ -149,7 +157,7 @@ class PricePointGeneratorTest extends TestCase
     {
         $this->assertSame(
             $expectedResult,
-            PricePointGenerator::get($pair, $buyAmount, $priceStart, $priceEnd, $increment, $priceChange)->hasVariablePriceIncrementPercent(),
+            $this->ppg->get($pair, $buyAmount, $priceStart, $priceEnd, $increment, $priceChange)->hasVariablePriceIncrementPercent(),
             'Failed asserting variable price increment was set correctly'
         );
     }
