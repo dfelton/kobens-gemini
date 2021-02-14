@@ -33,6 +33,7 @@ final class GetPastTrades implements GetPastTradesInterface
             try {
                 $response = $this->request->getResponse(self::URL_PATH, $payload, [], true);
             } catch (InvalidNonceException $e) {
+                // FIXME: This can be addressed with better keys management
                 continue;
             }
         }
