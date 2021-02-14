@@ -19,7 +19,7 @@ final class Archiver extends Command
 {
     use SleeperTrait;
 
-    private const DEFAULT_DELAY = 5;
+    private const DEFAULT_DELAY = 2;
 
     protected static $defaultName = 'repeater:archiver';
 
@@ -90,7 +90,7 @@ final class Archiver extends Command
                 $this->sellFilled->setNextState($row->getId());
                 $this->processor->execute($row);
                 $this->connection->commit();
-            } catch (\Error $e) {
+            } catch (\Throwable $e) {
                 $this->connection->rollback();
                 throw $e;
             }
