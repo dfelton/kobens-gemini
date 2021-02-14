@@ -6,7 +6,8 @@ namespace Kobens\Gemini\TradeRepeater;
 
 use Kobens\Exchange\PairInterface;
 use Kobens\Gemini\Exception;
-use Kobens\Gemini\Exchange\Order\Fee\ApiMakerHoldBps;
+use Kobens\Gemini\Exception\Order\MinimumAmountException;
+use Kobens\Gemini\Exchange\Order\Fee\ApiMakerHoldBpsInterface;
 use Kobens\Gemini\Exchange\Order\Fee\MaxApiMakerBps;
 use Kobens\Gemini\TradeRepeater\PricePointGenerator\PricePoint;
 use Kobens\Gemini\TradeRepeater\PricePointGenerator\Result;
@@ -16,35 +17,46 @@ use Kobens\Math\BasicCalculator\Multiply;
 use Kobens\Math\BasicCalculator\Subtract;
 use Kobens\Math\IsEvenlyDivisible;
 
-final class PricePointGenerator
+final class PricePointGenerator implements PricePointGeneratorInterface
 {
+    private ApiMakerHoldBpsInterface $apiMakerHoldBps;
+
+    public function __construct(
+        ApiMakerHoldBpsInterface $apiMakerHoldBps
+    ) {
+        $this->apiMakerHoldBps = $apiMakerHoldBps;
+    }
+
     /**
-     * @param PairInterface $pair Currency Pair which to generate PricePoint models for
-     * @param string $buyAmount Amount of base currency to purchase with each PricePoint
-     * @param string $priceStart Quote currency buy price which to first generate a PricePoint for
-     * @param string $priceEnd Quote currency buy price which to not generate PricePoint models beyond
-     * @param string $increment Amount Quote currency buy price should be incremented between each PricePoint
-     * @param string $priceChange Multiplier to use to determine Quote currency sell price in relation to a PricePoint's buy price ("1" would result in no price change, "2" result in a 100% gain in price)
-     * @param string $saveAmount Amount of base currency to HODL from the buy order (determines amount to sell in a PricePoint)
-     * @param bool $byPassMinOrderSize Do not throw an exception for min order size violations.
-     * @return Result
-     * @throws \Exception
+     * {@inheritDoc}
+     * @see \Kobens\Gemini\TradeRepeater\PricePointGeneratorInterface::get()
      */
-    public static function get(PairInterface $pair, string $buyAmount, string $priceStart, string $priceEnd, string $increment, string $priceChange, string $saveAmount = '0', $byPassMinOrderSize = false): Result
-    {
+    public function get(
+        PairInterface $pair,
+        string $buyAmount,
+        string $priceStart,
+        string $priceEnd,
+        string $increment,
+        string $priceChange,
+        string $saveAmount = '0',
+        $byPassMinOrderSize = false,
+        $incrementByPercent = false
+    ): Result {
         $sellAmount = Subtract::getResult($buyAmount, $saveAmount);
         if (!$byPassMinOrderSize) {
-            self::validateOrderSize($pair, $buyAmount, $sellAmount);
+            $this->validateOrderSize($pair, $buyAmount, $sellAmount);
         }
 
-        self::validatePriceStart($pair, $priceStart);
-        self::validatePriceIncrement($pair, $increment);
+        $this->validatePriceStart($pair, $priceStart);
+        if ($incrementByPercent === false) {
+            $this->validatePriceIncrement($pair, $increment);
+        }
 
         $orders = [];
         $variableIncrement = false;
         $price = $priceStart;
         while (Compare::getResult($price, $priceEnd) !== Compare::RIGHT_LESS_THAN) {
-            $sellData = self::getSellPrice($price, $priceChange, $pair);
+            $sellData = $this->getSellPrice($price, $priceChange, $pair);
             $variableIncrement = $variableIncrement || ($sellData['isExact'] === false);
             $pricePoint = new PricePoint(
                 $buyAmount,
@@ -52,14 +64,26 @@ final class PricePointGenerator
                 $sellAmount,
                 $sellData['sell_price'],
                 MaxApiMakerBps::get(),
-                ApiMakerHoldBps::get()
+                $this->apiMakerHoldBps->get()
             );
-            self::validateHasGains($pricePoint);
+            $this->validateHasGains($pricePoint);
             $orders[] = $pricePoint;
             if (Compare::getResult($increment, '0') === Compare::EQUAL || Compare::getResult($priceStart, $priceEnd) === Compare::EQUAL) {
                 break;
             }
-            $price = Add::getResult($price, $increment);
+            if ($incrementByPercent === false) {
+                $price = Add::getResult($price, $increment);
+            } else {
+                $priceIncrease = bcmul(
+                    $price,
+                    $increment,
+                    Add::getScale($pair->getMinPriceIncrement(), $pair->getMinPriceIncrement())
+                );
+                if (Compare::getResult($priceIncrease, $pair->getMinPriceIncrement()) === Compare::RIGHT_GREATER_THAN) {
+                    $priceIncrease = $pair->getMinPriceIncrement();
+                }
+                $price = Add::getResult($price, $priceIncrease);
+            }
         }
         return new Result($orders, $variableIncrement);
     }
@@ -70,16 +94,16 @@ final class PricePointGenerator
      * @param string $sellAmount
      * @throws Exception
      */
-    private static function validateOrderSize(PairInterface $pair, string $buyAmount, string $sellAmount): void
+    private function validateOrderSize(PairInterface $pair, string $buyAmount, string $sellAmount): void
     {
         if (Compare::getResult($pair->getMinOrderSize(), $buyAmount) === Compare::LEFT_GREATER_THAN) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new MinimumAmountException(sprintf(
                 'Buy amount "%s" is invalid. Minimum order size is "%s".',
                 $buyAmount,
                 $pair->getMinOrderSize()
             ));
         } elseif (Compare::getResult($pair->getMinOrderSize(), $sellAmount) === Compare::LEFT_GREATER_THAN) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new MinimumAmountException(sprintf(
                 'Sell amount "%s" is invalid. Minimum order size is "%s".',
                 $sellAmount,
                 $pair->getMinOrderSize()
@@ -87,7 +111,7 @@ final class PricePointGenerator
         }
     }
 
-    private static function validatePriceStart(PairInterface $pair, string $priceStart): void
+    private function validatePriceStart(PairInterface $pair, string $priceStart): void
     {
         $compare = Compare::getResult($priceStart, $pair->getMinPriceIncrement());
         if ($compare === Compare::EQUAL) {
@@ -109,7 +133,7 @@ final class PricePointGenerator
         }
     }
 
-    private static function validatePriceIncrement(PairInterface $pair, string $increment): void
+    private function validatePriceIncrement(PairInterface $pair, string $increment): void
     {
         if (IsEvenlyDivisible::getResult($increment, $pair->getMinPriceIncrement()) === false) {
             throw new \InvalidArgumentException(\sprintf(
@@ -124,7 +148,7 @@ final class PricePointGenerator
      * @param PricePoint $pricePoint
      * @throws Exception
      */
-    private static function validateHasGains(PricePoint $pricePoint): void
+    private function validateHasGains(PricePoint $pricePoint): void
     {
         // "Potentially" in the wording here because fees are variable, and we assume the worst
         if (Compare::getResult($pricePoint->getProfitQuote(), '0') === Compare::RIGHT_GREATER_THAN) {
@@ -154,7 +178,7 @@ final class PricePointGenerator
      * @param PairInterface $pair
      * @return array
      */
-    private static function getSellPrice(string $priceStart, string $priceChange, PairInterface $pair): array
+    private function getSellPrice(string $priceStart, string $priceChange, PairInterface $pair): array
     {
         $exact = Multiply::getResult($priceStart, $priceChange);
         $scale = strpos($pair->getMinPriceIncrement(), '.') === false

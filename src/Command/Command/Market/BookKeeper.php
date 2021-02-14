@@ -30,13 +30,13 @@ final class BookKeeper extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Opens a market book.');
         $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Trading Symbol', 'btcusd');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $book = $this->bookFactory->create($input->getOption('symbol'));
         $loop = true;
@@ -66,9 +66,10 @@ final class BookKeeper extends Command
                 } while ($e instanceof \Throwable);
             }
         } while ($loop);
+        return 0;
     }
 
-    protected function outputErrorAndSleep(OutputInterface $output, string $message, int $seconds = 10)
+    protected function outputErrorAndSleep(OutputInterface $output, string $message, int $seconds = 10): void
     {
         if ($seconds < 1) {
             $seconds = 10;

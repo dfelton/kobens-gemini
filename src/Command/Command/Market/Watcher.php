@@ -57,14 +57,14 @@ final class Watcher extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Outputs details on a market book.');
         $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Trading Pair Symbol', 'btcusd');
         $this->addOption('refresh', 'r', InputOption::VALUE_OPTIONAL, 'Refresh rate in micro seconds', self::REFRESH_DEFAULT);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->init($input);
 
@@ -108,6 +108,7 @@ final class Watcher extends Command
             $this->bookIsOpen = true;
             \usleep($this->refreshRate);
         }
+        return 0;
     }
 
     private function init(InputInterface $input): void

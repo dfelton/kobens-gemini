@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8a31e1b7ea326b41199fcc3d4d759626",
+    "content-hash": "507df7c17935025b49f5a237cf9a20b3",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1038,12 +1038,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-core.git",
-                "reference": "ef253679df5269beb28412d8586c39103e32f05c"
+                "reference": "60bb749737e28c92091d205cb3eca5cd13a398ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dfelton/kobens-core/zipball/ef253679df5269beb28412d8586c39103e32f05c",
-                "reference": "ef253679df5269beb28412d8586c39103e32f05c",
+                "url": "https://api.github.com/repos/dfelton/kobens-core/zipball/60bb749737e28c92091d205cb3eca5cd13a398ab",
+                "reference": "60bb749737e28c92091d205cb3eca5cd13a398ab",
                 "shasum": ""
             },
             "require": {
@@ -1060,6 +1060,7 @@
                 "phpunit/phpunit": "^8",
                 "zendframework/zend-debug": "^2.6"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -1080,7 +1081,7 @@
                 "source": "https://github.com/dfelton/kobens-core/tree/master",
                 "issues": "https://github.com/dfelton/kobens-core/issues"
             },
-            "time": "2020-08-07T15:51:48+00:00"
+            "time": "2021-02-08T19:43:29+00:00"
         },
         {
             "name": "kobens/kobens-currency",
@@ -1224,16 +1225,16 @@
         },
         {
             "name": "kobens/kobens-math",
-            "version": "1.0.0",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-math.git",
-                "reference": "b6269b9032fb582a1eab6892077ffa66b7e93c67"
+                "reference": "f64f46cc591648d822555dff95734ba7b1fc213d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dfelton/kobens-math/zipball/b6269b9032fb582a1eab6892077ffa66b7e93c67",
-                "reference": "b6269b9032fb582a1eab6892077ffa66b7e93c67",
+                "url": "https://api.github.com/repos/dfelton/kobens-math/zipball/f64f46cc591648d822555dff95734ba7b1fc213d",
+                "reference": "f64f46cc591648d822555dff95734ba7b1fc213d",
                 "shasum": ""
             },
             "require": {
@@ -1264,10 +1265,10 @@
             ],
             "description": "Library for arithmetic operations.",
             "support": {
-                "source": "https://github.com/dfelton/kobens-math/tree/v1.0.0",
+                "source": "https://github.com/dfelton/kobens-math/tree/v2.0.0",
                 "issues": "https://github.com/dfelton/kobens-math/issues"
             },
-            "time": "2020-12-30T05:52:25+00:00"
+            "time": "2021-02-08T17:19:27+00:00"
         },
         {
             "name": "league/uri",

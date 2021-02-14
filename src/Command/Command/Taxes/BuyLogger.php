@@ -25,12 +25,12 @@ final class BuyLogger extends Command
 
     private string $symbol;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Trading Symbol', 'btcusd');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->symbol = $input->getOption('symbol');
         do {
@@ -49,6 +49,7 @@ final class BuyLogger extends Command
                 ]);
             }
         } while ($rows->count() > 0);
+        return 0;
     }
 
     private function getBuyLogTable(): TableGateway

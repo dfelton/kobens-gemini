@@ -15,7 +15,7 @@ abstract class AbstractNewOrder extends Command
 {
     abstract protected function getNewOrderInterface(): NewOrderInterface;
 
-    final protected function configure()
+    final protected function configure(): void
     {
         $this->addArgument('side', InputArgument::REQUIRED, 'buy|sell');
         $this->addArgument('symbol', InputArgument::REQUIRED);
@@ -24,7 +24,7 @@ abstract class AbstractNewOrder extends Command
         $this->addArgument('clientOrderId', InputArgument::OPTIONAL);
     }
 
-    final protected function execute(InputInterface $input, OutputInterface $output)
+    final protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $data = $this->getNewOrderInterface()->place(
             Pair::getInstance($input->getArgument('symbol')),
@@ -49,6 +49,7 @@ abstract class AbstractNewOrder extends Command
                 $output->writeln("$key\t{$this->getFormattedVal($val)}");
             }
         }
+        return 0;
     }
 
     final private function getFormattedVal($value): string

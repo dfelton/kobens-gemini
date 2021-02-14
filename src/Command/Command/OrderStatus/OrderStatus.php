@@ -23,7 +23,7 @@ final class OrderStatus extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Fetch the status for an individual order');
         $this->addOption('order_id', 'o', InputOption::VALUE_OPTIONAL, 'Order Id');

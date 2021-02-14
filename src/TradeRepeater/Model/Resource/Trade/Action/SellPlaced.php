@@ -10,7 +10,7 @@ use Kobens\Gemini\TradeRepeater\Model\Trade;
 final class SellPlaced extends AbstractAction implements SellPlacedInterface
 {
     public const STATUS_CURRENT = 'SELL_PLACED';
-    private const STATUS_NEXT      = 'SELL_FILLED';
+    private const STATUS_NEXT = 'SELL_FILLED';
 
     protected function isHealthy(Trade $trade): bool
     {
@@ -30,7 +30,9 @@ final class SellPlaced extends AbstractAction implements SellPlacedInterface
         try {
             $record = $this->getHealthyRecord($id, true);
             $this->table->update(
-                ['status' => self::STATUS_NEXT],
+                [
+                    'status' => self::STATUS_NEXT,
+                ],
                 ['id' => $record->getId()]
             );
             $this->connection->commit();

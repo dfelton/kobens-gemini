@@ -33,7 +33,7 @@ final class Rest extends Command
 
     private const EXCEPTION_DELAY = 60;
 
-    protected static $defaultName = 'trade-repeater:fill-monitor-rest';
+    protected static $defaultName = 'repeater:fill-monitor-rest';
 
     private GetActiveOrdersInterface $activeOrders;
 
@@ -66,8 +66,8 @@ final class Rest extends Command
 
     protected function configure(): void
     {
-        $this->addOption('buy', 'b', InputOption::VALUE_OPTIONAL, 'Audit Buy Orders', '0');
-        $this->addOption('sell', 's', InputOption::VALUE_OPTIONAL, 'Audit Sell Orders', '0');
+        $this->addOption('buy', 'b', InputOption::VALUE_OPTIONAL, 'Audit Buy Orders', '1');
+        $this->addOption('sell', 's', InputOption::VALUE_OPTIONAL, 'Audit Sell Orders', '1');
         $this->addOption('pair', 'p', InputOption::VALUE_OPTIONAL, 'Pair to audit. Default to all');
     }
 
@@ -75,6 +75,10 @@ final class Rest extends Command
     {
         $buyAudit = $input->getOption('buy') === '1';
         $sellAudit = $input->getOption('sell') === '1';
+        if ($sellAudit === false && $buyAudit === false) {
+            $output->writeln('<fg=red>Must audit at least buy or sell orders.</>');
+            return 1;
+        }
         $pair = $input->getOption('pair')
             ? Pair::getInstance($input->getOption('pair'))
             : null;
@@ -109,7 +113,7 @@ final class Rest extends Command
                         $time
                     ));
                 }
-                $this->sleep(3600 + (60 * rand(2, 5)), $this->sleeper, $this->shutdown);
+                $this->sleep(600, $this->sleeper, $this->shutdown);
             } catch (ConnectionException | MaintenanceException | SystemException $e) {
                 $this->exceptionDelay($output, $e);
             } catch (\Exception $e) {
@@ -141,10 +145,10 @@ final class Rest extends Command
         /** @var \Kobens\Gemini\TradeRepeater\Model\Trade $row */
         $activeIds = $this->getActiveOrderIds();
         if ($buyOrders) {
-            $this->iterateBuyOrders($output, $activeIds, $pair);
+            $this->iterateBuyOrders($output, $activeIds['buy'], $pair);
         }
         if ($sellOrders) {
-            $this->iterateSellOrders($output, $activeIds, $pair);
+            $this->iterateSellOrders($output, $activeIds['sell'], $pair);
         }
     }
 
@@ -157,7 +161,7 @@ final class Rest extends Command
             }
             if (
                 ($pair !== null && $pair->getSymbol() !== $row->getSymbol()) ||
-                ($activeIds['buy'][$row->getBuyOrderId()] ?? null) ||
+                ($activeIds[$row->getBuyOrderId()] ?? null) ||
                 $this->isStillHealthy($this->buyPlaced, $row->getId()) === false
             ) {
                 continue;
@@ -165,7 +169,7 @@ final class Rest extends Command
 
             $isFilled = null;
             $i = 0;
-            while ($isFilled == null && $i <= 100) {
+            while ($isFilled === null && $i <= 100) {
                 try {
                     $isFilled = $this->isFilled($row->getBuyOrderId());
                 } catch (InvalidNonceException $e) {
@@ -186,8 +190,8 @@ final class Rest extends Command
                     $row->getBuyAmount(),
                     strtoupper(Pair::getInstance($row->getSymbol())->getBase()->getSymbol()),
                     json_decode($row->getMeta())->buy_price,
-                    strtoupper(Pair::getInstance($row->getSymbol())->getQuote()->getSymbol()),
                     strtoupper(Pair::getInstance($row->getSymbol())->getBase()->getSymbol()),
+                    strtoupper(Pair::getInstance($row->getSymbol())->getQuote()->getSymbol()),
                 ));
             }
         }
@@ -201,7 +205,7 @@ final class Rest extends Command
                 break;
             } elseif (
                 ($pair !== null && $pair->getSymbol() !== $row->getSymbol()) ||
-                ($activeIds['sell'][$row->getSellOrderId()] ?? null) ||
+                ($activeIds[$row->getSellOrderId()] ?? null) ||
                 $this->isStillHealthy($this->sellPlaced, $row->getId()) === false
             ) {
                 continue;
@@ -209,7 +213,7 @@ final class Rest extends Command
 
             $isFilled = null;
             $i = 0;
-            while ($isFilled == null && $i <= 100) {
+            while ($isFilled === null && $i <= 100) {
                 try {
                     $isFilled = $this->isFilled($row->getSellOrderId());
                 } catch (InvalidNonceException $e) {
@@ -230,8 +234,8 @@ final class Rest extends Command
                     $row->getSellAmount(),
                     strtoupper(Pair::getInstance($row->getSymbol())->getBase()->getSymbol()),
                     json_decode($row->getMeta())->sell_price,
-                    strtoupper(Pair::getInstance($row->getSymbol())->getQuote()->getSymbol()),
                     strtoupper(Pair::getInstance($row->getSymbol())->getBase()->getSymbol()),
+                    strtoupper(Pair::getInstance($row->getSymbol())->getQuote()->getSymbol()),
                 ));
             }
         }
@@ -263,7 +267,7 @@ final class Rest extends Command
     {
         $ids = ['buy' => [], 'sell' => []];
         foreach ($this->activeOrders->getOrders() as $order) {
-            $ids[$order->side][$order->order_id] = null;
+            $ids[$order->side][$order->order_id] = true;
         }
         return $ids;
     }

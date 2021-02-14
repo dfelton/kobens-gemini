@@ -22,17 +22,18 @@ final class CancelAllActive extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Cancel all open orders on the Gemini exchange.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $data = $this->cancel->cancelAll();
         $output->writeln([
             \sprintf('%s order(s) cancelled.', \count($data->details->cancelledOrders)),
             \sprintf('%s order(s) cancellations rejected.', \count($data->details->cancelRejects))
         ]);
+        return 0;
     }
 }

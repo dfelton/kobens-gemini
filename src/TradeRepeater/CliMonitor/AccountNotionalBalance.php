@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Kobens\Gemini\TradeRepeater\Watcher;
+namespace Kobens\Gemini\TradeRepeater\CliMonitor;
 
 use Kobens\Core\Config;
-use Kobens\Gemini\TradeRepeater\Watcher\Helper\DataInterface;
+use Kobens\Gemini\TradeRepeater\CliMonitor\Helper\DataInterface;
 use Kobens\Math\BasicCalculator\Add;
 use Kobens\Math\BasicCalculator\Compare;
 use Kobens\Math\BasicCalculator\Subtract;
@@ -32,7 +32,7 @@ final class AccountNotionalBalance
         $investedUsd = self::formatVal($investedUsd);
         $amount = self::formatVal($amount);
         $table = new Table($output);
-        $table->setHeaderTitle('Account');
+        $table->setHeaderTitle('Account - ' . (new \DateTime())->format('Y-m-d H:i:s'));
         $table->setHeaders(['Notional Balance', '    USD Invested', '      Difference']);
         $table->addRow(["$ <fg=green>$amount</>", "$ $investedUsd", "$ <fg=$diffFormat>$diff</>"]);
         return $table;

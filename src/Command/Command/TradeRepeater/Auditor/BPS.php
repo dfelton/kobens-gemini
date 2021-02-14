@@ -36,7 +36,7 @@ final class BPS extends Command
     private const SLEEP_DELAY = 600;
     private const SLEEP_EXCEPTION_DELAY = 10;
 
-    protected static $defaultName = 'trade-repeater:audit:bps';
+    protected static $defaultName = 'repeater:audit:bps';
 
     private EmergencyShutdownInterface $shutdown;
 
@@ -63,7 +63,7 @@ final class BPS extends Command
         parent::__construct();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         while (!$this->shutdown->isShutdownModeEnabled()) {
             try {
@@ -76,6 +76,7 @@ final class BPS extends Command
             }
         }
         $output->writeln("\n<fg=red>{$this->now()}\tShutdown signal detected.\n");
+        return 0;
     }
 
     /**

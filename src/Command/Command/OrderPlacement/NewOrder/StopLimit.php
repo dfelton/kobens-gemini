@@ -25,7 +25,7 @@ final class StopLimit extends Command
         parent::__construct();
     }
 
-    final protected function configure()
+    final protected function configure(): void
     {
         $this->addArgument('side', InputArgument::REQUIRED, 'buy|sell');
         $this->addArgument('symbol', InputArgument::REQUIRED);
@@ -35,7 +35,7 @@ final class StopLimit extends Command
         $this->addArgument('clientOrderId', InputArgument::OPTIONAL);
     }
 
-    final protected function execute(InputInterface $input, OutputInterface $output)
+    final protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $data = $this->stopLimitOrder->place(
             Pair::getInstance($input->getArgument('symbol')),
@@ -61,6 +61,8 @@ final class StopLimit extends Command
                 $output->writeln("$key\t{$this->getFormattedVal($val)}");
             }
         }
+
+        return 0;
     }
 
     final private function getFormattedVal($value): string

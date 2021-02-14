@@ -24,7 +24,7 @@ final class GetPastTrades extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Fetches trade data since a given timestamp');
         $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Trading Symbol', 'btcusd');
@@ -33,7 +33,7 @@ final class GetPastTrades extends Command
         $this->addOption('raw', 'r', InputOption::VALUE_OPTIONAL, 'Whether or not to output raw response data or not', false);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $symbol = $input->getOption('symbol');
         $timestamp = $input->getOption('timestamp');
@@ -59,6 +59,7 @@ final class GetPastTrades extends Command
                 $table->render();
             }
         }
+        return 0;
     }
 
     private function getTable(OutputInterface $output): Table

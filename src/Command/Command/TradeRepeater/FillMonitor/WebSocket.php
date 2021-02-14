@@ -24,7 +24,7 @@ final class WebSocket extends Command
 {
     use SleeperTrait;
 
-    protected static $defaultName = 'trade-repeater:fill-monitor-websocket';
+    protected static $defaultName = 'repeater:fill-monitor-websocket';
 
     private BuyPlacedInterface $buyPlaced;
 
@@ -63,13 +63,13 @@ final class WebSocket extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Monitors order fillings for the Gemini Trade Repater');
         $this->addOption('reconnect_delay', 'd', InputOption::VALUE_OPTIONAL, 'Time to wait in seconds (min 5 seconds) between reconnection attempts.', 10);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $reconnectDelay = (int) $input->getOption('reconnect_delay');
         if ($reconnectDelay < 5) {
@@ -93,6 +93,7 @@ final class WebSocket extends Command
             $this->now(),
             self::class
         ));
+        return 0;
     }
 
     private function main(OutputInterface $output): \Closure
@@ -170,8 +171,8 @@ final class WebSocket extends Command
                 $msg['original_amount'],
                 strtoupper(Pair::getInstance($msg['symbol'])->getBase()->getSymbol()),
                 $msg['price'],
-                strtoupper(Pair::getInstance($msg['symbol'])->getQuote()->getSymbol()),
                 strtoupper(Pair::getInstance($msg['symbol'])->getBase()->getSymbol()),
+                strtoupper(Pair::getInstance($msg['symbol'])->getQuote()->getSymbol()),
             ));
         } elseif (!in_array($msg['side'], ['buy','sell'])) {
             throw new \Exception("Unhandled side '{$msg['side']}'");

@@ -8,14 +8,15 @@ use Kobens\Core\Config;
 use Kobens\Core\SleeperInterface;
 use Kobens\Exchange\PairInterface;
 use Kobens\Gemini\Exchange\Currency\Pair as CurrencyPair;
-use Kobens\Gemini\TradeRepeater\Watcher\Helper\Data;
-use Kobens\Gemini\TradeRepeater\Watcher\MarketSpread;
-use Kobens\Gemini\TradeRepeater\Watcher\TradeSpread;
+use Kobens\Gemini\TradeRepeater\CliMonitor\Helper\Data;
+use Kobens\Gemini\TradeRepeater\CliMonitor\MarketSpread;
+use Kobens\Gemini\TradeRepeater\CliMonitor\TradeSpread;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Kobens\Http\Exception\Status\ServerErrorException;
 
 final class Pair extends Command
 {
@@ -40,7 +41,7 @@ final class Pair extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Monitoring output on trades and the market');
         $this->addOption('pair', 'p', InputOption::VALUE_OPTIONAL, 'Comma separated trading pair(s) to show trade-repeater data for', 'btcusd');
@@ -58,7 +59,7 @@ final class Pair extends Command
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $sleep = $this->getRefreshRate($input);
         $loop = $input->getOption('disable-loop') === false;
@@ -86,6 +87,7 @@ final class Pair extends Command
                 } while ($e instanceof \Throwable);
             }
         } while ($loop && !file_exists(Config::getInstance()->getRootDir() . self::KILL_FILE));
+        return 0;
     }
 
     /**
@@ -112,7 +114,12 @@ final class Pair extends Command
      */
     private function main(InputInterface $input, OutputInterface $output): void
     {
-        $data = $this->getData($input, $output);
+        try {
+            $data = $this->getData($input, $output);
+        } catch (ServerErrorException $e) {
+            $data = [(new Table($output))->setRows([['Server Error at Exchange']])];
+        }
+
         $time = (new Table($output))->setRows([['Date / Time:', (new \DateTime())->format('Y-m-d H:i:s')]]);
 
         $output->write("\e[H\e[J");

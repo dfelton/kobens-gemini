@@ -26,7 +26,7 @@ final class AddToPosition extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument('id', InputArgument::REQUIRED, 'ID of Repeater Record');
         $this->addArgument('amount', InputArgument::REQUIRED, 'Additional Amount to Buy');

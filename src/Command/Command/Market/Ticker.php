@@ -8,8 +8,8 @@ use Kobens\Gemini\Api\Rest\PublicEndpoints\TickerInterface;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputArgument;
 
 final class Ticker extends Command
 {
@@ -24,15 +24,15 @@ final class Ticker extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Outputs details on a market book.');
-        $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Trading Pair Symbol', 'btcusd');
+        $this->addArgument('symbol', InputArgument::OPTIONAL, 'Trading Pair Symbol', 'btcusd');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $symbol = $input->getOption('symbol');
+        $symbol = $input->getArgument('symbol');
         $data = $this->ticker->getData($symbol);
         $base = \strtoupper(Pair::getInstance($symbol)->getBase()->getSymbol());
         $quote = \strtoupper(Pair::getInstance($symbol)->getQuote()->getSymbol());
@@ -50,5 +50,6 @@ final class Ticker extends Command
         $output->writeln("\t<options=bold>{$quote}</>\t{$data->volume->{$quote}}");
 
         $output->write(PHP_EOL);
+        return 0;
     }
 }

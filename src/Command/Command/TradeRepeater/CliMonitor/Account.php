@@ -8,10 +8,13 @@ use Kobens\Core\Config;
 use Kobens\Core\SleeperInterface;
 use Kobens\Exchange\PairInterface;
 use Kobens\Gemini\Exchange\Currency\Pair;
-use Kobens\Gemini\TradeRepeater\Watcher\AccountNotionalBalance;
-use Kobens\Gemini\TradeRepeater\Watcher\Balances;
-use Kobens\Gemini\TradeRepeater\Watcher\Helper\Data;
-use Kobens\Gemini\TradeRepeater\Watcher\Profits;
+use Kobens\Gemini\TradeRepeater\CliMonitor\AccountNotionalBalance;
+use Kobens\Gemini\TradeRepeater\CliMonitor\Balances;
+use Kobens\Gemini\TradeRepeater\CliMonitor\Helper\Data;
+use Kobens\Gemini\TradeRepeater\CliMonitor\Profits;
+use Kobens\Http\Exception\Status\ServerErrorException;
+use Kobens\Math\BasicCalculator\Add;
+use Kobens\Math\BasicCalculator\Multiply;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,8 +24,6 @@ use Zend\Db\Adapter\Adapter;
 use Zend\Db\TableGateway\TableGatewayInterface;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Sql\Select;
-use Kobens\Math\BasicCalculator\Multiply;
-use Kobens\Math\BasicCalculator\Add;
 
 final class Account extends Command
 {
@@ -55,7 +56,7 @@ final class Account extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Monitoring: Account Summary');
         $this->addOption('amount', null, InputOption::VALUE_OPTIONAL, 'Show balance(s) "Amount".', false);
@@ -76,23 +77,17 @@ final class Account extends Command
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $sleep = $this->getRefreshRate($input);
-        $amount = $input->getOption('amount') !== false;
-        $amountNotional = $input->getOption('amount-notional') !== false;
-        $amountAvailable = $input->getOption('available') !== false;
-        $amountAvailableNotional = $input->getOption('available-notional') !== false;
+        $args = $this->getArgs($input);
         $loop = $input->getOption('disable-loop') === false;
         do {
             try {
                 $this->main(
                     $input,
                     $output,
-                    $amount,
-                    $amountNotional,
-                    $amountAvailable,
-                    $amountAvailableNotional
+                    $args
                 );
                 $this->data->reset();
                 if ($loop) {
@@ -115,6 +110,17 @@ final class Account extends Command
                 } while ($e instanceof \Throwable);
             }
         } while ($loop && !file_exists(Config::getInstance()->getRootDir() . self::KILL_FILE));
+        return 0;
+    }
+
+    private function getArgs(InputInterface $input): array
+    {
+        return [
+            $input->getOption('amount') !== false,
+            $input->getOption('amount-notional') !== false,
+            $input->getOption('available') !== false,
+            $input->getOption('available-notional') !== false,
+        ];
     }
 
     /**
@@ -144,25 +150,17 @@ final class Account extends Command
     private function main(
         InputInterface $input,
         OutputInterface $output,
-        bool $amount,
-        bool $amountNotional,
-        bool $amountAvailable,
-        bool $amountAvailableNotional
+        array $args
     ): void {
-        $data = $this->getData($input, $output, $amount, $amountNotional, $amountAvailable, $amountAvailableNotional);
-        $time = (new Table($output))->setRows([['Date / Time:', (new \DateTime())->format('Y-m-d H:i:s')]]);
-        $feesReserves = new Table($output);
-        $feesReserves->addRow([
-            'USD Fees Reserve:',
-            $this->getUsdFeeReserve()
-        ]);
-
+        try {
+            $data = $this->getData($input, $output, ...$args);
+        } catch (ServerErrorException $e) {
+            $data = [(new Table($output))->setRows([['Server Error at Exchange']])];
+        }
         $output->write("\e[H\e[J");
-        $time->render();
         foreach ($data as $table) {
             $table->render();
         }
-        $feesReserves->render();
     }
 
     private function getRefreshRate(InputInterface $input): int
@@ -194,28 +192,15 @@ final class Account extends Command
         $data = [];
         try {
             $data[] = AccountNotionalBalance::getTable($output, $this->data, Config::getInstance());
-            $data[] = Balances::getTable($output, $this->data, $amount, $amountNotional, $amountAvailable, $amountAvailableNotional);
-            $data[] = $this->profits->get($output);
+            if ($amount || $amountNotional || $amountAvailable || $amountAvailableNotional) {
+                $data[] = Balances::getTable($output, $this->data, $amount, $amountNotional, $amountAvailable, $amountAvailableNotional);
+            }
+            foreach ($this->profits->get($output) as $table) {
+                $data[] = $table;
+            }
         } catch (\Kobens\Gemini\Exception $e) {
             $data[] = (new Table($output))->addRow([$e->getMessage()]);
         }
         return $data;
-    }
-
-    private function getUsdFeeReserve(): string
-    {
-        $records = $this->tblTradeRepeater->select(function (Select $select) {
-            $select->columns(['symbol', 'buy_price', 'buy_amount']);
-        });
-        $total = '0';
-        foreach ($records as $record) {
-            $pair = Pair::getInstance($record->symbol);
-            if ($pair->getQuote()->getSymbol() === 'usd') {
-                $costBasis = Multiply::getResult($record->buy_price, $record->buy_amount);
-                $fees = Multiply::getResult($costBasis, '0.0035'); // TODO: Reference constant
-                $total = Add::getResult($total, $fees);
-            }
-        }
-        return $total;
     }
 }

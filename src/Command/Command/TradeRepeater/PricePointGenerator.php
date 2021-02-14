@@ -19,22 +19,27 @@ use Kobens\Exchange\PairInterface;
 
 final class PricePointGenerator extends Command
 {
-    protected static $defaultName = 'trade-repeater:price-point-generator';
+    protected static $defaultName = 'repeater:ppg';
 
     /**
      * @var TableGatewayInterface
      */
-    private $table;
+    private TableGatewayInterface $table;
+
+    private Generator $generator;
 
     public function __construct(
-        TableGatewayInterface $table
+        TableGatewayInterface $table,
+        Generator $generator
     ) {
         $this->table = $table;
+        $this->generator = $generator;
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
+        $this->setDescription('Price Point Generator.');
         $this->addArgument('symbol', InputArgument::REQUIRED, 'Trading Pair Symbol');
         $this->addArgument('buy_amount', InputArgument::REQUIRED, 'Buy Amount per Order');
         $this->addArgument('buy_price_start', InputArgument::REQUIRED, 'Buy Price Start');
@@ -44,12 +49,14 @@ final class PricePointGenerator extends Command
         $this->addArgument('save_amount', InputArgument::OPTIONAL, 'Save Amount', 0);
         $this->addArgument('is_enabled', InputArgument::OPTIONAL, 'Is Enabled', 1);
         $this->addOption('create', 'c', InputOption::VALUE_OPTIONAL, 'Create records (if omitted, will simply report summary)', 0);
+        $this->addOption('increment-by-percent', 'i', InputOption::VALUE_OPTIONAL, 'Interpret provided increment value as a percentage', '0');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $pair = Pair::getInstance($input->getArgument('symbol'));
-        $result = Generator::get(
+        $create = $input->getOption('create') === '1';
+        $result = $this->generator->get(
             $pair,
             (string) $input->getArgument('buy_amount'),
             (string) $input->getArgument('buy_price_start'),
@@ -57,6 +64,8 @@ final class PricePointGenerator extends Command
             (string) $input->getArgument('increment'),
             (string) $input->getArgument('sell_after_gain'),
             (string) $input->getArgument('save_amount'),
+            $create === false,
+            $input->getOption('increment-by-percent') === '1'
         );
         $isEnabled = (int) $input->getArgument('is_enabled');
         if ($input->getOption('create') === '1') {
@@ -72,6 +81,31 @@ final class PricePointGenerator extends Command
         $base = $pair->getBase();
         $quote = $pair->getQuote();
         $pricePoints = $result->getPricePoints();
+
+        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+            foreach ($pricePoints as $i => $pricePoint) {
+                $this->reportPricePoint(
+                    $output,
+                    new TableCell(sprintf("Order %d", $i), ['colspan' => 2]),
+                    $pricePoint,
+                    $pair
+                );
+            }
+        } else {
+            $this->reportPricePoint(
+                $output,
+                new TableCell('First Order', ['colspan' => 2]),
+                reset($pricePoints),
+                $pair
+            );
+            $this->reportPricePoint(
+                $output,
+                new TableCell('Last Order', ['colspan' => 2]),
+                end($pricePoints),
+                $pair
+            );
+        }
+
         $table = new Table($output);
         $table->setHeaders([new TableCell('Price Point Summary', ['colspan' => 2])]);
         $table->addRow(['Buy Amount', (string) $input->getArgument('buy_amount')]);
@@ -102,19 +136,6 @@ final class PricePointGenerator extends Command
             $result->getTotalProfitQuote(),
         ]);
         $table->render();
-
-        $this->reportPricePoint(
-            $output,
-            new TableCell('First Order', ['colspan' => 2]),
-            reset($pricePoints),
-            $pair
-        );
-        $this->reportPricePoint(
-            $output,
-            new TableCell('Last Order', ['colspan' => 2]),
-            end($pricePoints),
-            $pair
-        );
     }
 
     private function reportPricePoint(OutputInterface $output, TableCell $header, PricePoint $pricePoint, PairInterface $pair): void
@@ -132,6 +153,10 @@ final class PricePointGenerator extends Command
         $table->addRow([
             'Amount (Buy)',
             $pricePoint->getBuyAmountBase()
+        ]);
+        $table->addRow([
+            sprintf('Required %s for Buy', $pair->getQuote()->getSymbol()),
+            Add::getResult($pricePoint->getBuyAmountQuote(), $pricePoint->getBuyFeeHold())
         ]);
         $table->addRow([
             'Amount (Sell)',

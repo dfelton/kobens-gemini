@@ -12,6 +12,7 @@ use Kobens\Core\Db;
 use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetPastTradesInterface;
+use Kobens\Gemini\Exchange\Currency\Pair;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,14 +20,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Adapter\Exception\InvalidQueryException;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
+use Kobens\Core\SleeperInterface;
 
 final class TradeHistory extends Command
 {
     protected static $defaultName = 'logger:trade-history';
 
     private const DEFAULT_SYMBOL = 'btcusd';
-    private const DEFAULT_DELAY  = 600;
-    private const MIN_DELAY      = 60;
+    private const DEFAULT_DELAY  = 60;
+    private const MIN_DELAY      = 30;
     private const MAX_DELAY      = 600;
 
     private ?TableGateway $table = null;
@@ -35,20 +37,26 @@ final class TradeHistory extends Command
 
     private EmergencyShutdownInterface $shutdown;
 
+    private SleeperInterface $sleeper;
+
     private string $symbol;
 
     private int $delay;
 
+    private Pair $pair;
+
     public function __construct(
         GetPastTradesInterface $getPastTradesInterface,
-        EmergencyShutdownInterface $shutdownInterface
+        EmergencyShutdownInterface $shutdownInterface,
+        SleeperInterface $sleeper
     ) {
         $this->pastTrades = $getPastTradesInterface;
         $this->shutdown = $shutdownInterface;
+        $this->sleeper = $sleeper;
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Maintains The trading history for a specified symbol.');
         $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Symbol to fetch history for.', self::DEFAULT_SYMBOL);
@@ -57,7 +65,7 @@ final class TradeHistory extends Command
             'd',
             InputOption::VALUE_OPTIONAL,
             \sprintf(
-                'Time in seconds to delay between requests when up to date. (%d - %d)',
+                'Time in seconds to delay between requests once up to date. (%d - %d)',
                 self::MIN_DELAY,
                 self::MAX_DELAY
             ),
@@ -65,9 +73,11 @@ final class TradeHistory extends Command
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $exitCode = 0;
         $this->symbol = $input->getOption('symbol');
+        $this->pair = Pair::getInstance($this->symbol);
         $this->delay  = (int) $input->getOption('delay');
         $timestampms  = $this->getLastTradeTimestampMs();
 
@@ -75,15 +85,36 @@ final class TradeHistory extends Command
             $this->delay = self::DEFAULT_DELAY;
         }
 
+        try {
+            $this->mainLoop($output, $timestampms);
+        } catch (\Exception $e) {
+            $this->shutdown->enableShutdownMode($e);
+            $exitCode = 1;
+        }
+
+        $output->writeln(sprintf(
+            "<fg=red>%s\tShutdown signal detected - %s (%s)",
+            $this->now(),
+            self::class,
+            $this->symbol
+        ));
+
+        return $exitCode;
+    }
+
+    private function mainLoop(OutputInterface $output, int $timestampms): void
+    {
         while (!$this->shutdown->isShutdownModeEnabled()) {
             $pageFirstTimestampms = $timestampms;
 
-            $output->writeln(\sprintf(
-                "\n%s\tFetching page %d (%s)",
-                $this->now(),
-                $timestampms,
-                \gmdate("Y-m-d H:i:s", (int) \substr((string) $timestampms, 0, 10))
-            ));
+            if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                $output->writeln(\sprintf(
+                    "\n%s\tFetching page %d (%s)",
+                    $this->now(),
+                    $timestampms,
+                    \gmdate("Y-m-d H:i:s", (int) \substr((string) $timestampms, 0, 10))
+                ));
+            }
 
             try {
                 $page = $this->pastTrades->getTrades($this->symbol, $timestampms, GetPastTradesInterface::LIMIT_MAX);
@@ -99,17 +130,25 @@ final class TradeHistory extends Command
             }
 
             $i = \count($page);
-            $j = $i - 1;
             $hadResults = $i > 0 ? true : false;
 
             while ($i > 0) {
                 --$i;
                 try {
                     if ($this->logTrade($page[$i])) {
-                        if ($i === $j) {
-                            $output->write("\n{$this->now()}\t");
-                        }
-                        $output->write('.');
+                        $output->writeln(sprintf(
+                            "%s\tTransaction %d Logged: %s %s %s @ %s %s/%s on %s for order id %s",
+                            $this->now(),
+                            $page[$i]->tid,
+                            $page[$i]->type,
+                            $page[$i]->amount,
+                            strtoupper($this->pair->getBase()->getSymbol()),
+                            $page[$i]->price,
+                            strtoupper($this->pair->getBase()->getSymbol()),
+                            strtoupper($this->pair->getQuote()->getSymbol()),
+                            date('Y-m-d H:i:s', $page[$i]->timestamp),
+                            $page[$i]->order_id
+                        ));
                     }
                 } catch (\Exception $e) {
                     $this->shutdown->enableShutdownMode($e);
@@ -134,17 +173,20 @@ final class TradeHistory extends Command
                         }
                     }
                 } else {
-                    $output->write(\sprintf(
-                        "\n%s\t<fg=green>Trade History for %s pair is up to date. Sleeping for %d seconds...</>\n",
-                        $this->now(),
-                        $this->symbol,
-                        $this->delay
-                    ));
-                    \sleep($this->delay);
+                    if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                        $output->write(\sprintf(
+                            "\n%s\t<fg=green>Trade History for %s pair is up to date. Sleeping for %d seconds...</>\n",
+                            $this->now(),
+                            $this->symbol,
+                            $this->delay
+                        ));
+                    }
+                    $this->sleeper->sleep($this->delay, function (): bool {
+                        return $this->shutdown->isShutdownModeEnabled();
+                    });
                 }
             }
         }
-        $output->writeln("\n<fg=red>Shutdown Detected</>");
     }
 
     private function logPageLimitError(int $timestampms): void
@@ -170,7 +212,7 @@ final class TradeHistory extends Command
                 'fee_amount' => $trade->fee_amount,
                 'order_id' => $trade->order_id,
                 'client_order_id' => \property_exists($trade, 'client_order_id') ? $trade->client_order_id : null,
-                'trade_date' => \gmdate('Y-m-d H:i:s', (int) \substr((string) $trade->timestampms, 0, 10)),
+                'trade_date' => \gmdate('Y-m-d H:i:s', $trade->timestamp),
             ]);
             $result = true;
         } catch (InvalidQueryException $e) {
