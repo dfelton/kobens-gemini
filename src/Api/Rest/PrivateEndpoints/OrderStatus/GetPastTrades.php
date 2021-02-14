@@ -6,7 +6,6 @@ namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus;
 
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetPastTradesInterface as I;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
-use Kobens\Core\Http\ResponseInterface;
 use Kobens\Gemini\Exception\Api\Reason\InvalidNonceException;
 
 final class GetPastTrades implements GetPastTradesInterface
@@ -21,6 +20,10 @@ final class GetPastTrades implements GetPastTradesInterface
         $this->request = $requestInterface;
     }
 
+    /**
+     * {@inheritDoc}
+     * @see \Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetPastTradesInterface::getTrades()
+     */
     public function getTrades(string $symbol, int $timestampms = null, int $limitTrades = null): array
     {
         $response = null;
@@ -39,6 +42,13 @@ final class GetPastTrades implements GetPastTradesInterface
         return \json_decode($response->getBody());
     }
 
+    /**
+     * @param string $symbol
+     * @param int $timestampms
+     * @param int $limitTrades
+     * @throws \LogicException
+     * @return array
+     */
     private function getPayload(string $symbol, int $timestampms, int $limitTrades): array
     {
         $payload = ['symbol' => $symbol];
