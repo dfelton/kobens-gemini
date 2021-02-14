@@ -32,7 +32,7 @@ final class AccountNotionalBalance
         $investedUsd = self::formatVal($investedUsd);
         $amount = self::formatVal($amount);
         $table = new Table($output);
-        $table->setHeaderTitle('Account');
+        $table->setHeaderTitle('Account - ' . (new \DateTime())->format('Y-m-d H:i:s'));
         $table->setHeaders(['Notional Balance', '    USD Invested', '      Difference']);
         $table->addRow(["$ <fg=green>$amount</>", "$ $investedUsd", "$ <fg=$diffFormat>$diff</>"]);
         return $table;
