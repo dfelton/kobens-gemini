@@ -561,3 +561,13 @@ CREATE TABLE `trade_history_zrxusd` (
   PRIMARY KEY (`tid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History ZRXUSD';
 
+
+CREATE TABLE `repeater_stats_daily_profit` (
+  `id` int(13) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `symbol` varchar(12) NOT NULL COMMENT 'Symbol',
+  `amount` varchar(50) NOT NULL COMMENT 'Amount',
+  `amount_notional` varchar(50) NOT NULL COMMENT 'Amount',
+  `date` timestamp NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Date',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Repeater Stats Daily Profit';
+
