@@ -29,6 +29,7 @@ final class Buyer extends Command
     use SleeperTrait;
 
     private const EXCEPTION_DELAY = 60;
+    private const DEFAULT_DELAY = 2;
 
     protected static $defaultName = 'repeater:buyer';
 
@@ -60,15 +61,15 @@ final class Buyer extends Command
     protected function configure(): void
     {
         $this->setDescription('Places buy orders on the exchange for the Gemini Trade Repeater');
-        $this->addOption('delay', 'd', InputOption::VALUE_OPTIONAL, 'Delay in seconds to start looking again for new BUY_READY orders. Minimum 5 seconds', 5);
+        $this->addOption('delay', 'd', InputOption::VALUE_OPTIONAL, 'Delay in seconds to start looking again for new BUY_READY orders. Minimum 2 seconds', self::DEFAULT_DELAY);
         $this->addOption('maxIterationsDelay', null, InputOption::VALUE_OPTIONAL, 'Delay in seconds to resume operations when a MaxIterationsException occurrs', 5);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $delay = (int) $input->getOption('delay');
-        if ($delay < 5) {
-            $delay = 5;
+        if ($delay < self::DEFAULT_DELAY) {
+            $delay = self::DEFAULT_DELAY;
         }
         while ($this->shutdown->isShutdownModeEnabled() === false) {
             try {
