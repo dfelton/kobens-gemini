@@ -27,7 +27,7 @@ final class Ticker extends Command
     protected function configure(): void
     {
         $this->setDescription('Outputs details on a market book.');
-        $this->addArgument('symbol', InputArgument::REQUIRED, 'Trading Pair Symbol', 'btcusd');
+        $this->addArgument('symbol', InputArgument::OPTIONAL, 'Trading Pair Symbol', 'btcusd');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
