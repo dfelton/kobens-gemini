@@ -56,6 +56,7 @@ use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Processor\ReInvest;
 use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Processor\TopWeekly;
 use Kobens\Gemini\Exchange\Order\Maker\RequiredQuote;
 use Kobens\Core\ErrorHandler;
+use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Bucket;
 
 require \dirname(__DIR__) . '/bootstrap.php';
 
@@ -262,9 +263,16 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Archiver(
     $archiveInterface,
     $connectionInterface,
     $sleeperInterface,
-    new Processor(new ReInvest($updateTrade), $tradeResource, new TopWeekly($addAmount, $adapter, new RequiredQuote($apiMakerHoldBps), $shutdownInterface))
+    new Processor(
+        new ReInvest($updateTrade),
+        new Bucket($adapter)
+//         new TopWeekly($addAmount, $adapter, new RequiredQuote($apiMakerHoldBps), $shutdownInterface)
+    )
 ));
-$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Stats\PatchFix($adapter));
+
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Archiver\SetFillTimestamp($adapter, $sleeperInterface, $shutdownInterface));
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Disable($orderStatusInterface, $cancelOrderInterface, $adapter, $tradeResource, $shutdownInterface, $getPriceInterface, $updateTrade));
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Stats\DailyProfit($adapter, $sleeperInterface, $shutdownInterface));
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Stats\SevenDayAggregate(
     new \Kobens\Gemini\TradeRepeater\Stats\SevenDayAggregate\Updater($adapter)
 ));
@@ -322,7 +330,8 @@ unset($buyAuditorKey, $buyAuditorRequestInterface);
 $data = new Data(
     $getActiveOrdersInterface,
     $getNotionalBalancesInterface,
-    $getPriceInterface
+    $getPriceInterface,
+    new TableGateway('trade_repeater', $adapter)
 );
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\CliMonitor\Account($data, $sleeperInterface, new Profits($adapter, $getPriceInterface), $adapter));
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\CliMonitor\Pair($data, $sleeperInterface));
@@ -350,7 +359,7 @@ $app->add(new \Kobens\Gemini\Command\Command\OrderStatus\BookKeeper(
 ));
 
 // TODO: This Command should use a unique KeyInterface, with no Trading Authority
-$app->add(new \Kobens\Gemini\Command\Command\Logger\TradeHistory($getPastTradesInterface, $shutdownInterface));
+$app->add(new \Kobens\Gemini\Command\Command\Logger\TradeHistory($getPastTradesInterface, $shutdownInterface, $sleeperInterface));
 
 
 // TODO: The following commands can use a common KeyInterface, with Trading Authority
