@@ -181,7 +181,7 @@ final class TradeHistory extends Command
                             $this->delay
                         ));
                     }
-                    $this->sleeper->sleep($this->delay, function(): bool {
+                    $this->sleeper->sleep($this->delay, function (): bool {
                         return $this->shutdown->isShutdownModeEnabled();
                     });
                 }

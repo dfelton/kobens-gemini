@@ -40,5 +40,4 @@ final class Processor implements ProcessorInterface
         $this->bucket->addToBucket($quote, $this->reinvest->execute($profits[$quote], $trade));
         $this->bucket->addToBucket($base, $profits[$base]);
     }
-
 }

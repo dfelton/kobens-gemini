@@ -168,7 +168,7 @@ final class Disable extends Command
      */
     private function getTradeIds(Pair $pair, string $priceFrom, string $priceTo): array
     {
-        $data = $this->tblTradeRepeater->select(function(Select $select) use ($pair): void {
+        $data = $this->tblTradeRepeater->select(function (Select $select) use ($pair): void {
             $select->where->equalTo('symbol', $pair->getSymbol());
             $select->where->equalTo('status', 'BUY_PLACED');
             $select->where->equalTo('is_error', 0);

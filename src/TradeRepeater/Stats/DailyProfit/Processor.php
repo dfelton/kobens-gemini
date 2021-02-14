@@ -11,14 +11,11 @@ final class Processor implements ProcessorInterface
 {
     private Adapter $adapter;
 
-    public function __construct(
-
-    ) {
-
+    public function __construct()
+    {
     }
 
     public function execute(): void
     {
-
     }
 }

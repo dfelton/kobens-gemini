@@ -78,12 +78,12 @@ final class TopWeekly
 
     private function getTrades(): array
     {
-        $trades = $this->tblStats->select(function(Select $select) {
-           $select->reset(Select::COLUMNS);
-           $select->order('count DESC');
-           $select->join('trade_repeater', 'repeater_stats_7day_aggregate.repeater_id = trade_repeater.id', '*');
-           $select->limit(100);
-           $select->where('trade_repeater.status = "BUY_PLACED"');
+        $trades = $this->tblStats->select(function (Select $select) {
+            $select->reset(Select::COLUMNS);
+            $select->order('count DESC');
+            $select->join('trade_repeater', 'repeater_stats_7day_aggregate.repeater_id = trade_repeater.id', '*');
+            $select->limit(100);
+            $select->where('trade_repeater.status = "BUY_PLACED"');
         });
         $data = [];
         foreach ($trades as $trade) {

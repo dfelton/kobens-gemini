@@ -49,7 +49,7 @@ final class SetFillTimestamp extends Command
                 $exitCode = 1;
             }
             if ($this->shutdown->isShutdownModeEnabled() === false) {
-                $this->sleeper->sleep(60, function(): bool {
+                $this->sleeper->sleep(60, function (): bool {
                     return $this->shutdown->isShutdownModeEnabled();
                 });
             }
@@ -79,7 +79,7 @@ final class SetFillTimestamp extends Command
                     yield $row;
                 }
             }
-            $this->sleeper->sleep(10, function(): bool {
+            $this->sleeper->sleep(10, function (): bool {
                 return $this->shutdown->isShutdownModeEnabled();
             });
         } while ($rows->count() > 0 && $this->shutdown->isShutdownModeEnabled() === false);

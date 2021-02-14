@@ -8,6 +8,5 @@ class MinimumAmountException extends \InvalidArgumentException
 {
     public function __construct()
     {
-
     }
 }

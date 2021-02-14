@@ -153,11 +153,9 @@ final class DailyProfit extends Command
 
                     $profits[$quote]['amount'] = Add::getResult($profits[$quote]['amount'], $profitQuote);
                     $profits[$quote]['amount_notional'] = Add::getResult($profits[$quote]['amount_notional'], $profitQuote);
-
                 } else {
                     throw new \Exception(sprintf('Class "%s" is not yet written to handle non-USD quote pairs.', self::class));
                 }
-
             } elseif (strtolower($fees['fee_currency']) === $pair->getBase()->getSymbol()) {
                 throw new \Exception(sprintf('Class "%s" not written to handle fees in base currency.', self::class));
             } else {
