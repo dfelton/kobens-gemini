@@ -56,7 +56,7 @@ final class TopWeekly
             $pair = Pair::getInstance($trade->getSymbol());
             $amountRequired = $this->requiredQuote->get(
                 $trade->getBuyPrice(),
-                Multiply::getResult($pair->getMinOrderIncrement(), '5')
+                Multiply::getResult($pair->getMinOrderIncrement(), '10')
             );
             if (Compare::getResult($amountRequired, $remaining) === Compare::LEFT_LESS_THAN) {
                 try {
@@ -82,7 +82,7 @@ final class TopWeekly
            $select->reset(Select::COLUMNS);
            $select->order('count DESC');
            $select->join('trade_repeater', 'repeater_stats_7day_aggregate.repeater_id = trade_repeater.id', '*');
-           $select->limit('500');
+           $select->limit(100);
            $select->where('trade_repeater.status = "BUY_PLACED"');
         });
         $data = [];
