@@ -44,6 +44,7 @@ final class Updater
             $select->where(function (Where $where): void {
                 $where->greaterThanOrEqualTo('created_at', date('Y-m-d H:i:s', time() - 604800));
             });
+            $select->where('repeater_id IN (SELECT id from trade_repeater)');
             $select->group('repeater_id');
         });
         $raw = [];
