@@ -43,16 +43,16 @@ final class Profits
     {
         $profits = $this->getData();
         return [
-            $this->getTable($output, $profits['all_time']),
-            $this->getTable($output, $profits['past_week']),
+            $this->getTable($output, $profits['all_time'], sprintf('All Time (since %s)', $profits['all_time']['date'])),
+            $this->getTable($output, $profits['past_week'], sprintf('Past 7 Days')),
         ];
     }
 
-    private function getTable(OutputInterface $output, array $profits): Table
+    private function getTable(OutputInterface $output, array $profits, string $tableTitle): Table
     {
         $table = new Table($output);
         $table->setColumnMaxWidth(0, 10);
-        $table->setHeaderTitle(sprintf('Profits Since %s', $profits['date']));
+        $table->setHeaderTitle($tableTitle);
         $table->setHeaders(['Asset', 'Amount', 'Amount Notional']);
 
         $totalNotional = '0';
