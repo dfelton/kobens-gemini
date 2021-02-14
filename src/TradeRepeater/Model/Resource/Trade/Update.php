@@ -14,6 +14,10 @@ final class Update implements UpdateInterface
 
     private Adapter $adapter;
 
+    private array $restrictedKeys = [
+        'id', 'symbol',
+    ];
+
     public function __construct(
         Adapter $adapter
     ) {
@@ -39,6 +43,16 @@ final class Update implements UpdateInterface
             ],
             ['id' => $trade->getId()]
         );
+    }
+
+    public function setData(array $data, int $id): void
+    {
+        foreach ($this->restrictedKeys as $key) {
+            if (array_key_exists($key, $data)) {
+                throw new \InvalidArgumentException(sprintf('Updating "%s" is not allowed.', $key));
+            }
+        }
+        $this->table->update($data, ['id' => $id]);
     }
 
     public function updateAmounts(int $id, string $buyAmount, string $sellAmmount): void
