@@ -157,20 +157,10 @@ final class Account extends Command
         } catch (ServerErrorException $e) {
             $data = [(new Table($output))->setRows([['Server Error at Exchange']])];
         }
-        $time = (new Table($output))->setRows([['Date / Time:', (new \DateTime())->format('Y-m-d H:i:s')]]);
-
-        $feesReserves = new Table($output);
-        $feesReserves->addRow([
-            'USD Fees Reserve:',
-            $this->getUsdFeeReserve()
-        ]);
-
         $output->write("\e[H\e[J");
-        $time->render();
         foreach ($data as $table) {
             $table->render();
         }
-        $feesReserves->render();
     }
 
     private function getRefreshRate(InputInterface $input): int
@@ -205,27 +195,12 @@ final class Account extends Command
             if ($amount || $amountNotional || $amountAvailable || $amountAvailableNotional) {
                 $data[] = Balances::getTable($output, $this->data, $amount, $amountNotional, $amountAvailable, $amountAvailableNotional);
             }
-            $data[] = $this->profits->get($output);
+            foreach ($this->profits->get($output) as $table) {
+                $data[] = $table;
+            }
         } catch (\Kobens\Gemini\Exception $e) {
             $data[] = (new Table($output))->addRow([$e->getMessage()]);
         }
         return $data;
-    }
-
-    private function getUsdFeeReserve(): string
-    {
-        $records = $this->tblTradeRepeater->select(function (Select $select) {
-            $select->columns(['symbol', 'buy_price', 'buy_amount']);
-        });
-        $total = '0';
-        foreach ($records as $record) {
-            $pair = Pair::getInstance($record->symbol);
-            if ($pair->getQuote()->getSymbol() === 'usd') {
-                $costBasis = Multiply::getResult($record->buy_price, $record->buy_amount);
-                $fees = Multiply::getResult($costBasis, '0.0035'); // TODO: Reference constant
-                $total = Add::getResult($total, $fees);
-            }
-        }
-        return $total;
     }
 }
