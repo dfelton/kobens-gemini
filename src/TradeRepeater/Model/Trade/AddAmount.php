@@ -8,6 +8,7 @@ use Kobens\Gemini\Api\Market\GetPriceInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelOrderInterface;
 use Kobens\Gemini\Exchange\Currency\Pair;
+use Kobens\Gemini\TradeRepeater\Exception\UnsupportedAddAmountStateException;
 use Kobens\Gemini\TradeRepeater\Model\Trade;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade as TradeResource;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyPlaced as StatusBuyPlaced;
@@ -19,7 +20,6 @@ use Kobens\Math\BasicCalculator\Divide;
 use Kobens\Math\BasicCalculator\Subtract;
 use Kobens\Math\BasicCalculator\Multiply;
 use Zend\Db\Adapter\Adapter;
-use Kobens\Gemini\TradeRepeater\Exception\UnsupportedAddAmountStateException;
 
 final class AddAmount
 {
@@ -91,6 +91,22 @@ final class AddAmount
                 ));
         }
         return $amountAdded;
+    }
+
+    public function addTo(string $symbol, string $amount, string $priceFrom, string $priceTo): void
+    {
+        $rows = $this->tradeResource->getList(
+            $symbol,
+            [
+                'buy_price_gte' => $priceFrom,
+                'buy_price_lte' => $priceTo,
+                'status' => 'BUY_PLACED',
+            ]
+        );
+        /** @var Trade $row */
+        foreach ($rows as $row) {
+            $this->add($row->getId(), $amount);
+        }
     }
 
     private function addToBuy(int $id, string $amount, string $expectedStatus, bool $useTransaction): string
