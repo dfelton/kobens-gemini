@@ -61,6 +61,7 @@ final class Profits
             );
             $table->addRow($row);
         }
+        $table->addRow(['', '', '', '', '']);
         $table->addRow([
             new TableCell('Total Notional', ['colspan' => 2]),
             $cellsAllTime['total_notional'],
