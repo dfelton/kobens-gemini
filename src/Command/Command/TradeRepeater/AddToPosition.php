@@ -10,6 +10,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Kobens\Gemini\Exchange\Currency\Pair;
+use Kobens\Math\BasicCalculator\Add;
+use Kobens\Math\BasicCalculator\Multiply;
+use Symfony\Component\Console\Helper\Table;
 
 final class AddToPosition extends Command
 {
@@ -56,8 +59,40 @@ final class AddToPosition extends Command
                     $e->getTraceAsString()
                 ));
             }
+        } else {
+            $data = $this->getSummary($pair->getSymbol(), $amount, $priceFrom, $priceTo);
+            $table = new Table($output);
+            foreach ($data as $label => $value) {
+                $table->addRow([
+                    ucwords(str_replace('_', ' ', $label)),
+                    $value
+                ]);
+            }
+            $table->render();
         }
         return $exitCode;
+    }
+
+    private function getSummary(string $symbol, string $amount, string $priceFrom, string $priceTo): array
+    {
+        /** @var \Kobens\Gemini\TradeRepeater\Model\Trade $trade */
+        $filters = ['buy_price_gte' => $priceFrom, 'buy_price_lte' => $priceTo, 'status' => 'BUY_PLACED'];
+        $data = [
+            'total_records' => 0,
+            'total_quote' => '0',
+            'total_base' => '0',
+        ];
+        foreach ($this->tradeResource->getList($symbol, $filters) as $trade) {
+            $costBasis = Multiply::getResult($amount, $trade->getBuyPrice());
+            $deposit = Multiply::getResult($costBasis, '0.0035'); // TODO: Reference constant
+            $data['total_quote'] = Add::getResult(
+                $data['total_quote'],
+                Add::getResult($costBasis, $deposit)
+            );
+            $data['total_base'] = Add::getResult($data['total_base'], $amount);
+            ++$data['total_records'];
+        }
+        return $data;
     }
 
     private function getArg(InputInterface $input, string $arg): string
