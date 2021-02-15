@@ -49,8 +49,25 @@ final class AddToPosition extends Command
         $priceFrom = $this->getArg($input, 'price-from');
         $priceTo = $this->getArg($input, 'price-to');
         if ($input->getOption('confirm') === '1') {
+            $addTo = $this->addAmount->addTo($pair->getSymbol(), $amount, $priceFrom, $priceTo);
             try {
-                $this->addAmount->addTo($pair->getSymbol(), $amount, $priceFrom, $priceTo);
+                foreach ($addTo as $result) {
+                    /** @var \Kobens\Gemini\TradeRepeater\Model\Trade $trade */
+                    $trade = $result['trade'];
+                    $amount = $result['amount'];
+                    $newAmount = Add::getResult($amount, $trade->getBuyAmount());
+                    $output->writeln(sprintf(
+                        'Amount of %s added to %s record. Was buy %s %s @ %s %s/%s, now buy %s',
+                        $amount,
+                        $trade->getSymbol(),
+                        $trade->getBuyAmount(),
+                        strtoupper($pair->getBase()->getSymbol()),
+                        $trade->getBuyPrice(),
+                        strtoupper($pair->getBase()->getSymbol()),
+                        strtoupper($pair->getQuote()->getSymbol()),
+                        $newAmount
+                    ));
+                }
             } catch (\Throwable $e) {
                 $exitCode = 1;
                 $output->writeln(sprintf(
