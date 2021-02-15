@@ -170,6 +170,7 @@ final class DailyProfit extends Command
     {
         $totalFees = '0';
         $feeCurrency = null;
+        /** @var array $transaction */
         foreach ($this->getTransactionsForBuySellPair($buyOrderId, $sellOrderId, $symbol) as $transaction) {
             if ($feeCurrency === null) {
                 $feeCurrency = $transaction['fee_currency'];
@@ -187,7 +188,7 @@ final class DailyProfit extends Command
         ];
     }
 
-    private function getTransactionsForBuySellPair(int $buyOrderId, int $sellOrderId, string $symbol): array
+    private function getTransactionsForBuySellPair(int $buyOrderId, int $sellOrderId, string $symbol): \Generator
     {
         $pair = Pair::getInstance($symbol);
         $stmt = $this->adapter->query(sprintf(
@@ -195,18 +196,16 @@ final class DailyProfit extends Command
             'trade_history_' . $pair->getSymbol()
         ));
         $rows = $stmt->execute(['buyOrderId' => $buyOrderId, 'sellOrderId' => $sellOrderId]);
-        $data = [];
         foreach ($rows as $row) {
-            $data[] = $row;
+            yield $row;
         }
-        return $data;
     }
 
     private function fetchRepeaterArchivesForDay(string $day): \Generator
     {
         $endDate = date('Y-m-d 00:00:00', strtotime($day . ' +1 day'));
         $stmt = $this->adapter->query(
-            'SELECT * FROM `trade_repeater_archive` WHERE `sell_fill_timestamp` >= :dateFrom AND `sell_fill_timestamp` < :dateTo'
+            'SELECT * FROM `trade_repeater_archive` WHERE `sell_fill_timestamp` IS NOT NULL AND `sell_fill_timestamp` >= :dateFrom AND `sell_fill_timestamp` < :dateTo'
         );
         $rows = $stmt->execute(['dateFrom' => $day, 'dateTo' => $endDate]);
         foreach ($rows as $row) {
