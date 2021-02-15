@@ -168,9 +168,10 @@ $sellPlacedInterface = new SellPlaced($adapter, $tradeResource);
 $sellSentInterface = new SellSent($adapter, $tradeResource);
 
 $apiMakerHoldBps = new ApiMakerHoldBps();
+$addAmount = new AddAmount($cancelOrderInterface, $getPriceInterface, $orderStatusInterface, $tradeResource, $adapter, $updateTrade);
 
 $app = new \Symfony\Component\Console\Application($composer->name, $composer->version);
-$addAmount = new AddAmount($cancelOrderInterface, $getPriceInterface, $orderStatusInterface, $tradeResource, $adapter, $updateTrade);
+$app->add(new \Kobens\Gemini\Command\Command\Info\Pair());
 
 // TODO: All TradeRepeater classes will need to use Kobens\Gemini\Api\Rest\* objects that have their own KeyInterface per TradeRepeater to avoid Nonce clashing
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\AddToPosition($addAmount, $tradeResource));
