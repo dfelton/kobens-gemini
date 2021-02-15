@@ -13,6 +13,7 @@ use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Math\BasicCalculator\Add;
 use Kobens\Math\BasicCalculator\Multiply;
 use Symfony\Component\Console\Helper\Table;
+use Kobens\Math\BasicCalculator\Compare;
 
 final class AddToPosition extends Command
 {
@@ -82,6 +83,8 @@ final class AddToPosition extends Command
             'total_quote' => '0',
             'total_base' => '0',
         ];
+        $lowestBuyPrice = null;
+        $highestBuyPrice = null;
         foreach ($this->tradeResource->getList($symbol, $filters) as $trade) {
             $costBasis = Multiply::getResult($amount, $trade->getBuyPrice());
             $deposit = Multiply::getResult($costBasis, '0.0035'); // TODO: Reference constant
@@ -91,7 +94,15 @@ final class AddToPosition extends Command
             );
             $data['total_base'] = Add::getResult($data['total_base'], $amount);
             ++$data['total_records'];
+            if ($lowestBuyPrice === null || Compare::getResult($lowestBuyPrice, $trade->getBuyPrice()) === Compare::LEFT_GREATER_THAN) {
+                $lowestBuyPrice = $trade->getBuyPrice();
+            }
+            if ($highestBuyPrice === null || Compare::getResult($highestBuyPrice, $trade->getBuyPrice()) === Compare::LEFT_LESS_THAN) {
+                $highestBuyPrice = $trade->getBuyPrice();
+            }
         }
+        $data['lowest_buy_price'] = $lowestBuyPrice;
+        $data['highest_buy_price'] = $highestBuyPrice;
         return $data;
     }
 
