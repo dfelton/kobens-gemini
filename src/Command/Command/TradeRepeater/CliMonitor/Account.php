@@ -192,9 +192,7 @@ final class Account extends Command
             if ($amount || $amountNotional || $amountAvailable || $amountAvailableNotional) {
                 $data[] = Balances::getTable($output, $this->data, $amount, $amountNotional, $amountAvailable, $amountAvailableNotional);
             }
-            foreach ($this->profits->get($output) as $table) {
-                $data[] = $table;
-            }
+            $data[] = $this->profits->get($output);
         } catch (\Kobens\Gemini\Exception $e) {
             $data[] = (new Table($output))->addRow([$e->getMessage()]);
         }

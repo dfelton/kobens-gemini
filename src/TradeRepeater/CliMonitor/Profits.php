@@ -37,24 +37,54 @@ final class Profits
 
     /**
      * @param OutputInterface $output
-     * @return Table[]
+     * @return Table
      */
-    public function get(OutputInterface $output): array
+    public function get(OutputInterface $output): Table
     {
-        $profits = $this->getData();
-        return [
-            $this->getTable($output, $profits['all_time'], sprintf('All Time (since %s)', $profits['all_time']['date'])),
-            $this->getTable($output, $profits['past_week'], sprintf('Past 7 Days')),
-        ];
+        $data = $this->getData();
+        $table = new Table($output);
+        $table->setHeaders([
+            [
+                '',
+                new TableCell(sprintf('All Time Since %s', $data['all_time']['date']), ['colspan' => 2]),
+                new TableCell('Past 7 Days', ['colspan' => 2])
+            ],
+            ['Asset', 'Amount', 'Amount Notional', 'Amount', 'Amount Notional'],
+        ]);
+        $cellsAllTime = $this->getCells($data['all_time']);
+        $cellsPastWeek = $this->getCells($data['past_week']);
+        foreach ($cellsAllTime['cells'] as $symbol => $cellData) {
+            $row = array_merge(
+                [strtoupper($symbol)],
+                $cellData,
+                $cellsPastWeek['cells'][$symbol] ?? []
+            );
+            $table->addRow($row);
+        }
+        $table->addRow([
+            new TableCell('Total Notional', ['colspan' => 2]),
+            $cellsAllTime['total_notional'],
+            '',
+            $cellsPastWeek['total_notional'],
+        ]);
+        $table->addRow([
+            new TableCell('Daily Average', ['colspan' => 2]),
+            $cellsAllTime['daily_average'],
+            '',
+            $cellsPastWeek['daily_average'],
+        ]);
+        $table->addRow([
+            new TableCell('Projected Yearly', ['colspan' => 2]),
+            $cellsAllTime['projected_yearly'],
+            '',
+            $cellsPastWeek['projected_yearly'],
+        ]);
+        return $table;
     }
 
-    private function getTable(OutputInterface $output, array $profits, string $tableTitle): Table
+    private function getCells(array $profits): array
     {
-        $table = new Table($output);
-        $table->setColumnMaxWidth(0, 10);
-        $table->setHeaderTitle($tableTitle);
-        $table->setHeaders(['Asset', 'Amount', 'Amount Notional']);
-
+        $cells = [];
         $totalNotional = '0';
         $notionals = [];
         $longestNotional = 0;
@@ -78,35 +108,22 @@ final class Profits
 
         foreach (array_keys($notionals) as $symbol) {
             $row = [
-                strtoupper($symbol),
                 str_pad($profits['profits'][$symbol], $longestAmount, ' ', STR_PAD_LEFT),
                 str_pad($notionals[$symbol], $longestNotional, ' ', STR_PAD_LEFT)
             ];
-            if ($row[0] === 'USD') {
+            if (strtoupper($symbol) === 'USD') {
                 $row[0] = '<fg=green>' . $row[0] . '</>';
                 $row[1] = '<fg=green>' . $row[1] . '</>';
-                $row[2] = '<fg=green>' . $row[2] . '</>';
             }
-            $table->addRow($row);
+            $cells[$symbol] = $row;
         }
-
-        $table->addRow([
-            new TableCell('', ['colspan' => 3]),
-        ]);
-        $table->addRow([
-            new TableCell('<fg=green>Total Notional</>', ['colspan' => 2]),
-            str_pad('$' . number_format((float) $totalNotional, 2), $longestNotional, ' ', STR_PAD_LEFT),
-        ]);
         $dailyAverage = Divide::getResult($totalNotional, $profits['days'], 2);
-        $table->addRow([
-            new TableCell('<fg=green>Daily Average</>', ['colspan' => 2]),
-            str_pad('$' . $dailyAverage, $longestNotional, ' ', STR_PAD_LEFT),
-        ]);
-        $table->addRow([
-            new TableCell('<fg=green>Projected Yearly</>', ['colspan' => 2]),
-            str_pad('$' . number_format((float) Multiply::getResult($dailyAverage, '365'), 2), $longestNotional, ' ', STR_PAD_LEFT),
-        ]);
-        return $table;
+        return [
+            'cells' => $cells,
+            'total_notional' => str_pad('$' . number_format((float) $totalNotional, 2), $longestNotional, ' ', STR_PAD_LEFT),
+            'daily_average' => str_pad('$' . $dailyAverage, $longestNotional, ' ', STR_PAD_LEFT),
+            'projected_yearly' => str_pad('$' . number_format((float) Multiply::getResult($dailyAverage, '365'), 2), $longestNotional, ' ', STR_PAD_LEFT),
+        ];
     }
 
     /**
