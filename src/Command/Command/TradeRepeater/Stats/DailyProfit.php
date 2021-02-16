@@ -6,6 +6,7 @@ namespace Kobens\Gemini\Command\Command\TradeRepeater\Stats;
 
 use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Core\SleeperInterface;
+use Kobens\Gemini\Command\Traits\KillFile;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Math\BasicCalculator\Add;
 use Kobens\Math\BasicCalculator\Compare;
@@ -15,9 +16,16 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Adapter\Adapter;
+use Symfony\Component\Console\Input\InputOption;
 
 final class DailyProfit extends Command
 {
+    use KillFile;
+
+    private const DELAY_DEFAULT = 60;
+    private const DELAY_MIN = 10;
+    private const KILL_FILE = 'kill_repeater_stats_daily_profit';
+
     private Adapter $adapter;
 
     private SleeperInterface $sleeper;
@@ -38,14 +46,24 @@ final class DailyProfit extends Command
     protected function configure(): void
     {
         $this->setName('repeater:stats:daily-profit');
-        $this->setDescription('Continously manages the daily profit stats table');
+        $this->setDescription('Continously manages the daily profit stats table.');
+        $this->addOption(
+            'delay',
+            'd',
+            InputOption::VALUE_REQUIRED,
+            sprintf(
+                'Delay in seconds between updating latest calculations for the day, default %d seconds, minimum %d.',
+                self::DELAY_DEFAULT,
+                self::DELAY_MIN
+            )
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $exitCode = 0;
         $date = $this->getDayForUpdate();
-        while ($date !== null && $this->shutdown->isShutdownModeEnabled() === false) {
+        while ($date !== null && $this->shutdown->isShutdownModeEnabled() === false && $this->killFileExists(self::KILL_FILE) === false) {
             $isToday = date('Y-m-d 00:00:00', time()) === $date;
             $profits = $this->getProfitsForDay($date);
             foreach ($profits as $symbol => $profit) {
@@ -54,7 +72,7 @@ final class DailyProfit extends Command
                 }
             }
             if ($isToday) {
-                $this->sleeper->sleep(60, function (): bool {
+                $this->sleeper->sleep($this->getDelay($input), function (): bool {
                     return $this->shutdown->isShutdownModeEnabled();
                 });
             }
@@ -67,7 +85,23 @@ final class DailyProfit extends Command
                 self::class
             ));
         }
+        if ($this->killFileExists(self::KILL_FILE)) {
+            $output->writeln(sprintf(
+                "<fg=red>%s\tKill File Detected - %s",
+                $this->now(),
+                self::class
+            ));
+        }
         return $exitCode;
+    }
+
+    private function getDelay(InputOption $input): int
+    {
+        $delay = (int) $input->getOption('delay');
+        if ($delay < self::DELAY_MIN) {
+            $delay = self::DELAY_MIN;
+        }
+        return $delay;
     }
 
     private function logProfit(string $date, string $symbol, string $amount, string $amountNotional, bool $isToday): void

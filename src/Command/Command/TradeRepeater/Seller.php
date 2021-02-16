@@ -8,6 +8,7 @@ use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Core\SleeperInterface;
 use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\ForceMakerInterface;
+use Kobens\Gemini\Command\Traits\KillFile;
 use Kobens\Gemini\Exception\MaxIterationsException;
 use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
 use Kobens\Gemini\Exception\Api\Reason\SystemException;
@@ -27,8 +28,10 @@ use Kobens\Math\BasicCalculator\Compare;
 final class Seller extends Command
 {
     use SleeperTrait;
+    use KillFile;
 
     private const EXCEPTION_DELAY = 60;
+    private const KILL_FILE = 'kill_repeater_seller';
 
     protected static $defaultName = 'repeater:seller';
 
@@ -70,7 +73,7 @@ final class Seller extends Command
         if ($delay < 5) {
             $delay = 5;
         }
-        while (!$this->shutdown->isShutdownModeEnabled()) {
+        while ($this->shutdown->isShutdownModeEnabled() === false && $this->killFileExists(self::KILL_FILE) === false) {
             try {
                 if (!$this->mainLoop($input, $output)) {
                     $this->sleep($delay, $this->sleeper, $this->shutdown);
@@ -79,11 +82,20 @@ final class Seller extends Command
                 $this->shutdown->enableShutdownMode($e);
             }
         }
-        $output->writeln(sprintf(
-            "<fg=red>%s\tShutdown signal detected - %s",
-            $this->now(),
-            self::class
-        ));
+        if ($this->shutdown->isShutdownModeEnabled()) {
+            $output->writeln(sprintf(
+                "<fg=red>%s\tShutdown signal detected - %s",
+                $this->now(),
+                self::class
+            ));
+        }
+        if ($this->killFileExists(self::KILL_FILE)) {
+            $output->writeln(sprintf(
+                "<fg=red>%s\tKill File Detected - %s",
+                $this->now(),
+                self::class
+            ));
+        }
         return 0;
     }
 

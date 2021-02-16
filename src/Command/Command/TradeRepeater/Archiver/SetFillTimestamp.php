@@ -11,9 +11,14 @@ use Zend\Db\Adapter\Adapter;
 use Kobens\Core\SleeperInterface;
 use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Gemini\Exchange\Currency\Pair;
+use Kobens\Gemini\Command\Traits\KillFile;
 
 final class SetFillTimestamp extends Command
 {
+    use KillFile;
+
+    private const KILL_FILE = 'kill_repeater_archiver_set_fill_timestamp';
+
     private Adapter $adapter;
 
     private SleeperInterface $sleeper;
@@ -39,7 +44,7 @@ final class SetFillTimestamp extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $exitCode = 0;
-        while ($this->shutdown->isShutdownModeEnabled() === false) {
+        while ($this->shutdown->isShutdownModeEnabled() === false && $this->killFileExists(self::KILL_FILE) === false) {
             try {
                 foreach ($this->getRowsForUpdate() as $row) {
                     $this->logFillTime($row);
@@ -54,11 +59,20 @@ final class SetFillTimestamp extends Command
                 });
             }
         }
-        $output->writeln(sprintf(
-            "<fg=red>%s\tShutdown signal detected - %s",
-            $this->now(),
-            self::class
-        ));
+        if ($this->shutdown->isShutdownModeEnabled()) {
+            $output->writeln(sprintf(
+                "<fg=red>%s\tShutdown signal detected - %s",
+                $this->now(),
+                self::class
+            ));
+        }
+        if ($this->killFileExists(self::KILL_FILE)) {
+            $output->writeln(sprintf(
+                "<fg=red>%s\tKill File Detected - %s",
+                $this->now(),
+                self::class
+            ));
+        }
         return $exitCode;
     }
 
