@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus;
 
+use Kobens\Core\Http\ResponseInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
+use Kobens\Gemini\Exception\Api\Reason\RateLimitException;
 use Kobens\Http\Exception\Status\ServerError\BadGatewayException;
 use Psr\Log\LoggerInterface;
-use Kobens\Core\Http\ResponseInterface;
-use Kobens\Gemini\Exception\Api\Reason\RateLimitException;
 
 class OrderStatus implements OrderStatusInterface
 {

@@ -7,9 +7,9 @@ namespace Kobens\Gemini\Command\Command\Market;
 use Kobens\Gemini\Api\Rest\PublicEndpoints\TickerInterface;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
 
 final class Ticker extends Command
 {

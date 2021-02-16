@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
 use Kobens\Core\EmergencyShutdownInterface;
-use Kobens\Core\Exception\ConnectionException;
 use Kobens\Core\SleeperInterface;
+use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\ForceMakerInterface;
 use Kobens\Gemini\Command\Traits\KillFile;
+use Kobens\Gemini\Exception\MaxIterationsException;
 use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
 use Kobens\Gemini\Exception\Api\Reason\SystemException;
-use Kobens\Gemini\Exception\MaxIterationsException;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\Model\Trade;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyReadyInterface;

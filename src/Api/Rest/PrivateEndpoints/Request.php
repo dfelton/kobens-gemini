@@ -6,13 +6,13 @@ namespace Kobens\Gemini\Api\Rest\PrivateEndpoints;
 
 use Kobens\Core\Exception\Http\CurlException;
 use Kobens\Core\Http\CurlInterface;
-use Kobens\Core\Http\Request\ThrottlerInterface;
 use Kobens\Core\Http\ResponseInterface;
+use Kobens\Core\Http\Request\ThrottlerInterface;
+use Kobens\Gemini\Exception;
 use Kobens\Gemini\Api\HostInterface;
 use Kobens\Gemini\Api\KeyInterface;
 use Kobens\Gemini\Api\NonceInterface;
 use Kobens\Gemini\Api\Helper\ResponseHandler;
-use Kobens\Gemini\Exception;
 use Psr\Log\LoggerInterface;
 
 /**

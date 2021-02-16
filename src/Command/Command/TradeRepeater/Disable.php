@@ -4,27 +4,26 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelOrderInterface;
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
-use Zend\Db\Adapter\Adapter;
-use Zend\Db\TableGateway\TableGatewayInterface;
-use Zend\Db\TableGateway\TableGateway;
-use Kobens\Gemini\TradeRepeater\Model\Trade;
-use Kobens\Gemini\TradeRepeater\Model\Resource\Trade as TradeResource;
-use Zend\Db\Sql\Select;
-use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Gemini\Api\Market\GetPriceInterface;
-use Kobens\Math\BasicCalculator\Subtract;
-use Symfony\Component\Console\Input\InputOption;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelOrderInterface;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
+use Kobens\Gemini\Exchange\Currency\Pair;
+use Kobens\Gemini\TradeRepeater\Model\Trade;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Update;
+use Kobens\Math\BasicCalculator\Compare;
 use Kobens\Math\BasicCalculator\Divide;
 use Kobens\Math\BasicCalculator\Multiply;
-use Kobens\Math\BasicCalculator\Compare;
-use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Update;
+use Kobens\Math\BasicCalculator\Subtract;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql\Select;
+use Zend\Db\TableGateway\TableGateway;
+use Zend\Db\TableGateway\TableGatewayInterface;
 
 final class Disable extends Command
 {
@@ -44,7 +43,7 @@ final class Disable extends Command
 
     private TableGatewayInterface $tblTradeRepeater;
 
-    private TradeResource $tradeResource;
+    private \Kobens\Gemini\TradeRepeater\Model\Resource\Trade $tradeResource;
 
     private EmergencyShutdownInterface $shutdown;
 
@@ -56,7 +55,7 @@ final class Disable extends Command
         OrderStatusInterface $orderStatus,
         CancelOrderInterface $cancelOrder,
         Adapter $adapter,
-        TradeResource $tradeResource,
+        \Kobens\Gemini\TradeRepeater\Model\Resource\Trade $tradeResource,
         EmergencyShutdownInterface $shutdown,
         GetPriceInterface $getPrice,
         Update $update,

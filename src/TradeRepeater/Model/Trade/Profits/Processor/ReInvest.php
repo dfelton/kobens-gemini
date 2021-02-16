@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Processor;
 
 use Kobens\Gemini\Exchange\Currency\Pair;
-use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Update;
 use Kobens\Gemini\TradeRepeater\Model\Trade;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Update;
 use Kobens\Gemini\TradeRepeater\Model\Trade\AddAmount\Calculator;
 use Kobens\Math\BasicCalculator\Add;
 use Kobens\Math\BasicCalculator\Compare;
@@ -23,7 +23,7 @@ final class ReInvest
         $this->update = $update;
     }
 
-    public function execute(string $quoteAmount, Trade $trade, string $use = '0.95'): string
+    public function execute(string $quoteAmount, Trade $trade, string $use = '0.50'): string
     {
         $pair = Pair::getInstance($trade->getSymbol());
         $reinvestInSamePosition = Multiply::getResult($quoteAmount, $use);

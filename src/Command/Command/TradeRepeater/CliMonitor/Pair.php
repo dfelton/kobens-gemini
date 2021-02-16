@@ -6,17 +6,16 @@ namespace Kobens\Gemini\Command\Command\TradeRepeater\CliMonitor;
 
 use Kobens\Core\Config;
 use Kobens\Core\SleeperInterface;
-use Kobens\Exchange\PairInterface;
 use Kobens\Gemini\Exchange\Currency\Pair as CurrencyPair;
-use Kobens\Gemini\TradeRepeater\CliMonitor\Helper\Data;
 use Kobens\Gemini\TradeRepeater\CliMonitor\MarketSpread;
 use Kobens\Gemini\TradeRepeater\CliMonitor\TradeSpread;
+use Kobens\Gemini\TradeRepeater\CliMonitor\Helper\Data;
+use Kobens\Http\Exception\Status\ServerErrorException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Http\Exception\Status\ServerErrorException;
 
 final class Pair extends Command
 {
@@ -91,7 +90,7 @@ final class Pair extends Command
     }
 
     /**
-     * @return PairInterface[]
+     * @return \Kobens\Exchange\PairInterface[]
      */
     private function getPairs(InputInterface $input, string $option): array
     {
@@ -140,7 +139,7 @@ final class Pair extends Command
 
     /**
      * @param OutputInterface $output
-     * @param PairInterface[] $pairs
+     * @param \Kobens\Exchange\PairInterface[] $pairs
      * @param bool $showMarketData
      * @return Table[]
      */

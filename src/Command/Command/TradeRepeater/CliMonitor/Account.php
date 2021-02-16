@@ -6,12 +6,11 @@ namespace Kobens\Gemini\Command\Command\TradeRepeater\CliMonitor;
 
 use Kobens\Core\Config;
 use Kobens\Core\SleeperInterface;
-use Kobens\Exchange\PairInterface;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\CliMonitor\AccountNotionalBalance;
 use Kobens\Gemini\TradeRepeater\CliMonitor\Balances;
-use Kobens\Gemini\TradeRepeater\CliMonitor\Helper\Data;
 use Kobens\Gemini\TradeRepeater\CliMonitor\Profits;
+use Kobens\Gemini\TradeRepeater\CliMonitor\Helper\Data;
 use Kobens\Http\Exception\Status\ServerErrorException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
@@ -19,8 +18,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Adapter\Adapter;
-use Zend\Db\TableGateway\TableGatewayInterface;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Db\TableGateway\TableGatewayInterface;
 
 final class Account extends Command
 {
@@ -121,7 +120,7 @@ final class Account extends Command
     }
 
     /**
-     * @return PairInterface[]
+     * @return \Kobens\Exchange\PairInterface[]
      */
     private function getPairs(InputInterface $input, string $option): array
     {

@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Kobens\Gemini\TradeRepeater\Stats\SevenDayAggregate;
 
 use Zend\Db\Adapter\Adapter;
-use Zend\Db\TableGateway\TableGatewayInterface;
-use Zend\Db\TableGateway\TableGateway;
+use Zend\Db\Sql\Expression;
 use Zend\Db\Sql\Select;
 use Zend\Db\Sql\Where;
-use Zend\Db\Sql\Expression;
-use Zend\Db\Sql\Insert;
+use Zend\Db\TableGateway\TableGateway;
+use Zend\Db\TableGateway\TableGatewayInterface;
 
 final class Updater
 {

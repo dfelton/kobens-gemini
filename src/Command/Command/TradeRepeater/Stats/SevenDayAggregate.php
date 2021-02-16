@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Command\Command\TradeRepeater\Stats;
 
+use Kobens\Gemini\TradeRepeater\Stats\SevenDayAggregate\Updater;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Gemini\TradeRepeater\Stats\SevenDayAggregate\Updater;
 
 final class SevenDayAggregate extends Command
 {

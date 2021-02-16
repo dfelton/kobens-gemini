@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Command\Command\Info;
 
+use Kobens\Gemini\Exchange\Currency\Pair as P;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Gemini\Exchange\Currency\Pair as P;
-use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Meant to output similar table as found here: https://docs.gemini.com/rest-api/#symbols-and-minimums

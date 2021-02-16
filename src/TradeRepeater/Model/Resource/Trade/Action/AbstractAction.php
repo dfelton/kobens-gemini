@@ -6,7 +6,6 @@ namespace Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action;
 
 use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
 use Kobens\Gemini\TradeRepeater\Model\Trade;
-use Kobens\Gemini\TradeRepeater\Model\Resource\Trade as TradeResource;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Adapter\Driver\ConnectionInterface;
 use Zend\Db\TableGateway\TableGateway;
@@ -21,11 +20,11 @@ abstract class AbstractAction
 
     protected ConnectionInterface $connection;
 
-    protected TradeResource $tradeResource;
+    protected \Kobens\Gemini\TradeRepeater\Model\Resource\Trade $tradeResource;
 
     public function __construct(
         Adapter $adapter,
-        TradeResource $tradeResource
+        \Kobens\Gemini\TradeRepeater\Model\Resource\Trade $tradeResource
     ) {
         $this->adapter = $adapter;
         $this->connection = $adapter->getDriver()->getConnection();

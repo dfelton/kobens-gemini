@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement;
 
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetAvailableBalances\Balance;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetAvailableBalances\BalanceInterface;
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 
 class GetAvailableBalances implements GetAvailableBalancesInterface
 {
