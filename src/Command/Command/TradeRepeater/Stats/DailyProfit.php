@@ -65,18 +65,23 @@ final class DailyProfit extends Command
         $date = $this->getDayForUpdate();
         while ($date !== null && $this->shutdown->isShutdownModeEnabled() === false && $this->killFileExists(self::KILL_FILE) === false) {
             $isToday = date('Y-m-d 00:00:00', time()) === $date;
-            $profits = $this->getProfitsForDay($date);
-            foreach ($profits as $symbol => $profit) {
-                if (Compare::getResult($profit['amount'], '0') === Compare::LEFT_GREATER_THAN) {
-                    $this->logProfit($date, $symbol, $profit['amount'], $profit['amount_notional'], $isToday);
+            try {
+                $profits = $this->getProfitsForDay($date);
+                foreach ($profits as $symbol => $profit) {
+                    if (Compare::getResult($profit['amount'], '0') === Compare::LEFT_GREATER_THAN) {
+                        $this->logProfit($date, $symbol, $profit['amount'], $profit['amount_notional'], $isToday);
+                    }
                 }
+                if ($isToday) {
+                    $this->sleeper->sleep($this->getDelay($input), function (): bool {
+                        return $this->shutdown->isShutdownModeEnabled();
+                    });
+                }
+                $date = $this->getDayForUpdate();
+            } catch (\Throwable $e) {
+                $exitCode = 1;
+                $this->shutdown->enableShutdownMode($e);
             }
-            if ($isToday) {
-                $this->sleeper->sleep($this->getDelay($input), function (): bool {
-                    return $this->shutdown->isShutdownModeEnabled();
-                });
-            }
-            $date = $this->getDayForUpdate();
         }
         if ($this->shutdown->isShutdownModeEnabled()) {
             $output->writeln(sprintf(

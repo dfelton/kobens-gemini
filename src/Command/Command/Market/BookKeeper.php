@@ -38,6 +38,7 @@ final class BookKeeper extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $exitCode = 0;
         $book = $this->bookFactory->create($input->getOption('symbol'));
         $loop = true;
         do {
@@ -50,6 +51,7 @@ final class BookKeeper extends Command
             } catch (ConnectionException $e) {
                 $this->outputErrorAndSleep($output, $e->getMessage());
             } catch (\Throwable $e) {
+                $exitCode = 1;
                 $loop = false;
                 do {
                     $output->writeln([
@@ -66,7 +68,7 @@ final class BookKeeper extends Command
                 } while ($e instanceof \Throwable);
             }
         } while ($loop);
-        return 0;
+        return $exitCode;
     }
 
     protected function outputErrorAndSleep(OutputInterface $output, string $message, int $seconds = 10): void

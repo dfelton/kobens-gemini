@@ -24,8 +24,17 @@ final class GetNotionalVolume extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $table = NotionalVolumeTable::getTable($this->volume->getVolume(), $output);
-        $table->render();
-        return 0;
+        $exitCode = 0;
+        try {
+            NotionalVolumeTable::getTable($this->volume->getVolume(), $output)->render();
+        } catch (\Throwable $e) {
+            $exitCode = 1;
+            $output->writeln([
+                sprintf('Error Message: %s', $e->getMessage()),
+                sprintf('Error Code: %d', $e->getCode()),
+                sprintf("Stack Trace:\n%s", $e->getTraceAsString()),
+            ]);
+        }
+        return $exitCode;
     }
 }

@@ -60,6 +60,7 @@ final class Pair extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $exitCode = 0;
         $sleep = $this->getRefreshRate($input);
         $loop = $input->getOption('disable-loop') === false;
         do {
@@ -71,6 +72,7 @@ final class Pair extends Command
                     });
                 }
             } catch (\Throwable $e) {
+                $exitCode = 1;
                 $loop = false;
                 do {
                     $output->writeln([
@@ -86,7 +88,7 @@ final class Pair extends Command
                 } while ($e instanceof \Throwable);
             }
         } while ($loop && !file_exists(Config::getInstance()->getRootDir() . self::KILL_FILE));
-        return 0;
+        return $exitCode;
     }
 
     /**

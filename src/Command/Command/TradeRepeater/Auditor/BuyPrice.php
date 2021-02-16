@@ -81,6 +81,7 @@ final class BuyPrice extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $exitCode = 0;
         $sleep = (int) $input->getOption('delay');
         if ($sleep < 10) {
             $sleep = 10;
@@ -102,15 +103,18 @@ final class BuyPrice extends Command
                 $this->exceptionDelay($output, $e);
             } catch (\Exception $e) {
                 $this->shutdown->enableShutdownMode($e);
+                $exitCode = 1;
             }
         }
 
-        $output->writeln(sprintf(
-            "<fg=red>%s\tShutdown signal detected - %s",
-            $this->now(),
-            self::class
-        ));
-        return 0;
+        if ($this->shutdown->isShutdownModeEnabled()) {
+            $output->writeln(sprintf(
+                "<fg=red>%s\tShutdown signal detected - %s",
+                $this->now(),
+                self::class
+            ));
+        }
+        return $exitCode;
     }
 
     private function exceptionDelay(OutputInterface $output, \Exception $e)

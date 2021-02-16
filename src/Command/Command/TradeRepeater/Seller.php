@@ -69,6 +69,7 @@ final class Seller extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $exitCode = 0;
         $delay = (int) $input->getOption('delay');
         if ($delay < 5) {
             $delay = 5;
@@ -78,8 +79,9 @@ final class Seller extends Command
                 if (!$this->mainLoop($input, $output)) {
                     $this->sleep($delay, $this->sleeper, $this->shutdown);
                 }
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $this->shutdown->enableShutdownMode($e);
+                $exitCode = 1;
             }
         }
         if ($this->shutdown->isShutdownModeEnabled()) {
@@ -96,7 +98,7 @@ final class Seller extends Command
                 self::class
             ));
         }
-        return 0;
+        return $exitCode;
     }
 
     private function mainLoop(InputInterface $input, OutputInterface $output): bool

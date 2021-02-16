@@ -73,6 +73,7 @@ final class WebSocket extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $exitCode = 0;
         $reconnectDelay = (int) $input->getOption('reconnect_delay');
         if ($reconnectDelay < 5) {
             $reconnectDelay = 5;
@@ -86,16 +87,18 @@ final class WebSocket extends Command
                     "<fg=yellow>{$this->now()}\tSleeping {$reconnectDelay} seconds before next reconnect attempt.</>"
                 ]);
                 $this->sleep($reconnectDelay, $this->sleeper, $this->shutdown);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $this->shutdown->enableShutdownMode($e);
             }
         }
-        $output->writeln(sprintf(
-            "<fg=red>%s\tShutdown signal detected - %s",
-            $this->now(),
-            self::class
-        ));
-        return 0;
+        if ($this->shutdown->isShutdownModeEnabled()) {
+            $output->writeln(sprintf(
+                "<fg=red>%s\tShutdown signal detected - %s",
+                $this->now(),
+                self::class
+            ));
+        }
+        return $exitCode;
     }
 
     private function main(OutputInterface $output): \Closure

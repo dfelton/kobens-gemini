@@ -28,7 +28,17 @@ final class SevenDayAggregate extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->updater->execute();
-        return 0;
+        $exitCode = 0;
+        try {
+            $this->updater->execute();
+        } catch (\Throwable $e) {
+            $exitCode = 1;
+            $output->writeln([
+                sprintf('Error Message: %s', $e->getMessage()),
+                sprintf('Error Code: %d', $e->getCode()),
+                sprintf("Stack Trace:\n%s", $e->getTraceAsString()),
+            ]);
+        }
+        return $exitCode;
     }
 }
