@@ -3,10 +3,13 @@
 
 declare(strict_types=1);
 
+require dirname(__DIR__) . '/vendor/autoload.php';
+
 use Kobens\Core\Cache;
 use Kobens\Core\Config;
 use Kobens\Core\Db;
 use Kobens\Core\EmergencyShutdown;
+use Kobens\Core\ErrorHandler;
 use Kobens\Core\Sleeper;
 use Kobens\Core\Http\Request\Throttler;
 use Kobens\Core\Http\Request\Throttler\Adapter\MariaDb;
@@ -32,7 +35,13 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatus;
 use Kobens\Gemini\Api\Rest\PublicEndpoints\Ticker;
 use Kobens\Gemini\Api\WebSocket\MarketData\BookKeeperFactory;
 use Kobens\Gemini\Api\WebSocket\OrderEvents\BookKeeper;
+use Kobens\Gemini\Exchange\Order\Fee\ApiMakerHoldBps;
+use Kobens\Gemini\TradeRepeater\PricePointGenerator;
+use Kobens\Gemini\TradeRepeater\CliMonitor\Profits;
+use Kobens\Gemini\TradeRepeater\CliMonitor\Helper\Data;
+use Kobens\Gemini\TradeRepeater\Model\GetRecordId;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade as TradeResource;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Update;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\Archive;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyFilled;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyPlaced;
@@ -41,43 +50,48 @@ use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuySent;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellFilled;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellPlaced;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellSent;
-use Kobens\Gemini\TradeRepeater\CliMonitor\Helper\Data;
-use Zend\Db\TableGateway\TableGateway;
-use Kobens\Gemini\TradeRepeater\Model\GetRecordId;
-use Kobens\Gemini\TradeRepeater\Model\Trade\ShouldResetBuy;
-use Kobens\Gemini\TradeRepeater\CliMonitor\Profits;
 use Kobens\Gemini\TradeRepeater\Model\Trade\AddAmount;
-use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Update;
-use Kobens\Gemini\TradeRepeater\PricePointGenerator;
-use Kobens\Gemini\Exchange\Order\Fee\ApiMakerHoldBps;
-use KobensTest\Gemini\Unit\Exchange\Order\Fee\ApiMakerHoldBpsTest;
+use Kobens\Gemini\TradeRepeater\Model\Trade\ShouldResetBuy;
+use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Bucket;
 use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Processor;
 use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Processor\ReInvest;
-use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Processor\TopWeekly;
-use Kobens\Gemini\Exchange\Order\Maker\RequiredQuote;
-use Kobens\Core\ErrorHandler;
-use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Bucket;
+use Zend\Db\TableGateway\TableGateway;
 
-require \dirname(__DIR__) . '/bootstrap.php';
+error_reporting(E_ALL | E_STRICT);
+set_error_handler([new ErrorHandler(), 'handler']);
 
 try {
+    $config = \Kobens\Core\Config::getInstance();
+    $config->setConfig(dirname(__DIR__) . '/env/config.xml');
+    $config->setRootDir(dirname(__DIR__));
+
+    $phpSettings = $config->get('php');
+    if ($phpSettings) {
+        if ($phpSettings->get('timezone')) {
+            \date_default_timezone_set((string) $phpSettings->get('timezone'));
+        }
+    }
+    unset ($config, $phpSettings);
+
+    // Init Exchange Mapper (todo: may not be necessary if we're scrapping kobens-exchange's trade-repeater)
+    new \Kobens\Exchange\Exchange\Mapper(['gemini' => \Kobens\Gemini\Exchange::class]);
+
     $json = @\file_get_contents(\dirname(__DIR__) . '/composer.json');
     if ($json === false) {
         throw new \Exception('Unable to read application\'s composer.json file.');
     }
-    $composer = @\json_decode($json);
-    if ($composer  === false) {
-        throw new \Exception('Unable to parse application\'s composer.json file.');
-    }
+    $composer = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
     unset($json);
-
-} catch (\Exception $e) {
-    echo \sprintf("Initialization Error: %s\n", $e->getMessage());
+} catch (\Throwable $e) {
+    echo \sprintf(
+        "Initialization Error\nError Message: %s\nError Code: %d\nStack Trace: %s\n",
+        $e->getMessage(),
+        $e->getCode(),
+        $e->getTraceAsString()
+    );
+    echo
     exit(1);
 }
-
-error_reporting(E_ALL | E_STRICT);
-set_error_handler([new ErrorHandler(), 'handler']);
 
 $config = Config::getInstance();
 $adapter = Db::getAdapter();
@@ -92,7 +106,6 @@ $keyInterface = new Key(
     $config->get('gemini')->api->key->secret_key
 );
 $nonceInterface = new Nonce();
-
 
 // TODO: Maybe use db user that only has rights to read/write on throttler table.
 // NOTE: Throttlers intentionally use their own db connection so as to not have transactional
