@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus;
 
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetPastTradesInterface as I;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetPastTradesInterface as I;
 use Kobens\Gemini\Exception\Api\Reason\InvalidNonceException;
 use Kobens\Http\Exception\Status\ServerError\BadGatewayException;
 

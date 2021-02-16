@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\TradeRepeater\Model\Trade;
 
+use Kobens\Gemini\Api\Market\GetPriceInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
 use Kobens\Gemini\TradeRepeater\Model\Trade;
 use Kobens\Math\PercentDifference;
 use Kobens\Math\BasicCalculator\Compare;
-use Kobens\Gemini\Api\Market\GetPriceInterface;
 
 final class ShouldResetBuy implements ShouldResetBuyInterface
 {

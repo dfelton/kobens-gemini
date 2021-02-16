@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action;
 
 use Kobens\Core\Db;
-use Zend\Db\TableGateway\TableGateway;
 use Kobens\Gemini\TradeRepeater\Model\Trade;
+use Zend\Db\TableGateway\TableGateway;
 
 final class Archive implements ArchiveInterface
 {

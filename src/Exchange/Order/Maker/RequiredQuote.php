@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Kobens\Gemini\Exchange\Order\Maker;
 
 use Kobens\Gemini\Exchange\Order\Fee\ApiMakerHoldBpsInterface;
-use Kobens\Math\BasicCalculator\Multiply;
 use Kobens\Math\BasicCalculator\Add;
+use Kobens\Math\BasicCalculator\Multiply;
 
 final class RequiredQuote
 {

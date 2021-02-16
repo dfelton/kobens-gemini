@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement;
 
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 use Kobens\Gemini\Exception;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetNotionalBalances\Balance;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetNotionalBalances\BalanceInterface;
 

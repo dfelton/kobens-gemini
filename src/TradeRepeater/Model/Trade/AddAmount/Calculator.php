@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Kobens\Gemini\TradeRepeater\Model\Trade\AddAmount;
 
 use Kobens\Exchange\PairInterface;
+use Kobens\Math\BasicCalculator\Add;
+use Kobens\Math\BasicCalculator\Compare;
 use Kobens\Math\BasicCalculator\Multiply;
 use Kobens\Math\BasicCalculator\Subtract;
-use Kobens\Math\BasicCalculator\Compare;
-use Kobens\Math\BasicCalculator\Add;
 
 final class Calculator implements CalculatorInterface
 {

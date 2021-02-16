@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Processor;
 
+use Kobens\Core\EmergencyShutdownInterface;
+use Kobens\Gemini\Exchange\Currency\Pair;
+use Kobens\Gemini\Exchange\Order\Maker\RequiredQuote;
+use Kobens\Gemini\TradeRepeater\Exception\UnsupportedAddAmountStateException;
+use Kobens\Gemini\TradeRepeater\Model\Trade;
+use Kobens\Gemini\TradeRepeater\Model\Trade\AddAmount;
+use Kobens\Math\BasicCalculator\Add;
+use Kobens\Math\BasicCalculator\Compare;
+use Kobens\Math\BasicCalculator\Multiply;
+use Kobens\Math\BasicCalculator\Subtract;
 use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\TableGateway\TableGatewayInterface;
-use Zend\Db\Sql\Select;
-use Kobens\Gemini\TradeRepeater\Model\Trade;
-use Kobens\Gemini\Exchange\Order\Maker\RequiredQuote;
-use Kobens\Math\BasicCalculator\Multiply;
-use Kobens\Gemini\Exchange\Currency\Pair;
-use Kobens\Math\BasicCalculator\Compare;
-use Kobens\Math\BasicCalculator\Subtract;
-use Kobens\Gemini\TradeRepeater\Model\Trade\AddAmount;
-use Kobens\Core\EmergencyShutdownInterface;
-use Kobens\Math\BasicCalculator\Add;
-use Kobens\Gemini\TradeRepeater\Exception\UnsupportedAddAmountStateException;
 
 final class TopWeekly
 {

@@ -11,11 +11,11 @@ use Kobens\Gemini\Exchange\Order\Fee\ApiMakerHoldBpsInterface;
 use Kobens\Gemini\Exchange\Order\Fee\MaxApiMakerBps;
 use Kobens\Gemini\TradeRepeater\PricePointGenerator\PricePoint;
 use Kobens\Gemini\TradeRepeater\PricePointGenerator\Result;
+use Kobens\Math\IsEvenlyDivisible;
 use Kobens\Math\BasicCalculator\Add;
 use Kobens\Math\BasicCalculator\Compare;
 use Kobens\Math\BasicCalculator\Multiply;
 use Kobens\Math\BasicCalculator\Subtract;
-use Kobens\Math\IsEvenlyDivisible;
 
 final class PricePointGenerator implements PricePointGeneratorInterface
 {

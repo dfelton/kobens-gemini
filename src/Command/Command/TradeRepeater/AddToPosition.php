@@ -2,18 +2,17 @@
 
 namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
-use Kobens\Gemini\TradeRepeater\Model\Resource\Trade as TradeResource;
+use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\Model\Trade\AddAmount;
+use Kobens\Math\BasicCalculator\Add;
+use Kobens\Math\BasicCalculator\Compare;
+use Kobens\Math\BasicCalculator\Multiply;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Kobens\Gemini\Exchange\Currency\Pair;
-use Kobens\Math\BasicCalculator\Add;
-use Kobens\Math\BasicCalculator\Multiply;
-use Symfony\Component\Console\Helper\Table;
-use Kobens\Math\BasicCalculator\Compare;
+use Symfony\Component\Console\Output\OutputInterface;
 
 final class AddToPosition extends Command
 {
@@ -21,11 +20,11 @@ final class AddToPosition extends Command
 
     private AddAmount $addAmount;
 
-    private TradeResource $tradeResource;
+    private \Kobens\Gemini\TradeRepeater\Model\Resource\Trade $tradeResource;
 
     public function __construct(
         AddAmount $addAmount,
-        TradeResource $tradeResource
+        \Kobens\Gemini\TradeRepeater\Model\Resource\Trade $tradeResource
     ) {
         $this->addAmount = $addAmount;
         $this->tradeResource = $tradeResource;

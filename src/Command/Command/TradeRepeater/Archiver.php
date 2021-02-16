@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
+use Kobens\Core\Db;
 use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Core\SleeperInterface;
 use Kobens\Gemini\Command\Traits\KillFile;
+use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\Model\Trade;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\ArchiveInterface;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellFilledInterface;
+use Kobens\Gemini\TradeRepeater\Model\Trade\CalculateCompletedProfits;
 use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\ProcessorInterface;
+use Kobens\Math\BasicCalculator\Compare;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Adapter\Driver\ConnectionInterface;
-use Kobens\Gemini\TradeRepeater\Model\Trade\CalculateCompletedProfits;
-use Kobens\Gemini\Exchange\Currency\Pair;
-use Kobens\Math\BasicCalculator\Compare;
-use Kobens\Core\Db;
 
 final class Archiver extends Command
 {

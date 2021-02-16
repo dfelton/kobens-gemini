@@ -16,11 +16,11 @@ use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\Model\Trade;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyFilledInterface;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellSentInterface;
+use Kobens\Math\BasicCalculator\Compare;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Math\BasicCalculator\Compare;
 
 /**
  * TODO: implement a pid file so this command cannot be ran more than once process at a time.

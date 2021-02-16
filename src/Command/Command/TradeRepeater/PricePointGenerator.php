@@ -2,20 +2,19 @@
 
 namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
+use Kobens\Exchange\PairInterface;
 use Kobens\Gemini\Exchange\Currency\Pair;
-use Kobens\Gemini\TradeRepeater\PricePointGenerator as Generator;
 use Kobens\Gemini\TradeRepeater\PricePointGenerator\PricePoint;
+use Kobens\Gemini\TradeRepeater\PricePointGenerator\Result;
+use Kobens\Math\BasicCalculator\Add;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\TableGateway\TableGatewayInterface;
-use Kobens\Gemini\TradeRepeater\PricePointGenerator\Result;
-use Symfony\Component\Console\Helper\Table;
-use Kobens\Math\BasicCalculator\Add;
-use Symfony\Component\Console\Helper\TableCell;
-use Kobens\Exchange\PairInterface;
 
 final class PricePointGenerator extends Command
 {
@@ -26,11 +25,11 @@ final class PricePointGenerator extends Command
      */
     private TableGatewayInterface $table;
 
-    private Generator $generator;
+    private \Kobens\Gemini\TradeRepeater\PricePointGenerator $generator;
 
     public function __construct(
         TableGatewayInterface $table,
-        Generator $generator
+        \Kobens\Gemini\TradeRepeater\PricePointGenerator $generator
     ) {
         $this->table = $table;
         $this->generator = $generator;

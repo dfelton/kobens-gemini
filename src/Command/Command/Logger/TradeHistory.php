@@ -10,6 +10,7 @@ namespace Kobens\Gemini\Command\Command\Logger;
 
 use Kobens\Core\Db;
 use Kobens\Core\EmergencyShutdownInterface;
+use Kobens\Core\SleeperInterface;
 use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetPastTradesInterface;
 use Kobens\Gemini\Exchange\Currency\Pair;
@@ -20,7 +21,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Adapter\Exception\InvalidQueryException;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
-use Kobens\Core\SleeperInterface;
 
 final class TradeHistory extends Command
 {

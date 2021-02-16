@@ -5,20 +5,19 @@ declare(strict_types=1);
 namespace Kobens\Gemini\TradeRepeater\Model\Trade;
 
 use Kobens\Gemini\Api\Market\GetPriceInterface;
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelOrderInterface;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\Exception\UnsupportedAddAmountStateException;
 use Kobens\Gemini\TradeRepeater\Model\Trade;
-use Kobens\Gemini\TradeRepeater\Model\Resource\Trade as TradeResource;
+use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\UpdateInterface;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyPlaced as StatusBuyPlaced;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellPlaced as StatusSellPlaced;
-use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\UpdateInterface;
 use Kobens\Math\BasicCalculator\Add;
 use Kobens\Math\BasicCalculator\Compare;
 use Kobens\Math\BasicCalculator\Divide;
-use Kobens\Math\BasicCalculator\Subtract;
 use Kobens\Math\BasicCalculator\Multiply;
+use Kobens\Math\BasicCalculator\Subtract;
 use Zend\Db\Adapter\Adapter;
 
 final class AddAmount
@@ -33,7 +32,7 @@ final class AddAmount
     private CancelOrderInterface $cancelOrder;
     private GetPriceInterface $getPrice;
     private OrderStatusInterface $orderStatus;
-    private TradeResource $tradeResource;
+    private \Kobens\Gemini\TradeRepeater\Model\Resource\Trade $tradeResource;
     private Adapter $adapter;
     private UpdateInterface $updateTrade;
 
@@ -41,7 +40,7 @@ final class AddAmount
         CancelOrderInterface $cancelOrder,
         GetPriceInterface $getPrice,
         OrderStatusInterface $orderStatus,
-        TradeResource $tradeResource,
+        \Kobens\Gemini\TradeRepeater\Model\Resource\Trade $tradeResource,
         Adapter $adapter,
         UpdateInterface $updateTrade
     ) {

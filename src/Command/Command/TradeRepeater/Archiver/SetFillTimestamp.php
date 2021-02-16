@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Command\Command\TradeRepeater\Archiver;
 
+use Kobens\Core\EmergencyShutdownInterface;
+use Kobens\Core\SleeperInterface;
+use Kobens\Gemini\Command\Traits\KillFile;
+use Kobens\Gemini\Exchange\Currency\Pair;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Adapter\Adapter;
-use Kobens\Core\SleeperInterface;
-use Kobens\Core\EmergencyShutdownInterface;
-use Kobens\Gemini\Exchange\Currency\Pair;
-use Kobens\Gemini\Command\Traits\KillFile;
 
 final class SetFillTimestamp extends Command
 {

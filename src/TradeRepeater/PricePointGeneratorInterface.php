@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Kobens\Gemini\TradeRepeater;
 
 use Kobens\Exchange\PairInterface;
-use Kobens\Gemini\Exception;
 use Kobens\Gemini\TradeRepeater\PricePointGenerator\Result;
 
 interface PricePointGeneratorInterface

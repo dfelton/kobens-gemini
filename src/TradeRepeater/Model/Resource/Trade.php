@@ -6,10 +6,10 @@ namespace Kobens\Gemini\TradeRepeater\Model\Resource;
 
 use Kobens\Gemini\Exception\TradeRepeater\RecordNotFoundException;
 use Kobens\Gemini\TradeRepeater\Model\Trade as TradeModel;
+use Kobens\Math\BasicCalculator\Compare;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
-use Kobens\Math\BasicCalculator\Compare;
 
 final class Trade
 {

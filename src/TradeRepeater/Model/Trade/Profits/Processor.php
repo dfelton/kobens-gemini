@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\TradeRepeater\Model\Trade\Profits;
 
-use Kobens\Gemini\TradeRepeater\Model\Trade;
-use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Processor\ReInvest;
-use Kobens\Gemini\TradeRepeater\Model\Trade\CalculateCompletedProfits;
 use Kobens\Gemini\Exchange\Currency\Pair;
+use Kobens\Gemini\TradeRepeater\Model\Trade;
+use Kobens\Gemini\TradeRepeater\Model\Trade\CalculateCompletedProfits;
+use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Processor\ReInvest;
 
 /**
  * When a repeater position has completed a sale, we have

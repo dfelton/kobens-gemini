@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\TradeRepeater\Model\Trade;
 
-use Kobens\Gemini\TradeRepeater\Model\Trade;
 use Kobens\Gemini\Exchange\Currency\Pair;
+use Kobens\Gemini\TradeRepeater\Model\Trade;
 use Kobens\Math\BasicCalculator\Multiply;
 use Kobens\Math\BasicCalculator\Subtract;
 
