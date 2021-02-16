@@ -95,7 +95,7 @@ final class DailyProfit extends Command
         return $exitCode;
     }
 
-    private function getDelay(InputOption $input): int
+    private function getDelay(InputInterface $input): int
     {
         $delay = (int) $input->getOption('delay');
         if ($delay < self::DELAY_MIN) {
