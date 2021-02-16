@@ -73,6 +73,7 @@ final class Rest extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $exitCode = 0;
         $buyAudit = $input->getOption('buy') === '1';
         $sellAudit = $input->getOption('sell') === '1';
         if ($sellAudit === false && $buyAudit === false) {
@@ -116,16 +117,19 @@ final class Rest extends Command
                 $this->sleep(600, $this->sleeper, $this->shutdown);
             } catch (ConnectionException | MaintenanceException | SystemException $e) {
                 $this->exceptionDelay($output, $e);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $this->shutdown->enableShutdownMode($e);
+                $exitCode = 1;
             }
         }
-        $output->writeln(sprintf(
-            "<fg=red>%s\tShutdown signal detected - %s",
-            $this->now(),
-            self::class
-        ));
-        return 0;
+        if ($this->shutdown->isShutdownModeEnabled()) {
+            $output->writeln(sprintf(
+                "<fg=red>%s\tShutdown signal detected - %s",
+                $this->now(),
+                self::class
+            ));
+        }
+        return $exitCode;
     }
 
     private function exceptionDelay(OutputInterface $output, \Exception $e)

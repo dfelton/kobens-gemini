@@ -65,6 +65,7 @@ final class BPS extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $exitCode = 0;
         while (!$this->shutdown->isShutdownModeEnabled()) {
             try {
                 $this->auditBPS($output);
@@ -73,10 +74,11 @@ final class BPS extends Command
                 $this->sleep(self::SLEEP_DELAY, $this->sleeper, $this->shutdown);
             } catch (\Exception $e) {
                 $this->shutdown->enableShutdownMode($e);
+                $exitCode = 1;
             }
         }
         $output->writeln("\n<fg=red>{$this->now()}\tShutdown signal detected.\n");
-        return 0;
+        return $exitCode;
     }
 
     /**

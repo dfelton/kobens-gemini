@@ -84,6 +84,7 @@ final class Disable extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $exitCode = 0;
         $pair = Pair::getInstance($input->getArgument('pair'));
         $force = $input->getOption('force') === '1';
         $priceFrom = $input->getArgument('price-from');
@@ -93,13 +94,14 @@ final class Disable extends Command
             try {
                 $this->disable($output, $id, $force);
                 $this->adapter->getDriver()->getConnection()->commit();
-            } catch (\Exception $e) {
-                $this->adapter->getDriver()->getConnection()->rollback();
+            } catch (\Throwable $e) {
                 $this->shutdown->enableShutdownMode($e);
+                $this->adapter->getDriver()->getConnection()->rollback();
+                $exitCode = 1;
                 break;
             }
         }
-        return 0;
+        return $exitCode;
     }
 
     private function disable(OutputInterface $output, int $id, bool $force = false): void

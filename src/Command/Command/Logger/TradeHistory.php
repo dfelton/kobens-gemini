@@ -91,13 +91,14 @@ final class TradeHistory extends Command
             $this->shutdown->enableShutdownMode($e);
             $exitCode = 1;
         }
-
-        $output->writeln(sprintf(
-            "<fg=red>%s\tShutdown signal detected - %s (%s)",
-            $this->now(),
-            self::class,
-            $this->symbol
-        ));
+        if ($this->shutdown->isShutdownModeEnabled()) {
+            $output->writeln(sprintf(
+                "<fg=red>%s\tShutdown signal detected - %s (%s)",
+                $this->now(),
+                self::class,
+                $this->symbol
+            ));
+        }
 
         return $exitCode;
     }

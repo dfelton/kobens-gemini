@@ -70,9 +70,9 @@ final class AddToPosition extends Command
             } catch (\Throwable $e) {
                 $exitCode = 1;
                 $output->writeln(sprintf(
-                    "Error Code: %d\nError Message: %s\nStack Trace:\n%s",
-                    $e->getCode(),
+                    "Error Message: %s\nError Code: %d\nStack Trace:\n%s",
                     $e->getMessage(),
+                    $e->getCode(),
                     $e->getTraceAsString()
                 ));
             }

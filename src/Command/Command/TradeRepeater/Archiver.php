@@ -68,6 +68,7 @@ final class Archiver extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $exitCode = 0;
         $delay = (int) $input->getOption('delay');
         if ($delay <= 0) {
             $delay = self::DEFAULT_DELAY;
@@ -78,6 +79,7 @@ final class Archiver extends Command
                 $this->sleep($delay, $this->sleeper, $this->shutdown);
             } catch (\Throwable $e) {
                 $this->shutdown->enableShutdownMode($e);
+                $exitCode = 1;
             }
         }
         if ($this->shutdown->isShutdownModeEnabled()) {
@@ -94,7 +96,7 @@ final class Archiver extends Command
                 self::class
             ));
         }
-        return 0;
+        return $exitCode;
     }
 
     private function mainLoop(OutputInterface $output): void

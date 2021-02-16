@@ -75,6 +75,7 @@ final class Account extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $exitCode = 0;
         $sleep = $this->getRefreshRate($input);
         $args = $this->getArgs($input);
         $loop = $input->getOption('disable-loop') === false;
@@ -91,6 +92,7 @@ final class Account extends Command
                     });
                 }
             } catch (\Throwable $e) {
+                $exitCode = 1;
                 $loop = false;
                 do {
                     $output->writeln([
@@ -106,7 +108,7 @@ final class Account extends Command
                 } while ($e instanceof \Throwable);
             }
         } while ($loop && !file_exists(Config::getInstance()->getRootDir() . self::KILL_FILE));
-        return 0;
+        return $exitCode;
     }
 
     private function getArgs(InputInterface $input): array

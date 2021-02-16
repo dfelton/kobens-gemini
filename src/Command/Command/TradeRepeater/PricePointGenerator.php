@@ -53,6 +53,7 @@ final class PricePointGenerator extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $exitCode = 0;
         $pair = Pair::getInstance($input->getArgument('symbol'));
         $create = $input->getOption('create') === '1';
         $result = $this->generator->get(
@@ -68,11 +69,20 @@ final class PricePointGenerator extends Command
         );
         $isEnabled = (int) $input->getArgument('is_enabled');
         if ($input->getOption('create') === '1') {
-            $this->create($output, $pair, $result, $isEnabled);
+            try {
+                $this->create($output, $pair, $result, $isEnabled);
+            } catch (\Throwable $e) {
+                $output->writeln([
+                    sprintf('Error Message: %s', $e->getMessage()),
+                    sprintf('Error Code: %d', $e->getCode()),
+                    sprintf("Stack Trace:\n%s", $e->getTraceAsString()),
+                ]);
+                $exitCode = 1;
+            }
         } else {
             $this->summarize($input, $output, $pair, $result);
         }
-        return 0;
+        return $exitCode;
     }
 
     private function summarize(InputInterface $input, OutputInterface $output, Pair $pair, Result $result): void
