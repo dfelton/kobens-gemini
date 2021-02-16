@@ -93,7 +93,7 @@ final class AddAmount
         return $amountAdded;
     }
 
-    public function addTo(string $symbol, string $amount, string $priceFrom, string $priceTo): void
+    public function addTo(string $symbol, string $amount, string $priceFrom, string $priceTo): \Generator
     {
         $rows = $this->tradeResource->getList(
             $symbol,
@@ -105,7 +105,11 @@ final class AddAmount
         );
         /** @var Trade $row */
         foreach ($rows as $row) {
-            $this->add($row->getId(), $amount);
+            $amount = $this->add($row->getId(), $amount);
+            yield [
+                'trade' => $row,
+                'amount' => $amount,
+            ];
         }
     }
 

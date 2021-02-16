@@ -226,7 +226,7 @@ if [ $? -eq 1 ]; then
     php -n $(dirname $BASH_SOURCE)/gemini repeater:seller &
 fi
 
-ps aux | grep -v grep | grep -q gemini\ repeater:archiver
+ps aux | grep -v 'grep\|fill-time' | grep -q gemini\ repeater:archiver
 if [ $? -eq 1 ]; then
     php -n $(dirname $BASH_SOURCE)/gemini repeater:archiver &
 fi

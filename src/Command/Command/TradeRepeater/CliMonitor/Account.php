@@ -13,8 +13,6 @@ use Kobens\Gemini\TradeRepeater\CliMonitor\Balances;
 use Kobens\Gemini\TradeRepeater\CliMonitor\Helper\Data;
 use Kobens\Gemini\TradeRepeater\CliMonitor\Profits;
 use Kobens\Http\Exception\Status\ServerErrorException;
-use Kobens\Math\BasicCalculator\Add;
-use Kobens\Math\BasicCalculator\Multiply;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,7 +21,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\TableGateway\TableGatewayInterface;
 use Zend\Db\TableGateway\TableGateway;
-use Zend\Db\Sql\Select;
 
 final class Account extends Command
 {
@@ -195,9 +192,7 @@ final class Account extends Command
             if ($amount || $amountNotional || $amountAvailable || $amountAvailableNotional) {
                 $data[] = Balances::getTable($output, $this->data, $amount, $amountNotional, $amountAvailable, $amountAvailableNotional);
             }
-            foreach ($this->profits->get($output) as $table) {
-                $data[] = $table;
-            }
+            $data[] = $this->profits->get($output);
         } catch (\Kobens\Gemini\Exception $e) {
             $data[] = (new Table($output))->addRow([$e->getMessage()]);
         }
