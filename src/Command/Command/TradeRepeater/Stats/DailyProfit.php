@@ -17,9 +17,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Adapter\Adapter;
+use Kobens\Gemini\Command\Traits\TradeRepeater\ExitProgram;
 
 final class DailyProfit extends Command
 {
+    use ExitProgram;
     use KillFile;
 
     private const DELAY_DEFAULT = 60;
@@ -83,20 +85,7 @@ final class DailyProfit extends Command
                 $this->shutdown->enableShutdownMode($e);
             }
         }
-        if ($this->shutdown->isShutdownModeEnabled()) {
-            $output->writeln(sprintf(
-                "<fg=red>%s\tShutdown signal detected - %s",
-                $this->now(),
-                self::class
-            ));
-        }
-        if ($this->killFileExists(self::KILL_FILE)) {
-            $output->writeln(sprintf(
-                "<fg=red>%s\tKill File Detected - %s",
-                $this->now(),
-                self::class
-            ));
-        }
+        $this->outputExit($output, $this->shutdown, self::KILL_FILE);
         return $exitCode;
     }
 

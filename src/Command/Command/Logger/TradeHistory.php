@@ -21,13 +21,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Adapter\Exception\InvalidQueryException;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
+use Kobens\Gemini\Command\Traits\GetNow;
 
 final class TradeHistory extends Command
 {
+    use GetNow;
+
     protected static $defaultName = 'logger:trade-history';
 
     private const DEFAULT_SYMBOL = 'btcusd';
-    private const DEFAULT_DELAY  = 60;
+    private const DELAY_DEFAULT  = 60;
     private const MIN_DELAY      = 30;
     private const MAX_DELAY      = 600;
 
@@ -69,7 +72,7 @@ final class TradeHistory extends Command
                 self::MIN_DELAY,
                 self::MAX_DELAY
             ),
-            self::DEFAULT_DELAY
+            self::DELAY_DEFAULT
         );
     }
 
@@ -94,7 +97,7 @@ final class TradeHistory extends Command
         if ($this->shutdown->isShutdownModeEnabled()) {
             $output->writeln(sprintf(
                 "<fg=red>%s\tShutdown signal detected - %s (%s)",
-                $this->now(),
+                $this->getNow(),
                 self::class,
                 $this->symbol
             ));
@@ -111,7 +114,7 @@ final class TradeHistory extends Command
             if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                 $output->writeln(\sprintf(
                     "\n%s\tFetching page %d (%s)",
-                    $this->now(),
+                    $this->getNow(),
                     $timestampms,
                     \gmdate("Y-m-d H:i:s", (int) \substr((string) $timestampms, 0, 10))
                 ));
@@ -120,9 +123,9 @@ final class TradeHistory extends Command
             try {
                 $page = $this->pastTrades->getTrades($this->symbol, $timestampms, GetPastTradesInterface::LIMIT_MAX);
             } catch (ConnectionException $e) {
-                $output->writeln("<fg=red>{$this->now()}\tError Code: {$e->getCode()}</>");
-                $output->writeln("<fg=red>{$this->now()}\tError: {$e->getMessage()}</>");
-                $output->writeln("<fg=red>{$this->now()}\tSleeping 10 seconds and trying again...</>");
+                $output->writeln("<fg=red>{$this->getNow()}\tError Code: {$e->getCode()}</>");
+                $output->writeln("<fg=red>{$this->getNow()}\tError: {$e->getMessage()}</>");
+                $output->writeln("<fg=red>{$this->getNow()}\tSleeping 10 seconds and trying again...</>");
                 \sleep(10);
                 continue;
             } catch (\Exception $e) {
@@ -139,7 +142,7 @@ final class TradeHistory extends Command
                     if ($this->logTrade($page[$i])) {
                         $output->writeln(sprintf(
                             "%s\tTransaction %d Logged: %s %s %s @ %s %s/%s on %s for order id %s",
-                            $this->now(),
+                            $this->getNow(),
                             $page[$i]->tid,
                             $page[$i]->type,
                             $page[$i]->amount,
@@ -169,7 +172,7 @@ final class TradeHistory extends Command
                             // );
                             $this->logPageLimitError($pageFirstTimestampms);
                             $output->writeln(
-                                "\n{$this->now()}\t<fg=red>SKIPPING POTENTIAL $pageFirstTimestampms ORDERS DUE TO MAX PAGE SIZE LIMIT.</>"
+                                "\n{$this->getNow()}\t<fg=red>SKIPPING POTENTIAL $pageFirstTimestampms ORDERS DUE TO MAX PAGE SIZE LIMIT.</>"
                             );
                         }
                     }
@@ -177,7 +180,7 @@ final class TradeHistory extends Command
                     if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                         $output->write(\sprintf(
                             "\n%s\t<fg=green>Trade History for %s pair is up to date. Sleeping for %d seconds...</>\n",
-                            $this->now(),
+                            $this->getNow(),
                             $this->symbol,
                             $this->delay
                         ));
@@ -253,10 +256,5 @@ final class TradeHistory extends Command
             $this->table = new TableGateway('trade_history_' . $this->symbol, Db::getAdapter());
         }
         return $this->table;
-    }
-
-    private function now(): string
-    {
-        return (new \DateTime())->format('Y-m-d H:i:s');
     }
 }

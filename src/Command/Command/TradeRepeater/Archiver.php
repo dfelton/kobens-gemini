@@ -8,6 +8,8 @@ use Kobens\Core\Db;
 use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Core\SleeperInterface;
 use Kobens\Gemini\Command\Traits\KillFile;
+use Kobens\Gemini\Command\Traits\GetIntArg;
+use Kobens\Gemini\Command\Traits\TradeRepeater\ExitProgram;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\Model\Trade;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\ArchiveInterface;
@@ -15,18 +17,24 @@ use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\SellFilledInterface;
 use Kobens\Gemini\TradeRepeater\Model\Trade\CalculateCompletedProfits;
 use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\ProcessorInterface;
 use Kobens\Math\BasicCalculator\Compare;
+use Kobens\Math\BasicCalculator\Multiply;
+use Kobens\Math\BasicCalculator\Subtract;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Adapter\Driver\ConnectionInterface;
+use Kobens\Gemini\Command\Traits\GetNow;
 
 final class Archiver extends Command
 {
+    use ExitProgram;
     use SleeperTrait;
     use KillFile;
+    use GetIntArg;
+    use GetNow;
 
-    private const DEFAULT_DELAY = 2;
+    private const DELAY_DEFAULT = 2;
     private const KILL_FILE = 'kill_repeater_archiver';
 
     protected static $defaultName = 'repeater:archiver';
@@ -63,16 +71,13 @@ final class Archiver extends Command
     protected function configure(): void
     {
         $this->setDescription('Archives completed sell orders and marks record for next buy.');
-        $this->addOption('delay', 'd', InputOption::VALUE_OPTIONAL, 'Delay in seconds between looking for records.', self::DEFAULT_DELAY);
+        $this->addOption('delay', 'd', InputOption::VALUE_OPTIONAL, 'Delay in seconds between looking for records.', self::DELAY_DEFAULT);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $exitCode = 0;
-        $delay = (int) $input->getOption('delay');
-        if ($delay <= 0) {
-            $delay = self::DEFAULT_DELAY;
-        }
+        $delay = $this->getIntArg($input, 'delay', self::DELAY_DEFAULT);
         while ($this->shutdown->isShutdownModeEnabled() === false && $this->killFileExists(self::KILL_FILE) === false) {
             try {
                 $this->mainLoop($output);
@@ -82,20 +87,7 @@ final class Archiver extends Command
                 $exitCode = 1;
             }
         }
-        if ($this->shutdown->isShutdownModeEnabled()) {
-            $output->writeln(sprintf(
-                "<fg=red>%s\tShutdown signal detected - %s",
-                $this->now(),
-                self::class
-            ));
-        }
-        if ($this->killFileExists(self::KILL_FILE)) {
-            $output->writeln(sprintf(
-                "<fg=red>%s\tKill File Detected - %s",
-                $this->now(),
-                self::class
-            ));
-        }
+        $this->outputExit($output, $this->shutdown, self::KILL_FILE);
         return $exitCode;
     }
 
@@ -124,9 +116,18 @@ final class Archiver extends Command
         $pair = Pair::getInstance($trade->getSymbol());
         $base = $pair->getBase()->getSymbol();
         $quote = $pair->getQuote()->getSymbol();
+        $markup = Multiply::getResult(
+            Divide(
+                Subtract::getResult($trade->getSellPrice(), $trade->getBuyPrice()),
+                $trade->getBuyPrice(),
+                5
+            ),
+            '100',
+            3
+        );
         $output->writeln(sprintf(
-            "%s\t(%d)\t<fg=yellow>ARCHIVED\tBUY %s %s @ %s %s/%s --- SELL %s %s @ %s %s/%s</>",
-            $this->now(),
+            "%s\t(%d)\t<fg=yellow>ARCHIVED\tBUY %s %s @ %s %s/%s --- SELL %s %s @ %s %s/%s (%s%% markup)</>",
+            $this->getNow(),
             $trade->getId(),
             $trade->getBuyAmount(),
             strtoupper($base),
@@ -137,7 +138,8 @@ final class Archiver extends Command
             strtoupper($base),
             $trade->getSellPrice(),
             strtoupper($base),
-            strtoupper($quote)
+            strtoupper($quote),
+            $markup
         ));
         $profits = CalculateCompletedProfits::get($trade);
         foreach ([$base, $quote] as $symbol) {
@@ -145,16 +147,11 @@ final class Archiver extends Command
             if (Compare::getResult($profit, '0') === Compare::LEFT_GREATER_THAN) {
                 $output->writeln(sprintf(
                     "%s\tProfit: %s %s",
-                    $this->now(),
+                    $this->getNow(),
                     $profit,
                     strtoupper($symbol)
                 ));
             }
         }
-    }
-
-    private function now(): string
-    {
-        return (new \DateTime())->format('Y-m-d H:i:s');
     }
 }
