@@ -12,10 +12,12 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Adapter\Adapter;
+use Kobens\Gemini\Command\Traits\TradeRepeater\ExitProgram;
 
 final class SetFillTimestamp extends Command
 {
     use KillFile;
+    use ExitProgram;
 
     private const KILL_FILE = 'kill_repeater_archiver_set_fill_timestamp';
 
@@ -59,20 +61,7 @@ final class SetFillTimestamp extends Command
                 });
             }
         }
-        if ($this->shutdown->isShutdownModeEnabled()) {
-            $output->writeln(sprintf(
-                "<fg=red>%s\tShutdown signal detected - %s",
-                $this->now(),
-                self::class
-            ));
-        }
-        if ($this->killFileExists(self::KILL_FILE)) {
-            $output->writeln(sprintf(
-                "<fg=red>%s\tKill File Detected - %s",
-                $this->now(),
-                self::class
-            ));
-        }
+        $this->outputExit($output, $this->shutdown, self::KILL_FILE);
         return $exitCode;
     }
 

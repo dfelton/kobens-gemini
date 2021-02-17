@@ -11,6 +11,8 @@ use Kobens\Exchange\PairInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetActiveOrdersInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
 use Kobens\Gemini\Command\Command\TradeRepeater\SleeperTrait;
+use Kobens\Gemini\Command\Traits\KillFile;
+use Kobens\Gemini\Command\Traits\TradeRepeater\ExitProgram;
 use Kobens\Gemini\Exception\Api\Reason\InvalidNonceException;
 use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
 use Kobens\Gemini\Exception\Api\Reason\SystemException;
@@ -26,12 +28,17 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Kobens\Gemini\Command\Traits\GetNow;
 
 final class Rest extends Command
 {
+    use ExitProgram;
+    use KillFile;
     use SleeperTrait;
+    use GetNow;
 
     private const EXCEPTION_DELAY = 60;
+    private const KILL_FILE = 'kill_repeater_fill_monitor_rest';
 
     protected static $defaultName = 'repeater:fill-monitor-rest';
 
@@ -84,13 +91,13 @@ final class Rest extends Command
             ? Pair::getInstance($input->getOption('pair'))
             : null;
 
-        while ($this->shutdown->isShutdownModeEnabled() === false) {
+        while ($this->shutdown->isShutdownModeEnabled() === false && $this->killFileExists(self::KILL_FILE) === false) {
             $time = Subtract::getResult('0', (string) microtime(true));
             try {
                 if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                     $output->writeln(sprintf(
                         "%s\tAUDIT START\t%s (%s)",
-                        $this->now(),
+                        $this->getNow(),
                         ($pair === null) ? 'all pairs' : $pair->getSymbol(),
                         (
                             ($buyAudit ? '<fg=green>buy</>' : '') .
@@ -104,7 +111,7 @@ final class Rest extends Command
                 if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                     $output->writeln(sprintf(
                         "%s\tAUDIT END\t%s (%s) completed in %s seconds",
-                        $this->now(),
+                        $this->getNow(),
                         ($pair === null) ? 'all pairs' : $pair->getSymbol(),
                         (
                             ($buyAudit ? '<fg=green>buy</>' : '') .
@@ -122,21 +129,15 @@ final class Rest extends Command
                 $exitCode = 1;
             }
         }
-        if ($this->shutdown->isShutdownModeEnabled()) {
-            $output->writeln(sprintf(
-                "<fg=red>%s\tShutdown signal detected - %s",
-                $this->now(),
-                self::class
-            ));
-        }
+        $this->outputExit($output, $this->shutdown, self::KILL_FILE);
         return $exitCode;
     }
 
     private function exceptionDelay(OutputInterface $output, \Exception $e)
     {
         $output->writeln([
-            "<fg=red>{$this->now()}\t{$e->getMessage()}</>",
-            "<fg=red>{$this->now()}\tSleeping " . self::EXCEPTION_DELAY . " seconds</>"
+            "<fg=red>{$this->getNow()}\t{$e->getMessage()}</>",
+            "<fg=red>{$this->getNow()}\tSleeping " . self::EXCEPTION_DELAY . " seconds</>"
         ]);
         $this->sleep(self::EXCEPTION_DELAY, $this->sleeper, $this->shutdown);
     }
@@ -188,7 +189,7 @@ final class Rest extends Command
             } elseif ($isFilled && $this->buyPlaced->setNextState($row->getId())) {
                 $output->writeln(sprintf(
                     "%s\t(%d)\t<fg=green>BUY_FILLED</>\tOrder ID %d\t%s %s @ %s %s/%s",
-                    $this->now(),
+                    $this->getNow(),
                     $row->getId(),
                     $row->getBuyOrderId(),
                     $row->getBuyAmount(),
@@ -232,7 +233,7 @@ final class Rest extends Command
             } elseif ($isFilled && $this->sellPlaced->setNextState($row->getId())) {
                 $output->writeln(sprintf(
                     "%s\t(%d)\t<fg=red>SELL_FILLED</>\tOrder ID %d\t%s %s @ %s %s/%s",
-                    $this->now(),
+                    $this->getNow(),
                     $row->getId(),
                     $row->getSellOrderId(),
                     $row->getSellAmount(),
@@ -274,10 +275,5 @@ final class Rest extends Command
             $ids[$order->side][$order->order_id] = true;
         }
         return $ids;
-    }
-
-    private function now(): string
-    {
-        return (new \DateTime())->format('Y-m-d H:i:s');
     }
 }

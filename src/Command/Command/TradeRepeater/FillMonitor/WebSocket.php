@@ -13,6 +13,10 @@ use Kobens\Gemini\Api\HostInterface;
 use Kobens\Gemini\Api\KeyInterface;
 use Kobens\Gemini\Api\NonceInterface;
 use Kobens\Gemini\Command\Command\TradeRepeater\SleeperTrait;
+use Kobens\Gemini\Command\Traits\GetIntArg;
+use Kobens\Gemini\Command\Traits\GetNow;
+use Kobens\Gemini\Command\Traits\KillFile;
+use Kobens\Gemini\Command\Traits\TradeRepeater\ExitProgram;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\Model\GetRecordIdInterface;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\BuyPlacedInterface;
@@ -24,7 +28,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class WebSocket extends Command
 {
+    use ExitProgram;
+    use KillFile;
     use SleeperTrait;
+    use GetIntArg;
+    use GetNow;
+
+    private const KILL_FILE = 'kill_repeater_fill_monitor_websocket';
 
     protected static $defaultName = 'repeater:fill-monitor-websocket';
 
@@ -68,36 +78,28 @@ final class WebSocket extends Command
     protected function configure(): void
     {
         $this->setDescription('Monitors order fillings for the Gemini Trade Repater');
-        $this->addOption('reconnect_delay', 'd', InputOption::VALUE_OPTIONAL, 'Time to wait in seconds (min 5 seconds) between reconnection attempts.', 10);
+        $this->addOption('reconnect_delay', 'd', InputOption::VALUE_OPTIONAL, 'Time to wait in seconds (min 1 second, max 60) between reconnection attempts.', 10);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $exitCode = 0;
-        $reconnectDelay = (int) $input->getOption('reconnect_delay');
-        if ($reconnectDelay < 5) {
-            $reconnectDelay = 5;
-        }
+        $reconnectDelay = $this->getIntArg($input, 'reconnect_delay', 5, 1, 60);
         while (!$this->shutdown->isShutdownModeEnabled()) {
             try {
                 \Amp\Loop::run($this->main($output));
             } catch (ConnectionException | ClosedException $e) {
                 $output->writeln([
-                    "<fg=red>{$this->now()}\t{$e->getMessage()}</>",
-                    "<fg=yellow>{$this->now()}\tSleeping {$reconnectDelay} seconds before next reconnect attempt.</>"
+                    "<fg=red>{$this->getNow()}\t{$e->getMessage()}</>",
+                    "<fg=yellow>{$this->getNow()}\tSleeping {$reconnectDelay} seconds before next reconnect attempt.</>"
                 ]);
                 $this->sleep($reconnectDelay, $this->sleeper, $this->shutdown);
             } catch (\Throwable $e) {
                 $this->shutdown->enableShutdownMode($e);
+                $exitCode = 1;
             }
         }
-        if ($this->shutdown->isShutdownModeEnabled()) {
-            $output->writeln(sprintf(
-                "<fg=red>%s\tShutdown signal detected - %s",
-                $this->now(),
-                self::class
-            ));
-        }
+        $this->outputExit($output, $this->shutdown, self::KILL_FILE);
         return $exitCode;
     }
 
@@ -119,7 +121,7 @@ final class WebSocket extends Command
                 } else {
                     $this->processMessage($data, $output);
                 }
-                if ($this->shutdown->isShutdownModeEnabled()) {
+                if ($this->shutdown->isShutdownModeEnabled() || $this->killFileExists(self::KILL_FILE)) {
                     \Amp\Loop::stop();
                 }
             }
@@ -133,7 +135,7 @@ final class WebSocket extends Command
                 if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                     $output->writeln(sprintf(
                         "%s\tHeartbeat Received - %s",
-                        $this->now(),
+                        $this->getNow(),
                         self::class
                     ));
                 }
@@ -150,7 +152,7 @@ final class WebSocket extends Command
             case $msg['type'] === 'subscription_ack':
                 $output->writeln(sprintf(
                     "%s\tSubscription acknowledged - %s",
-                    $this->now(),
+                    $this->getNow(),
                     self::class
                 ));
                 break;
@@ -168,7 +170,7 @@ final class WebSocket extends Command
         ) {
             $output->writeln(sprintf(
                 "%s\t(%d)\t<fg=%s>%s_FILLED</>\tOrder ID %d\t%s %s @ %s %s/%s",
-                $this->now(),
+                $this->getNow(),
                 $id,
                 $msg['side'] === 'buy' ? 'green' : 'red',
                 strtoupper($msg['side']),
@@ -202,10 +204,5 @@ final class WebSocket extends Command
             'X-GEMINI-PAYLOAD'   => $base64Payload,
             'X-GEMINI-SIGNATURE' => $signature,
         ];
-    }
-
-    private function now(): string
-    {
-        return (new \DateTime())->format('Y-m-d H:i:s');
     }
 }
