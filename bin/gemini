@@ -373,7 +373,7 @@ $app->add(new \Kobens\Gemini\Command\Command\OrderStatus\BookKeeper(
 ));
 
 // TODO: This Command should use a unique KeyInterface, with no Trading Authority
-$app->add(new \Kobens\Gemini\Command\Command\Logger\TradeHistory($getPastTradesInterface, $shutdownInterface, $sleeperInterface));
+$app->add(new \Kobens\Gemini\Command\Command\Logger\TradeHistory($getPastTradesInterface, $shutdownInterface, $sleeperInterface, $adapter));
 
 
 // TODO: The following commands can use a common KeyInterface, with Trading Authority

@@ -18,11 +18,13 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Adapter\Adapter;
 use Kobens\Gemini\Command\Traits\TradeRepeater\ExitProgram;
+use Kobens\Gemini\Command\Traits\GetIntArg;
 
 final class DailyProfit extends Command
 {
     use ExitProgram;
     use KillFile;
+    use GetIntArg;
 
     private const DELAY_DEFAULT = 60;
     private const DELAY_MIN = 10;
@@ -65,6 +67,7 @@ final class DailyProfit extends Command
     {
         $exitCode = 0;
         $date = $this->getDayForUpdate();
+        $delay = $this->getIntArg($input, 'delay', self::DELAY_DEFAULT, self::DELAY_MIN);
         while ($date !== null && $this->shutdown->isShutdownModeEnabled() === false && $this->killFileExists(self::KILL_FILE) === false) {
             $isToday = date('Y-m-d 00:00:00', time()) === $date;
             try {
@@ -75,7 +78,7 @@ final class DailyProfit extends Command
                     }
                 }
                 if ($isToday) {
-                    $this->sleeper->sleep($this->getDelay($input), function (): bool {
+                    $this->sleeper->sleep($delay, function (): bool {
                         return $this->shutdown->isShutdownModeEnabled();
                     });
                 }
@@ -87,15 +90,6 @@ final class DailyProfit extends Command
         }
         $this->outputExit($output, $this->shutdown, self::KILL_FILE);
         return $exitCode;
-    }
-
-    private function getDelay(InputInterface $input): int
-    {
-        $delay = (int) $input->getOption('delay');
-        if ($delay < self::DELAY_MIN) {
-            $delay = self::DELAY_MIN;
-        }
-        return $delay;
     }
 
     private function logProfit(string $date, string $symbol, string $amount, string $amountNotional, bool $isToday): void
@@ -273,10 +267,5 @@ final class DailyProfit extends Command
             }
         }
         return $day;
-    }
-
-    private function now(): string
-    {
-        return (new \DateTime())->format('Y-m-d H:i:s');
     }
 }

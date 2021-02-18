@@ -10,8 +10,8 @@ use Kobens\Exchange\Exception\ClosedBookException;
 use Kobens\Gemini\Api\WebSocket\MarketData\BookKeeperFactoryInterface;
 use Kobens\Gemini\Exception\Api\WebSocket\SocketSequenceException;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class BookKeeper extends Command
@@ -33,13 +33,13 @@ final class BookKeeper extends Command
     protected function configure(): void
     {
         $this->setDescription('Opens a market book.');
-        $this->addOption('symbol', 's', InputOption::VALUE_OPTIONAL, 'Trading Symbol', 'btcusd');
+        $this->addArgument('symbol', InputArgument::OPTIONAL, 'Trading Symbol', 'btcusd');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $exitCode = 0;
-        $book = $this->bookFactory->create($input->getOption('symbol'));
+        $book = $this->bookFactory->create($input->getArgument('symbol'));
         $loop = true;
         do {
             try {

@@ -14,20 +14,22 @@ trait ExitProgram
     use KillFile;
     use GetNow;
 
-    private function outputExit(OutputInterface $output, EmergencyShutdownInterface $shutdown, string $killFile): void
+    private function outputExit(OutputInterface $output, EmergencyShutdownInterface $shutdown, string $killFile, string $outputSuffix = ''): void
     {
         if ($shutdown->isShutdownModeEnabled()) {
             $output->writeln(sprintf(
-                "<fg=red>%s\tShutdown signal detected - %s",
+                "<fg=red>%s\tShutdown signal detected - %s%s</>",
                 $this->getNow(),
-                self::class
+                self::class,
+                $outputSuffix
             ));
         }
         if ($this->killFileExists($killFile)) {
             $output->writeln(sprintf(
-                "<fg=red>%s\tKill File Detected - %s",
+                "<fg=red>%s\tKill File Detected - %s%s</>",
                 $this->getNow(),
-                self::class
+                self::class,
+                $outputSuffix
             ));
         }
     }
