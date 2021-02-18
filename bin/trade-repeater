@@ -3,247 +3,247 @@
 #
 # Book Keepers
 #
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s aaveusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper aaveusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s aaveusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper aaveusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s ampusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper ampusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s ampusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper ampusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s balusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper balusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s balusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper balusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s batusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper batusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s batusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper batusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s bchusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper bchusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s bchusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper bchusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s btcusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper btcusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s btcusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper btcusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s compusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper compusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s compusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper compusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s crvusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper crvusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s crvusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper crvusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s ethusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper ethusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s ethusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper ethusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s filusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper filusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s filusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper filusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s kncusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper kncusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s kncusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper kncusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s linkusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper linkusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s linkusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper linkusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s ltcusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper ltcusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s ltcusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper ltcusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s manausd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper manausd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s manausd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper manausd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s mkrusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper mkrusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s mkrusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper mkrusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s oxtusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper oxtusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s oxtusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper oxtusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s renusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper renusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s renusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper renusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s snxusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper snxusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s snxusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper snxusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s storjusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper storjusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s storjusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper storjusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s umausd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper umausd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s umausd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper umausd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s uniusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper uniusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s uniusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper uniusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s yfiusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper yfiusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s yfiusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper yfiusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s zecusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper zecusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s zecusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper zecusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini market:book-keeper -s zrxusd'
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper zrxusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper -s zrxusd &
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper zrxusd &
 fi
 
 #
 # Trade History Processes
 #
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s aaveusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history aaveusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s aaveusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history aaveusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s ampusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history ampusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s ampusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history ampusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s balusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history balusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s balusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history balusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s batusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history batusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s batusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history batusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s bchusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history bchusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s bchusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history bchusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s btcusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history btcusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s btcusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history btcusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s compusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history compusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s compusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history compusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s crvusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history crvusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s crvusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history crvusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s ethusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history ethusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s ethusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history ethusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s filusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history filusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s filusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history filusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s kncusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history kncusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s kncusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history kncusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s linkusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history linkusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s linkusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history linkusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s ltcusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history ltcusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s ltcusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history ltcusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s manausd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history manausd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s manausd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history manausd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s mkrusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history mkrusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s mkrusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history mkrusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s oxtusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history oxtusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s oxtusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history oxtusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s renusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history renusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s renusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history renusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s snxusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history snxusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s snxusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history snxusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s storjusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history storjusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s storjusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history storjusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s umausd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history umausd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s umausd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history umausd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s uniusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history uniusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s uniusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history uniusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s yfiusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history yfiusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s yfiusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history yfiusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s zecusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history zecusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s zecusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history zecusd &
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history -s zrxusd'
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history zrxusd'
 if [ $? -eq 1 ]; then
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history -s zrxusd &
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history zrxusd &
 fi
 
 #
