@@ -78,7 +78,7 @@ final class DailyProfit extends Command
                     }
                 }
                 if ($isToday) {
-                    $this->sleeper->sleep($delay, function(): bool {
+                    $this->sleeper->sleep($delay, function (): bool {
                         return $this->shutdown->isShutdownModeEnabled();
                     });
                 }
@@ -267,10 +267,5 @@ final class DailyProfit extends Command
             }
         }
         return $day;
-    }
-
-    private function now(): string
-    {
-        return (new \DateTime())->format('Y-m-d H:i:s');
     }
 }
