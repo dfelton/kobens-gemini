@@ -104,10 +104,9 @@ final class AddAmount
         );
         /** @var Trade $row */
         foreach ($rows as $row) {
-            $amount = $this->add($row->getId(), $amount);
             yield [
                 'trade' => $row,
-                'amount' => $amount,
+                'amount_added' => $this->add($row->getId(), $amount),
             ];
         }
     }
