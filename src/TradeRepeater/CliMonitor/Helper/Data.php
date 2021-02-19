@@ -8,11 +8,12 @@ use Kobens\Gemini\Api\Market\GetPriceInterface;
 use Kobens\Gemini\Api\Market\GetPrice\Result;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetNotionalBalancesInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetActiveOrdersInterface;
-use Zend\Db\TableGateway\TableGatewayInterface;
-use Kobens\Math\BasicCalculator\Multiply;
 use Kobens\Math\BasicCalculator\Add;
+use Kobens\Math\BasicCalculator\Multiply;
 use Kobens\Gemini\Exchange\Currency\Pair;
+use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Select;
+use Zend\Db\TableGateway\TableGatewayInterface;
 
 final class Data implements DataInterface
 {
@@ -39,16 +40,27 @@ final class Data implements DataInterface
 
     private TableGatewayInterface $tblTradeRepeater;
 
+    private Adapter $adapter;
+
     public function __construct(
         GetActiveOrdersInterface $getActiveOrdersInterface,
         GetNotionalBalancesInterface $getNotionalBalancesInterface,
         GetPriceInterface $getPriceInterface,
-        TableGatewayInterface $tblTradeRepeater
+        TableGatewayInterface $tblTradeRepeater,
+        Adapter $adapter
     ) {
         $this->activeOrders = $getActiveOrdersInterface;
         $this->notionalBalance = $getNotionalBalancesInterface;
         $this->price = $getPriceInterface;
         $this->tblTradeRepeater = $tblTradeRepeater;
+        $this->adapter = $adapter;
+    }
+
+    public function getProfitsBucketValue(string $bucket): string
+    {
+        $stmt = $this->adapter->query('SELECT `amount` FROM `repeater_profits_bucket` WHERE `currency` = :bucket');
+        $result = $stmt->execute(['bucket' => $bucket]);
+        return $result->count() === 1 ? $result->current()['amount'] : '';
     }
 
     public function reset(): void
@@ -77,7 +89,6 @@ final class Data implements DataInterface
         return $this->orders;
     }
 
-
     /**
      * @return \Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetNotionalBalances\BalanceInterface[]
      */
@@ -87,6 +98,14 @@ final class Data implements DataInterface
             $this->notionalBalances = $this->notionalBalance->getBalances();
         }
         return $this->notionalBalances;
+    }
+
+    public function getNotional(string $symbol, string $amount): string
+    {
+        return Multiply::getResult(
+            $this->getPriceResult($symbol)->getBid(),
+            $amount
+        );
     }
 
     public function getExtra(): array

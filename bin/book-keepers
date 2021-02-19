@@ -1,0 +1,149 @@
+#!/bin/bash
+
+#
+# Book Keepers
+#
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper aaveusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper aaveusd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper ampusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper ampusd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper balusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper balusd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper batusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper batusd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper bchusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper bchusd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper btcusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper btcusd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper compusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper compusd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper crvusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper crvusd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper ethusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper ethusd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper filusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper filusd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper kncusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper kncusd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper linkusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper linkusd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper ltcusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper ltcusd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper manausd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper manausd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper mkrusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper mkrusd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper oxtusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper oxtusd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper renusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper renusd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper snxusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper snxusd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper storjusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper storjusd &
+    slee 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper umausd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper umausd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper uniusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper uniusd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper yfiusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper yfiusd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper zecusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper zecusd &
+    sleep 1
+fi
+
+ps aux | grep -v grep | grep -q 'gemini market:book-keeper zrxusd'
+if [ $? -eq 1 ]; then
+    php -n $(dirname $BASH_SOURCE)/gemini market:book-keeper zrxusd &
+    sleep 1
+fi
+

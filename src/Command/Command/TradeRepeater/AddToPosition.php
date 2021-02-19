@@ -53,19 +53,32 @@ final class AddToPosition extends Command
                 foreach ($addTo as $result) {
                     /** @var \Kobens\Gemini\TradeRepeater\Model\Trade $trade */
                     $trade = $result['trade'];
-                    $amount = $result['amount'];
-                    $newAmount = Add::getResult($amount, $trade->getBuyAmount());
-                    $output->writeln(sprintf(
-                        'Amount of %s added to %s record. Was buy %s %s @ %s %s/%s, now buy %s',
-                        $amount,
-                        $trade->getSymbol(),
-                        $trade->getBuyAmount(),
-                        strtoupper($pair->getBase()->getSymbol()),
-                        $trade->getBuyPrice(),
-                        strtoupper($pair->getBase()->getSymbol()),
-                        strtoupper($pair->getQuote()->getSymbol()),
-                        $newAmount
-                    ));
+                    $amountAdded = $result['amount_added'];
+                    if (Compare::getResult($amountAdded, '0') === Compare::LEFT_GREATER_THAN) {
+                        $newAmount = Add::getResult($amountAdded, $trade->getBuyAmount());
+                        $output->writeln(sprintf(
+                            'Amount of %s added to %s record. Was buy %s %s @ %s %s/%s, now buy %s',
+                            $amountAdded,
+                            $trade->getSymbol(),
+                            $trade->getBuyAmount(),
+                            strtoupper($pair->getBase()->getSymbol()),
+                            $trade->getBuyPrice(),
+                            strtoupper($pair->getBase()->getSymbol()),
+                            strtoupper($pair->getQuote()->getSymbol()),
+                            $newAmount
+                        ));
+                    } else {
+                        $output->writeln(sprintf(
+                            '<fg=yellow>%s record %d of buy %s %s @ %s %s/%s skipped. No amount added.</>',
+                            $trade->getSymbol(),
+                            $trade->getId(),
+                            $trade->getBuyAmount(),
+                            strtoupper($pair->getBase()->getSymbol()),
+                            $trade->getBuyPrice(),
+                            strtoupper($pair->getBase()->getSymbol()),
+                            strtoupper($pair->getQuote()->getSymbol()),
+                        ));
+                    }
                 }
             } catch (\Throwable $e) {
                 $exitCode = 1;

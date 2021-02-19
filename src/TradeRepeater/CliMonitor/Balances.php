@@ -9,6 +9,7 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetNotionalBalances\BalanceInterface;
 use Symfony\Component\Console\Helper\TableCell;
+use Kobens\Math\BasicCalculator\Subtract;
 
 final class Balances
 {
@@ -22,7 +23,7 @@ final class Balances
      */
     public static function getTable(
         OutputInterface $output,
-        DataInterface $data,
+        DataInterface $dataHelper,
         bool $amount = false,
         bool $amountNotional = false,
         bool $amountAvailable = false,
@@ -42,8 +43,8 @@ final class Balances
             $cols++;
         }
         $table = new Table($output);
-        $extra = $data->getExtra();
-        $balances = $data->getNotionalBalances();
+        $extra = $dataHelper->getExtra();
+        $balances = $dataHelper->getNotionalBalances();
         $table->setHeaderTitle('Balances');
         $table->setHeaders(self::getHeaders($amount, $amountNotional, $amountAvailable, $amountAvailableNotional));
 
@@ -64,11 +65,12 @@ final class Balances
             $data[] = $row;
         }
 
+
         foreach ($data as &$row) {
             $isUsd = $row[0] === 'USD';
             foreach ($row as $i => &$col) {
                 if ($i !== 0) {
-                    $padLength = $lengths[$i] < 18 ? 18 : $lengths[$i];
+                    $padLength = $lengths[$i] < 20 ? 20 : $lengths[$i];
                     $col = str_pad($col, $padLength, ' ', STR_PAD_LEFT);
                 }
                 if ($isUsd) {
@@ -77,12 +79,41 @@ final class Balances
             }
             if (($extra[strtolower($row[0]) . 'usd'] ?? null) !== null) {
                 $row[] = $extra[strtolower($row[0]) . 'usd'];
+            } else {
+                $row[] = '';
+            }
+            if ($isUsd) {
+                $row[] = '<fg=green>' . $dataHelper->getProfitsBucketValue('usd') . '</>';
+                $row[] = end($row);
+            } else {
+                $row[] = $dataHelper->getProfitsBucketValue($isUsd ? 'usd' : strtolower($row[0]));
+                $row[] = $isUsd ? '' : $dataHelper->getNotional(strtolower($row[0]) . 'usd', end($row));
             }
             $table->addRow($row);
         }
         $table->addRow([new TableCell('', ['colspan' => $cols + 1])]);
-        $table->addRow([new TableCell('USD Maker Deposit', ['colspan' => $cols]), $extra['usd_maker_deposit']]);
         $table->addRow([new TableCell('Total Repeater USD Invested', ['colspan' => $cols]), $extra['total_usd_investment']]);
+        $table->addRow([new TableCell('', ['colspan' => $cols + 1])]);
+        $table->addRow([new TableCell('USD Maker Deposit', ['colspan' => $cols]), $extra['usd_maker_deposit']]);
+        $table->addRow([
+            new TableCell('USD Available Over Maker Deposit And Bucket(s)', ['colspan' => $cols]),
+            str_pad(
+                bcadd(
+                    Subtract::getResult(
+                        Subtract::getResult(
+                            $dataHelper->getNotionalBalances()['USD']->getAvailable(),
+                            trim($extra['usd_maker_deposit'])
+                        ),
+                        $dataHelper->getProfitsBucketValue('usd')
+                    ),
+                    '0',
+                    strlen(explode('.', $extra['usd_maker_deposit'])[1])
+                ),
+                strlen($extra['usd_maker_deposit']),
+                ' ',
+                STR_PAD_LEFT
+            )
+        ]);
         return $table;
     }
 
@@ -111,6 +142,8 @@ final class Balances
             $headers[] = 'Available Notional';
         }
         $headers[] = 'Repeater Invested USD';
+        $headers[] = 'Profit Bucket';
+        $headers[] = 'Profit Bucket Notional';
         return $headers;
     }
 

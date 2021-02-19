@@ -23,4 +23,8 @@ interface DataInterface
     public function getNotionalBalances(): array;
 
     public function getExtra(): array;
+
+    public function getProfitsBucketValue(string $bucket): string;
+
+    public function getNotional(string $symbol, string $amount): string;
 }
