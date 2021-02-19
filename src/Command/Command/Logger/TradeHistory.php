@@ -234,18 +234,18 @@ final class TradeHistory extends Command
 
     private function transactionExists(int $tid): bool
     {
-        $exists = false;
-        if ($this->lastInsertedTransactionId === null) {
+//         $exists = false;
+//         if ($this->lastInsertedTransactionId === null) {
             $result = $this->getTable()->select(function (Select $select) use ($tid): void {
                 $select->where->equalTo('tid', $tid);
             });
             $exists = $result->count() === 1;
-            if ($exists) {
-                $this->lastInsertedTransactionId = $tid;
-            }
-        } else {
-            $exists = $tid === $this->lastInsertedTransactionId;
-        }
+//             if ($exists) {
+//                 $this->lastInsertedTransactionId = $tid;
+//             }
+//         } else {
+//             $exists = $tid === $this->lastInsertedTransactionId;
+//         }
         return $exists;
     }
 
