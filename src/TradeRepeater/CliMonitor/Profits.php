@@ -48,23 +48,26 @@ final class Profits
                 '',
                 new TableCell(sprintf('All Time Since %s', $data['all_time']['date']), ['colspan' => 2]),
                 new TableCell('Past 30 Days', ['colspan' => 2]),
-                new TableCell('Past 7 Days', ['colspan' => 2])
+                new TableCell('Past 7 Days', ['colspan' => 2]),
+                new TableCell('Past 24 Hours', ['colspan' => 2]),
             ],
-            ['Asset', 'Amount', 'Amount Notional', 'Amount', 'Amount Notional', 'Amount', 'Amount Notional'],
+            ['Asset', 'Amount', 'Amount Notional', 'Amount', 'Amount Notional', 'Amount', 'Amount Notional', 'Amount', 'Amount Notional'],
         ]);
         $cellsAllTime = $this->getCells($data['all_time']);
         $cellsPast30d = $this->getCells($data['30d']);
         $cellsPast7d = $this->getCells($data['7d']);
+        $cellsPast1d = $this->getCells($data['1d']);
         foreach ($cellsAllTime['cells'] as $symbol => $cellData) {
             $row = array_merge(
                 [strtoupper($symbol)],
                 $cellData,
                 $cellsPast30d['cells'][$symbol] ?? [],
-                $cellsPast7d['cells'][$symbol] ?? []
+                $cellsPast7d['cells'][$symbol] ?? [],
+                $cellsPast1d['cells'][$symbol] ?? []
             );
             $table->addRow($row);
         }
-        $table->addRow(['', '', '', '', '', '', '']);
+        $table->addRow(['', '', '', '', '', '', '', '', '']);
         $table->addRow([
             new TableCell('Total Notional', ['colspan' => 2]),
             $cellsAllTime['total_notional'],
@@ -72,6 +75,8 @@ final class Profits
             $cellsPast30d['total_notional'],
             '',
             $cellsPast7d['total_notional'],
+            '',
+            $cellsPast1d['total_notional'],
         ]);
         $table->addRow([
             new TableCell('Daily Average', ['colspan' => 2]),
@@ -80,6 +85,8 @@ final class Profits
             $cellsPast30d['daily_average'],
             '',
             $cellsPast7d['daily_average'],
+            '',
+            $cellsPast1d['daily_average'],
         ]);
         $table->addRow([
             new TableCell('Projected Yearly', ['colspan' => 2]),
@@ -88,6 +95,8 @@ final class Profits
             $cellsPast30d['projected_yearly'],
             '',
             $cellsPast7d['projected_yearly'],
+            '',
+            $cellsPast1d['projected_yearly'],
         ]);
         return $table;
     }
@@ -151,11 +160,13 @@ final class Profits
         });
 
         $profits = [];
-        $profitsPastWeek = [];
-        $profitsPastThirtyDays = [];
+        $profits1d = [];
+        $profits7d = [];
+        $profits30d = [];
         $date = null;
-        $timestampOneWeekAgo = time() - 604800;
-        $timestampThirtyDaysAgo = time() - 2592000;
+        $timestamp1d = time() - 86400;
+        $timestamp7d = time() - 604800;
+        $timestamp30d = time() - 2592000;
         foreach ($results as $result) {
             if ($date === null) {
                 $date = $result->sell_fill_timestamp;
@@ -168,23 +179,31 @@ final class Profits
                 $profits[$symbol] = Add::getResult($profits[$symbol], $amount);
 
                 $sellFillTimestamp = strtotime($result->sell_fill_timestamp);
-                if ($sellFillTimestamp > $timestampOneWeekAgo) {
-                    if (($profitsPastWeek[$symbol] ?? null) === null) {
-                        $profitsPastWeek[$symbol] = '0';
+                if ($sellFillTimestamp > $timestamp1d) {
+                    if (($profits1d[$symbol] ?? null) === null) {
+                        $profits1d[$symbol] = '0';
                     }
-                    $profitsPastWeek[$symbol] = Add::getResult($profitsPastWeek[$symbol], $amount);
+                    $profits1d[$symbol] = Add::getResult($profits1d[$symbol], $amount);
                 }
-                if ($sellFillTimestamp > $timestampThirtyDaysAgo) {
-                    if (($profitsPastThirtyDays[$symbol] ?? null) === null) {
-                        $profitsPastThirtyDays[$symbol] = '0';
+                if ($sellFillTimestamp > $timestamp7d) {
+                    if (($profits7d[$symbol] ?? null) === null) {
+                        $profits7d[$symbol] = '0';
                     }
-                    $profitsPastThirtyDays[$symbol] = Add::getResult($profitsPastThirtyDays[$symbol], $amount);
+                    $profits7d[$symbol] = Add::getResult($profits7d[$symbol], $amount);
+                }
+                if ($sellFillTimestamp > $timestamp30d) {
+                    if (($profits30d[$symbol] ?? null) === null) {
+                        $profits30d[$symbol] = '0';
+                    }
+                    $profits30d[$symbol] = Add::getResult($profits30d[$symbol], $amount);
                 }
             }
         }
 
         ksort($profits);
-        ksort($profitsPastWeek);
+        ksort($profits1d);
+        ksort($profits7d);
+        ksort($profits30d);
 
         return [
             'all_time' => [
@@ -192,16 +211,21 @@ final class Profits
                 'profits' => $profits,
                 'days' => (string) round((time() - strtotime($date)) / (60 * 60 * 24), 2),
             ],
-            '30d' => [
-                'date' => date('Y-m-d H:s:i', $timestampOneWeekAgo),
-                'profits' => $profitsPastThirtyDays,
-                'days' => '30'
+            '1d' => [
+                'date' => date('Y-m-d H:s:i', $timestamp1d),
+                'profits' => $profits1d,
+                'days' => '1'
             ],
             '7d' => [
-                'date' => date('Y-m-d H:s:i', $timestampOneWeekAgo),
-                'profits' => $profitsPastWeek,
+                'date' => date('Y-m-d H:s:i', $timestamp7d),
+                'profits' => $profits7d,
                 'days' => '7'
-            ]
+            ],
+            '30d' => [
+                'date' => date('Y-m-d H:s:i', $timestamp7d),
+                'profits' => $profits30d,
+                'days' => '30'
+            ],
         ];
     }
 
