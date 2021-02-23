@@ -2,8 +2,11 @@
 
 namespace Kobens\Gemini\Command\Command\TradeRepeater;
 
+use Kobens\Gemini\Command\Traits\GetIntArg;
 use Kobens\Gemini\Exchange\Currency\Pair;
+use Kobens\Gemini\TradeRepeater\Model\Trade;
 use Kobens\Gemini\TradeRepeater\Model\Trade\AddAmount;
+use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Bucket;
 use Kobens\Math\BasicCalculator\Add;
 use Kobens\Math\BasicCalculator\Compare;
 use Kobens\Math\BasicCalculator\Multiply;
@@ -16,17 +19,23 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class AddToPosition extends Command
 {
+    use GetIntArg;
+
     protected static $defaultName = 'repeater:add-to';
 
     private AddAmount $addAmount;
 
     private \Kobens\Gemini\TradeRepeater\Model\Resource\Trade $tradeResource;
 
+    private Bucket $bucket;
+
     public function __construct(
         AddAmount $addAmount,
+        Bucket $bucket,
         \Kobens\Gemini\TradeRepeater\Model\Resource\Trade $tradeResource
     ) {
         $this->addAmount = $addAmount;
+        $this->bucket = $bucket;
         $this->tradeResource = $tradeResource;
         parent::__construct();
     }
@@ -38,6 +47,7 @@ final class AddToPosition extends Command
         $this->addArgument('price-from', InputArgument::REQUIRED, 'Price from');
         $this->addArgument('price-to', InputArgument::REQUIRED, 'Price to');
         $this->addOption('confirm', 'c', InputOption::VALUE_OPTIONAL, 'Confirm', '0');
+        $this->addOption('bucket', 'b', InputOption::VALUE_OPTIONAL, 'Use funds from bucket for action.', '0');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -48,10 +58,14 @@ final class AddToPosition extends Command
         $priceFrom = $this->getArg($input, 'price-from');
         $priceTo = $this->getArg($input, 'price-to');
         if ($input->getOption('confirm') === '1') {
+            if ($this->getIntArg($input, 'bucket', 0) === 1) {
+                $this->pullFromBucket($pair, $amount, $priceFrom, $priceTo);
+            }
+
             $addTo = $this->addAmount->addTo($pair->getSymbol(), $amount, $priceFrom, $priceTo);
             try {
                 foreach ($addTo as $result) {
-                    /** @var \Kobens\Gemini\TradeRepeater\Model\Trade $trade */
+                    /** @var Trade $trade */
                     $trade = $result['trade'];
                     $amountAdded = $result['amount_added'];
                     if (Compare::getResult($amountAdded, '0') === Compare::LEFT_GREATER_THAN) {
@@ -68,6 +82,8 @@ final class AddToPosition extends Command
                             $newAmount
                         ));
                     } else {
+                        $this->returnToBucket($pair, $trade, $amount);
+
                         $output->writeln(sprintf(
                             '<fg=yellow>%s record %d of buy %s %s @ %s %s/%s skipped. No amount added.</>',
                             $trade->getSymbol(),
@@ -101,6 +117,20 @@ final class AddToPosition extends Command
             $table->render();
         }
         return $exitCode;
+    }
+
+    private function returnToBucket(Pair $pair, Trade $trade, string $baseAmount): void
+    {
+        $costBasis = Multiply::getResult($trade->getBuyPrice(), $baseAmount);
+        $deposit = Multiply::getResult($costBasis, '0.0035'); // TODO: Reference constant
+        $total = Add::getResult($costBasis, $deposit);
+        $this->bucket->addToBucket($pair->getQuote()->getSymbol(), $total);
+    }
+
+    private function pullFromBucket(Pair $pair, string $amount, string $priceFrom, string $priceTo): void
+    {
+        $amountToPull = $this->getSummary($pair->getSymbol(), $amount, $priceFrom, $priceTo)['total_quote'];
+        $this->bucket->removeFromBucket($pair->getQuote()->getSymbol(), $amountToPull);
     }
 
     private function getSummary(string $symbol, string $amount, string $priceFrom, string $priceTo): array

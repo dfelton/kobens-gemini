@@ -6,6 +6,9 @@ namespace Kobens\Gemini\Command\Traits;
 
 use Symfony\Component\Console\Input\InputInterface;
 
+/**
+ * TODO: This whole trait and method should be called GetIntOption::getIntOption
+ */
 trait GetIntArg
 {
     private function getIntArg(InputInterface $input, string $arg, int $default, ?int $min = null, ?int $max = null): int

@@ -1,0 +1,158 @@
+#!/bin/bash
+
+#
+# Trade History Processes
+#
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history aaveusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger aaveusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history aaveusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history ampusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger ampusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history ampusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history balusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger balusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history balusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history batusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger batusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history batusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history bchusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger bchusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history bchusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history btcusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger btcusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history btcusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history compusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger compusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history compusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history crvusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger crvusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history crvusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history ethusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger ethusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history ethusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history filusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger filusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history filusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history kncusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger kncusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history kncusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history linkusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger linkusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history linkusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history ltcusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger ltcusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history ltcusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history manausd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger manausd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history manausd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history mkrusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger mkrusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history mkrusd &
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history oxtusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger oxtusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history oxtusd &
+    sleep 0.25
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history renusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger renusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history renusd &
+    sleep 0.25
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history snxusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger snxusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history snxusd &
+    sleep 0.25
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history storjusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger storjusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history storjusd &
+    sleep 0.25
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history umausd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger umausd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history umausd &
+    sleep 0.25
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history uniusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger uniusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history uniusd &
+    sleep 0.25
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history yfiusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger yfiusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history yfiusd &
+    sleep 0.25
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history zecusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger zecusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history zecusd &
+    sleep 0.25
+fi
+
+ps aux | grep -v grep | grep -q 'gemini logger:trade-history zrxusd'
+if [ $? -eq 1 ]; then
+    echo starting trade history logger zrxusd
+    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history zrxusd &
+    sleep 0.25
+fi
+

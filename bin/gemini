@@ -171,6 +171,23 @@ $getTradeVolumeInterface = new \Kobens\Gemini\Api\Rest\PrivateEndpoints\FeeAndVo
 $tradeResource = new TradeResource($adapter);
 $updateTrade = new Update($adapter);
 
+
+// $stmt = $adapter->query('SELECT id, buy_amount FROM trade_repeater WHERE `symbol` = "renusd"');
+// $result = $stmt->execute();
+// var_dump($result->count());
+// foreach ($result as $row) {
+//     $amount = explode('.', $row['buy_amount']);
+//     $length = strlen($amount[1]);
+//     if ($length === 7) {
+//         $newValue = $amount[0] . '.' . substr($amount[1], 0, 6);
+//         $updateTrade->setData(['buy_amount' => $newValue], (int) $row['id']);
+//         echo $row['id'], "\n";
+//     }
+
+// }
+// exit;
+
+
 $archiveInterface = new Archive();
 $buyFilledInterface = new BuyFilled($adapter, $tradeResource);
 $buyPlacedInterface = new BuyPlaced($adapter, $tradeResource);
@@ -183,11 +200,13 @@ $sellSentInterface = new SellSent($adapter, $tradeResource);
 $apiMakerHoldBps = new ApiMakerHoldBps();
 $addAmount = new AddAmount($cancelOrderInterface, $getPriceInterface, $orderStatusInterface, $tradeResource, $adapter, $updateTrade);
 
+$repeaterProfitsBucket = new Bucket($adapter);
+
 $app = new \Symfony\Component\Console\Application($composer->name, $composer->version);
 $app->add(new \Kobens\Gemini\Command\Command\Info\Pair());
 
 // TODO: All TradeRepeater classes will need to use Kobens\Gemini\Api\Rest\* objects that have their own KeyInterface per TradeRepeater to avoid Nonce clashing
-$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\AddToPosition($addAmount, $tradeResource));
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\AddToPosition($addAmount, $repeaterProfitsBucket, $tradeResource));
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\PricePointGenerator(
     new TableGateway('trade_repeater', $adapter),
     new PricePointGenerator($apiMakerHoldBps)
@@ -279,7 +298,7 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Archiver(
     $sleeperInterface,
     new Processor(
         new ReInvest($updateTrade),
-        new Bucket($adapter)
+        $repeaterProfitsBucket
 //         new TopWeekly($addAmount, $adapter, new RequiredQuote($apiMakerHoldBps), $shutdownInterface)
     )
 ));
