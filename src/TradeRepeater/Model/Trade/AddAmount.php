@@ -220,12 +220,16 @@ final class AddAmount
             $safeToAdd = true;
         } else {
             // Is current market bid a safe threshold percentage higher than original bid
-            $percent = Multiply::getResult(
-                Divide::getResult($trade->getBuyPrice(), $spread, 4),
-                '100'
-            );
-            if (Compare::getResult($percent, self::BUY_THRESHOLD) === Compare::LEFT_GREATER_THAN) {
-                $safeToAdd = true;
+            if (Compare::getResult($spread, '0') === Compare::EQUAL) {
+                $safeToAdd = false;
+            } else {
+                $percent = Multiply::getResult(
+                    Divide::getResult($trade->getBuyPrice(), $spread, 4),
+                    '100'
+                );
+                if (Compare::getResult($percent, self::BUY_THRESHOLD) === Compare::LEFT_GREATER_THAN) {
+                    $safeToAdd = true;
+                }
             }
         }
         return $safeToAdd;
