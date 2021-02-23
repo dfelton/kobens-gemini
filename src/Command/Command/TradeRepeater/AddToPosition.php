@@ -58,7 +58,6 @@ final class AddToPosition extends Command
         $priceFrom = $this->getArg($input, 'price-from');
         $priceTo = $this->getArg($input, 'price-to');
         if ($input->getOption('confirm') === '1') {
-
             if ($this->getIntArg($input, 'bucket', 0) === 1) {
                 $this->pullFromBucket($pair, $amount, $priceFrom, $priceTo);
             }
@@ -83,7 +82,6 @@ final class AddToPosition extends Command
                             $newAmount
                         ));
                     } else {
-
                         $this->returnToBucket($pair, $trade, $amount);
 
                         $output->writeln(sprintf(
