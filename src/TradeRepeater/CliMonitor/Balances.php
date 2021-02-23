@@ -13,6 +13,8 @@ use Kobens\Math\BasicCalculator\Subtract;
 
 final class Balances
 {
+    private static int $strPad = 20;
+
     /**
      * @param OutputInterface $output
      * @param DataInterface $data
@@ -70,7 +72,7 @@ final class Balances
             $isUsd = $row[0] === 'USD';
             foreach ($row as $i => &$col) {
                 if ($i !== 0) {
-                    $padLength = $lengths[$i] < 20 ? 20 : $lengths[$i];
+                    $padLength = $lengths[$i] < self::$strPad ? self::$strPad : $lengths[$i];
                     $col = str_pad($col, $padLength, ' ', STR_PAD_LEFT);
                 }
                 if ($isUsd) {
@@ -130,16 +132,16 @@ final class Balances
             'Currency',
         ];
         if ($amount) {
-            $headers[] = 'Amount';
+            $headers[] = str_pad('Amount', self::$strPad, ' ', STR_PAD_LEFT);
         }
         if ($amountNotional) {
-            $headers[] = 'Amount Notional';
+            $headers[] = str_pad('Amount Notional', self::$strPad, ' ', STR_PAD_LEFT);
         }
         if ($available) {
-            $headers[] = 'Available';
+            $headers[] = str_pad('Available', self::$strPad, ' ', STR_PAD_LEFT);
         }
         if ($availableNotional) {
-            $headers[] = 'Available Notional';
+            $headers[] = str_pad('Available Notional', self::$strPad, ' ', STR_PAD_LEFT);
         }
         $headers[] = 'Repeater Invested USD';
         $headers[] = 'Profit Bucket';
