@@ -1,190 +1,63 @@
 #!/bin/bash
 
 #
+# Dependencies
+#
+$(dirname $BASH_SOURCE)/trade-history
+$(dirname $BASH_SOURCE)/book-keepers
+
+#
 # Trade Repeater
 #
 ps aux | grep -v grep | grep -q gemini\ repeater:fill-monitor-websocket
 if [ $? -eq 1 ]; then
+    echo Repeater - Starting Websocket Fill Monitor
     php -n $(dirname $BASH_SOURCE)/gemini repeater:fill-monitor-websocket &
+    sleep 0.25
 fi
 
 ps aux | grep -v grep | grep -q gemini\ repeater:buyer
 if [ $? -eq 1 ]; then
+    echo Repeater - Starting Buyer
     php -n $(dirname $BASH_SOURCE)/gemini repeater:buyer &
+    sleep 0.25
 fi
 
 ps aux | grep -v grep | grep -q gemini\ repeater:seller
 if [ $? -eq 1 ]; then
+    echo Repeater - Starting Seller
     php -n $(dirname $BASH_SOURCE)/gemini repeater:seller &
+    sleep 0.25
 fi
 
 ps aux | grep -v 'grep\|fill-time' | grep -q gemini\ repeater:archiver
 if [ $? -eq 1 ]; then
+    echo 'Repeater - Starting Archiver (main)'
     php -n $(dirname $BASH_SOURCE)/gemini repeater:archiver &
+    sleep 0.25
 fi
 
 ps aux | grep -v grep | grep -q gemini\ repeater:archiver:fill-time
 if [ $? -eq 1 ]; then
+    echo 'Repeater - Starting Archiver (Fill Timestamp)'
     php -n $(dirname $BASH_SOURCE)/gemini repeater:archiver:fill-time &
+    sleep 0.25
 fi
 
 ps aux | grep -v grep | grep -q gemini\ repeater:fill-monitor-rest
 if [ $? -eq 1 ]; then
+    echo Repeater - Starting Rest Fill Monitor
     php -n $(dirname $BASH_SOURCE)/gemini repeater:fill-monitor-rest &
+    sleep 0.25
 fi
 
-
-#
-# Trade History Processes
-#
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history aaveusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history aaveusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history ampusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history ampusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history balusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history balusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history batusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history batusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history bchusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history bchusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history btcusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history btcusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history compusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history compusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history crvusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history crvusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history ethusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history ethusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history filusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history filusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history kncusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history kncusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history linkusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history linkusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history ltcusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history ltcusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history manausd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history manausd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history mkrusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history mkrusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history oxtusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history oxtusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history renusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history renusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history snxusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history snxusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history storjusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history storjusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history umausd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history umausd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history uniusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history uniusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history yfiusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history yfiusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history zecusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history zecusd &
-fi
-
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history zrxusd'
-if [ $? -eq 1 ]; then
-    sleep 1
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history zrxusd &
-fi
 #
 # Statistics
 #
 ps aux | grep -v grep | grep -q gemini\ repeater:stats:daily-profit
 if [ $? -eq 1 ]; then
+    echo Repeater - Starting Daily Profit Stats
     php -n $(dirname $BASH_SOURCE)/gemini repeater:stats:daily-profit &
+    sleep 0.25
 fi
 
