@@ -9,6 +9,7 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 use Kobens\Gemini\Exception\Api\Reason\RateLimitException;
 use Kobens\Http\Exception\Status\ServerError\BadGatewayException;
 use Psr\Log\LoggerInterface;
+use Kobens\Gemini\Exception\Api\Reason\InvalidNonceException;
 
 class OrderStatus implements OrderStatusInterface
 {
@@ -47,7 +48,7 @@ class OrderStatus implements OrderStatusInterface
         while (true) {
             try {
                 return $this->request->getResponse(self::URL_PATH, $payload, [], true);
-            } catch (BadGatewayException | RateLimitException $e) {
+            } catch (BadGatewayException | RateLimitException | InvalidNonceException $e) {
                 $this->logger->error($e->__toString());
                 if (++$attempts > $this->maxAttempts) {
                     throw new \Exception(
