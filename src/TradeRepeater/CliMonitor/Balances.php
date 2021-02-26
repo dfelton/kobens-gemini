@@ -109,7 +109,7 @@ final class Balances
                         $dataHelper->getProfitsBucketValue('usd')
                     ),
                     '0',
-                    strlen(explode('.', $extra['usd_maker_deposit'])[1])
+                    strlen(explode('.', $extra['usd_maker_deposit'])[1] ?? '')
                 ),
                 strlen($extra['usd_maker_deposit']),
                 ' ',

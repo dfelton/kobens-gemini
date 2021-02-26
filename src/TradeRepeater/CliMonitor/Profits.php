@@ -136,6 +136,9 @@ final class Profits
             }
             $cells[$symbol] = $row;
         }
+        if (Compare::getResult($profits['days'], '0') === Compare::EQUAL) {
+            $profits['days'] = '1';
+        }
         $dailyAverage = Divide::getResult($totalNotional, $profits['days'], 2);
         return [
             'cells' => $cells,
@@ -198,6 +201,10 @@ final class Profits
                     $profits30d[$symbol] = Add::getResult($profits30d[$symbol], $amount);
                 }
             }
+        }
+
+        if ($date === null) {
+            $date = date('Y-m-d H:i:s', time());
         }
 
         ksort($profits);
