@@ -13,6 +13,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Amp\Websocket\ClosedException;
 
 final class BookKeeper extends Command
 {
@@ -44,11 +45,7 @@ final class BookKeeper extends Command
         do {
             try {
                 $book->openBook();
-            } catch (ClosedBookException $e) {
-                $this->outputErrorAndSleep($output, $e->getMessage());
-            } catch (SocketSequenceException $e) {
-                $this->outputErrorAndSleep($output, $e->getMessage());
-            } catch (ConnectionException $e) {
+            } catch (ClosedBookException | SocketSequenceException | ConnectionException | ClosedException $e) {
                 $this->outputErrorAndSleep($output, $e->getMessage());
             } catch (\Throwable $e) {
                 $exitCode = 1;
