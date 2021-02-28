@@ -48,6 +48,13 @@ final class Bucket
         return $total;
     }
 
+    public function get(string $currency): string
+    {
+        $sql = 'SELECT `amount` FROM `repeater_profits_bucket` WHERE `currency` = :currency';
+        $rows = $this->adapter->query($sql, ['currency' => $currency]);
+        return $rows->count() === 1 ? $rows->current()->amount : '0';
+    }
+
     public function getForUpdate(string $currency): string
     {
         $sql = 'SELECT `amount` FROM `repeater_profits_bucket` WHERE `currency` = :currency FOR UPDATE';
@@ -78,7 +85,7 @@ final class Bucket
                 $this->adapter->getDriver()->getConnection()->rollback();
             }
             throw new \InvalidArgumentException(sprintf(
-                'Unabled to remove amount of "%s" from "%s" bucket. Only "%s" remaining.',
+                'Unable to remove amount of "%s" from "%s" bucket. Only "%s" remaining.',
                 $amount,
                 $currency,
                 $bucketAmount

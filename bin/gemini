@@ -208,6 +208,8 @@ $app->add(new \Kobens\Gemini\Command\Command\Info\Pair());
 // TODO: All TradeRepeater classes will need to use Kobens\Gemini\Api\Rest\* objects that have their own KeyInterface per TradeRepeater to avoid Nonce clashing
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\AddToPosition($addAmount, $repeaterProfitsBucket, $tradeResource));
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\PricePointGenerator(
+    $adapter,
+    $repeaterProfitsBucket,
     new TableGateway('trade_repeater', $adapter),
     new PricePointGenerator($apiMakerHoldBps)
 ));

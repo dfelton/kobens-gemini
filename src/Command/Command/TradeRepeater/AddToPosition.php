@@ -47,7 +47,7 @@ final class AddToPosition extends Command
         $this->addArgument('price-from', InputArgument::REQUIRED, 'Price from');
         $this->addArgument('price-to', InputArgument::REQUIRED, 'Price to');
         $this->addOption('confirm', 'c', InputOption::VALUE_OPTIONAL, 'Confirm', '0');
-        $this->addOption('bucket', 'b', InputOption::VALUE_OPTIONAL, 'Use funds from bucket for action.', '0');
+        $this->addOption('bucket', 'b', InputOption::VALUE_OPTIONAL, 'Use funds from bucket for action.', '1');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

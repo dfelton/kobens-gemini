@@ -15,6 +15,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\TableGateway\TableGatewayInterface;
+use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Bucket;
+use Kobens\Math\BasicCalculator\Compare;
+use Zend\Db\Adapter\Adapter;
 
 final class PricePointGenerator extends Command
 {
@@ -27,10 +30,18 @@ final class PricePointGenerator extends Command
 
     private \Kobens\Gemini\TradeRepeater\PricePointGenerator $generator;
 
+    private Bucket $bucket;
+
+    private Adapter $adapter;
+
     public function __construct(
+        Adapter $adapter,
+        Bucket $bucket,
         TableGatewayInterface $table,
         \Kobens\Gemini\TradeRepeater\PricePointGenerator $generator
     ) {
+        $this->adapter = $adapter;
+        $this->bucket = $bucket;
         $this->table = $table;
         $this->generator = $generator;
         parent::__construct();
@@ -47,6 +58,7 @@ final class PricePointGenerator extends Command
         $this->addArgument('sell_after_gain', InputArgument::REQUIRED, 'Sell After Gain (1 = same price as purchase, 2 = 100% gain from purchase price)');
         $this->addArgument('save_amount', InputArgument::OPTIONAL, 'Save Amount', 0);
         $this->addArgument('is_enabled', InputArgument::OPTIONAL, 'Is Enabled', 1);
+        $this->addOption('bucket', 'b', InputOption::VALUE_OPTIONAL, 'Use funds from bucket to create records.', '1');
         $this->addOption('create', 'c', InputOption::VALUE_OPTIONAL, 'Create records (if omitted, will simply report summary)', 0);
         $this->addOption('increment-by-percent', 'i', InputOption::VALUE_OPTIONAL, 'Interpret provided increment value as a percentage', '0');
     }
@@ -54,6 +66,23 @@ final class PricePointGenerator extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $exitCode = 0;
+        try {
+            $this->main($input, $output);
+        } catch (\Throwable $e) {
+            $output->writeln([
+                "<fg=red>Error Message: {$e->getMessage()}</>",
+                "<fg=red>Error Code: {$e->getCode()}</>",
+            ]);
+            if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                $output->writeln("Trace:\n{$e->getTraceAsString()}");
+            }
+            $exitCode = 1;
+        }
+        return $exitCode;
+    }
+
+    private function main(InputInterface $input, OutputInterface $output): void
+    {
         $pair = Pair::getInstance($input->getArgument('symbol'));
         $create = $input->getOption('create') === '1';
         $result = $this->generator->get(
@@ -68,21 +97,28 @@ final class PricePointGenerator extends Command
             $input->getOption('increment-by-percent') === '1'
         );
         $isEnabled = (int) $input->getArgument('is_enabled');
-        if ($input->getOption('create') === '1') {
-            try {
-                $this->create($output, $pair, $result, $isEnabled);
-            } catch (\Throwable $e) {
-                $output->writeln([
-                    sprintf('Error Message: %s', $e->getMessage()),
-                    sprintf('Error Code: %d', $e->getCode()),
-                    sprintf("Stack Trace:\n%s", $e->getTraceAsString()),
-                ]);
-                $exitCode = 1;
+        if ($create) {
+            $total = 0;
+            /** @var PricePoint $item */
+            foreach ($this->create($output, $pair, $result, $isEnabled, $input->getOption('bucket') === '1') as $item) {
+                ++$total;
+                    $output->writeln(sprintf(
+                        "Inserting %s record for %s buy amount at %s price.\tSell %s at %s price.",
+                        $pair->getSymbol(),
+                        $item->getBuyAmountBase(),
+                        $item->getBuyPrice(),
+                        $item->getSellAmountBase(),
+                        $item->getSellPrice()
+                    ));
             }
+            $output->writeln(sprintf(
+                'Total of %d records inserted for the %s pair.',
+                $total,
+                $pair->getSymbol()
+            ));
         } else {
             $this->summarize($input, $output, $pair, $result);
         }
-        return $exitCode;
     }
 
     private function summarize(InputInterface $input, OutputInterface $output, Pair $pair, Result $result): void
@@ -182,40 +218,50 @@ final class PricePointGenerator extends Command
         $table->render();
     }
 
-
     /**
      * @param OutputInterface $output
      * @param PricePoint[] $pricePoints
      */
-    private function create(OutputInterface $output, Pair $pair, Result $result, bool $isEnabled): void
+    private function create(OutputInterface $output, Pair $pair, Result $result, bool $isEnabled, bool $pullFromBucket): \Generator
     {
-        foreach ($result->getPricePoints() as $position) {
-            if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                $output->writeln(sprintf(
-                    "Inserting %s record for %s buy amount at %s price.\tSell %s at %s price.",
-                    $pair->getSymbol(),
-                    $position->getBuyAmountBase(),
-                    $position->getBuyPrice(),
-                    $position->getSellAmountBase(),
-                    $position->getSellPrice()
-                ));
-            }
-            $this->table->insert([
-                'is_enabled' => $isEnabled,
-                'status' => 'BUY_READY',
-                'symbol' => $pair->getSymbol(),
-                'buy_amount' => $position->getBuyAmountBase(),
-                'buy_price' => $position->getBuyPrice(),
-                'sell_amount' => $position->getSellAmountBase(),
-                'sell_price' => $position->getSellPrice(),
-            ]);
-        }
-        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_NORMAL) {
-            $output->writeln(sprintf(
-                'Total of %d records inserted for the %s pair.',
-                count($result->getPricePoints()),
-                $pair->getSymbol()
+        if ($pullFromBucket && !$this->hasFunds($result, $pair)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Not enough funds in "%s" bucket to create positions.',
+                $pair->getQuote()->getSymbol()
             ));
         }
+        foreach ($result->getPricePoints() as $position) {
+            $this->adapter->driver->getConnection()->beginTransaction();
+            try {
+                if ($pullFromBucket) {
+                    $this->bucket->removeFromBucket($pair->getQuote()->getSymbol(), Add::getResult($position->getBuyAmountQuote(), $position->getBuyFeeHold()));
+                }
+                $this->table->insert([
+                    'is_enabled' => $isEnabled,
+                    'status' => 'BUY_READY',
+                    'symbol' => $pair->getSymbol(),
+                    'buy_amount' => $position->getBuyAmountBase(),
+                    'buy_price' => $position->getBuyPrice(),
+                    'sell_amount' => $position->getSellAmountBase(),
+                    'sell_price' => $position->getSellPrice(),
+                ]);
+                $this->adapter->driver->getConnection()->commit();
+                yield $position;
+            } catch (\Throwable $e) {
+                $this->adapter->driver->getConnection()->rollback();
+                throw $e;
+            }
+        }
+    }
+
+    private function hasFunds(Result $result, Pair $pair): bool
+    {
+        $contains = $this->bucket->get($pair->getQuote()->getSymbol());
+        $required = Add::getResult(
+            $result->getTotalBuyQuote(),
+            $result->getTotalBuyFeesHold(),
+        );
+        $compare = Compare::getResult($contains, $required);
+        return $compare === Compare::LEFT_GREATER_THAN || $compare === Compare::EQUAL;
     }
 }
