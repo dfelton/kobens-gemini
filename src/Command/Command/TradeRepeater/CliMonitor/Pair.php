@@ -16,6 +16,7 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputArgument;
 
 final class Pair extends Command
 {
@@ -43,7 +44,7 @@ final class Pair extends Command
     protected function configure(): void
     {
         $this->setDescription('Monitoring output on trades and the market');
-        $this->addOption('pair', 'p', InputOption::VALUE_OPTIONAL, 'Comma separated trading pair(s) to show trade-repeater data for', 'btcusd');
+        $this->addArgument('symbol', InputArgument::OPTIONAL, 'Comma separated trading pair(s) to show trade-repeater data for', 'btcusd');
         $this->addOption('disable-loop', null, InputOption::VALUE_OPTIONAL, 'Disable continous output', false);
         $this->addOption(
             'refresh',
@@ -94,11 +95,11 @@ final class Pair extends Command
     /**
      * @return \Kobens\Exchange\PairInterface[]
      */
-    private function getPairs(InputInterface $input, string $option): array
+    private function getPairs(InputInterface $input): array
     {
         $pairs = [];
-        if ($input->getOption($option) !== null) {
-            foreach (explode(',', $input->getOption($option)) as $symbol) {
+        if ($input->getArgument('symbol') !== null) {
+            foreach (explode(',', $input->getArgument('symbol')) as $symbol) {
                 $pairs[] = CurrencyPair::getInstance(strtolower(trim($symbol)));
             }
         }
