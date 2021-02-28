@@ -69,7 +69,6 @@ final class PricePointGenerator extends Command
         try {
             $this->main($input, $output);
         } catch (\Throwable $e) {
-
             $output->writeln([
                 "<fg=red>Error Message: {$e->getMessage()}</>",
                 "<fg=red>Error Code: {$e->getCode()}</>",
