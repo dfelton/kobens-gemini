@@ -78,7 +78,7 @@ final class Bucket
                 $this->adapter->getDriver()->getConnection()->rollback();
             }
             throw new \InvalidArgumentException(sprintf(
-                'Unabled to remove amount of "%s" from "%s" bucket. Only "%s" remaining.',
+                'Unable to remove amount of "%s" from "%s" bucket. Only "%s" remaining.',
                 $amount,
                 $currency,
                 $bucketAmount
