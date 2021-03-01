@@ -14,9 +14,13 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Amp\Websocket\ClosedException;
+use Kobens\Core\Config;
+use Kobens\Gemini\Command\Traits\GetNow;
 
 final class BookKeeper extends Command
 {
+    use GetNow;
+
     protected static $defaultName = 'market:book-keeper';
 
     private BookKeeperFactoryInterface $bookFactory;
@@ -40,16 +44,34 @@ final class BookKeeper extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $exitCode = 0;
+        if (!$this->shutdown()) {
+            $output->writeln(sprintf(
+                "%s\tStarting book keeper %s",
+                $this->getNow(),
+                $input->getArgument('symbol')
+            ));
+            $this->main($input, $output);
+        }
+        if ($this->shutdown()) {
+            $output->writeln(sprintf(
+                "%s\tShutdown signal detected - %s (%s)",
+                $this->getNow(),
+                self::class,
+                $input->getArgument('symbol')
+            ));
+        }
+        return $exitCode;
+    }
+
+    protected function main(InputInterface $input, OutputInterface $output): int
+    {
         $book = $this->bookFactory->create($input->getArgument('symbol'));
-        $loop = true;
         do {
             try {
                 $book->openBook();
             } catch (ClosedBookException | SocketSequenceException | ConnectionException | ClosedException $e) {
                 $this->outputErrorAndSleep($output, $e->getMessage());
             } catch (\Throwable $e) {
-                $exitCode = 1;
-                $loop = false;
                 do {
                     $output->writeln([
                         "Code: {$e->getCode()}",
@@ -63,29 +85,50 @@ final class BookKeeper extends Command
                         $output->writeln("\nPrevious:");
                     }
                 } while ($e instanceof \Throwable);
+                return 1;
             }
-        } while ($loop);
-        return $exitCode;
+        } while ($this->shutdown() === false);
+        return 0;
     }
 
-    protected function outputErrorAndSleep(OutputInterface $output, string $message, int $seconds = 10): void
+    private function shutdown(): bool
+    {
+        return file_exists(
+            Config::getInstance()->getRootDir() . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'kill_market_book'
+        );
+    }
+
+    protected function outputErrorAndSleep(InputInterface $input, OutputInterface $output, string $message, int $seconds = 10): void
     {
         if ($seconds < 1) {
             $seconds = 10;
         }
         if (!$output->isQuiet()) {
-            $output->writeln("\nERROR: $message");
-            $output->write("Sleeping $seconds seconds");
+            $output->writeln(sprintf(
+                "%s\tERROR: %s --- %s (%s)",
+                $this->getNow(),
+                $message,
+                self::class,
+                $input->getArgument('symbol')
+            ));
+            $output->writeln(sprintf(
+                "%s\tSleeping %d seconds: %s --- %s (%s)",
+                $this->getNow(),
+                $seconds,
+                self::class,
+                $input->getArgument('symbol')
+            ));
         }
         for ($i = 1; $i <= $seconds; $i++) {
-            if (!$output->isQuiet()) {
-                $output->write('.');
-            }
             \sleep(1);
         }
         if (!$output->isQuiet()) {
-            $output->write(PHP_EOL);
-            $output->writeln('Resuming operations');
+            $output->writeln(
+                "%s\tResuming operations --- %s (%s)",
+                $this->getNow(),
+                self::class,
+                $input->getArgument('symbol')
+            );
         }
     }
 }

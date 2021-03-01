@@ -23,7 +23,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
-use Zend\Db\Adapter\Exception\InvalidQueryException;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Adapter\Adapter;
@@ -94,17 +93,31 @@ final class TradeHistory extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $exitCode = 0;
-        $this->symbol = $input->getArgument('symbol');
-        $this->pair = Pair::getInstance($this->symbol);
-        $this->delay = $this->getIntArg($input, 'delay', self::DELAY_DEFAULT, self::MIN_DELAY, self::MAX_DELAY);
-        $timestampms  = $this->getLastTradeTimestampMs();
+        if ($this->shutdown->isShutdownModeEnabled() === false) {
+            $this->symbol = $input->getArgument('symbol');
+            $this->pair = Pair::getInstance($this->symbol);
+            $this->delay = $this->getIntArg($input, 'delay', self::DELAY_DEFAULT, self::MIN_DELAY, self::MAX_DELAY);
+            $output->writeln(sprintf(
+                "%s\tStarting trade history logger %s",
+                $this->getNow(),
+                $input->getArgument('symbol')
+            ));
+            $this->main($input, $output);
+        }
+        $this->outputExit($output, $this->shutdown, self::KILL_FILE, sprintf(' (%s)', $input->getArgument('symbol')));
+        return $exitCode;
+    }
+
+    protected function main(InputInterface $input, OutputInterface $output): int
+    {
+        $exitCode = 0;
+        $timestampms = $this->getLastTradeTimestampMs();
         try {
             $this->mainLoop($output, $timestampms);
         } catch (\Throwable $e) {
             $this->shutdown->enableShutdownMode($e);
             $exitCode = 1;
         }
-        $this->outputExit($output, $this->shutdown, self::KILL_FILE, sprintf(' (%s)', $this->symbol));
         return $exitCode;
     }
 
