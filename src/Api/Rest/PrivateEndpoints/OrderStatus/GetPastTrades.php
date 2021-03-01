@@ -8,6 +8,7 @@ use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetPastTradesInterface as I;
 use Kobens\Gemini\Exception\Api\Reason\InvalidNonceException;
 use Kobens\Http\Exception\Status\ServerError\BadGatewayException;
+use Kobens\Http\Exception\Status\ServerError\GatewayTimeoutException;
 
 final class GetPastTrades implements GetPastTradesInterface
 {
@@ -33,9 +34,11 @@ final class GetPastTrades implements GetPastTradesInterface
         while ($response === null && ++$i <= 15) {
             try {
                 $response = $this->request->getResponse(self::URL_PATH, $payload, [], true);
-            } catch (InvalidNonceException | BadGatewayException $e) {
+            } catch (InvalidNonceException | BadGatewayException | GatewayTimeoutException $e) {
                 // FIXME: InvalidNonceException can be addressed with better keys management
-                continue;
+                if ($i >= 15) {
+                    throw $e;
+                }
             }
         }
         if ($response === null) {
