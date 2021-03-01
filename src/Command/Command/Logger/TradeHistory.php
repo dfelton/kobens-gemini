@@ -18,6 +18,7 @@ use Kobens\Gemini\Command\Traits\GetIntArg;
 use Kobens\Gemini\Command\Traits\KillFile;
 use Kobens\Gemini\Command\Traits\TradeRepeater\ExitProgram;
 use Kobens\Gemini\Exchange\Currency\Pair;
+use Kobens\Http\Exception\Status\ServerError\GatewayTimeoutException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -137,7 +138,7 @@ final class TradeHistory extends Command
 
             try {
                 $page = $this->pastTrades->getTrades($this->symbol, $timestampms, GetPastTradesInterface::LIMIT_MAX);
-            } catch (ConnectionException $e) {
+            } catch (ConnectionException | GatewayTimeoutException $e) {
                 $output->writeln("<fg=red>{$this->getNow()}\tError Code: {$e->getCode()}</>");
                 $output->writeln("<fg=red>{$this->getNow()}\tError: {$e->getMessage()}</>");
                 $output->writeln("<fg=red>{$this->getNow()}\tSleeping 10 seconds and trying again...</>");
