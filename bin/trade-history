@@ -3,156 +3,146 @@
 #
 # Trade History Processes
 #
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history aaveusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history aaveusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger aaveusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history aaveusd &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history aaveusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history ampusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history ampusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger ampusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history ampusd &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history ampusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history balusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history balusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger balusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history balusd &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history balusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history batusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history batusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger batusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history batusd &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history batusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history bchusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history bchusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger bchusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history bchusd &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history bchusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history btcusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history btcusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger btcusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history btcusd &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history btcusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history compusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history compusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger compusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history compusd &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history compusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history crvusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history crvusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger crvusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history crvusd &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history crvusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history ethusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history ethusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger ethusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history ethusd &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history ethusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history filusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history filusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger filusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history filusd &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history filusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history kncusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history kncusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger kncusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history kncusd &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history kncusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history linkusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history linkusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger linkusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history linkusd &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history linkusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history ltcusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history ltcusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger ltcusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history ltcusd &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history ltcusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history manausd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history manausd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger manausd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history manausd &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history manausd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history mkrusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history mkrusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger mkrusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history mkrusd &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history mkrusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history oxtusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history oxtusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger oxtusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history oxtusd &
-    sleep 0.25
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history oxtusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history renusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history renusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger renusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history renusd &
-    sleep 0.25
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history renusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history snxusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history snxusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger snxusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history snxusd &
-    sleep 0.25
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history snxusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history storjusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history storjusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger storjusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history storjusd &
-    sleep 0.25
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history storjusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history umausd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history umausd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger umausd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history umausd &
-    sleep 0.25
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history umausd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history uniusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history uniusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger uniusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history uniusd &
-    sleep 0.25
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history uniusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history yfiusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history yfiusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger yfiusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history yfiusd &
-    sleep 0.25
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history yfiusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history zecusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history zecusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger zecusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history zecusd &
-    sleep 0.25
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history zecusd &
+    sleep 0.2
 fi
 
-ps aux | grep -v grep | grep -q 'gemini logger:trade-history zrxusd'
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history zrxusd"
 if [ $? -eq 1 ]; then
-    echo starting trade history logger zrxusd
-    php -n $(dirname $BASH_SOURCE)/gemini logger:trade-history zrxusd &
-    sleep 0.25
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history zrxusd &
+    sleep 0.2
 fi
-

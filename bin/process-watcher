@@ -2,7 +2,7 @@
 
 while true
 do
-  GEMINI_PROCESSES="$(ps -eo pid,cmd --sort=command | grep -v grep | grep bin/gemini)"
+  GEMINI_PROCESSES="$(ps -eo pid,cmd --sort=command | grep -v grep | grep "$(realpath $(dirname $BASH_SOURCE))/gemini")"
   COUNT="$(($(wc -l <<< "$GEMINI_PROCESSES")-1))"
   echo -e "\033c$GEMINI_PROCESSES\nRunning Processes: $COUNT\n"
   sleep 5

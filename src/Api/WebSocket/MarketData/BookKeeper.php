@@ -26,17 +26,20 @@ final class BookKeeper extends AbstractKeeper
 
     public function openBook(): void
     {
-        $this->ensureIsClosed();
+        if ($this->isClosed() === false) {
+            throw new Exception('Can only open closed book.');
+        }
         \Amp\Loop::run($this->getRunClosure());
     }
 
-    private function ensureIsClosed()
+    private function isClosed(): bool
     {
         try {
             $this->util->checkPulse();
-            throw new Exception('Can only open closed book.');
         } catch (ClosedBookException $e) {
+            return true;
         }
+        return false;
     }
 
     private function getRunClosure(): \Closure
@@ -51,8 +54,18 @@ final class BookKeeper extends AbstractKeeper
                 $payload = \json_decode($payload);
                 $this->processMessage($payload);
                 $this->setPulse();
+                if ($this->shutdown()) {
+                    \Amp\Loop::stop();
+                }
             }
         };
+    }
+
+    private function shutdown(): bool
+    {
+        return file_exists(
+            Config::getInstance()->getRootDir() . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'kill_market_book'
+        );
     }
 
     private function processMessage(\stdClass $payload)

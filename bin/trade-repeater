@@ -9,55 +9,55 @@ $(dirname $BASH_SOURCE)/book-keepers
 #
 # Trade Repeater
 #
-ps aux | grep -v grep | grep -q gemini\ repeater:fill-monitor-websocket
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini repeater:fill-monitor-websocket"
 if [ $? -eq 1 ]; then
     echo Repeater - Starting Websocket Fill Monitor
-    php -n $(dirname $BASH_SOURCE)/gemini repeater:fill-monitor-websocket &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini repeater:fill-monitor-websocket &
     sleep 0.25
 fi
 
-ps aux | grep -v grep | grep -q gemini\ repeater:buyer
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini repeater:buyer"
 if [ $? -eq 1 ]; then
     echo Repeater - Starting Buyer
-    php -n $(dirname $BASH_SOURCE)/gemini repeater:buyer &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini repeater:buyer &
     sleep 0.25
 fi
 
-ps aux | grep -v grep | grep -q gemini\ repeater:seller
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini repeater:seller"
 if [ $? -eq 1 ]; then
     echo Repeater - Starting Seller
-    php -n $(dirname $BASH_SOURCE)/gemini repeater:seller &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini repeater:seller &
     sleep 0.25
 fi
 
-ps aux | grep -v 'grep\|fill-time' | grep -q gemini\ repeater:archiver
+ps aux | grep -v 'grep\|fill-time' | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini repeater:archiver"
 if [ $? -eq 1 ]; then
     echo 'Repeater - Starting Archiver (main)'
-    php -n $(dirname $BASH_SOURCE)/gemini repeater:archiver &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini repeater:archiver &
     sleep 0.25
 fi
 
-ps aux | grep -v grep | grep -q gemini\ repeater:archiver:fill-time
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini repeater:archiver:fill-time"
 if [ $? -eq 1 ]; then
     echo 'Repeater - Starting Archiver (Fill Timestamp)'
-    php -n $(dirname $BASH_SOURCE)/gemini repeater:archiver:fill-time &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini repeater:archiver:fill-time &
     sleep 0.25
 fi
 
-ps aux | grep -v grep | grep -q gemini\ repeater:fill-monitor-rest
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini repeater:fill-monitor-rest"
 if [ $? -eq 1 ]; then
     echo Repeater - Starting Rest Fill Monitor
-    php -n $(dirname $BASH_SOURCE)/gemini repeater:fill-monitor-rest &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini repeater:fill-monitor-rest &
     sleep 0.25
 fi
 
 #
 # Statistics
 #
-ps aux | grep -v grep | grep -q gemini\ repeater:stats:daily-profit
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini repeater:stats:daily-profit"
 if [ $? -eq 1 ]; then
     echo Repeater - Starting Daily Profit Stats
-    php -n $(dirname $BASH_SOURCE)/gemini repeater:stats:daily-profit &
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini repeater:stats:daily-profit &
     sleep 0.25
 fi
 
