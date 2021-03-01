@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\FundManagement\GetNotionalBalances\BalanceInterface;
 use Symfony\Component\Console\Helper\TableCell;
 use Kobens\Math\BasicCalculator\Subtract;
+use Kobens\Gemini\Exchange\Currency\Pair;
 
 final class Balances
 {
@@ -67,7 +68,7 @@ final class Balances
             $data[] = $row;
         }
 
-
+        $symbols = [];
         foreach ($data as &$row) {
             $isUsd = $row[0] === 'USD';
             foreach ($row as $i => &$col) {
@@ -75,12 +76,16 @@ final class Balances
                     $padLength = $lengths[$i] < self::$strPad ? self::$strPad : $lengths[$i];
                     $col = str_pad($col, $padLength, ' ', STR_PAD_LEFT);
                 }
+                if ($i === 0 && $isUsd === false) {
+                    $symbols[] = strtolower($col) . 'usd';
+                }
                 if ($isUsd) {
                     $col = '<fg=green>' . $col . '</>';
                 }
             }
             if (($extra[strtolower($row[0]) . 'usd'] ?? null) !== null) {
                 $row[] = $extra[strtolower($row[0]) . 'usd'];
+                unset($extra[strtolower($row[0]) . 'usd']);
             } else {
                 $row[] = '';
             }
@@ -88,10 +93,25 @@ final class Balances
                 $row[] = '<fg=green>' . $dataHelper->getProfitsBucketValue('usd') . '</>';
                 $row[] = end($row);
             } else {
-                $row[] = $dataHelper->getProfitsBucketValue($isUsd ? 'usd' : strtolower($row[0]));
+                $row[] = $dataHelper->getProfitsBucketValue(strtolower($row[0]));
                 $row[] = $isUsd ? '' : $dataHelper->getNotional(strtolower($row[0]) . 'usd', end($row));
             }
             $table->addRow($row);
+        }
+        foreach (array_keys($extra) as $symbol) {
+            if (!in_array($symbol, ['usd_maker_deposit', 'total_usd_investment']) && !in_array($symbol, $symbols)) {
+                $pair = Pair::getInstance($symbol);
+                $row = [
+                    strtoupper($pair->getBase()->getSymbol()),
+                ];
+                for ($i = 0, $j = $cols - 1; $i < $j; ++$i) {
+                    $row[] = '';
+                }
+                $row[] = $extra[$symbol];
+                $row[] = $dataHelper->getProfitsBucketValue($pair->getBase()->getSymbol());
+                $row[] = $dataHelper->getNotional(strtolower($row[0]) . 'usd', end($row));
+                $table->addRow($row);
+            }
         }
         $table->addRow([new TableCell('', ['colspan' => $cols + 1])]);
         $table->addRow([new TableCell('Total Repeater USD Invested', ['colspan' => $cols]), $extra['total_usd_investment']]);
