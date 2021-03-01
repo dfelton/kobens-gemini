@@ -61,7 +61,11 @@ class OrderStatus implements OrderStatusInterface
                         $e
                     );
                 }
-                sleep(5);
+                if ($e instanceof RateLimitException) {
+                    sleep(5);
+                } else {
+                    sleep(1);
+                }
             }
         }
     }
