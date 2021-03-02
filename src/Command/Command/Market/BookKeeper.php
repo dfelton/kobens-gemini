@@ -16,6 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Amp\Websocket\ClosedException;
 use Kobens\Core\Config;
 use Kobens\Gemini\Command\Traits\GetNow;
+use Kobens\Gemini\Exchange\Currency\Pair;
 
 final class BookKeeper extends Command
 {
@@ -65,12 +66,13 @@ final class BookKeeper extends Command
 
     protected function main(InputInterface $input, OutputInterface $output): int
     {
-        $book = $this->bookFactory->create($input->getArgument('symbol'));
+        $symbol = Pair::getInstance($input->getArgument('symbol'))->getSymbol();
+        $book = $this->bookFactory->create($symbol);
         do {
             try {
                 $book->openBook();
             } catch (ClosedBookException | SocketSequenceException | ConnectionException | ClosedException $e) {
-                $this->outputErrorAndSleep($output, $e->getMessage());
+                $this->outputErrorAndSleep($symbol, $output, $e->getMessage());
             } catch (\Throwable $e) {
                 do {
                     $output->writeln([
@@ -98,36 +100,34 @@ final class BookKeeper extends Command
         );
     }
 
-    protected function outputErrorAndSleep(InputInterface $input, OutputInterface $output, string $message, int $seconds = 10): void
+    private function outputErrorAndSleep(string $symbol, OutputInterface $output, string $message, int $seconds = 10): void
     {
         if ($seconds < 1) {
             $seconds = 10;
         }
         if (!$output->isQuiet()) {
             $output->writeln(sprintf(
-                "%s\tERROR: %s --- %s (%s)",
+                "<fg=red>%s\tERROR: %s --- %s (%s)</>",
                 $this->getNow(),
                 $message,
                 self::class,
-                $input->getArgument('symbol')
+                $symbol
             ));
             $output->writeln(sprintf(
-                "%s\tSleeping %d seconds: %s --- %s (%s)",
+                "<fg=red>%s\tSleeping %d seconds: %s --- %s (%s)</>",
                 $this->getNow(),
                 $seconds,
                 self::class,
-                $input->getArgument('symbol')
+                $symbol
             ));
         }
-        for ($i = 1; $i <= $seconds; $i++) {
-            \sleep(1);
-        }
+        \sleep($seconds);
         if (!$output->isQuiet()) {
             $output->writeln(
                 "%s\tResuming operations --- %s (%s)",
                 $this->getNow(),
                 self::class,
-                $input->getArgument('symbol')
+                $symbol
             );
         }
     }

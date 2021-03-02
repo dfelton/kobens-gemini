@@ -49,12 +49,13 @@ final class GetTradeVolume extends Command
         }
 
         $priorSymbol = null;
+        $table = null;
         foreach ($data[0] as $row) {
             if ($symbol !== null && $row->symbol !== $symbol) {
                 continue;
             }
             if ($priorSymbol === null || $row->symbol !== $priorSymbol) {
-                if ($table ?? null) {
+                if ($table) {
                     $table->render();
                 }
                 $table = new Table($output);
@@ -63,7 +64,7 @@ final class GetTradeVolume extends Command
             }
             $table->addRow(array_values((array) $row));
         }
-        if ($table ?? null) {
+        if ($table) {
             $table->render();
         } else {
             $output->writeln('<fg=red>No trading volume to report</>');
