@@ -102,14 +102,14 @@ final class PricePointGenerator extends Command
             /** @var PricePoint $item */
             foreach ($this->create($output, $pair, $result, $isEnabled, $input->getOption('bucket') === '1') as $item) {
                 ++$total;
-                    $output->writeln(sprintf(
-                        "Inserting %s record for %s buy amount at %s price.\tSell %s at %s price.",
-                        $pair->getSymbol(),
-                        $item->getBuyAmountBase(),
-                        $item->getBuyPrice(),
-                        $item->getSellAmountBase(),
-                        $item->getSellPrice()
-                    ));
+                $output->writeln(sprintf(
+                    "Inserting %s record for %s buy amount at %s price.\tSell %s at %s price.",
+                    $pair->getSymbol(),
+                    $item->getBuyAmountBase(),
+                    $item->getBuyPrice(),
+                    $item->getSellAmountBase(),
+                    $item->getSellPrice()
+                ));
             }
             $output->writeln(sprintf(
                 'Total of %d records inserted for the %s pair.',
