@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor;
 
+use Amp\Dns\DnsException;
+use Amp\Http\Client\Connection\UnprocessedRequestException;
 use Amp\Websocket\ClosedException;
 use Amp\Websocket\Client\ConnectionException;
 use Amp\Websocket\Client\Handshake;
@@ -25,7 +27,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Amp\Dns\DnsException;
 
 final class WebSocket extends Command
 {
@@ -89,7 +90,7 @@ final class WebSocket extends Command
         while (!$this->shutdown->isShutdownModeEnabled()) {
             try {
                 \Amp\Loop::run($this->main($output));
-            } catch (ConnectionException | ClosedException | DnsException $e) {
+            } catch (ConnectionException | ClosedException | DnsException | UnprocessedRequestException $e) {
                 $output->writeln([
                     "<fg=red>{$this->getNow()}\t{$e->getMessage()}</>",
                     "<fg=yellow>{$this->getNow()}\tSleeping {$reconnectDelay} seconds before next reconnect attempt.</>"

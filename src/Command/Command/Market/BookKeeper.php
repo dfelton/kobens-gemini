@@ -18,6 +18,7 @@ use Kobens\Core\Config;
 use Kobens\Gemini\Command\Traits\GetNow;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Amp\Dns\DnsException;
+use Amp\Http\Client\Connection\UnprocessedRequestException;
 
 final class BookKeeper extends Command
 {
@@ -72,7 +73,7 @@ final class BookKeeper extends Command
         do {
             try {
                 $book->openBook();
-            } catch (ClosedBookException | SocketSequenceException | ConnectionException | ClosedException | DnsException $e) {
+            } catch (ClosedBookException | SocketSequenceException | ConnectionException | ClosedException | DnsException | UnprocessedRequestException $e) {
                 $this->outputErrorAndSleep($symbol, $output, $e->getMessage());
             } catch (\Throwable $e) {
                 do {
@@ -101,7 +102,7 @@ final class BookKeeper extends Command
         );
     }
 
-    private function outputErrorAndSleep(string $symbol, OutputInterface $output, string $message, int $seconds = 30): void
+    private function outputErrorAndSleep(string $symbol, OutputInterface $output, string $message, int $seconds = 60): void
     {
         if ($seconds < 1) {
             $seconds = 10;
@@ -111,13 +112,6 @@ final class BookKeeper extends Command
                 "<fg=red>%s\tERROR: %s --- %s (%s)</>",
                 $this->getNow(),
                 $message,
-                self::class,
-                $symbol
-            ));
-            $output->writeln(sprintf(
-                "<fg=red>%s\tSleeping %d seconds: --- %s (%s)</>",
-                $this->getNow(),
-                $seconds,
                 self::class,
                 $symbol
             ));
