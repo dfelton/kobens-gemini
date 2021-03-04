@@ -14,6 +14,7 @@ use Kobens\Gemini\Api\KeyInterface;
 use Kobens\Gemini\Api\NonceInterface;
 use Kobens\Gemini\Api\Helper\ResponseHandler;
 use Psr\Log\LoggerInterface;
+use Kobens\Gemini\Exception\MaxIterationsException;
 
 /**
  * Class Request
@@ -113,7 +114,7 @@ final class Request implements RequestInterface
             }
         } while (!$response && $autoRetry && ++$i < self::MAX_ITERATIONS);
         if (!$response) {
-            throw new Exception('Max Iterations Reached');
+            throw new MaxIterationsException('Max Iterations Reached');
         }
         $this->responseHandler->handleResponse($response);
         return $response;

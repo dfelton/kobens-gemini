@@ -27,6 +27,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Adapter\Adapter;
+use Kobens\Gemini\Exception\MaxIterationsException;
 
 final class TradeHistory extends Command
 {
@@ -138,7 +139,7 @@ final class TradeHistory extends Command
 
             try {
                 $page = $this->pastTrades->getTrades($this->symbol, $timestampms, GetPastTradesInterface::LIMIT_MAX);
-            } catch (ConnectionException | GatewayTimeoutException $e) {
+            } catch (ConnectionException | GatewayTimeoutException | MaxIterationsException $e) {
                 $output->writeln("<fg=red>{$this->getNow()}\tError Code: {$e->getCode()}</>");
                 $output->writeln("<fg=red>{$this->getNow()}\tError: {$e->getMessage()}</>");
                 $output->writeln("<fg=red>{$this->getNow()}\tSleeping 10 seconds and trying again...</>");
