@@ -70,6 +70,7 @@ final class BookKeeper extends Command
         $book = $this->bookFactory->create($symbol);
         do {
             try {
+                throw new ClosedBookException();
                 $book->openBook();
             } catch (ClosedBookException | SocketSequenceException | ConnectionException | ClosedException $e) {
                 $this->outputErrorAndSleep($symbol, $output, $e->getMessage());
@@ -114,7 +115,7 @@ final class BookKeeper extends Command
                 $symbol
             ));
             $output->writeln(sprintf(
-                "<fg=red>%s\tSleeping %d seconds: %s --- %s (%s)</>",
+                "<fg=red>%s\tSleeping %d seconds: --- %s (%s)</>",
                 $this->getNow(),
                 $seconds,
                 self::class,
@@ -123,12 +124,12 @@ final class BookKeeper extends Command
         }
         \sleep($seconds);
         if (!$output->isQuiet()) {
-            $output->writeln(
+            $output->writeln(sprintf(
                 "%s\tResuming operations --- %s (%s)",
                 $this->getNow(),
                 self::class,
                 $symbol
-            );
+            ));
         }
     }
 }
