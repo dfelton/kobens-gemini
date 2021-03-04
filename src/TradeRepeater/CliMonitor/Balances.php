@@ -69,7 +69,9 @@ final class Balances
         }
 
         $symbols = [];
+        $evenOdd = 0;
         foreach ($data as &$row) {
+            $color = ++$evenOdd % 2 === 0 ? 'magenta' : 'cyan';
             $isUsd = $row[0] === 'USD';
             foreach ($row as $i => &$col) {
                 if ($i !== 0) {
@@ -81,20 +83,38 @@ final class Balances
                 }
                 if ($isUsd) {
                     $col = '<fg=green>' . $col . '</>';
+                } elseif ($i !== 0) {
+                    $col = sprintf(
+                        '<fg=%s>%s</>',
+                        $color,
+                        (string) $col
+                    );
                 }
             }
             if (($extra[strtolower($row[0]) . 'usd'] ?? null) !== null) {
-                $row[] = $extra[strtolower($row[0]) . 'usd'];
+                $row[] = sprintf(
+                    '<fg=%s>%s</>',
+                    $color,
+                    (string) $extra[strtolower($row[0]) . 'usd']
+                );
                 unset($extra[strtolower($row[0]) . 'usd']);
             } else {
                 $row[] = '';
             }
             if ($isUsd) {
                 $row[] = '<fg=green>' . $dataHelper->getProfitsBucketValue('usd') . '</>';
-                $row[] = end($row);
+//                 $row[] = end($row);
             } else {
-                $row[] = $dataHelper->getProfitsBucketValue(strtolower($row[0]));
-                $row[] = $isUsd ? '' : $dataHelper->getNotional(strtolower($row[0]) . 'usd', end($row));
+                $row[] = sprintf(
+                    '<fg=%s>%s</>',
+                    $color,
+                    (string) $dataHelper->getProfitsBucketValue(strtolower($row[0]))
+                );
+//                 $row[] = sprintf(
+//                     '<fg=%s>%s</>',
+//                     $color,
+//                     (string) $dataHelper->getNotional(strtolower($row[0]) . 'usd', $rawEnd)
+//                 );
             }
             $table->addRow($row);
         }
@@ -165,7 +185,7 @@ final class Balances
         }
         $headers[] = 'Repeater Invested USD';
         $headers[] = 'Profit Bucket';
-        $headers[] = 'Profit Bucket Notional';
+//         $headers[] = 'Profit Bucket Notional';
         return $headers;
     }
 
