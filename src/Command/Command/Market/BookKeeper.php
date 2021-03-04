@@ -70,7 +70,6 @@ final class BookKeeper extends Command
         $book = $this->bookFactory->create($symbol);
         do {
             try {
-                throw new ClosedBookException();
                 $book->openBook();
             } catch (ClosedBookException | SocketSequenceException | ConnectionException | ClosedException $e) {
                 $this->outputErrorAndSleep($symbol, $output, $e->getMessage());
