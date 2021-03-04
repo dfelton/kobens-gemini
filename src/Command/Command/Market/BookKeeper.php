@@ -17,6 +17,7 @@ use Amp\Websocket\ClosedException;
 use Kobens\Core\Config;
 use Kobens\Gemini\Command\Traits\GetNow;
 use Kobens\Gemini\Exchange\Currency\Pair;
+use Amp\Dns\DnsException;
 
 final class BookKeeper extends Command
 {
@@ -71,7 +72,7 @@ final class BookKeeper extends Command
         do {
             try {
                 $book->openBook();
-            } catch (ClosedBookException | SocketSequenceException | ConnectionException | ClosedException $e) {
+            } catch (ClosedBookException | SocketSequenceException | ConnectionException | ClosedException | DnsException $e) {
                 $this->outputErrorAndSleep($symbol, $output, $e->getMessage());
             } catch (\Throwable $e) {
                 do {
@@ -100,7 +101,7 @@ final class BookKeeper extends Command
         );
     }
 
-    private function outputErrorAndSleep(string $symbol, OutputInterface $output, string $message, int $seconds = 10): void
+    private function outputErrorAndSleep(string $symbol, OutputInterface $output, string $message, int $seconds = 30): void
     {
         if ($seconds < 1) {
             $seconds = 10;
