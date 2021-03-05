@@ -14,7 +14,7 @@ final class BookKeeper extends AbstractKeeper
 {
     private const API_PATH = '/v1/marketdata/';
 
-    private int $socketSequence;
+    private int $socketSequence = 0;
 
     protected array $params = [
         'heartbeat' => 'true',
@@ -71,6 +71,16 @@ final class BookKeeper extends AbstractKeeper
     private function processMessage(\stdClass $payload)
     {
         if ($payload->socket_sequence === 0) {
+            if ($this->socketSequence !== 0) {
+                throw new SocketSequenceException(\sprintf(
+                    'Expected sequence number "%s", received "%s".',
+                    $this->socketSequence + 1,
+                    $payload->socket_sequence
+                ));
+            }
+            if (($payload->events ?? null) == null) {
+                throw new \Exception('"events" property not present on message.', 0, new \Exception(json_encode($payload)));
+            }
             $book = [];
             foreach ($payload->events as $e) {
                 $book[$e->side][$e->price] = $e->remaining;
