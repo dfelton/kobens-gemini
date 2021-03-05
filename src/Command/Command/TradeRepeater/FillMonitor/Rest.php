@@ -11,11 +11,13 @@ use Kobens\Exchange\PairInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetActiveOrdersInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
 use Kobens\Gemini\Command\Command\TradeRepeater\SleeperTrait;
+use Kobens\Gemini\Command\Traits\GetNow;
 use Kobens\Gemini\Command\Traits\KillFile;
 use Kobens\Gemini\Command\Traits\TradeRepeater\ExitProgram;
 use Kobens\Gemini\Exception\Api\Reason\InvalidNonceException;
 use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
 use Kobens\Gemini\Exception\Api\Reason\SystemException;
+use Kobens\Gemini\Exception\MaxIterationsException;
 use Kobens\Gemini\Exception\TradeRepeater\UnhealthyStateException;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\Model\Trade;
@@ -28,7 +30,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Gemini\Command\Traits\GetNow;
 
 final class Rest extends Command
 {
@@ -147,13 +148,17 @@ final class Rest extends Command
      */
     private function mainLoop(OutputInterface $output, bool $buyOrders = false, bool $sellOrders = false, PairInterface $pair = null): void
     {
-        /** @var \Kobens\Gemini\TradeRepeater\Model\Trade $row */
-        $activeIds = $this->getActiveOrderIds();
-        if ($buyOrders) {
-            $this->iterateBuyOrders($output, $activeIds['buy'], $pair);
-        }
-        if ($sellOrders) {
-            $this->iterateSellOrders($output, $activeIds['sell'], $pair);
+        try {
+            /** @var \Kobens\Gemini\TradeRepeater\Model\Trade $row */
+            $activeIds = $this->getActiveOrderIds();
+            if ($buyOrders) {
+                $this->iterateBuyOrders($output, $activeIds['buy'], $pair);
+            }
+            if ($sellOrders) {
+                $this->iterateSellOrders($output, $activeIds['sell'], $pair);
+            }
+        } catch (MaxIterationsException $e) {
+            $this->sleep(60, $this->sleeper, $this->shutdown);
         }
     }
 
