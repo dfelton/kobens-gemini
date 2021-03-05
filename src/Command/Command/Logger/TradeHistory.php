@@ -17,6 +17,7 @@ use Kobens\Gemini\Command\Traits\GetNow;
 use Kobens\Gemini\Command\Traits\GetIntArg;
 use Kobens\Gemini\Command\Traits\KillFile;
 use Kobens\Gemini\Command\Traits\TradeRepeater\ExitProgram;
+use Kobens\Gemini\Exception\MaxIterationsException;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Http\Exception\Status\ServerError\GatewayTimeoutException;
 use Symfony\Component\Console\Command\Command;
@@ -27,7 +28,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Adapter\Adapter;
-use Kobens\Gemini\Exception\MaxIterationsException;
 
 final class TradeHistory extends Command
 {
