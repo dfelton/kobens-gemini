@@ -119,8 +119,13 @@ final class TradeSpread
         $orderRange = Subtract::getResult($askMax, $bidMin);
 
         $totalOrderCount = $buyCount + $sellCount;
-        $buyCountPercent = Multiply::getResult(Divide::getResult((string) $buyCount, (string) $totalOrderCount, 2), '100', 2);
-        $sellCountPercent = Multiply::getResult(Divide::getResult((string) $sellCount, (string) $totalOrderCount, 2), '100', 2);
+        if ($totalOrderCount === 0) {
+            $buyCountPercent = '0';
+            $sellCountPercent = '0';
+        } else {
+            $buyCountPercent = Multiply::getResult(Divide::getResult((string) $buyCount, (string) $totalOrderCount, 2), '100', 2);
+            $sellCountPercent = Multiply::getResult(Divide::getResult((string) $sellCount, (string) $totalOrderCount, 2), '100', 2);
+        }
 
         $scale = self::getScale($totalBuy, $totalSell);
         $totalBuy = (string) number_format((float) $totalBuy, $scale);
