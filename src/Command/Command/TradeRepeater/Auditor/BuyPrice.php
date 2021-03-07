@@ -10,7 +10,7 @@ use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Market\GetPriceInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\CancelOrderInterface;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
-use Kobens\Gemini\Command\Command\TradeRepeater\SleeperTrait;
+use Kobens\Gemini\Command\Traits\TradeRepeater\SleeperTrait;
 use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
 use Kobens\Gemini\Exception\Api\Reason\SystemException;
 use Kobens\Gemini\TradeRepeater\Model\Trade;

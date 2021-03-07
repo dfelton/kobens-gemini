@@ -25,6 +25,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Zend\Db\Adapter\Adapter;
+use Kobens\Gemini\Command\Traits\TradeRepeater\DbPing;
 
 /**
  * TODO: Implement a pid file so this command cannot be ran more than process at a time.
@@ -36,6 +38,7 @@ final class Buyer extends Command
     use KillFile;
     use GetIntArg;
     use GetNow;
+    use DbPing;
 
     private const EXCEPTION_DELAY = 60;
     private const DELAY_DEFAULT = 2;
@@ -53,18 +56,22 @@ final class Buyer extends Command
 
     private SleeperInterface $sleeper;
 
+    private Adapter $privateThrottlerAdapter;
+
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,
         BuyReadyInterface $buyReadyInterface,
         BuySentInterface $buySentInterface,
         ForceMakerInterface $forceMakerInterface,
-        SleeperInterface $sleeperInterface
+        SleeperInterface $sleeperInterface,
+        Adapter $privateThrottlerAdapter
     ) {
         $this->shutdown = $shutdownInterface;
         $this->buyReady = $buyReadyInterface;
         $this->buySent = $buySentInterface;
         $this->forceMaker = $forceMakerInterface;
         $this->sleeper = $sleeperInterface;
+        $this->privateThrottlerAdapter = $privateThrottlerAdapter;
         parent::__construct();
     }
 
@@ -82,6 +89,7 @@ final class Buyer extends Command
         while ($this->shutdown->isShutdownModeEnabled() === false && $this->killFileExists(self::KILL_FILE) === false) {
             try {
                 if (!$this->mainLoop($input, $output)) {
+                    $this->ping($this->privateThrottlerAdapter);
                     $this->sleep($delay, $this->sleeper, $this->shutdown);
                 }
             } catch (\Throwable $e) {
