@@ -11,6 +11,7 @@ use Kobens\Gemini\Command\Traits\KillFile;
 use Kobens\Gemini\Command\Traits\GetIntArg;
 use Kobens\Gemini\Command\Traits\GetNow;
 use Kobens\Gemini\Command\Traits\TradeRepeater\ExitProgram;
+use Kobens\Gemini\Command\Traits\TradeRepeater\SleeperTrait;
 use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\Model\Trade;
 use Kobens\Gemini\TradeRepeater\Model\Resource\Trade\Action\ArchiveInterface;

@@ -2,14 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Kobens\Gemini\Command\Command\TradeRepeater;
+namespace Kobens\Gemini\Command\Traits\TradeRepeater;
 
 use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Core\SleeperInterface;
 
-/**
- * TODO From an organizational aspect this doesn't really belong in this namespace.
- */
 trait SleeperTrait
 {
     public function sleep(int $sleepTime, SleeperInterface $sleeper, EmergencyShutdownInterface $shutdown): void

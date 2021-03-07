@@ -8,8 +8,11 @@ use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Core\SleeperInterface;
 use Kobens\Core\Exception\ConnectionException;
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderPlacement\NewOrder\ForceMakerInterface;
+use Kobens\Gemini\Command\Traits\GetIntArg;
+use Kobens\Gemini\Command\Traits\GetNow;
 use Kobens\Gemini\Command\Traits\KillFile;
 use Kobens\Gemini\Command\Traits\TradeRepeater\ExitProgram;
+use Kobens\Gemini\Command\Traits\TradeRepeater\SleeperTrait;
 use Kobens\Gemini\Exception\MaxIterationsException;
 use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
 use Kobens\Gemini\Exception\Api\Reason\SystemException;
@@ -22,8 +25,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Kobens\Gemini\Command\Traits\GetIntArg;
-use Kobens\Gemini\Command\Traits\GetNow;
 
 /**
  * TODO: Implement a pid file so this command cannot be ran more than process at a time.
