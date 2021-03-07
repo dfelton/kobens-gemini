@@ -4,25 +4,27 @@ declare(strict_types=1);
 
 namespace Kobens\Gemini\Command\Command\Market;
 
+use Amp\Dns\DnsException;
+use Amp\Http\Client\Connection\UnprocessedRequestException;
 use Amp\Websocket\Client\ConnectionException;
+use Amp\Websocket\ClosedException;
 use Kobens\Core\ConfigInterface;
+use Kobens\Core\Config;
 use Kobens\Exchange\Exception\ClosedBookException;
+use Kobens\Gemini\Command\Traits\GetNow;
+use Kobens\Gemini\Command\Traits\Output;
 use Kobens\Gemini\Api\WebSocket\MarketData\BookKeeperFactoryInterface;
 use Kobens\Gemini\Exception\Api\WebSocket\SocketSequenceException;
+use Kobens\Gemini\Exchange\Currency\Pair;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Amp\Websocket\ClosedException;
-use Kobens\Core\Config;
-use Kobens\Gemini\Command\Traits\GetNow;
-use Kobens\Gemini\Exchange\Currency\Pair;
-use Amp\Dns\DnsException;
-use Amp\Http\Client\Connection\UnprocessedRequestException;
 
 final class BookKeeper extends Command
 {
     use GetNow;
+    use Output;
 
     protected static $defaultName = 'market:book-keeper';
 
@@ -48,20 +50,10 @@ final class BookKeeper extends Command
     {
         $exitCode = 0;
         if (!$this->shutdown()) {
-            $output->writeln(sprintf(
-                "%s\tStarting book keeper %s",
-                $this->getNow(),
-                $input->getArgument('symbol')
-            ));
             $this->main($input, $output);
         }
         if ($this->shutdown()) {
-            $output->writeln(sprintf(
-                "%s\tShutdown signal detected - %s (%s)",
-                $this->getNow(),
-                self::class,
-                $input->getArgument('symbol')
-            ));
+            $this->writeError(sprintf('Shutdown signal detected (%s)', $input->getArgument('symbol')), $output);
         }
         return $exitCode;
     }
@@ -70,6 +62,16 @@ final class BookKeeper extends Command
     {
         $symbol = Pair::getInstance($input->getArgument('symbol'))->getSymbol();
         $book = $this->bookFactory->create($symbol);
+
+        // TODO: this method is not part of the interface
+        /** @var \Kobens\Gemini\Api\WebSocket\MarketData\BookKeeper $book */
+        if ($book->isOpen()) {
+            $this->writeError(sprintf('Can only open a closed book (%s)', $symbol), $output);
+            return 1;
+        }
+
+        $this->writeNotice(sprintf('Starting book keeper (%s)', $symbol), $output);
+
         do {
             try {
                 $book->openBook();
@@ -108,22 +110,11 @@ final class BookKeeper extends Command
             $seconds = 10;
         }
         if (!$output->isQuiet()) {
-            $output->writeln(sprintf(
-                "<fg=red>%s\tERROR: %s --- %s (%s)</>",
-                $this->getNow(),
-                $message,
-                self::class,
-                $symbol
-            ));
+            $this->writeError(sprintf('%s (%s)', $message, $symbol), $output);
         }
         \sleep($seconds);
         if (!$output->isQuiet()) {
-            $output->writeln(sprintf(
-                "%s\tResuming operations --- %s (%s)",
-                $this->getNow(),
-                self::class,
-                $symbol
-            ));
+            $this->writeNotice(sprintf('%s (%s)', 'Resuming Operations', $symbol), $output);
         }
     }
 }

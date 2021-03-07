@@ -7,8 +7,8 @@ namespace Kobens\Gemini\Api\WebSocket\MarketData;
 use Kobens\Core\Config;
 use Kobens\Exchange\Book\Keeper\AbstractKeeper;
 use Kobens\Exchange\Exception\ClosedBookException;
-use Kobens\Gemini\Exception;
 use Kobens\Gemini\Exception\Api\WebSocket\SocketSequenceException;
+use Kobens\Gemini\Exception\Api\WebSocket\BookAlreadyOpenException;
 
 final class BookKeeper extends AbstractKeeper
 {
@@ -26,20 +26,20 @@ final class BookKeeper extends AbstractKeeper
 
     public function openBook(): void
     {
-        if ($this->isClosed() === false) {
-            throw new Exception('Can only open closed book.');
+        if ($this->isOpen() === true) {
+            throw new BookAlreadyOpenException('Can only open closed book.');
         }
         \Amp\Loop::run($this->getRunClosure());
     }
 
-    private function isClosed(): bool
+    public function isOpen(): bool
     {
         try {
             $this->util->checkPulse();
         } catch (ClosedBookException $e) {
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
     private function getRunClosure(): \Closure
@@ -52,10 +52,16 @@ final class BookKeeper extends AbstractKeeper
             while ($message = yield $connection->receive()) {
                 $payload = yield $message->buffer();
                 $payload = \json_decode($payload);
-                $this->processMessage($payload);
-                $this->setPulse();
-                if ($this->shutdown()) {
+                try {
+                    $this->processMessage($payload);
+                    $this->setPulse();
+                    if ($this->shutdown()) {
+                        \Amp\Loop::stop();
+                    }
+                } catch (\Throwable $e) {
                     \Amp\Loop::stop();
+                    $this->socketSequence = 0;
+                    throw $e;
                 }
             }
         };
