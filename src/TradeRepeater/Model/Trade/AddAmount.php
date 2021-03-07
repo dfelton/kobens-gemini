@@ -55,15 +55,7 @@ final class AddAmount
     public function add(int $id, string $amount): string
     {
         $trade = $this->tradeResource->getById($id);
-        $pair = Pair::getInstance($trade->getSymbol());
-        if (Compare::getResult($amount, $pair->getMinOrderIncrement()) === Compare::LEFT_LESS_THAN) {
-            throw new \InvalidArgumentException(sprintf(
-                'Add amount "%s" is invalid. The "%s" pair\'s minimum order increment is "%s"',
-                $amount,
-                strtoupper($pair->getSymbol()),
-                $pair->getMinOrderIncrement()
-            ));
-        }
+        $this->validateAmount(Pair::getInstance($trade->getSymbol()), $amount);
         $amountAdded = '0';
         switch ($trade->getStatus()) {
             case StatusBuyPlaced::STATUS_CURRENT:
@@ -90,6 +82,28 @@ final class AddAmount
                 ));
         }
         return $amountAdded;
+    }
+
+    public function validateAmount(Pair $pair, string $amount): void
+    {
+        $precisionAllowed = strlen(explode('.', $pair->getMinOrderIncrement())[1] ?? '');
+        $precisionAmount = strlen(explode('.', $amount)[1] ?? '');
+        if ($precisionAmount > $precisionAllowed) {
+            throw new \InvalidArgumentException(sprintf(
+                'Can only increase orders by up to "%d" decimal points, "%d" attempted with "%s".',
+                $precisionAllowed,
+                $precisionAmount,
+                $amount
+            ));
+        }
+        if (Compare::getResult($amount, $pair->getMinOrderIncrement()) === Compare::LEFT_LESS_THAN) {
+            throw new \InvalidArgumentException(sprintf(
+                'Add amount "%s" is invalid. The "%s" pair\'s minimum order increment is "%s"',
+                $amount,
+                strtoupper($pair->getSymbol()),
+                $pair->getMinOrderIncrement()
+            ));
+        }
     }
 
     public function addTo(string $symbol, string $amount, string $priceFrom, string $priceTo): \Generator

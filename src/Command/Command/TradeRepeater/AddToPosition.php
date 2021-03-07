@@ -17,6 +17,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * TODO: Break this up, this class is doing too much.
+ */
 final class AddToPosition extends Command
 {
     use GetIntArg;
@@ -43,9 +46,9 @@ final class AddToPosition extends Command
     protected function configure(): void
     {
         $this->addArgument('symbol', InputArgument::REQUIRED, 'ID of Repeater Record');
-        $this->addArgument('amount', InputArgument::REQUIRED, 'Additional Amount to Buy');
         $this->addArgument('price-from', InputArgument::REQUIRED, 'Price from');
         $this->addArgument('price-to', InputArgument::REQUIRED, 'Price to');
+        $this->addArgument('amount', InputArgument::REQUIRED, 'Additional Amount to Buy');
         $this->addOption('confirm', 'c', InputOption::VALUE_OPTIONAL, 'Confirm', '0');
         $this->addOption('bucket', 'b', InputOption::VALUE_OPTIONAL, 'Use funds from bucket for action.', '1');
     }
@@ -55,16 +58,29 @@ final class AddToPosition extends Command
         $exitCode = 0;
         $pair = Pair::getInstance($input->getArgument('symbol'));
         $amount = $this->getArg($input, 'amount');
+        try {
+            $this->addAmount->validateAmount($pair, $amount);
+            $this->main($input, $output, $pair, $amount);
+        } catch (\InvalidArgumentException $e) {
+            $exitCode = 1;
+            $output->writeln(sprintf('<fg=red>%s</>', $e->getMessage()));
+        }
+
+        return $exitCode;
+    }
+
+    private function main(InputInterface $input, OutputInterface $output, Pair $pair, string $amount): int
+    {
+        $exitCode = 0;
         $priceFrom = $this->getArg($input, 'price-from');
         $priceTo = $this->getArg($input, 'price-to');
+
         if ($input->getOption('confirm') === '1') {
             if ($this->getIntArg($input, 'bucket', 0) === 1) {
                 $this->pullFromBucket($pair, $amount, $priceFrom, $priceTo);
             }
-
-            $addTo = $this->addAmount->addTo($pair->getSymbol(), $amount, $priceFrom, $priceTo);
             try {
-                foreach ($addTo as $result) {
+                foreach ($this->addAmount->addTo($pair->getSymbol(), $amount, $priceFrom, $priceTo) as $result) {
                     /** @var Trade $trade */
                     $trade = $result['trade'];
                     $amountAdded = $result['amount_added'];
@@ -83,7 +99,6 @@ final class AddToPosition extends Command
                         ));
                     } else {
                         $this->returnToBucket($pair, $trade, $amount);
-
                         $output->writeln(sprintf(
                             '<fg=yellow>%s record %d of buy %s %s @ %s %s/%s skipped. No amount added.</>',
                             $trade->getSymbol(),
