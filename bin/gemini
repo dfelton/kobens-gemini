@@ -57,6 +57,9 @@ use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Processor;
 use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Processor\ReInvest;
 use Zend\Db\TableGateway\TableGateway;
 use Kobens\Gemini\TradeRepeater\CliMonitor\AverageOrderSize;
+use Kobens\Gemini\TradeRepeater\UsdProfitsDistributor\TopPairs;
+use Kobens\Gemini\TradeRepeater\UsdProfitsDistributor\LeastInvested;
+use Kobens\Gemini\TradeRepeater\UsdProfitsDistributor\AllPairs;
 
 error_reporting(E_ALL | E_STRICT);
 set_error_handler([new ErrorHandler(), 'handler']);
@@ -211,13 +214,16 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\CliMonitor\AverageOrd
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\UsdProfitsDistributor(
     new \Kobens\Gemini\TradeRepeater\UsdProfitsDistributor(
         $addAmount,
-        $adapter,
         $repeaterProfitsBucket,
         $privateThrottlerAdapter,
         $shutdownInterface,
         $sleeperInterface,
-        $tradeResource,
-        $orderStatusInterface
+        $orderStatusInterface,
+        [
+            new TopPairs($adapter, $tradeResource, $shutdownInterface),
+            new LeastInvested($adapter, $tradeResource, $shutdownInterface),
+            new AllPairs($adapter, $tradeResource, $shutdownInterface),
+        ]
     ),
     $shutdownInterface
 ));

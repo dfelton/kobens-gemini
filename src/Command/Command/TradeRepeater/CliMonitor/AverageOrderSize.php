@@ -37,7 +37,7 @@ final class AverageOrderSize extends Command
         $base = $input->getOption('base');
         $quote = $input->getOption('quote');
         if ($base === null && $quote === null) {
-            $output->write('<fg=red>Please provide either a base or quote currency</>');
+            $output->writeln('<fg=red>Please provide either a base or quote currency</>');
             $exitCode = 1;
         } else {
             try {
@@ -54,6 +54,13 @@ final class AverageOrderSize extends Command
                     $output->writeln(sprintf(
                         'Average Order Amount: %s %s across %d orders',
                         $avg['avg'],
+                        $quote,
+                        $avg['count']
+                    ));
+                    $output->writeln(sprintf(
+                        'Average Amount of %s necessary for minimum order increment: %s %s across %d orders',
+                        $quote,
+                        $avg['min'],
                         $quote,
                         $avg['count']
                     ));

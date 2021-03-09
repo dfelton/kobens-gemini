@@ -25,6 +25,7 @@ final class AverageOrderSize
     {
         $total = '0';
         $count = 0;
+        $min = '0';
         foreach ($this->getNext(null, $baseCurrency) as $row) {
             ++$count;
             $costBasis = Multiply::getResult($row['buy_amount'], $row['buy_price']);
@@ -33,6 +34,7 @@ final class AverageOrderSize
                 $total,
                 Add::getResult($costBasis, $depositAmount)
             );
+            $min = Add::getResult($min, Multiply::getResult(Pair::getInstance($row['symbol'])->getMinOrderIncrement(), $row['buy_price']));
         }
         return [
             'count' => $count,
@@ -41,8 +43,11 @@ final class AverageOrderSize
                 : Divide::getResult(
                     $total,
                     (string) $count,
-                    Currency::getInstance($quoteCurrency)->getScale()
+                    $quoteCurrency === 'usd' ? 6 : Currency::getInstance($quoteCurrency)->getScale()
                 ),
+            'min' => $count === 0
+                ? '0'
+                : Add::getResult(Divide::getResult($min, (string) $count, 20), '0'),
         ];
     }
 

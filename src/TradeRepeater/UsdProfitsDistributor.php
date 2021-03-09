@@ -6,19 +6,19 @@ namespace Kobens\Gemini\TradeRepeater;
 
 use Kobens\Core\EmergencyShutdownInterface;
 use Kobens\Core\SleeperInterface;
+use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
+use Kobens\Gemini\Command\Traits\KillFile;
+use Kobens\Gemini\Exchange\Currency\Pair;
 use Kobens\Gemini\TradeRepeater\Model\Trade\AddAmount;
 use Kobens\Gemini\TradeRepeater\Model\Trade;
-use Kobens\Gemini\TradeRepeater\Model\Resource\Trade as TradeResource;
 use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Bucket;
-use Kobens\Gemini\Command\Traits\KillFile;
+use Kobens\Math\BasicCalculator\Add;
+use Kobens\Math\BasicCalculator\Compare;
+use Kobens\Math\BasicCalculator\Divide;
+use Kobens\Math\BasicCalculator\Multiply;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Adapter\Adapter;
-use Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\OrderStatusInterface;
-use Kobens\Gemini\Exchange\Currency\Pair;
-use Kobens\Math\BasicCalculator\Multiply;
-use Kobens\Math\BasicCalculator\Add;
-use Kobens\Math\BasicCalculator\Compare;
 
 // TODO: There is places we call this a "USD" distributor and there is places we don't assume USD but grab the quote dynamically. Which is it gonna be?
 final class UsdProfitsDistributor implements UsdProfitsDistributorInterface
@@ -39,29 +39,55 @@ final class UsdProfitsDistributor implements UsdProfitsDistributorInterface
 
     private SleeperInterface $sleeper;
 
-    private TradeResource $tradeResource;
-
     private OrderStatusInterface $orderStatus;
+
+    /**
+     * @var UsdProfitsDistributor\RecordSelectorInterface[]
+     */
+    private array $recordSelectors = [];
+
+    private string $usdOrderSize;
 
     public function __construct(
         AddAmount $addAmount,
-        Adapter $adapter,
         Bucket $bucket,
         Adapter $privateThrottlerAdapter,
         EmergencyShutdownInterface $emergencyShutdown,
         SleeperInterface $sleeper,
-        TradeResource $tradeResource,
         OrderStatusInterface $orderStatus,
-        $usdOrderSize = '0.0001'
+        array $recordSelectors,
+        string $usdOrderSize = '0.0005'
     ) {
-        $this->adapter = $adapter;
         $this->addAmount = $addAmount;
         $this->bucket = $bucket;
         $this->privateThrottlerAdapter = $privateThrottlerAdapter;
         $this->sleeper = $sleeper;
         $this->emergencyShutdown = $emergencyShutdown;
-        $this->tradeResource = $tradeResource;
         $this->orderStatus = $orderStatus;
+        $this->usdOrderSize = $usdOrderSize;
+        $this->init($recordSelectors);
+    }
+
+    /**
+     * @param UsdProfitsDistributor\RecordSelectorInterface[] $recordSelectors
+     */
+    private function init(array $recordSelectors): void
+    {
+        if ($recordSelectors === []) {
+            throw new \InvalidArgumentException(sprintf(
+                '"$recordSelectors" must at least one instance as "%s" object.',
+                UsdProfitsDistributor\RecordSelectorInterface::class
+            ));
+        }
+        foreach ($recordSelectors as $selector) {
+            if (!$selector instanceof UsdProfitsDistributor\RecordSelectorInterface) {
+                throw new \InvalidArgumentException(sprintf(
+                    '"$recordSelectors" must only contain instances of "%s"',
+                    UsdProfitsDistributor\RecordSelectorInterface::class
+                ));
+            }
+            $this->recordSelectors[] = $selector;
+        }
     }
 
     public function execute(InputInterface $input, OutputInterface $output): \Generator
@@ -76,9 +102,9 @@ final class UsdProfitsDistributor implements UsdProfitsDistributorInterface
             if (!$this->haveFundsForIncrement($trade)) {
                 yield [
                     'type' => 'notice',
-                    sprintf(
+                    'message' => sprintf(
                         'Waiting for sufficient funds to add %s to %s buy order of %s @ %s %s/%s',
-                        $pair->getMinOrderIncrement(),
+                        $this->getAddAmount($trade),
                         strtoupper($pair->getSymbol()),
                         $trade->getBuyAmount(),
                         $trade->getBuyPrice(),
@@ -92,6 +118,7 @@ final class UsdProfitsDistributor implements UsdProfitsDistributorInterface
                     ! $this->haveFundsForIncrement($trade) &&
                     $isAvailableToAddTo == true
                 ) {
+                    $this->privateThrottlerAdapter->query('SELECT 1')->execute(); // ping database to keep connection alive
                     $this->sleeper->sleep(
                         60,
                         function (): bool {
@@ -102,13 +129,17 @@ final class UsdProfitsDistributor implements UsdProfitsDistributorInterface
                 }
             }
             // Need to check again in case status changed while sleeping during a wait for funds
-            if ($isAvailableToAddTo) {
+            if (
+                $isAvailableToAddTo === true &&
+                $this->emergencyShutdown->isShutdownModeEnabled() == false &&
+                $this->killFileExists(self::KILL_FILE) === false
+            ) {
                 try {
-                    $amountAdded = $this->addAmount->add($trade->getId(), $pair->getMinOrderIncrement());
+                    $amountAdded = $this->addAmount->add($trade->getId(), $this->getAddAmount($trade));
                     if (Compare::getResult($amountAdded, '0') === Compare::LEFT_GREATER_THAN) {
                         $this->bucket->removeFromBucket(
                             $pair->getQuote()->getSymbol(),
-                            $this->getFundsRequiredForMinOrderIncrement($trade)
+                            $this->getFundsRequiredForOrderIncrement($trade)
                         );
                     }
                     yield [
@@ -117,7 +148,7 @@ final class UsdProfitsDistributor implements UsdProfitsDistributorInterface
                             "Increased %s buy order of %s by amount of %s @ %s %s/%s",
                             strtoupper($trade->getSymbol()),
                             $trade->getBuyAmount(),
-                            $pair->getMinOrderIncrement(),
+                            $this->getAddAmount($trade),
                             $trade->getBuyPrice(),
                             strtoupper($pair->getBase()->getSymbol()),
                             strtoupper($pair->getQuote()->getSymbol())
@@ -131,13 +162,23 @@ final class UsdProfitsDistributor implements UsdProfitsDistributorInterface
                     throw $e;
                 }
             }
+            usleep(100000);
         }
     }
 
-    private function getFundsRequiredForMinOrderIncrement(Trade $trade): string
+    private function getAddAmount(Trade $trade): string
     {
         $pair = Pair::getInstance($trade->getSymbol());
-        $quoteAmount = Multiply::getResult($trade->getBuyPrice(), $pair->getMinOrderIncrement());
+        $amount = Divide::getResult($this->usdOrderSize, $trade->getBuyPrice(), strlen(explode('.', $pair->getMinOrderIncrement())[1] ?? ''));
+        if (Compare::getResult($amount, $pair->getMinOrderIncrement()) === Compare::LEFT_LESS_THAN) {
+            $amount = $pair->getMinOrderIncrement();
+        }
+        return $amount;
+    }
+
+    private function getFundsRequiredForOrderIncrement(Trade $trade): string
+    {
+        $quoteAmount = Multiply::getResult($trade->getBuyPrice(), $this->getAddAmount($trade));
         $depositAmount = Multiply::getResult($quoteAmount, '0.0035'); // TODO: Reference constant or class or something...
         return Add::getResult($quoteAmount, $depositAmount);
     }
@@ -157,7 +198,7 @@ final class UsdProfitsDistributor implements UsdProfitsDistributorInterface
 
     private function haveFundsForIncrement(Trade $trade): bool
     {
-        $requiredAmount = $this->getFundsRequiredForMinOrderIncrement($trade);
+        $requiredAmount = $this->getFundsRequiredForOrderIncrement($trade);
         $bucketContains = $this->bucket->get(Pair::getInstance($trade->getSymbol())->getQuote()->getSymbol());
 
         return Compare::getResult($requiredAmount, $bucketContains) === Compare::LEFT_LESS_THAN;
@@ -165,48 +206,15 @@ final class UsdProfitsDistributor implements UsdProfitsDistributorInterface
 
     private function getNext(): \Generator
     {
-        // TODO: good spot to implement multiple strategies, where one strategy runs after another.
-        // The act of iterating through all possible and incrementing only minimum amount possible
-        // ensures we're "adding something to everything" but doesn't evenly distribute USD.
-        // We could have strategies that take a round to "apply to better performing" or "apply to
-        // ones with lowest USD investment", etc.
-
-        // ^ keep that idea but thisis not the right spot... as it is not where we decide amount to be added.
-        // Each strategy will need their own getNext() or something and strategies get invoked earlier on
-
-        $lastId = 4873; // TODO: Start at 0 every time or log where it left off on last excution and resume from there?
         while (
             ! $this->emergencyShutdown->isShutdownModeEnabled() &&
             ! $this->killFileExists(self::KILL_FILE)
         ) {
-            $trade = $this->fetch($lastId);
-            if ($trade) {
-                $lastId = $trade->getId();
-
-                // TODO: Remove check on yfiusd once there is more "distribution strategies" implemented.
-                //       Until then that pair just sucks up too much USD in relation to all the other pairs.
-                $pair = Pair::getInstance($trade->getSymbol());
-                if ($pair->getQuote()->getSymbol() === 'usd' && $pair->getSymbol() !== 'yfiusd') {
+            foreach ($this->recordSelectors as $selector) {
+                foreach ($selector->get() as $trade) {
                     yield $trade;
-                    $this->privateThrottlerAdapter->query('SELECT 1')->execute(); // ping database to keep connection alive
                 }
-            } else {
-                $lastId = 0;
-//                 $this->sleeper->sleep(
-//                     60,
-//                     function(): bool {
-//                         return $this->emergencyShutdown->isShutdownModeEnabled();
-//                     }
-//                 );
             }
         }
-    }
-
-    private function fetch(int $lastId): ?Trade
-    {
-        $results = $this->adapter->query(
-            'SELECT id FROM trade_repeater WHERE `id` > :id AND `status` = :status ORDER BY `id` LIMIT 1'
-        )->execute(['id' => $lastId, 'status' => 'BUY_PLACED']);
-        return $results->count() === 1 ? $this->tradeResource->getById((int) $results->current()['id']) : null;
     }
 }
