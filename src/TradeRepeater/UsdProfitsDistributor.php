@@ -56,7 +56,7 @@ final class UsdProfitsDistributor implements UsdProfitsDistributorInterface
         SleeperInterface $sleeper,
         OrderStatusInterface $orderStatus,
         array $recordSelectors,
-        string $usdOrderSize = '0.0005'
+        string $usdOrderSize = '0.005'
     ) {
         $this->addAmount = $addAmount;
         $this->bucket = $bucket;
