@@ -16,6 +16,6 @@ trait DbPing
      */
     private function ping(Adapter $adapter): void
     {
-        $adapter->query('SELECT "" AS ping');
+        $adapter->query('SELECT "" AS ping')->execute();
     }
 }
