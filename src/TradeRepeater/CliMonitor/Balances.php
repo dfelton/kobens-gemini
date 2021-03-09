@@ -116,6 +116,9 @@ final class Balances
 //                     (string) $dataHelper->getNotional(strtolower($row[0]) . 'usd', $rawEnd)
 //                 );
             }
+            if ($isUsd === false) {
+                $row[0] = sprintf('<fg=%s>%s</>', $color, $row[0]);
+            }
             $table->addRow($row);
         }
         foreach (array_keys($extra) as $symbol) {
