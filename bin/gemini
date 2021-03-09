@@ -56,6 +56,7 @@ use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Bucket;
 use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Processor;
 use Kobens\Gemini\TradeRepeater\Model\Trade\Profits\Processor\ReInvest;
 use Zend\Db\TableGateway\TableGateway;
+use Kobens\Gemini\TradeRepeater\CliMonitor\AverageOrderSize;
 
 error_reporting(E_ALL | E_STRICT);
 set_error_handler([new ErrorHandler(), 'handler']);
@@ -204,6 +205,22 @@ $app = new \Symfony\Component\Console\Application($composer->name, $composer->ve
 $app->add(new \Kobens\Gemini\Command\Command\Info\Pair());
 
 // TODO: All TradeRepeater classes will need to use Kobens\Gemini\Api\Rest\* objects that have their own KeyInterface per TradeRepeater to avoid Nonce clashing
+
+// TODO: This "UsdProfitsDistributor" is REALLY going to need its own private key
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\CliMonitor\AverageOrderSize(new AverageOrderSize($adapter)));
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\UsdProfitsDistributor(
+    new \Kobens\Gemini\TradeRepeater\UsdProfitsDistributor(
+        $addAmount,
+        $adapter,
+        $repeaterProfitsBucket,
+        $privateThrottlerAdapter,
+        $shutdownInterface,
+        $sleeperInterface,
+        $tradeResource,
+        $orderStatusInterface
+    ),
+    $shutdownInterface
+));
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\AddToPosition($addAmount, $repeaterProfitsBucket, $tradeResource));
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\PricePointGenerator(
     $adapter,
