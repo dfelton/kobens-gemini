@@ -211,6 +211,7 @@ $app->add(new \Kobens\Gemini\Command\Command\Info\Pair());
 
 // TODO: This "UsdProfitsDistributor" is REALLY going to need its own private key
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\CliMonitor\AverageOrderSize(new AverageOrderSize($adapter)));
+$app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Bucket($repeaterProfitsBucket));
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\UsdProfitsDistributor(
     new \Kobens\Gemini\TradeRepeater\UsdProfitsDistributor(
         $addAmount,
