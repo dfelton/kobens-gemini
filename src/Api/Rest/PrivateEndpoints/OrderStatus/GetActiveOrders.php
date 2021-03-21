@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus;
 
 use Kobens\Gemini\Api\Rest\PrivateEndpoints\RequestInterface;
+use Kobens\Http\Exception\Status\ServerError\BadGatewayException;
+use Kobens\Http\Exception\Status\ServerError\GatewayTimeoutException;
 
-class GetActiveOrders implements GetActiveOrdersInterface
+final class GetActiveOrders implements GetActiveOrdersInterface
 {
-    protected const URL_PATH = '/v1/orders';
+    private const URL_PATH = '/v1/orders';
 
     private RequestInterface $request;
 
@@ -20,7 +22,17 @@ class GetActiveOrders implements GetActiveOrdersInterface
 
     public function getOrders(): array
     {
-        $response = $this->request->getResponse(self::URL_PATH, [], [], true);
+        $response = null;
+        $i = 0;
+        while ($response === null && ++$i <= 15) {
+            try {
+                $response = $this->request->getResponse(self::URL_PATH, [], [], true);
+            } catch (BadGatewayException | GatewayTimeoutException $e) {
+                if ($i >= 15) {
+                    throw $e;
+                }
+            }
+        }
         return \json_decode($response->getBody());
     }
 }
