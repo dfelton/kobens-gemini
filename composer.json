@@ -42,7 +42,7 @@
         "ext-mbstring": "*",
         "amphp/websocket-client": "^1.0",
         "kobens/kobens-core": "dev-master",
-        "kobens/kobens-currency": "^2.3",
+        "kobens/kobens-currency": "^3.0",
         "kobens/kobens-exchange": "dev-master",
         "kobens/kobens-http": "dev-master",
         "kobens/kobens-math": "^2.0",
