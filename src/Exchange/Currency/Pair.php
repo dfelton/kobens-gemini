@@ -15,6 +15,9 @@ final class Pair extends CurrencyPair implements PairInterface
     private string $minPriceIncrement;
 
     private static array $pairs = [
+        // 1inch - https://1inch.exchange/
+        '1inchusd' => ['base' => '1inch', 'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
+
         // Aave - https://aave.com/
         'aaveusd'  => ['base' => 'aave',  'quote' => 'usd', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
 
@@ -34,6 +37,9 @@ final class Pair extends CurrencyPair implements PairInterface
         'bchbtc'   => ['base' => 'bch',   'quote' => 'btc', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
         'bcheth'   => ['base' => 'bch',   'quote' => 'eth', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
 
+        // Bancor Network Token - https://app.bancor.network/
+        'bntusd'   => ['base' => 'bnt',   'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
+
         // Bitcoin
         'btcusd'   => ['base' => 'btc',   'quote' => 'usd', 'minOrderSize' => '0.00001', 'minOrderIncrement' => '0.00000001', 'minPriceIncrement' => '0.01'],
         'btcdai'   => ['base' => 'btc',   'quote' => 'dai', 'minOrderSize' => '0.00001', 'minOrderIncrement' => '0.00000001', 'minPriceIncrement' => '0.01'],
@@ -47,21 +53,30 @@ final class Pair extends CurrencyPair implements PairInterface
         // Dai Stablecoin
         'daiusd'   => ['base' => 'dai',   'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
 
+        // Enjin
+        'enjusd'   => ['base' => 'enj',   'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
+
         // Ethereum
         'ethbtc'   => ['base' => 'eth',   'quote' => 'btc', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
         'ethdai'   => ['base' => 'eth',   'quote' => 'dai', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.01'],
         'ethusd'   => ['base' => 'eth',   'quote' => 'usd', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.01'],
 
-        // Kyber Network
-        'kncusd'   => ['base' => 'knc',   'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
-
         // Filecoin
         'filusd'   => ['base' => 'fil',   'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
+
+        // The Graph
+        'grtusd'   => ['base' => 'grt',   'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
+
+        // Kyber Network
+        'kncusd'   => ['base' => 'knc',   'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
 
         // Chainlink
         'linkbtc'  => ['base' => 'link',  'quote' => 'btc', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00000001'],
         'linketh'  => ['base' => 'link',  'quote' => 'eth', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0000001'],
         'linkusd'  => ['base' => 'link',  'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
+
+        // Loopring
+        'lrcusd'   => ['base' => 'lrc',   'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
 
         // Litecoin
         'ltcbch'   => ['base' => 'ltc',   'quote' => 'bch', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.00001',    'minPriceIncrement' => '0.0001'],
@@ -86,30 +101,36 @@ final class Pair extends CurrencyPair implements PairInterface
         // RenVM - https://renproject.io/
         'renusd'   => ['base' => 'ren',   'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
 
-        // Storj - https://storj.io/
-        'storjusd' => ['base' => 'storj', 'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
+        // The Sandbox
+        'sandusd'  => ['base' => 'sand',  'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
+
+        // SKALE Token - https://skale.network/token
+        'sklusd'   => ['base' => 'skl',   'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
 
         // Synthetix - https://www.synthetix.io/
         'snxusd'   => ['base' => 'snx',   'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
 
+        // Storj - https://storj.io/
+        'storjusd' => ['base' => 'storj', 'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
+
         // Universal Market Access - https://umaproject.org/
-        'umausd'  => ['base' => 'uma',   'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
+        'umausd'  => ['base' => 'uma',   'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',    'minPriceIncrement' => '0.0001'],
 
         // Uniswap - https://uniswap.org/
-        'uniusd'  => ['base' => 'uni',   'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
+        'uniusd'  => ['base' => 'uni',   'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',    'minPriceIncrement' => '0.0001'],
 
         // Yearn Finance - https://yearn.finance/
-        'yfiusd'  => ['base' => 'yfi',   'quote' => 'usd', 'minOrderSize' => '0.00001', 'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.01'],
+        'yfiusd'  => ['base' => 'yfi',   'quote' => 'usd', 'minOrderSize' => '0.00001', 'minOrderIncrement' => '0.000001',    'minPriceIncrement' => '0.01'],
 
         // ZCash
-        'zecbch'  => ['base' => 'zec',   'quote' => 'bch', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
-        'zecbtc'  => ['base' => 'zec',   'quote' => 'btc', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
-        'zeceth'  => ['base' => 'zec',   'quote' => 'eth', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
-        'zecltc'  => ['base' => 'zec',   'quote' => 'ltc', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.001'],
-        'zecusd'  => ['base' => 'zec',   'quote' => 'usd', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.01'],
+        'zecbch'  => ['base' => 'zec',   'quote' => 'bch', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',    'minPriceIncrement' => '0.0001'],
+        'zecbtc'  => ['base' => 'zec',   'quote' => 'btc', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',    'minPriceIncrement' => '0.00001'],
+        'zeceth'  => ['base' => 'zec',   'quote' => 'eth', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',    'minPriceIncrement' => '0.0001'],
+        'zecltc'  => ['base' => 'zec',   'quote' => 'ltc', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',    'minPriceIncrement' => '0.001'],
+        'zecusd'  => ['base' => 'zec',   'quote' => 'usd', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',    'minPriceIncrement' => '0.01'],
 
         // 0x - https://0x.org/
-        'zrxusd'  => ['base' => 'zrx',   'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
+        'zrxusd'  => ['base' => 'zrx',   'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',    'minPriceIncrement' => '0.00001'],
     ];
 
     /**
