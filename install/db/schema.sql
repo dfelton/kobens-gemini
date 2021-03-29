@@ -142,6 +142,21 @@ CREATE TABLE IF NOT EXISTS `taxes_zecusd_sell_log` (
 -- ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - Form 8949';
 
 
+DROP TABLE IF EXISTS `trade_history_1inchusd`;
+CREATE TABLE `trade_history_1inchusd` (
+  `tid` bigint(13) unsigned NOT NULL COMMENT 'Transaction ID',
+  `price` varchar(50) NOT NULL COMMENT 'Price',
+  `amount` varchar(50) NOT NULL COMMENT 'Amount',
+  `timestampms` bigint(13) unsigned NOT NULL COMMENT 'Timestamp Milliseconds',
+  `type` varchar(4) NOT NULL COMMENT 'Type',
+  `aggressor` tinyint(1) NOT NULL COMMENT 'Aggressor',
+  `fee_currency` varchar(10) NOT NULL COMMENT 'Fee Currency',
+  `fee_amount` varchar(50) NOT NULL COMMENT 'Fee Amount',
+  `order_id` bigint(13) unsigned NOT NULL COMMENT 'Order Id',
+  `client_order_id` varchar(100) DEFAULT NULL,
+  `trade_date` timestamp NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Trade Date',
+  PRIMARY KEY (`tid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History 1INCHUSD';
 
 
 DROP TABLE IF EXISTS `trade_history_aaveusd`;
@@ -224,6 +239,23 @@ CREATE TABLE `trade_history_bchusd` (
   PRIMARY KEY (`tid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History BCHUSD';
 
+DROP TABLE IF EXISTS `trade_history_bntusd`;
+CREATE TABLE `trade_history_bntusd` (
+  `tid` bigint(13) unsigned NOT NULL COMMENT 'Transaction ID',
+  `price` varchar(50) NOT NULL COMMENT 'Price',
+  `amount` varchar(50) NOT NULL COMMENT 'Amount',
+  `timestampms` bigint(13) unsigned NOT NULL COMMENT 'Timestamp Milliseconds',
+  `type` varchar(4) NOT NULL COMMENT 'Type',
+  `aggressor` tinyint(1) NOT NULL COMMENT 'Aggressor',
+  `fee_currency` varchar(10) NOT NULL COMMENT 'Fee Currency',
+  `fee_amount` varchar(50) NOT NULL COMMENT 'Fee Amount',
+  `order_id` bigint(13) unsigned NOT NULL COMMENT 'Order Id',
+  `client_order_id` varchar(100) DEFAULT NULL,
+  `trade_date` timestamp NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Trade Date',
+  PRIMARY KEY (`tid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History BNTUSD';
+
+
 DROP TABLE IF EXISTS `trade_history_btcusd`;
 CREATE TABLE `trade_history_btcusd` (
   `tid` bigint(13) unsigned NOT NULL COMMENT 'Transaction ID',
@@ -288,6 +320,22 @@ CREATE TABLE `trade_history_daiusd` (
   PRIMARY KEY (`tid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History DAIUSD';
 
+DROP TABLE IF EXISTS `trade_history_enjusd`;
+CREATE TABLE `trade_history_enjusd` (
+  `tid` bigint(13) unsigned NOT NULL COMMENT 'Transaction ID',
+  `price` varchar(50) NOT NULL COMMENT 'Price',
+  `amount` varchar(50) NOT NULL COMMENT 'Amount',
+  `timestampms` bigint(13) unsigned NOT NULL COMMENT 'Timestamp Milliseconds',
+  `type` varchar(4) NOT NULL COMMENT 'Type',
+  `aggressor` tinyint(1) NOT NULL COMMENT 'Aggressor',
+  `fee_currency` varchar(10) NOT NULL COMMENT 'Fee Currency',
+  `fee_amount` varchar(50) NOT NULL COMMENT 'Fee Amount',
+  `order_id` bigint(13) unsigned NOT NULL COMMENT 'Order Id',
+  `client_order_id` varchar(100) DEFAULT NULL,
+  `trade_date` timestamp NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Trade Date',
+  PRIMARY KEY (`tid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History ENJUSD';
+
 DROP TABLE IF EXISTS `trade_history_ethusd`;
 CREATE TABLE `trade_history_ethusd` (
   `tid` bigint(13) unsigned NOT NULL COMMENT 'Transaction ID',
@@ -319,6 +367,22 @@ CREATE TABLE `trade_history_filusd` (
   `trade_date` timestamp NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Trade Date',
   PRIMARY KEY (`tid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History FILUSD';
+
+DROP TABLE IF EXISTS `trade_history_grtusd`;
+CREATE TABLE `trade_history_grtusd` (
+  `tid` bigint(13) unsigned NOT NULL COMMENT 'Transaction ID',
+  `price` varchar(50) NOT NULL COMMENT 'Price',
+  `amount` varchar(50) NOT NULL COMMENT 'Amount',
+  `timestampms` bigint(13) unsigned NOT NULL COMMENT 'Timestamp Milliseconds',
+  `type` varchar(4) NOT NULL COMMENT 'Type',
+  `aggressor` tinyint(1) NOT NULL COMMENT 'Aggressor',
+  `fee_currency` varchar(10) NOT NULL COMMENT 'Fee Currency',
+  `fee_amount` varchar(50) NOT NULL COMMENT 'Fee Amount',
+  `order_id` bigint(13) unsigned NOT NULL COMMENT 'Order Id',
+  `client_order_id` varchar(100) DEFAULT NULL,
+  `trade_date` timestamp NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Trade Date',
+  PRIMARY KEY (`tid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History GRTUSD';
 
 DROP TABLE IF EXISTS `trade_history_kncusd`;
 CREATE TABLE `trade_history_kncusd` (
@@ -352,6 +416,21 @@ CREATE TABLE `trade_history_linkusd` (
   PRIMARY KEY (`tid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History LINKUSD';
 
+DROP TABLE IF EXISTS `trade_history_lrcusd`;
+CREATE TABLE `trade_history_lrcusd` (
+  `tid` bigint(13) unsigned NOT NULL COMMENT 'Transaction ID',
+  `price` varchar(50) NOT NULL COMMENT 'Price',
+  `amount` varchar(50) NOT NULL COMMENT 'Amount',
+  `timestampms` bigint(13) unsigned NOT NULL COMMENT 'Timestamp Milliseconds',
+  `type` varchar(4) NOT NULL COMMENT 'Type',
+  `aggressor` tinyint(1) NOT NULL COMMENT 'Aggressor',
+  `fee_currency` varchar(10) NOT NULL COMMENT 'Fee Currency',
+  `fee_amount` varchar(50) NOT NULL COMMENT 'Fee Amount',
+  `order_id` bigint(13) unsigned NOT NULL COMMENT 'Order Id',
+  `client_order_id` varchar(100) DEFAULT NULL,
+  `trade_date` timestamp NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Trade Date',
+  PRIMARY KEY (`tid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History LRCUSD';
 
 DROP TABLE IF EXISTS `trade_history_ltcusd`;
 CREATE TABLE `trade_history_ltcusd` (
@@ -448,6 +527,38 @@ CREATE TABLE `trade_history_renusd` (
   `trade_date` timestamp NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Trade Date',
   PRIMARY KEY (`tid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History RENUSD';
+
+DROP TABLE IF EXISTS `trade_history_sandusd`;
+CREATE TABLE `trade_history_sandusd` (
+  `tid` bigint(13) unsigned NOT NULL COMMENT 'Transaction ID',
+  `price` varchar(50) NOT NULL COMMENT 'Price',
+  `amount` varchar(50) NOT NULL COMMENT 'Amount',
+  `timestampms` bigint(13) unsigned NOT NULL COMMENT 'Timestamp Milliseconds',
+  `type` varchar(4) NOT NULL COMMENT 'Type',
+  `aggressor` tinyint(1) NOT NULL COMMENT 'Aggressor',
+  `fee_currency` varchar(10) NOT NULL COMMENT 'Fee Currency',
+  `fee_amount` varchar(50) NOT NULL COMMENT 'Fee Amount',
+  `order_id` bigint(13) unsigned NOT NULL COMMENT 'Order Id',
+  `client_order_id` varchar(100) DEFAULT NULL,
+  `trade_date` timestamp NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Trade Date',
+  PRIMARY KEY (`tid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History SANDUSD';
+
+DROP TABLE IF EXISTS `trade_history_sklusd`;
+CREATE TABLE `trade_history_sklusd` (
+  `tid` bigint(13) unsigned NOT NULL COMMENT 'Transaction ID',
+  `price` varchar(50) NOT NULL COMMENT 'Price',
+  `amount` varchar(50) NOT NULL COMMENT 'Amount',
+  `timestampms` bigint(13) unsigned NOT NULL COMMENT 'Timestamp Milliseconds',
+  `type` varchar(4) NOT NULL COMMENT 'Type',
+  `aggressor` tinyint(1) NOT NULL COMMENT 'Aggressor',
+  `fee_currency` varchar(10) NOT NULL COMMENT 'Fee Currency',
+  `fee_amount` varchar(50) NOT NULL COMMENT 'Fee Amount',
+  `order_id` bigint(13) unsigned NOT NULL COMMENT 'Order Id',
+  `client_order_id` varchar(100) DEFAULT NULL,
+  `trade_date` timestamp NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Trade Date',
+  PRIMARY KEY (`tid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History SKLUSD';
 
 DROP TABLE IF EXISTS `trade_history_snxusd`;
 CREATE TABLE `trade_history_snxusd` (

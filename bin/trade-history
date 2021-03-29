@@ -3,6 +3,12 @@
 #
 # Trade History Processes
 #
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history 1inchusd"
+if [ $? -eq 1 ]; then
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history 1inchusd &
+    sleep 0.2
+fi
+
 ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history aaveusd"
 if [ $? -eq 1 ]; then
     php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history aaveusd &
@@ -33,6 +39,12 @@ if [ $? -eq 1 ]; then
     sleep 0.2
 fi
 
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history bntusd"
+if [ $? -eq 1 ]; then
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history bntusd &
+    sleep 0.2
+fi
+
 ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history btcusd"
 if [ $? -eq 1 ]; then
     php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history btcusd &
@@ -57,9 +69,21 @@ if [ $? -eq 1 ]; then
     sleep 0.2
 fi
 
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history enjusd"
+if [ $? -eq 1 ]; then
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history enjusd &
+    sleep 0.2
+fi
+
 ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history filusd"
 if [ $? -eq 1 ]; then
     php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history filusd &
+    sleep 0.2
+fi
+
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history grtusd"
+if [ $? -eq 1 ]; then
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history grtusd &
     sleep 0.2
 fi
 
@@ -72,6 +96,12 @@ fi
 ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history linkusd"
 if [ $? -eq 1 ]; then
     php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history linkusd &
+    sleep 0.2
+fi
+
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history lrcusd"
+if [ $? -eq 1 ]; then
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history lrcusd &
     sleep 0.2
 fi
 
@@ -102,6 +132,18 @@ fi
 ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history renusd"
 if [ $? -eq 1 ]; then
     php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history renusd &
+    sleep 0.2
+fi
+
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history sandusd"
+if [ $? -eq 1 ]; then
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history sandusd &
+    sleep 0.2
+fi
+
+ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history sklusd"
+if [ $? -eq 1 ]; then
+    php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history sklusd &
     sleep 0.2
 fi
 
