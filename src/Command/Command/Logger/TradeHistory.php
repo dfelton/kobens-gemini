@@ -40,7 +40,7 @@ final class TradeHistory extends Command
 
     private const KILL_FILE = 'kill_logger_trade_history';
 
-    private const DELAY_DEFAULT  = 60;
+    private const DELAY_DEFAULT  = 600;
     private const MIN_DELAY      = 30;
     private const MAX_DELAY      = 600;
 
