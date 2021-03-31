@@ -269,7 +269,8 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor\WebSocket
     $buyPlacedInterface,
     $sellPlacedInterface,
     $sleeperInterface,
-    new GetRecordId()
+    new GetRecordId(),
+    $adapter
 ));
 
 $restFillMonitorKey = new Key(

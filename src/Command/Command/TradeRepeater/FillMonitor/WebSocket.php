@@ -27,6 +27,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Zend\Db\Adapter\Adapter;
 
 final class WebSocket extends Command
 {
@@ -39,6 +40,8 @@ final class WebSocket extends Command
     private const KILL_FILE = 'kill_repeater_fill_monitor_websocket';
 
     protected static $defaultName = 'repeater:fill-monitor-websocket';
+
+    private Adapter $adapter;
 
     private BuyPlacedInterface $buyPlaced;
 
@@ -64,7 +67,8 @@ final class WebSocket extends Command
         BuyPlacedInterface $buyPlacedInterface,
         SellPlacedInterface $sellPlacedInterface,
         SleeperInterface $sleeperInterface,
-        GetRecordIdInterface $getRecordId
+        GetRecordIdInterface $getRecordId,
+        Adapter $adapter
     ) {
         $this->shutdown = $shutdownInterface;
         $this->host = $hostInterface;
@@ -74,6 +78,7 @@ final class WebSocket extends Command
         $this->sellPlaced = $sellPlacedInterface;
         $this->sleeper = $sleeperInterface;
         $this->getRecordId = $getRecordId;
+        $this->adapter = $adapter;
         parent::__construct();
     }
 
@@ -134,6 +139,7 @@ final class WebSocket extends Command
     {
         switch (true) {
             case $msg['type'] === 'heartbeat':
+                $this->adapter->query('SELECT 1')->execute(); // ping db to keep connection alive
                 if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                     $output->writeln(sprintf(
                         "%s\tHeartbeat Received - %s",
