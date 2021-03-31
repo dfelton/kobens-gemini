@@ -29,7 +29,7 @@ final class Account extends Command
     private const REFRESH_MIN = 5;
     private const REFRESH_MAX = 3600;
 
-    protected static $defaultName = 'repeater:monitor:account';
+    protected static $defaultName = 'repeater:account';
 
     private SleeperInterface $sleeper;
 
@@ -55,10 +55,10 @@ final class Account extends Command
     protected function configure(): void
     {
         $this->setDescription('Monitoring: Account Summary');
-        $this->addOption('amount', null, InputOption::VALUE_OPTIONAL, 'Show balance(s) "Amount".', false);
-        $this->addOption('amount-notional', null, InputOption::VALUE_OPTIONAL, 'Show balance(s) "Notional Amount".', false);
-        $this->addOption('available', null, InputOption::VALUE_OPTIONAL, 'Show balance(s) "Amount Available".', false);
-        $this->addOption('available-notional', null, InputOption::VALUE_OPTIONAL, 'Show balance(s) "Amount Available Notional"', false);
+        $this->addOption('amount', null, InputOption::VALUE_OPTIONAL, 'Show balance(s) "Amount".', true);
+        $this->addOption('amount-notional', null, InputOption::VALUE_OPTIONAL, 'Show balance(s) "Notional Amount".', true);
+        $this->addOption('available', null, InputOption::VALUE_OPTIONAL, 'Show balance(s) "Amount Available".', true);
+        $this->addOption('available-notional', null, InputOption::VALUE_OPTIONAL, 'Show balance(s) "Amount Available Notional"', true);
         $this->addOption('disable-loop', 'd', InputOption::VALUE_OPTIONAL, 'Disable continuous output', false);
         $this->addOption(
             'refresh',
