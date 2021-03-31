@@ -12,7 +12,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 final class AverageOrderSize extends Command
 {
-    protected static $defaultName = 'repeater:monitor:avg-size';
+    protected static $defaultName = 'repeater:avg-size';
 
     private ModelAverageOrderSize $averageOrderSize;
 

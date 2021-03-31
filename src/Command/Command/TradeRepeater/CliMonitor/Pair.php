@@ -26,7 +26,7 @@ final class Pair extends Command
     private const REFRESH_MIN = 5;
     private const REFRESH_MAX = 3600;
 
-    protected static $defaultName = 'repeater:monitor:pair';
+    protected static $defaultName = 'repeater:pair';
 
     private SleeperInterface $sleeper;
 
