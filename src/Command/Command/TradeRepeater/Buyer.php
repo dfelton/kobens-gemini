@@ -27,6 +27,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Db\Adapter\Adapter;
 use Kobens\Gemini\Command\Traits\TradeRepeater\DbPing;
+use Kobens\Gemini\Command\Traits\Output;
+use Kobens\Gemini\Exception\Api\Reason\MarketNotOpenException;
 
 /**
  * TODO: Implement a pid file so this command cannot be ran more than process at a time.
@@ -39,6 +41,7 @@ final class Buyer extends Command
     use GetIntArg;
     use GetNow;
     use DbPing;
+    use Output;
 
     private const EXCEPTION_DELAY = 60;
     private const DELAY_DEFAULT = 2;
@@ -57,6 +60,8 @@ final class Buyer extends Command
     private SleeperInterface $sleeper;
 
     private Adapter $privateThrottlerAdapter;
+
+    private array $closedMarkets = [];
 
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,
@@ -87,6 +92,12 @@ final class Buyer extends Command
         $exitCode = 0;
         $delay = $this->getIntArg($input, 'delay', self::DELAY_DEFAULT);
         while ($this->shutdown->isShutdownModeEnabled() === false && $this->killFileExists(self::KILL_FILE) === false) {
+            foreach (array_keys($this->closedMarkets) as $timeLastAttempt) {
+                // Allow for checking if the market is open once every minute
+                if (time() - $timeLastAttempt > 60) {
+                    unset($this->closedMarkets[$timeLastAttempt]);
+                }
+            }
             try {
                 if (!$this->mainLoop($input, $output)) {
                     $this->ping($this->privateThrottlerAdapter);
@@ -108,6 +119,9 @@ final class Buyer extends Command
         foreach ($this->buyReady->getHealthyRecords() as $row) {
             if ($this->shutdown->isShutdownModeEnabled()) {
                 break;
+            }
+            if (in_array($row->getSymbol(), $this->closedMarkets)) {
+                continue;
             }
 
             $buyClientOrderId = 'repeater_' . $row->getId() . '_buy_' . \microtime(true);
@@ -150,9 +164,13 @@ final class Buyer extends Command
                 $row->getBuyPrice(),
                 $buyClientOrderId
             );
+        } catch (MarketNotOpenException $e) {
+            $this->buyReady->resetState($row->getId());
+            $this->closedMarkets[time()] = $row->getSymbol();
+            $this->writeNotice(sprintf('Market Not Currently Open: %s', $row->getSymbol()), $output);
         } catch (ConnectionException $e) {
             $this->buyReady->resetState($row->getId());
-            $output->writeln("<fg=red>{$this->getNow()}\tConnection Exception Occurred.</>");
+            $this->writeWarning('Connection Exception Occurred', $output);
         } catch (MaintenanceException | SystemException $e) {
             $this->buyReady->resetState($row->getId());
             $output->writeln("<fg=red>{$this->getNow()}\t ({$row->symbol}) $e->getMessage()");
