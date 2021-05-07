@@ -28,6 +28,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Adapter\Adapter;
+use Kobens\Gemini\Command\Traits\Output;
+use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
 
 final class TradeHistory extends Command
 {
@@ -35,6 +37,7 @@ final class TradeHistory extends Command
     use ExitProgram;
     use GetNow;
     use GetIntArg;
+    use Output;
 
     protected static $defaultName = 'logger:trade-history';
 
@@ -139,12 +142,20 @@ final class TradeHistory extends Command
 
             try {
                 $page = $this->pastTrades->getTrades($this->symbol, $timestampms, GetPastTradesInterface::LIMIT_MAX);
-            } catch (ConnectionException | GatewayTimeoutException | MaxIterationsException $e) {
-                $output->writeln("<fg=red>{$this->getNow()}\tError Code: {$e->getCode()}</>");
-                $output->writeln("<fg=red>{$this->getNow()}\tError: {$e->getMessage()}</>");
-                $output->writeln("<fg=red>{$this->getNow()}\tSleeping 10 seconds and trying again...</>");
+            } catch (ConnectionException | GatewayTimeoutException | MaxIterationsException | MaintenanceException $e) {
+                $this->writeWarning(
+                    implode(
+                        "\n			",
+                        [
+                            'Error Message: ' . $e->getMessage(),
+                            'Error Code: ' . $e->getCode(),
+                        ]
+                    ),
+                    $output
+                );
+
                 $this->sleeper->sleep(
-                    10,
+                    $this->delay,
                     function (): bool {
                         return $this->shutdown->isShutdownModeEnabled();
                     }
@@ -183,7 +194,7 @@ final class TradeHistory extends Command
                         if (\count($page) === GetPastTradesInterface::LIMIT_MAX) {
                             // TODO: Support ticket # 1385118
                             // throw new \Exception(
-                            //     'Unable to ensure we can fetch the next page. Maximum results per page yielded trade all executing on the same timestamp. Timestamp Milliseconds: '.$timestampms
+                            //     'Unable to ensure we can fetch the next page. Maximum results per page yielded trade all executing on the same timestamp. Timestamp Milliseconds: ' . $timestampms
                             // );
                             $this->logPageLimitError($pageFirstTimestampms);
                             $output->writeln(sprintf(
