@@ -28,6 +28,7 @@ final class CalculateCompletedProfits
         $proceeds = Multiply::getResult($trade->getSellAmount(), $meta->sell_price);
 
         // Assuming 10BPS (lowest volume tier pricing if all "maker or cancel" orders)
+        // TODO: now that we can request trade data on order status endpoint, use that to get fees (doesn't have to wait for trade logger to log transaction)
         $feeBuy = Multiply::getResult($costBasis, '0.001');
         $feeSell = Multiply::getResult($proceeds, '0.001');
 

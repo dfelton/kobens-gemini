@@ -1318,16 +1318,16 @@
         },
         {
             "name": "kobens/kobens-currency",
-            "version": "3.0.0",
+            "version": "3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dfelton/kobens-currency.git",
-                "reference": "71d4331e55f0bbdc8c446c51c1d264ed8691e858"
+                "reference": "b2f11576b1fa4cfd855bede0c91cc314ad8d6493"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dfelton/kobens-currency/zipball/71d4331e55f0bbdc8c446c51c1d264ed8691e858",
-                "reference": "71d4331e55f0bbdc8c446c51c1d264ed8691e858",
+                "url": "https://api.github.com/repos/dfelton/kobens-currency/zipball/b2f11576b1fa4cfd855bede0c91cc314ad8d6493",
+                "reference": "b2f11576b1fa4cfd855bede0c91cc314ad8d6493",
                 "shasum": ""
             },
             "require": {
@@ -1361,10 +1361,10 @@
             ],
             "description": "Library for providing a common interface for interacting with currencies both digital and fiat.",
             "support": {
-                "source": "https://github.com/dfelton/kobens-currency/tree/v3.0.0",
+                "source": "https://github.com/dfelton/kobens-currency/tree/v3.2.0",
                 "issues": "https://github.com/dfelton/kobens-currency/issues"
             },
-            "time": "2021-03-28T20:48:42+00:00"
+            "time": "2021-05-04T18:51:22+00:00"
         },
         {
             "name": "kobens/kobens-exchange",
