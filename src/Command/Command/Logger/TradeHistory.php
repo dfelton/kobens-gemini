@@ -30,6 +30,7 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Adapter\Adapter;
 use Kobens\Gemini\Command\Traits\Output;
 use Kobens\Gemini\Exception\Api\Reason\MaintenanceException;
+use Kobens\Gemini\Exception\Api\Reason\SystemException;
 
 final class TradeHistory extends Command
 {
@@ -142,7 +143,7 @@ final class TradeHistory extends Command
 
             try {
                 $page = $this->pastTrades->getTrades($this->symbol, $timestampms, GetPastTradesInterface::LIMIT_MAX);
-            } catch (ConnectionException | GatewayTimeoutException | MaxIterationsException | MaintenanceException $e) {
+            } catch (ConnectionException | GatewayTimeoutException | MaxIterationsException | MaintenanceException | SystemException $e) {
                 $this->writeWarning(
                     implode(
                         "\n			",
