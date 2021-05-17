@@ -61,6 +61,8 @@ final class Buyer extends Command
 
     private Adapter $privateThrottlerAdapter;
 
+    private Adapter $publicThrottlerAdapter;
+
     private array $closedMarkets = [];
 
     public function __construct(
@@ -69,7 +71,8 @@ final class Buyer extends Command
         BuySentInterface $buySentInterface,
         ForceMakerInterface $forceMakerInterface,
         SleeperInterface $sleeperInterface,
-        Adapter $privateThrottlerAdapter
+        Adapter $privateThrottlerAdapter,
+        Adapter $publicThrottlerAdapter
     ) {
         $this->shutdown = $shutdownInterface;
         $this->buyReady = $buyReadyInterface;
@@ -77,6 +80,7 @@ final class Buyer extends Command
         $this->forceMaker = $forceMakerInterface;
         $this->sleeper = $sleeperInterface;
         $this->privateThrottlerAdapter = $privateThrottlerAdapter;
+        $this->publicThrottlerAdapter = $publicThrottlerAdapter;
         parent::__construct();
     }
 
@@ -101,6 +105,7 @@ final class Buyer extends Command
             try {
                 if (!$this->mainLoop($input, $output)) {
                     $this->ping($this->privateThrottlerAdapter);
+                    $this->ping($this->publicThrottlerAdapter);
                     $this->sleep($delay, $this->sleeper, $this->shutdown);
                 }
             } catch (\Throwable $e) {
