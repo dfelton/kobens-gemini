@@ -42,6 +42,25 @@
                 </fill_monitor_websocket>
             </trade_repeater>
         </keys>
+        <taxes>
+            <year_2020>
+                <form1099K>
+                    <transaction_count>1234</transaction_count>
+                    <jan>123.45</jan>
+                    <feb>123.45</feb>
+                    <mar>123.45</mar>
+                    <apr>123.45</apr>
+                    <may>123.45</may>
+                    <jun>123.45</jun>
+                    <jul>123.45</jul>
+                    <aug>123.45</aug>
+                    <sep>123.45</sep>
+                    <oct>123.45</oct>
+                    <nov>123.45</nov>
+                    <dec>123.45</dec>
+                </form1099K>
+            </year_2020>
+        </taxes>
     </gemini>
     <storage>
         <invested_usd>0.00</invested_usd>
