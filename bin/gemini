@@ -116,11 +116,11 @@ $nonceInterface = new Nonce();
 //       operations interfere with the rest of the application (BEGIN/COMMIT).
 //       Also so multiple instances of application can share throttling if desired.
 
-$privateThrottlerAdapter = new \Zend\Db\Adapter\Adapter($config->get('kobens')->core->throttler->adapter->mariadb->toArray());
-$publicThrottlerInterface = new Throttler(
-    new MariaDb(new \Zend\Db\Adapter\Adapter($config->get('kobens')->core->throttler->adapter->mariadb->toArray())),
-    $hostInterface->getHost() . '::public'
-);
+$throttlerCredentials = $config->get('kobens')->core->throttler->adapter->mariadb->toArray();
+$privateThrottlerAdapter = new \Zend\Db\Adapter\Adapter($throttlerCredentials);
+$publicThrottlerAdapter = new \Zend\Db\Adapter\Adapter($throttlerCredentials);
+unset($throttlerCredentials);
+$publicThrottlerInterface = new Throttler(new MariaDb($publicThrottlerAdapter), $hostInterface->getHost() . '::public');
 $privateThrottlerInterface = new Throttler(new MariaDb($privateThrottlerAdapter), $hostInterface->getHost() . '::private');
 
 $logger = new \Monolog\Logger('curl');
@@ -255,7 +255,8 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Buyer(
         $getPriceInterface
     ),
     $sleeperInterface,
-    $privateThrottlerAdapter
+    $privateThrottlerAdapter,
+    $publicThrottlerAdapter
 ));
 
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\FillMonitor\WebSocket(
