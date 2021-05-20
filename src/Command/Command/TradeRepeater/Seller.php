@@ -57,13 +57,16 @@ final class Seller extends Command
 
     private Adapter $privateThrottlerAdapter;
 
+    private Adapter $publicThrottlerAdapter;
+
     public function __construct(
         EmergencyShutdownInterface $shutdownInterface,
         BuyFilledInterface $buyFilledInterface,
         SellSentInterface $sellSentInterface,
         ForceMakerInterface $forceMakerInterface,
         SleeperInterface $sleeperInterface,
-        Adapter $privateThrottlerAdapter
+        Adapter $privateThrottlerAdapter,
+        Adapter $publicThrottlerAdapter
     ) {
         $this->buyFilled = $buyFilledInterface;
         $this->sellSent = $sellSentInterface;
@@ -71,6 +74,7 @@ final class Seller extends Command
         $this->forceMaker = $forceMakerInterface;
         $this->sleeper = $sleeperInterface;
         $this->privateThrottlerAdapter = $privateThrottlerAdapter;
+        $this->publicThrottlerAdapter = $publicThrottlerAdapter;
         parent::__construct();
     }
 
@@ -89,6 +93,7 @@ final class Seller extends Command
             try {
                 if (!$this->mainLoop($input, $output)) {
                     $this->ping($this->privateThrottlerAdapter);
+                    $this->ping($this->publicThrottlerAdapter);
                     $this->sleep($delay, $this->sleeper, $this->shutdown);
                 }
             } catch (\Throwable $e) {
