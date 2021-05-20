@@ -4,7 +4,7 @@
     "description": "For facilitating trades on the Gemini exchange.",
     "type": "project",
     "license": "BSD-3-Clause",
-    "minimum-stability": "dev",
+    "mininum-stability": "stable",
     "authors": [
         {
             "name": "Darren Felton",
@@ -41,14 +41,14 @@
         "ext-json": "*",
         "ext-mbstring": "*",
         "amphp/websocket-client": "^1.0",
-        "kobens/kobens-core": "dev-master",
+        "kobens/kobens-core": "^2.0",
         "kobens/kobens-currency": "^3.0",
-        "kobens/kobens-exchange": "dev-master",
         "kobens/kobens-http": "dev-master",
         "kobens/kobens-math": "^2.0",
         "symfony/console": "^4.2",
         "zendframework/zend-config": "^3.2",
-        "zendframework/zend-db": "^2.9"
+        "zendframework/zend-db": "^2.9",
+        "kobens/kobens-exchange": "^0.2"
     },
     "require-dev": {
         "zendframework/zend-debug": "^2.6",
