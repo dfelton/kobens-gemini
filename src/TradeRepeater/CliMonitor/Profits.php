@@ -47,6 +47,7 @@ final class Profits
             [
                 '',
                 new TableCell(sprintf('All Time Since %s', $data['all_time']['date']), ['colspan' => 2]),
+                new TableCell('Past 90 Days', ['colspan' => 2]),
                 new TableCell('Past 30 Days', ['colspan' => 2]),
                 new TableCell('Past 7 Days', ['colspan' => 2]),
                 new TableCell('Past 24 Hours', ['colspan' => 2]),
@@ -54,6 +55,7 @@ final class Profits
             ['Asset', 'Amount', 'Amount Notional', 'Amount', 'Amount Notional', 'Amount', 'Amount Notional', 'Amount', 'Amount Notional'],
         ]);
         $cellsAllTime = $this->getCells($data['all_time']);
+        $cellsPast90d = $this->getCells($data['90d']);
         $cellsPast30d = $this->getCells($data['30d']);
         $cellsPast7d = $this->getCells($data['7d']);
         $cellsPast1d = $this->getCells($data['1d']);
@@ -61,6 +63,7 @@ final class Profits
             $row = array_merge(
                 [strtoupper($symbol)],
                 $cellData,
+                $cellsPast90d['cells'][$symbol] ?? [],
                 $cellsPast30d['cells'][$symbol] ?? [],
                 $cellsPast7d['cells'][$symbol] ?? [],
                 $cellsPast1d['cells'][$symbol] ?? []
@@ -72,6 +75,8 @@ final class Profits
             new TableCell('Total Notional', ['colspan' => 2]),
             $cellsAllTime['total_notional'],
             '',
+            $cellsPast90d['total_notional'],
+            '',
             $cellsPast30d['total_notional'],
             '',
             $cellsPast7d['total_notional'],
@@ -82,6 +87,8 @@ final class Profits
             new TableCell('Daily Average', ['colspan' => 2]),
             $cellsAllTime['daily_average'],
             '',
+            $cellsPast90d['daily_average'],
+            '',
             $cellsPast30d['daily_average'],
             '',
             $cellsPast7d['daily_average'],
@@ -91,6 +98,8 @@ final class Profits
         $table->addRow([
             new TableCell('Projected Yearly', ['colspan' => 2]),
             $cellsAllTime['projected_yearly'],
+            '',
+            $cellsPast90d['projected_yearly'],
             '',
             $cellsPast30d['projected_yearly'],
             '',
@@ -166,10 +175,12 @@ final class Profits
         $profits1d = [];
         $profits7d = [];
         $profits30d = [];
+        $profits90d = [];
         $date = null;
         $timestamp1d = time() - 86400;
         $timestamp7d = time() - 604800;
         $timestamp30d = time() - 2592000;
+        $timestamp90d = time() - (2592000 * 3);
         foreach ($results as $result) {
             if ($date === null) {
                 $date = $result->sell_fill_timestamp;
@@ -200,6 +211,12 @@ final class Profits
                     }
                     $profits30d[$symbol] = Add::getResult($profits30d[$symbol], $amount);
                 }
+                if ($sellFillTimestamp > $timestamp90d) {
+                    if (($profits90d[$symbol] ?? null) === null) {
+                        $profits90d[$symbol] = '0';
+                    }
+                    $profits90d[$symbol] = Add::getResult($profits90d[$symbol], $amount);
+                }
             }
         }
 
@@ -211,6 +228,7 @@ final class Profits
         ksort($profits1d);
         ksort($profits7d);
         ksort($profits30d);
+        ksort($profits90d);
 
         return [
             'all_time' => [
@@ -232,6 +250,11 @@ final class Profits
                 'date' => date('Y-m-d H:s:i', $timestamp7d),
                 'profits' => $profits30d,
                 'days' => '30'
+            ],
+            '90d' => [
+                'date' => date('Y-m-d H:s:i', $timestamp7d),
+                'profits' => $profits90d,
+                'days' => '90'
             ],
         ];
     }
