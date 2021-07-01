@@ -159,8 +159,10 @@ final class Seller extends Command
             $output->writeln("<fg=red>{$this->getNow()}\tConnection Exception Occurred.</>");
         } catch (MaintenanceException | SystemException $e) {
             $this->buyFilled->resetState($row->getId());
-            $output->writeln("<fg=red>{$this->getNow()}\t ({$row->getSymbol()}) $e->getMessage()");
-            $output->writeln("<fg=red>{$this->getNow()}\tSleeping " . self::EXCEPTION_DELAY . " seconds...</>");
+            $output->writeln([
+                "<fg=red>{$this->getNow()}\t({$row->getSymbol()}) {$e->getMessage()}",
+                "<fg=red>{$this->getNow()}\tSleeping " . self::EXCEPTION_DELAY . " seconds...</>"
+            ]);
             $this->sleep(self::EXCEPTION_DELAY, $this->sleeper, $this->shutdown);
         } catch (MaxIterationsException $e) {
             $this->buyFilled->resetState($row->getId());
