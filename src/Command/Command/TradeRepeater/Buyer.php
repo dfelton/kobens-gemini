@@ -178,7 +178,7 @@ final class Buyer extends Command
             $this->writeWarning('Connection Exception Occurred', $output);
         } catch (MaintenanceException | SystemException $e) {
             $this->buyReady->resetState($row->getId());
-            $output->writeln("<fg=red>{$this->getNow()}\t ({$row->symbol}) $e->getMessage()");
+            $output->writeln("<fg=red>{$this->getNow()}\t ({$row->getSymbol()}) $e->getMessage()");
             $output->writeln("<fg=red>{$this->getNow()}\tSleeping " . self::EXCEPTION_DELAY . " seconds...</>");
             $this->sleep(self::EXCEPTION_DELAY, $this->sleeper, $this->shutdown);
         } catch (MaxIterationsException $e) {
