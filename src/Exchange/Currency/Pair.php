@@ -22,8 +22,12 @@ final class Pair extends CurrencyPair implements PairInterface
         // Aave - https://aave.com/
         'aaveusd'  => ['base' => 'aave',  'quote' => 'usd', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
 
+        'alcxusd'  => ['base' => 'alcx',  'quote' => 'usd', 'minOrderSize' => '0.00001', 'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.01'],
+
         // Amp Token - https://amptoken.org/
         'ampusd'   => ['base' => 'amp',   'quote' => 'usd', 'minOrderSize' => '10.0',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
+
+        'ankrusd'  => ['base' => 'ankr',  'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
 
         // Balancer - https://balancer.finance/
         'balusd'   => ['base' => 'bal',   'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
@@ -42,7 +46,7 @@ final class Pair extends CurrencyPair implements PairInterface
         'bntusd'   => ['base' => 'bnt',   'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
 
         // BarnBridge (BOND)
-        'bondusd'  => ['base' => 'bond',   'quote' => 'usd', 'minOrderSize' => '0.001',  'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
+        'bondusd'  => ['base' => 'bond',   'quote' => 'usd','minOrderSize' => '0.001',  'minOrderIncrement' => '0.000001',    'minPriceIncrement' => '0.0001'],
 
         // Bitcoin
         'btcdai'   => ['base' => 'btc',   'quote' => 'dai', 'minOrderSize' => '0.00001', 'minOrderIncrement' => '0.00000001', 'minPriceIncrement' => '0.01'],
@@ -54,8 +58,10 @@ final class Pair extends CurrencyPair implements PairInterface
         // Curve DAO Token
         'crvusd'   => ['base' => 'crv',   'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
 
+        'ctxusd'   => ['base' => 'ctx',   'quote' => 'usd', 'minOrderSize' => '0.002',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
+
         // Somnium Space (CUBE)
-        'cubeusd'  => ['base' => 'cube',   'quote' => 'usd', 'minOrderSize' => '0.01',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
+        'cubeusd'  => ['base' => 'cube',   'quote' => 'usd','minOrderSize' => '0.01',   'minOrderIncrement' => '0.000001',    'minPriceIncrement' => '0.0001'],
 
         // Dai Stablecoin
         'daiusd'   => ['base' => 'dai',   'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
@@ -74,11 +80,14 @@ final class Pair extends CurrencyPair implements PairInterface
         // Filecoin
         'filusd'   => ['base' => 'fil',   'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
 
+        // Fantom
+        'ftmusd'   => ['base' => 'ftm',   'quote' => 'usd', 'minOrderSize' => '0.03',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
+
         // The Graph
         'grtusd'   => ['base' => 'grt',   'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
 
         // Injective Protocol (INJ)
-        'injusd'   => ['base' => 'inj',    'quote' => 'usd', 'minOrderSize' => '0.01',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
+        'injusd'   => ['base' => 'inj',    'quote' => 'usd','minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
 
         // Kyber Network
         'kncusd'   => ['base' => 'knc',   'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
@@ -89,7 +98,7 @@ final class Pair extends CurrencyPair implements PairInterface
         'linkusd'  => ['base' => 'link',  'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
 
         // Livepeer (LPT)
-        'lptusd'   => ['base' => 'lpt',    'quote' => 'usd', 'minOrderSize' => '0.001',  'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
+        'lptusd'   => ['base' => 'lpt',    'quote' => 'usd','minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
 
         // Loopring
         'lrcusd'   => ['base' => 'lrc',   'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
@@ -104,7 +113,10 @@ final class Pair extends CurrencyPair implements PairInterface
         'manausd'  => ['base' => 'mana',  'quote' => 'usd', 'minOrderSize' => '1.0',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
 
         // Polygon (MATIC)
-        'maticusd' => ['base' => 'matic',  'quote' => 'usd', 'minOrderSize' => '0.1',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
+        'maticusd' => ['base' => 'matic',  'quote' => 'usd','minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
+
+        // Mirror
+        'mirusd'   => ['base' => 'mir',    'quote' => 'usd','minOrderSize' => '0.00001', 'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
 
         // Maker
         'mkrusd'   => ['base' => 'mkr',   'quote' => 'usd', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.01'],
@@ -140,6 +152,8 @@ final class Pair extends CurrencyPair implements PairInterface
 
         // Uniswap - https://uniswap.org/
         'uniusd'  => ['base' => 'uni',    'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
+
+        'xtzusd'  => ['base' => 'xtz',    'quote' => 'usd', 'minOrderSize' => '0.02',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
 
         // Yearn Finance - https://yearn.finance/
         'yfiusd'  => ['base' => 'yfi',    'quote' => 'usd', 'minOrderSize' => '0.00001', 'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.01'],
