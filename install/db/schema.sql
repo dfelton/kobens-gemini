@@ -117,6 +117,17 @@ CREATE TABLE IF NOT EXISTS `taxes_ampusd_sell_log` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - AMPUSD Sell Log';
 
 
+CREATE TABLE IF NOT EXISTS `taxes_ankrusd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - ANKRUSD Sell Log';
+
+
 CREATE TABLE IF NOT EXISTS `taxes_balusd_sell_log` (
     `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
     `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
@@ -194,6 +205,17 @@ CREATE TABLE IF NOT EXISTS `taxes_compusd_sell_log` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - COMPUSD Sell Log';
 
 
+CREATE TABLE IF NOT EXISTS `taxes_ctxusd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - CTXUSD Sell Log';
+
+
 CREATE TABLE IF NOT EXISTS `taxes_crvusd_sell_log` (
     `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
     `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
@@ -269,6 +291,17 @@ CREATE TABLE IF NOT EXISTS `taxes_filusd_sell_log` (
     `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
     PRIMARY KEY (`sell_tid`, `buy_tid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - FILUSD Sell Log';
+
+
+CREATE TABLE IF NOT EXISTS `taxes_ftmusd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - FTMUSD Sell Log';
 
 
 CREATE TABLE IF NOT EXISTS `taxes_grtusd_sell_log` (
@@ -368,6 +401,17 @@ CREATE TABLE IF NOT EXISTS `taxes_maticusd_sell_log` (
     `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
     PRIMARY KEY (`sell_tid`, `buy_tid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - MATICUSD Sell Log';
+
+
+CREATE TABLE IF NOT EXISTS `taxes_mirusd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - MIRUSD Sell Log';
 
 
 CREATE TABLE IF NOT EXISTS `taxes_mkrusd_sell_log` (
@@ -491,6 +535,17 @@ CREATE TABLE IF NOT EXISTS `taxes_uniusd_sell_log` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - UNIUSD Sell Log';
 
 
+CREATE TABLE IF NOT EXISTS `taxes_xtzusd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - XTZUSD Sell Log';
+
+
 CREATE TABLE IF NOT EXISTS `taxes_yfiusd_sell_log` (
     `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
     `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
@@ -583,6 +638,22 @@ CREATE TABLE IF NOT EXISTS `trade_history_ampusd` (
   `trade_date` timestamp NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Trade Date',
   PRIMARY KEY (`tid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History AMPUSD';
+
+
+CREATE TABLE IF NOT EXISTS `trade_history_ankrusd` (
+  `tid` bigint(13) unsigned NOT NULL COMMENT 'Transaction ID',
+  `price` varchar(50) NOT NULL COMMENT 'Price',
+  `amount` varchar(50) NOT NULL COMMENT 'Amount',
+  `timestampms` bigint(13) unsigned NOT NULL COMMENT 'Timestamp Milliseconds',
+  `type` varchar(4) NOT NULL COMMENT 'Type',
+  `aggressor` tinyint(1) NOT NULL COMMENT 'Aggressor',
+  `fee_currency` varchar(10) NOT NULL COMMENT 'Fee Currency',
+  `fee_amount` varchar(50) NOT NULL COMMENT 'Fee Amount',
+  `order_id` bigint(13) unsigned NOT NULL COMMENT 'Order Id',
+  `client_order_id` varchar(100) DEFAULT NULL,
+  `trade_date` timestamp NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Trade Date',
+  PRIMARY KEY (`tid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History ANKRUSD';
 
 
 CREATE TABLE IF NOT EXISTS `trade_history_balusd` (
@@ -793,6 +864,22 @@ CREATE TABLE IF NOT EXISTS `trade_history_crvusd` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History CRVUSD';
 
 
+CREATE TABLE IF NOT EXISTS `trade_history_ctxusd` (
+  `tid` bigint(13) unsigned NOT NULL COMMENT 'Transaction ID',
+  `price` varchar(50) NOT NULL COMMENT 'Price',
+  `amount` varchar(50) NOT NULL COMMENT 'Amount',
+  `timestampms` bigint(13) unsigned NOT NULL COMMENT 'Timestamp Milliseconds',
+  `type` varchar(4) NOT NULL COMMENT 'Type',
+  `aggressor` tinyint(1) NOT NULL COMMENT 'Aggressor',
+  `fee_currency` varchar(10) NOT NULL COMMENT 'Fee Currency',
+  `fee_amount` varchar(50) NOT NULL COMMENT 'Fee Amount',
+  `order_id` bigint(13) unsigned NOT NULL COMMENT 'Order Id',
+  `client_order_id` varchar(100) DEFAULT NULL,
+  `trade_date` timestamp NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Trade Date',
+  PRIMARY KEY (`tid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History CTXUSD';
+
+
 CREATE TABLE IF NOT EXISTS `trade_history_cubeusd` (
   `tid` bigint(13) unsigned NOT NULL COMMENT 'Transaction ID',
   `price` varchar(50) NOT NULL COMMENT 'Price',
@@ -919,6 +1006,22 @@ CREATE TABLE IF NOT EXISTS `trade_history_filusd` (
   `trade_date` timestamp NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Trade Date',
   PRIMARY KEY (`tid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History FILUSD';
+
+
+CREATE TABLE IF NOT EXISTS `trade_history_ftmusd` (
+  `tid` bigint(13) unsigned NOT NULL COMMENT 'Transaction ID',
+  `price` varchar(50) NOT NULL COMMENT 'Price',
+  `amount` varchar(50) NOT NULL COMMENT 'Amount',
+  `timestampms` bigint(13) unsigned NOT NULL COMMENT 'Timestamp Milliseconds',
+  `type` varchar(4) NOT NULL COMMENT 'Type',
+  `aggressor` tinyint(1) NOT NULL COMMENT 'Aggressor',
+  `fee_currency` varchar(10) NOT NULL COMMENT 'Fee Currency',
+  `fee_amount` varchar(50) NOT NULL COMMENT 'Fee Amount',
+  `order_id` bigint(13) unsigned NOT NULL COMMENT 'Order Id',
+  `client_order_id` varchar(100) DEFAULT NULL,
+  `trade_date` timestamp NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Trade Date',
+  PRIMARY KEY (`tid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History FTMUSD';
 
 
 CREATE TABLE IF NOT EXISTS `trade_history_grtusd` (
@@ -1145,6 +1248,22 @@ CREATE TABLE IF NOT EXISTS `trade_history_maticusd` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History MATICUSD';
 
 
+CREATE TABLE IF NOT EXISTS `trade_history_mirusd` (
+  `tid` bigint(13) unsigned NOT NULL COMMENT 'Transaction ID',
+  `price` varchar(50) NOT NULL COMMENT 'Price',
+  `amount` varchar(50) NOT NULL COMMENT 'Amount',
+  `timestampms` bigint(13) unsigned NOT NULL COMMENT 'Timestamp Milliseconds',
+  `type` varchar(4) NOT NULL COMMENT 'Type',
+  `aggressor` tinyint(1) NOT NULL COMMENT 'Aggressor',
+  `fee_currency` varchar(10) NOT NULL COMMENT 'Fee Currency',
+  `fee_amount` varchar(50) NOT NULL COMMENT 'Fee Amount',
+  `order_id` bigint(13) unsigned NOT NULL COMMENT 'Order Id',
+  `client_order_id` varchar(100) DEFAULT NULL,
+  `trade_date` timestamp NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Trade Date',
+  PRIMARY KEY (`tid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History MIRUSD';
+
+
 CREATE TABLE IF NOT EXISTS `trade_history_mkrusd` (
   `tid` bigint(13) unsigned NOT NULL COMMENT 'Transaction ID',
   `price` varchar(50) NOT NULL COMMENT 'Price',
@@ -1351,6 +1470,22 @@ CREATE TABLE IF NOT EXISTS `trade_history_uniusd` (
   `trade_date` timestamp NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Trade Date',
   PRIMARY KEY (`tid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History UNIUSD';
+
+
+CREATE TABLE IF NOT EXISTS `trade_history_xtzusd` (
+  `tid` bigint(13) unsigned NOT NULL COMMENT 'Transaction ID',
+  `price` varchar(50) NOT NULL COMMENT 'Price',
+  `amount` varchar(50) NOT NULL COMMENT 'Amount',
+  `timestampms` bigint(13) unsigned NOT NULL COMMENT 'Timestamp Milliseconds',
+  `type` varchar(4) NOT NULL COMMENT 'Type',
+  `aggressor` tinyint(1) NOT NULL COMMENT 'Aggressor',
+  `fee_currency` varchar(10) NOT NULL COMMENT 'Fee Currency',
+  `fee_amount` varchar(50) NOT NULL COMMENT 'Fee Amount',
+  `order_id` bigint(13) unsigned NOT NULL COMMENT 'Order Id',
+  `client_order_id` varchar(100) DEFAULT NULL,
+  `trade_date` timestamp NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Trade Date',
+  PRIMARY KEY (`tid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History XTZUSD';
 
 
 CREATE TABLE IF NOT EXISTS `trade_history_yfiusd` (
