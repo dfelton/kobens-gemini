@@ -134,7 +134,7 @@ final class Buyer extends Command
 
             if (true == $msg = $this->place($input, $output, $row, $buyClientOrderId)) {
                 $this->buySent->setNextState($row->getId(), $msg->order_id, $msg->price);
-                $output->writeln(\sprintf(
+                $output->writeln(sprintf(
                     "%s\t(%d)\t<fg=green>BUY</>_PLACED</>\tOrder ID %s\t%s %s @ %s %s/%s",
                     $this->getNow(),
                     $row->getId(),
@@ -146,7 +146,7 @@ final class Buyer extends Command
                     strtoupper(Pair::getInstance($msg->symbol)->getQuote()->getSymbol()),
                 ));
                 if (Compare::getResult($msg->price, $row->getBuyPrice()) !== Compare::EQUAL) {
-                    $output->writeln(\sprintf(
+                    $output->writeln(sprintf(
                         "%s\t\t<fg=yellow>(original buy price: %s)</>",
                         $this->getNow(),
                         $row->getBuyPrice()
@@ -158,6 +158,16 @@ final class Buyer extends Command
         return $placedOrders;
     }
 
+    /**
+     * Place a buy order on the order book
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @param Trade $row
+     * @param string $buyClientOrderId
+     * @throws \Exception
+     * @return \stdClass|NULL
+     */
     private function place(InputInterface $input, OutputInterface $output, Trade $row, string $buyClientOrderId): ?\stdClass
     {
         $msg = null;
@@ -178,18 +188,21 @@ final class Buyer extends Command
             $this->writeWarning('Connection Exception Occurred', $output);
         } catch (MaintenanceException | SystemException $e) {
             $this->buyReady->resetState($row->getId());
-            $output->writeln("<fg=red>{$this->getNow()}\t ({$row->getSymbol()}) $e->getMessage()");
-            $output->writeln("<fg=red>{$this->getNow()}\tSleeping " . self::EXCEPTION_DELAY . " seconds...</>");
+            $this->writeWarning(
+                sprintf('(%s) %s', $row->getSymbol(), $e->getMessage()),
+                $output
+            );
             $this->sleep(self::EXCEPTION_DELAY, $this->sleeper, $this->shutdown);
         } catch (MaxIterationsException $e) {
             $this->buyReady->resetState($row->getId());
-            $output->writeln(\sprintf(
-                "<fg=red>%s\tMax iterations reached for attempting ForceMaker on %s pair for price of %s.</>",
-                $this->getNow(),
-                $row->getSymbol(),
-                $row->getBuyPrice()
-            ));
-            $output->writeln("<fg=red>{$this->getNow()}\tSleeping {$input->getOption('maxIterationsDelay')} seconds...</>");
+            $this->writeWarning(
+                sprintf(
+                    'Max iterations reached for attempting ForceMaker on %s pair for price of %s.',
+                    $row->getSymbol(),
+                    $row->getBuyPrice()
+                ),
+                $output
+            );
             $this->sleep((int) $input->getOption('maxIterationsDelay'), $this->sleeper, $this->shutdown);
         } catch (\Exception $e) {
             $this->buySent->setErrorState($row->getId(), \get_class($e) . "::{$e->getMessage()}");
