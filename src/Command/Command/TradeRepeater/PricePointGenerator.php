@@ -60,7 +60,7 @@ final class PricePointGenerator extends Command
         $this->addArgument('is_enabled', InputArgument::OPTIONAL, 'Is Enabled', 1);
         $this->addOption('bucket', 'b', InputOption::VALUE_OPTIONAL, 'Use funds from bucket to create records.', '1');
         $this->addOption('create', 'c', InputOption::VALUE_OPTIONAL, 'Create records (if omitted, will simply report summary)', 0);
-        $this->addOption('increment-by-percent', 'i', InputOption::VALUE_OPTIONAL, 'Interpret provided increment value as a percentage', '0');
+        $this->addOption('increment-by-percent', 'i', InputOption::VALUE_OPTIONAL, 'Interpret provided increment value as a percentage', '1');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
