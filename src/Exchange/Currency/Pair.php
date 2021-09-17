@@ -29,6 +29,9 @@ final class Pair extends CurrencyPair implements PairInterface
 
         'ankrusd'  => ['base' => 'ankr',  'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
 
+        // Axie Infinity Token
+        'axsusd'   => ['base' => 'axs',   'quote' => 'usd', 'minOrderSize' => '0.003',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.01'],
+
         // Balancer - https://balancer.finance/
         'balusd'   => ['base' => 'bal',   'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
 
@@ -109,14 +112,20 @@ final class Pair extends CurrencyPair implements PairInterface
         'ltceth'   => ['base' => 'ltc',   'quote' => 'eth', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.00001',    'minPriceIncrement' => '0.0001'],
         'ltcusd'   => ['base' => 'ltc',   'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.00001',    'minPriceIncrement' => '0.01'],
 
+        // Terra
+        'lunausd'  => ['base' => 'luna',  'quote' => 'usd', 'minOrderSize' => '0.005',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.01'],
+
         // Decentraland
         'manausd'  => ['base' => 'mana',  'quote' => 'usd', 'minOrderSize' => '1.0',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
 
         // Polygon (MATIC)
-        'maticusd' => ['base' => 'matic',  'quote' => 'usd','minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
+        'maticusd' => ['base' => 'matic', 'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
+
+        // Moss Carbon Credit
+        'mco2usd'  => ['base' => 'mco2',  'quote' => 'usd', 'minOrderSize' => '0.02',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.01'],
 
         // Mirror
-        'mirusd'   => ['base' => 'mir',    'quote' => 'usd','minOrderSize' => '0.00001', 'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
+        'mirusd'   => ['base' => 'mir',   'quote' => 'usd', 'minOrderSize' => '0.00001', 'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
 
         // Maker
         'mkrusd'   => ['base' => 'mkr',   'quote' => 'usd', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.01'],
@@ -138,6 +147,9 @@ final class Pair extends CurrencyPair implements PairInterface
         // SKALE Token - https://skale.network/token
         'sklusd'   => ['base' => 'skl',   'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
 
+        // Smooth Love Potion
+        'slpusd'   => ['base' => 'slp',   'quote' => 'usd', 'minOrderSize' => '0.5',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
+
         // Synthetix - https://www.synthetix.io/
         'snxusd'   => ['base' => 'snx',   'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
 
@@ -152,6 +164,9 @@ final class Pair extends CurrencyPair implements PairInterface
 
         // Uniswap - https://uniswap.org/
         'uniusd'  => ['base' => 'uni',    'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
+
+        // TerraUSD
+        'ustusd'  => ['base' => 'ust',    'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.001'],
 
         'xtzusd'  => ['base' => 'xtz',    'quote' => 'usd', 'minOrderSize' => '0.02',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
 
