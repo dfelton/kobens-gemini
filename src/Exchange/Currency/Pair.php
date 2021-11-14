@@ -183,6 +183,8 @@ final class Pair extends CurrencyPair implements PairInterface
         // TerraUSD
         'ustusd'  => ['base' => 'ust',    'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.001'],
 
+        'wcfgusd' => ['base'  => 'wcfg',  'quote' => 'usd', 'minOrderSize' => '0.05',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.001'],
+
         'xtzusd'  => ['base' => 'xtz',    'quote' => 'usd', 'minOrderSize' => '0.02',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
 
         // Yearn Finance - https://yearn.finance/
