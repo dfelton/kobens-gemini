@@ -29,6 +29,10 @@ final class Pair extends CurrencyPair implements PairInterface
 
         'ankrusd'  => ['base' => 'ankr',  'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
 
+        'api3usd'  => ['base' => 'api3',  'quote' => 'usd', 'minOrderSize' => '0.03',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.001'],
+        'ashusd'   => ['base' => 'ash',   'quote' => 'usd', 'minOrderSize' => '0.005',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.001'],
+        'audiousd' => ['base' => 'audio', 'quote' => 'usd', 'minOrderSize' => '0.05',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.001'],
+
         // Axie Infinity Token
         'axsusd'   => ['base' => 'axs',   'quote' => 'usd', 'minOrderSize' => '0.003',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.01'],
 
@@ -80,6 +84,8 @@ final class Pair extends CurrencyPair implements PairInterface
         'ethdai'   => ['base' => 'eth',   'quote' => 'dai', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.01'],
         'ethusd'   => ['base' => 'eth',   'quote' => 'usd', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.01'],
 
+        'fetusd'   => ['base' => 'fet',   'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
+
         // Filecoin
         'filusd'   => ['base' => 'fil',   'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
 
@@ -118,6 +124,7 @@ final class Pair extends CurrencyPair implements PairInterface
         // Decentraland
         'manausd'  => ['base' => 'mana',  'quote' => 'usd', 'minOrderSize' => '1.0',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
 
+        'maskusd'  => ['base' => 'mask',  'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.001'],
         // Polygon (MATIC)
         'maticusd' => ['base' => 'matic', 'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
 
@@ -130,6 +137,8 @@ final class Pair extends CurrencyPair implements PairInterface
         // Maker
         'mkrusd'   => ['base' => 'mkr',   'quote' => 'usd', 'minOrderSize' => '0.001',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.01'],
 
+        'nmrusd'   => ['base' => 'nmr',   'quote' => 'usd', 'minOrderSize' => '0.003',   'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.001'],
+
         // Orchid
         'oxtbtc'   => ['base' => 'oxt',   'quote' => 'btc', 'minOrderSize' => '1.0',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00000001'],
         'oxteth'   => ['base' => 'oxt',   'quote' => 'eth', 'minOrderSize' => '1.0',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0000001'],
@@ -138,11 +147,17 @@ final class Pair extends CurrencyPair implements PairInterface
         // PAX Gold - https://www.paxos.com/paxgold/
         'paxgusd'  => ['base' => 'paxg',  'quote' => 'usd', 'minOrderSize' => '0.0001',  'minOrderIncrement' => '0.00000001', 'minPriceIncrement' => '0.01'],
 
+        'qntusd'   => ['base' => 'qnt',   'quote' => 'usd', 'minOrderSize' => '0.0004',  'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.01'],
+        'radusd'   => ['base' => 'rad',   'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.001'],
+        'rareusd'  => ['base' => 'rare',  'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.001'],
+
         // RenVM - https://renproject.io/
         'renusd'   => ['base' => 'ren',   'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
 
         // The Sandbox
         'sandusd'  => ['base' => 'sand',  'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
+
+        'shibusd'  => ['base' => 'shib',  'quote' => 'usd', 'minOrderSize' => '1000',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.000000001'],
 
         // SKALE Token - https://skale.network/token
         'sklusd'   => ['base' => 'skl',   'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
