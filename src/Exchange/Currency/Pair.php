@@ -149,7 +149,7 @@ final class Pair extends CurrencyPair implements PairInterface
 
         'qntusd'   => ['base' => 'qnt',   'quote' => 'usd', 'minOrderSize' => '0.0004',  'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.01'],
         'radusd'   => ['base' => 'rad',   'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.001'],
-        'rareusd'  => ['base' => 'rare',  'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.001'],
+        'rareusd'  => ['base' => 'rare',  'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.001'],
 
         // RenVM - https://renproject.io/
         'renusd'   => ['base' => 'ren',   'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
