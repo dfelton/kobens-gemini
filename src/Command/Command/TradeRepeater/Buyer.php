@@ -96,12 +96,7 @@ final class Buyer extends Command
         $exitCode = 0;
         $delay = $this->getIntArg($input, 'delay', self::DELAY_DEFAULT);
         while ($this->shutdown->isShutdownModeEnabled() === false && $this->killFileExists(self::KILL_FILE) === false) {
-            foreach (array_keys($this->closedMarkets) as $timeLastAttempt) {
-                // Allow for checking if the market is open once every minute
-                if (time() - $timeLastAttempt > 60) {
-                    unset($this->closedMarkets[$timeLastAttempt]);
-                }
-            }
+            $this->closedMarkets = [];
             try {
                 if (!$this->mainLoop($input, $output)) {
                     $this->ping($this->privateThrottlerAdapter);
@@ -181,7 +176,7 @@ final class Buyer extends Command
             );
         } catch (MarketNotOpenException $e) {
             $this->buyReady->resetState($row->getId());
-            $this->closedMarkets[time()] = $row->getSymbol();
+            $this->closedMarkets[] = $row->getSymbol();
             $this->writeNotice(sprintf('Market Not Currently Open: %s', $row->getSymbol()), $output);
         } catch (ConnectionException $e) {
             $this->buyReady->resetState($row->getId());
