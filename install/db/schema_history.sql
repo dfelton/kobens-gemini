@@ -869,6 +869,21 @@ CREATE TABLE IF NOT EXISTS `trade_history_qntusd` (
   PRIMARY KEY (`tid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History QNTUSD';
 
+CREATE TABLE IF NOT EXISTS `trade_history_radusd` (
+  `tid` bigint(13) unsigned NOT NULL COMMENT 'Transaction ID',
+  `price` varchar(50) NOT NULL COMMENT 'Price',
+  `amount` varchar(50) NOT NULL COMMENT 'Amount',
+  `timestampms` bigint(13) unsigned NOT NULL COMMENT 'Timestamp Milliseconds',
+  `type` varchar(4) NOT NULL COMMENT 'Type',
+  `aggressor` tinyint(1) NOT NULL COMMENT 'Aggressor',
+  `fee_currency` varchar(10) NOT NULL COMMENT 'Fee Currency',
+  `fee_amount` varchar(50) NOT NULL COMMENT 'Fee Amount',
+  `order_id` bigint(13) unsigned NOT NULL COMMENT 'Order Id',
+  `client_order_id` varchar(100) DEFAULT NULL,
+  `trade_date` timestamp NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Trade Date',
+  PRIMARY KEY (`tid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Trade History RADUSD';
+
 CREATE TABLE IF NOT EXISTS `trade_history_renusd` (
   `tid` bigint(13) unsigned NOT NULL COMMENT 'Transaction ID',
   `price` varchar(50) NOT NULL COMMENT 'Price',
