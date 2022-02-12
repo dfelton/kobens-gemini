@@ -1,10 +1,5 @@
 #!/bin/bash
 
-#
-# Dependencies
-#
-$(dirname $BASH_SOURCE)/trade-history
-$(dirname $BASH_SOURCE)/book-keepers
 
 #
 # Trade Repeater
@@ -67,4 +62,10 @@ if [ $? -eq 1 ]; then
     php -n $(realpath $(dirname $BASH_SOURCE))/gemini repeater:usd-profits-dist &
     sleep 0.25
 fi
+
+
+#
+# Dependencies
+#
+$(dirname $BASH_SOURCE)/trade-history
 
