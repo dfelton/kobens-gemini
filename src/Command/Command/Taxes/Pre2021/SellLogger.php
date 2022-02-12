@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kobens\Gemini\Command\Command\Taxes;
+namespace Kobens\Gemini\Command\Command\Taxes\Pre2021;
 
 use Kobens\Core\Db;
 use Kobens\Gemini\Exchange\Currency\Pair;
@@ -26,8 +26,7 @@ use Zend\Db\TableGateway\TableGateway;
  */
 final class SellLogger extends Command
 {
-
-    protected static $defaultName = 'taxes:sell-logger';
+    protected static $defaultName = 'taxes:pre-2021:sell-logger';
 
     private ?TableGateway $tblSellLog = null;
 
@@ -48,9 +47,9 @@ final class SellLogger extends Command
         $pair = Pair::getInstance($input->getOption('symbol'));
         $this->symbol = $pair->getSymbol();
 
-        $output->writeln('Truncating existing tables');
-        $conn->execute("TRUNCATE taxes_{$pair->getSymbol()}_buy_log;");
-        $conn->execute("TRUNCATE taxes_{$pair->getSymbol()}_sell_log;");
+//         $output->writeln('Truncating existing tables');
+//         $conn->execute("TRUNCATE taxes_{$pair->getSymbol()}_buy_log;");
+//         $conn->execute("TRUNCATE taxes_{$pair->getSymbol()}_sell_log;");
 
         $output->writeln('Populating buy table');
         $buyLogger = new BuyLogger();
@@ -204,8 +203,12 @@ final class SellLogger extends Command
     {
         /** @var \Zend\Db\ResultSet\ResultSetInterface $rows */
         $rows = $this->getTradeHistoryTable()->select(function (Select $select) {
-            $select->where->notIn('tid', (new Select('taxes_' . $this->symbol . '_sell_log'))->columns(['sell_tid']));
+            $select->where->notIn(
+                'tid',
+                (new Select('taxes_' . $this->symbol . '_sell_log'))->columns(['sell_tid'])
+            );
             $select->where->equalTo('type', 'sell');
+            $select->where->lessThan('trade_date', '2021-01-01 00:00:00');
             $select->order('tid ASC');
             $select->limit(100);
         });

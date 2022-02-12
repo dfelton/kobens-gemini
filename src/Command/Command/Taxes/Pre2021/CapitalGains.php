@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kobens\Gemini\Command\Command\Taxes;
+namespace Kobens\Gemini\Command\Command\Taxes\Pre2021;
 
 use Kobens\Core\Db;
 use Kobens\Math\BasicCalculator\Add;
@@ -22,7 +22,7 @@ final class CapitalGains extends Command
     /**
      * @var string
      */
-    protected static $defaultName = 'taxes:capital-gains';
+    protected static $defaultName = 'taxes:pre-2021:capital-gains';
 
     private string $symbol;
 

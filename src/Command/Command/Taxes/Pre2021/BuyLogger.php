@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kobens\Gemini\Command\Command\Taxes;
+namespace Kobens\Gemini\Command\Command\Taxes\Pre2021;
 
 use Kobens\Core\Db;
 use Symfony\Component\Console\Command\Command;
@@ -17,7 +17,7 @@ final class BuyLogger extends Command
     /**
      * @var string
      */
-    protected static $defaultName = 'taxes:buy-logger';
+    protected static $defaultName = 'taxes:pre-2021:buy-logger';
 
     private ?TableGateway $tblBuyLog = null;
 
@@ -36,9 +36,13 @@ final class BuyLogger extends Command
         do {
             /** @var \Zend\Db\ResultSet\ResultSetInterface $rows */
             $rows = $this->getTradeHistoryTable()->select(function (Select $select) {
-                $select->columns(['tid','amount']);
-                $select->where->notIn('tid', (new Select('taxes_' . $this->symbol . '_buy_log'))->columns(['tid']));
+                $select->columns(['tid', 'amount']);
+                $select->where->notIn(
+                    'tid',
+                    (new Select('taxes_' . $this->symbol . '_buy_log'))->columns(['tid'])
+                );
                 $select->where->equalTo('type', 'buy');
+                $select->where->lessThan('trade_date', '2021-01-01 00:00:00');
                 $select->order('tid ASC');
                 $select->limit(10000);
             });
