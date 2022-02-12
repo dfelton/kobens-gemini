@@ -14,6 +14,7 @@ do
     if [ $? -eq 1 ]
     then
         php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history $pair &
-        sleep 0.2
+        # by staggering the start time we reduce risk of running into rate limits
+        sleep 2
     fi
 done
