@@ -236,6 +236,7 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\PricePointGenerator(
     new PricePointGenerator($apiMakerHoldBps)
 ));
 
+$app->add(new \Kobens\Gemini\Command\Command\Report\YearToDateVolume($adapter));
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Buyer(
     $shutdownInterface,
     $buyReadyInterface,
@@ -400,10 +401,10 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\CliMonitor\Account($d
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\CliMonitor\Pair($data, $sleeperInterface));
 unset($data);
 
-// $app->add(new \Kobens\Gemini\Command\Command\Taxes\CapitalGains()); // @deprecated
-$app->add(new \Kobens\Gemini\Command\Command\Taxes\BuyLogger());
-$app->add(new \Kobens\Gemini\Command\Command\Taxes\SellLogger());
-$app->add(new \Kobens\Gemini\Command\Command\Taxes\Form8949());
+// $app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2021\CapitalGains()); // @deprecated
+$app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2021\BuyLogger());
+$app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2021\SellLogger());
+$app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2021\Form8949());
 
 $app->add(new \Kobens\Gemini\Command\Command\Market\BookKeeper(
     new BookKeeperFactory($exchangeInterface, Cache::getInstance()),
