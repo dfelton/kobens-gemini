@@ -14,7 +14,7 @@ do
     if [ $? -eq 1 ]
     then
         php -n $(realpath $(dirname $BASH_SOURCE))/gemini market:book-keeper $pair &
-        sleep 0.25
+        sleep 1
     fi
 done
 
