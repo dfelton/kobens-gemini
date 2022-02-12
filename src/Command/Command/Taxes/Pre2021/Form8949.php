@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kobens\Gemini\Command\Command\Taxes;
+namespace Kobens\Gemini\Command\Command\Taxes\Pre2021;
 
 use Kobens\Core\Config;
 use Kobens\Core\Db;
@@ -20,7 +20,7 @@ use Zend\Db\TableGateway\TableGatewayInterface;
 
 final class Form8949 extends Command
 {
-    protected static $defaultName = 'taxes:form8949';
+    protected static $defaultName = 'taxes:pre-2021:form8949';
 
     /**
      * @var int
