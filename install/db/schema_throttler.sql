@@ -15,9 +15,9 @@ CREATE TABLE `throttler` (
 INSERT INTO `throttler` (`id`,`max`)
 VALUES
   ('api.sandbox.gemini.com::public',  2),
-  ('api.sandbox.gemini.com::private', 10),
+  ('api.sandbox.gemini.com::private', 8),
   ('api.gemini.com::public',  2),
-  ('api.gemini.com::private', 10)
+  ('api.gemini.com::private', 8)
 ;
 
 
