@@ -45,7 +45,7 @@ final class Pair extends Command
     {
         $this->setDescription('Monitoring output on trades and the market');
         $this->addArgument('symbol', InputArgument::OPTIONAL, 'Comma separated trading pair(s) to show trade-repeater data for', 'btcusd');
-        $this->addOption('disable-loop', 'd', InputOption::VALUE_OPTIONAL, 'Disable continous output', false);
+        $this->addOption('loop', 'l', InputOption::VALUE_OPTIONAL, 'Continous output', '0');
         $this->addOption(
             'refresh',
             'r',
@@ -63,7 +63,7 @@ final class Pair extends Command
     {
         $exitCode = 0;
         $sleep = $this->getRefreshRate($input);
-        $loop = $input->getOption('disable-loop') === false;
+        $loop = ((string) $input->getOption('loop')) === '1';
         do {
             try {
                 $this->main($input, $output);
