@@ -111,7 +111,7 @@ final class Data implements DataInterface
     public function getExtra(): array
     {
         $records = $this->tblTradeRepeater->select(function (Select $select) {
-            $select->columns(['symbol', 'buy_price', 'buy_amount', 'meta']);
+            $select->columns(['symbol', 'status', 'buy_price', 'buy_amount', 'meta']);
             $select->where('is_enabled = 1');
         });
         $data = [];
@@ -138,7 +138,11 @@ final class Data implements DataInterface
                 $totalUsdInvestment = Add::getResult($totalUsdInvestment, $total);
 
                 $data[$pair->getSymbol()] = Add::getResult($data[$pair->getSymbol()], $total);
-                $usdMakerDeposit = Add::getResult($usdMakerDeposit, $makerDeposit);
+
+                // If the record is in a BUY_PLACED status, the funds for the maker deposit is already accounted for in the order
+                if ($record->status !== 'BUY_PLACED') {
+                    $usdMakerDeposit = Add::getResult($usdMakerDeposit, $makerDeposit);
+                }
 
                 $strlen = strlen(explode('.', $data[$pair->getSymbol()])[1] ?? '');
                 if ($strlen > $longestDecimal) {
