@@ -17,16 +17,20 @@ final class ReInvest
 {
     private Update $update;
 
+    private string $percent;
+
     public function __construct(
-        Update $update
+        Update $update,
+        string $percent
     ) {
         $this->update = $update;
+        $this->percent = $percent;
     }
 
-    public function execute(string $quoteAmount, Trade $trade, string $use = '0.50'): string
+    public function execute(string $quoteAmount, Trade $trade): string
     {
         $pair = Pair::getInstance($trade->getSymbol());
-        $reinvestInSamePosition = Multiply::getResult($quoteAmount, $use);
+        $reinvestInSamePosition = Multiply::getResult($quoteAmount, $this->percent);
         $calculation = new Calculator($pair, $reinvestInSamePosition, $trade->getBuyPrice());
         if (Compare::getResult($calculation->getBaseAmount(), $pair->getMinOrderIncrement()) !== Compare::RIGHT_GREATER_THAN) {
             $buyAmount = Add::getResult($trade->getBuyAmount(), $calculation->getBaseAmount());
