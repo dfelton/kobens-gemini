@@ -49,13 +49,6 @@ fi
 #
 # Statistics and Misc
 #
-ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini repeater:stats:daily-profit"
-if [ $? -eq 1 ]; then
-    echo Repeater - Starting Daily Profit Stats
-    php -n $(realpath $(dirname $BASH_SOURCE))/gemini repeater:stats:daily-profit &
-    sleep 0.25
-fi
-
 ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini repeater:usd-profits-dist"
 if [ $? -eq 1 ]; then
     echo Repeater - Starting USD Profits Distributor
