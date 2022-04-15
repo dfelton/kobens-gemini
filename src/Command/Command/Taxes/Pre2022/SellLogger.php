@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kobens\Gemini\Command\Command\Taxes\Pre2021;
+namespace Kobens\Gemini\Command\Command\Taxes\Pre2022;
 
 use Kobens\Core\Db;
 use Kobens\Gemini\Exchange\Currency\Pair;
@@ -26,7 +26,7 @@ use Zend\Db\TableGateway\TableGateway;
  */
 final class SellLogger extends Command
 {
-    protected static $defaultName = 'taxes:pre-2021:sell-logger';
+    protected static $defaultName = 'taxes:pre-2022:sell-logger';
 
     private ?TableGateway $tblSellLog = null;
 
@@ -46,15 +46,6 @@ final class SellLogger extends Command
         $conn = Db::getAdapter()->getDriver()->getConnection();
         $pair = Pair::getInstance($input->getOption('symbol'));
         $this->symbol = $pair->getSymbol();
-
-//         $output->writeln('Truncating existing tables');
-//         $conn->execute("TRUNCATE taxes_{$pair->getSymbol()}_buy_log;");
-//         $conn->execute("TRUNCATE taxes_{$pair->getSymbol()}_sell_log;");
-
-        $output->writeln('Populating buy table');
-        $buyLogger = new BuyLogger();
-        $buyLogger->setApplication($this->getApplication());
-        $buyLogger->run($input, $output);
 
         $bps = BPS::getInstance();
         do {
@@ -94,13 +85,29 @@ final class SellLogger extends Command
                                 throw \ErrorException();
                         }
 
-                        $sellFeePercent = $bps->getRate($sell['amount'], $sell['price'], $sell['fee_amount']);
-                        $buyFeePercent  = $bps->getRate($buy['amount'], $buy['price'], $buy['fee_amount']);
+                        $sellToLogQuoteAmount = Multiply::getResult($logAmount, $sell['price']);
+                        if ($sell['fee_amount'] === '0.00') {
+                            $sellToLogFee = '0.00';
+                        } else {
+                            try {
+                                $sellFeePercent = $bps->getRate($sell['amount'], $sell['price'], $sell['fee_amount']);
+                            } catch (\LogicException $e) {
+                                $sellFeePercent = '0.001';
+                            }
+                            $sellToLogFee = Multiply::getResult($sellToLogQuoteAmount, $sellFeePercent);
+                        }
 
                         $buyToLogQuoteAmount  = Multiply::getResult($logAmount, $buy['price']);
-                        $buyToLogFee          = Multiply::getResult($buyToLogQuoteAmount, $buyFeePercent);
-                        $sellToLogQuoteAmount = Multiply::getResult($logAmount, $sell['price']);
-                        $sellToLogFee         = Multiply::getResult($sellToLogQuoteAmount, $sellFeePercent);
+                        if ($buy['fee_amount'] === '0.00') {
+                            $buyToLogFee = '0.00';
+                        } else {
+                            try {
+                                $buyFeePercent  = $bps->getRate($buy['amount'], $buy['price'], $buy['fee_amount']);
+                            } catch (\LogicException $e) {
+                                $buyFeePercent = '0.001';
+                            }
+                            $buyToLogFee = Multiply::getResult($buyToLogQuoteAmount, $buyFeePercent);
+                        }
 
                         $costBasis   = Add::getResult($buyToLogQuoteAmount, $buyToLogFee);
                         $proceeds    = Subtract::getResult($sellToLogQuoteAmount, $sellToLogFee);
@@ -208,7 +215,7 @@ final class SellLogger extends Command
                 (new Select('taxes_' . $this->symbol . '_sell_log'))->columns(['sell_tid'])
             );
             $select->where->equalTo('type', 'sell');
-            $select->where->lessThan('trade_date', '2021-01-01 00:00:00');
+            $select->where->lessThan('trade_date', '2022-01-01 00:00:00');
             $select->order('tid ASC');
             $select->limit(100);
         });

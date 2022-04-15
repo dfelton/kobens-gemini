@@ -35,6 +35,42 @@ CREATE TABLE IF NOT EXISTS `taxes_aaveusd_sell_log` (
 
 
 
+CREATE TABLE IF NOT EXISTS `taxes_ashusd_buy_log` (
+    `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+    `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - ASHUSD Buy Log';
+
+CREATE TABLE IF NOT EXISTS `taxes_ashusd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - ASHUSD Sell Log';
+
+
+
+
+CREATE TABLE IF NOT EXISTS `taxes_alcxusd_buy_log` (
+    `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+    `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - ALCXUSD Buy Log';
+
+CREATE TABLE IF NOT EXISTS `taxes_alcxusd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - ALCXUSD Sell Log';
+
+
 
 CREATE TABLE IF NOT EXISTS `taxes_ampusd_buy_log` (
     `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
@@ -70,6 +106,56 @@ CREATE TABLE IF NOT EXISTS `taxes_ankrusd_sell_log` (
     PRIMARY KEY (`sell_tid`, `buy_tid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - ANKRUSD Sell Log';
 
+
+CREATE TABLE IF NOT EXISTS `taxes_api3usd_buy_log` (
+    `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+    `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - API3USD Buy Log';
+
+CREATE TABLE IF NOT EXISTS `taxes_api3usd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - API3USD Sell Log';
+
+
+CREATE TABLE IF NOT EXISTS `taxes_audiousd_buy_log` (
+    `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+    `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - AUDIOUSD Buy Log';
+
+CREATE TABLE IF NOT EXISTS `taxes_audiousd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - AUDIOUSD Sell Log';
+
+
+CREATE TABLE IF NOT EXISTS `taxes_axsusd_buy_log` (
+    `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+    `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - AXSUSD Buy Log';
+
+CREATE TABLE IF NOT EXISTS `taxes_axsusd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - AXSUSD Sell Log';
 
 
 
@@ -330,6 +416,23 @@ CREATE TABLE IF NOT EXISTS `taxes_ethusd_sell_log` (
 
 
 
+CREATE TABLE IF NOT EXISTS `taxes_fetusd_buy_log` (
+    `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+    `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - FETUSD Buy Log';
+
+CREATE TABLE IF NOT EXISTS `taxes_fetusd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - FETUSD Sell Log';
+
+
 
 CREATE TABLE IF NOT EXISTS `taxes_filusd_buy_log` (
     `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
@@ -457,6 +560,22 @@ CREATE TABLE IF NOT EXISTS `taxes_lptusd_sell_log` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - LPTUSD Sell Log';
 
 
+CREATE TABLE IF NOT EXISTS `taxes_lunausd_buy_log` (
+    `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+    `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - LUNAUSD Buy Log';
+
+CREATE TABLE IF NOT EXISTS `taxes_lunausd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - LUNAUSD Sell Log';
+
 
 CREATE TABLE IF NOT EXISTS `taxes_lrcusd_buy_log` (
     `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
@@ -511,6 +630,22 @@ CREATE TABLE IF NOT EXISTS `taxes_manausd_sell_log` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - MANAUSD Sell Log';
 
 
+CREATE TABLE IF NOT EXISTS `taxes_maskusd_buy_log` (
+    `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+    `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - MASKUSD Buy Log';
+
+CREATE TABLE IF NOT EXISTS `taxes_maskusd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - MASKUSD Sell Log';
+
 
 CREATE TABLE IF NOT EXISTS `taxes_maticusd_buy_log` (
     `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
@@ -529,6 +664,22 @@ CREATE TABLE IF NOT EXISTS `taxes_maticusd_sell_log` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - MATICUSD Sell Log';
 
 
+
+CREATE TABLE IF NOT EXISTS `taxes_mco2usd_buy_log` (
+    `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+    `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - MCO2USD Buy Log';
+
+CREATE TABLE IF NOT EXISTS `taxes_mco2usd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - MCO2USD Sell Log';
 
 
 CREATE TABLE IF NOT EXISTS `taxes_mirusd_buy_log` (
@@ -567,6 +718,22 @@ CREATE TABLE IF NOT EXISTS `taxes_mkrusd_sell_log` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - MKRUSD Sell Log';
 
 
+
+CREATE TABLE IF NOT EXISTS `taxes_nmrusd_buy_log` (
+    `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+    `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - NMRUSD Buy Log';
+
+CREATE TABLE IF NOT EXISTS `taxes_nmrusd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - NMRUSD Sell Log';
 
 
 
@@ -608,6 +775,57 @@ CREATE TABLE IF NOT EXISTS `taxes_paxgusd_sell_log` (
 
 
 
+CREATE TABLE IF NOT EXISTS `taxes_qntusd_buy_log` (
+    `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+    `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - QNTUSD Buy Log';
+
+CREATE TABLE IF NOT EXISTS `taxes_qntusd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - QNTUSD Sell Log';
+
+
+
+CREATE TABLE IF NOT EXISTS `taxes_radusd_buy_log` (
+    `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+    `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - RADUSD Buy Log';
+
+CREATE TABLE IF NOT EXISTS `taxes_radusd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - RADUSD Sell Log';
+
+
+CREATE TABLE IF NOT EXISTS `taxes_rareusd_buy_log` (
+    `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+    `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - RAREUSD Buy Log';
+
+CREATE TABLE IF NOT EXISTS `taxes_rareusd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - RAREUSD Sell Log';
+
 
 CREATE TABLE IF NOT EXISTS `taxes_renusd_buy_log` (
     `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
@@ -647,6 +865,23 @@ CREATE TABLE IF NOT EXISTS `taxes_sandusd_sell_log` (
 
 
 
+CREATE TABLE IF NOT EXISTS `taxes_shibusd_buy_log` (
+    `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+    `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - SHIBUSD Buy Log';
+
+CREATE TABLE IF NOT EXISTS `taxes_shibusd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - SHIBUSD Sell Log';
+
+
 
 CREATE TABLE IF NOT EXISTS `taxes_sklusd_buy_log` (
     `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
@@ -664,6 +899,22 @@ CREATE TABLE IF NOT EXISTS `taxes_sklusd_sell_log` (
     PRIMARY KEY (`sell_tid`, `buy_tid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - SKLUSD Sell Log';
 
+
+CREATE TABLE IF NOT EXISTS `taxes_slpusd_buy_log` (
+    `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+    `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - SLPUSD Buy Log';
+
+CREATE TABLE IF NOT EXISTS `taxes_slpusd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - SLPUSD Sell Log';
 
 
 
@@ -759,6 +1010,40 @@ CREATE TABLE IF NOT EXISTS `taxes_uniusd_sell_log` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - UNIUSD Sell Log';
 
 
+
+CREATE TABLE IF NOT EXISTS `taxes_ustusd_buy_log` (
+    `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+    `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - USTUSD Buy Log';
+
+CREATE TABLE IF NOT EXISTS `taxes_ustusd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - USTUSD Sell Log';
+
+
+
+CREATE TABLE IF NOT EXISTS `taxes_wcfgusd_buy_log` (
+    `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+    `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - WCFGUSD Buy Log';
+
+CREATE TABLE IF NOT EXISTS `taxes_wcfgusd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - WCFGUSD Sell Log';
 
 
 CREATE TABLE IF NOT EXISTS `taxes_xtzusd_buy_log` (

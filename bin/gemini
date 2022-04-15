@@ -401,10 +401,10 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\CliMonitor\Account($d
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\CliMonitor\Pair($data, $sleeperInterface));
 unset($data);
 
-// $app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2021\CapitalGains()); // @deprecated
-$app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2021\BuyLogger());
-$app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2021\SellLogger());
-$app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2021\Form8949());
+// $app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2022\CapitalGains()); // @deprecated
+$app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2022\BuyLogger());
+$app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2022\SellLogger());
+$app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2022\Form8949());
 
 $app->add(new \Kobens\Gemini\Command\Command\Market\BookKeeper(
     new BookKeeperFactory($exchangeInterface, Cache::getInstance()),

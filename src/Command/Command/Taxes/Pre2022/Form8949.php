@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kobens\Gemini\Command\Command\Taxes\Pre2021;
+namespace Kobens\Gemini\Command\Command\Taxes\Pre2022;
 
 use Kobens\Core\Config;
 use Kobens\Core\Db;
@@ -20,7 +20,7 @@ use Zend\Db\TableGateway\TableGatewayInterface;
 
 final class Form8949 extends Command
 {
-    protected static $defaultName = 'taxes:pre-2021:form8949';
+    protected static $defaultName = 'taxes:pre-2022:form8949';
 
     /**
      * @var int
@@ -52,6 +52,7 @@ final class Form8949 extends Command
     {
         $this->addArgument('year', InputArgument::REQUIRED);
         $this->setDescription('US Federal Tax Form 8949 & Gemini 1099-K');
+        $this->addArgument('compare_1099', InputArgument::OPTIONAL, 'Compare to 1099-K', 0);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -59,8 +60,10 @@ final class Form8949 extends Command
         $this->year = (int) $input->getArgument('year');
         $data = $this->getData();
         $output->writeln($this->getForm8949($data['8949']));
-        $output->write(PHP_EOL);
-        $output->writeln($this->getForm1099K($data['1099-K']));
+        if ((int) $input->getArgument('compare_1099') === 1) {
+            $output->write(PHP_EOL);
+            $output->writeln($this->getForm1099K($data['1099-K']));
+        }
         return 0;
     }
 
