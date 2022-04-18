@@ -130,18 +130,21 @@ final class Form8949 extends Command
         }
         $output[] = "\nGrand Total Summary:\n";
         $output[] = \sprintf(
-            "\tGross Proceeds:    $%s",
-            str_pad(number_format((float) $totalProceeds, 2), 12, ' ', STR_PAD_LEFT)
+            "\tGross Proceeds:     $%s",
+            str_pad(number_format((float) $totalProceeds, 2), 16, ' ', STR_PAD_LEFT)
         );
         $output[] = \sprintf(
-            "\tCost Basis:        $%s",
-            str_pad(number_format((float) $totalCostBasis, 2), 12, ' ', STR_PAD_LEFT)
+            "\tCost Basis:         $%s",
+            str_pad(number_format((float) $totalCostBasis, 2), 16, ' ', STR_PAD_LEFT)
         );
         $output[] = \sprintf(
-            "\tCapital Gain/Loss: $%s",
-            str_pad(number_format((float) $totalGainLoss, 2), 12, ' ', STR_PAD_LEFT)
+            "\tCapital Gain/Loss:  $%s",
+            str_pad(number_format((float) $totalGainLoss, 2), 16, ' ', STR_PAD_LEFT)
         );
-        $output[] = \sprintf("\tTotal Transactions:        %s", $totalTrades);
+        $output[] = \sprintf(
+            "\tTotal Transactions:  %s",
+            str_pad(number_format($totalTrades) . '   ', 16, ' ', STR_PAD_LEFT)
+        );
         return $output;
     }
 
