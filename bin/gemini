@@ -403,7 +403,11 @@ unset($data);
 
 // $app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2022\CapitalGains()); // @deprecated
 $app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2022\BuyLogger());
-$app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2022\SellLogger());
+$app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2022\SellLogger(
+    new \Kobens\Gemini\Taxes\SaleMetaFactory(
+        \Kobens\Gemini\Exchange\Order\Fee\Trade\BPS::getInstance()
+    )
+));
 $app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2022\Form8949());
 
 $app->add(new \Kobens\Gemini\Command\Command\Market\BookKeeper(
