@@ -1,5 +1,11 @@
 <?xml version="1.0"?>
 <config>
+    <coin_market_cap>
+        <api>
+            <host>sandbox-api.coinmarketcap.com</host>
+            <key>XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX</key>
+        </api>
+    </coin_market_cap>
     <gemini>
         <api>
             <host>api.sandbox.gemini.com</host>

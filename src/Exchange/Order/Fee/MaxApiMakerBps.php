@@ -11,7 +11,7 @@ final class MaxApiMakerBps
      *
      * @see https://gemini.com/fees/api-fee-schedule#api-fee
      */
-    private const MAX_API_MAKER_BPS = '10';
+    private const MAX_API_MAKER_BPS = '20';
 
     private function __construct()
     {

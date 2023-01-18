@@ -956,7 +956,7 @@ CREATE TABLE IF NOT EXISTS `taxes_storjusd_sell_log` (
 
 
 
-CREATE TABLE IF NOT EXISTS `taxes_suishiusd_buy_log` (
+CREATE TABLE IF NOT EXISTS `taxes_sushiusd_buy_log` (
     `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
     `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
     PRIMARY KEY (`tid`)

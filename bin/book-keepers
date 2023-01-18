@@ -5,16 +5,47 @@
 #
 
 ENV_FILE="$(realpath $(dirname $BASH_SOURCE))/.env"
+KILL_SWITCH="$(realpath $(dirname $(dirname $BASH_SOURCE)))/var/kill_market_book"
 [ ! -f $ENV_FILE ] && echo >&2 "No \"$ENV_FILE\" file found" && exit 1
 source $ENV_FILE
 
-for pair in "${SYMBOLS[@]}"
-do
-    ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini market:book-keeper $pair"
-    if [ $? -eq 1 ]
-    then
-        php -n $(realpath $(dirname $BASH_SOURCE))/gemini market:book-keeper $pair &
+export PATH="/usr/local/php-7.4.22/bin:$PATH"
+
+checkKillSwitch() {
+    [ -f $KILL_SWITCH ] && >&2 echo "Kill switch file '$KILL_SWITCH' detected." && exit 1
+}
+
+sleepSeconds() {
+    [[ "$1" == "" ]] && declare -i TIMER=5 || declare -i TIMER=$1
+
+    while [ $((--TIMER)) -ge 1 ]
+    do
         sleep 1
-    fi
+        checkKillSwitch
+    done
+}
+
+iteratePairs() {
+    declare -i SLEEP_TIME=$1
+
+    for pair in "${SYMBOLS[@]}"
+    do
+        ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini market:book-keeper $pair"
+        if [ $? -eq 1 ]
+        then
+            php -n $(realpath $(dirname $BASH_SOURCE))/gemini market:book-keeper $pair &
+            sleepSeconds $SLEEPTIME
+        fi
+    done
+}
+
+iteratePairs 1
+
+
+while true
+do
+    sleepSeconds 5
+    iteratePairs 5
+    sleepSeconds 600
 done
 

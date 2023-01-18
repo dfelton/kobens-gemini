@@ -156,7 +156,7 @@ final class TradeHistory extends Command
                 );
 
                 $this->sleeper->sleep(
-                    $this->delay,
+                    $this->delay + rand(10, 60),
                     function (): bool {
                         return $this->shutdown->isShutdownModeEnabled();
                     }

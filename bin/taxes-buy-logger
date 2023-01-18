@@ -1,0 +1,26 @@
+#!/bin/bash
+
+#
+# Taxes Processes
+#
+
+ENV_FILE="$(realpath $(dirname $BASH_SOURCE))/.env"
+[ ! -f $ENV_FILE ] && echo >&2 "No \"$ENV_FILE\" file found" && exit 1
+source $ENV_FILE
+
+for pair in "${SYMBOLS[@]}"
+do
+    ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini taxes:pre-2022:buy-logger -s $pair"
+    if [ $? -eq 1 ]
+    then
+        php -n $(realpath $(dirname $BASH_SOURCE))/gemini taxes:pre-2022:buy-logger -s $pair
+        if [ $? -ne 0 ]
+        then
+            exit 1
+        fi 
+    fi
+
+done
+
+exit 0
+

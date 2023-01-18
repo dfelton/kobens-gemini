@@ -118,7 +118,11 @@ final class Profits
         $longestNotional = 0;
         $longestAmount = 0;
         foreach ($profits['profits'] as $symbol => $amount) {
-            $notional = $this->getNotional($symbol, $amount);
+            try {
+                $notional = $this->getNotional($symbol, $amount);
+            } catch (\Kobens\Gemini\Exception\Api\Market\GetPrice\NullPriceException $e) {
+                continue;
+            } 
 
             $notionals[$symbol] = bcadd($notional, '0', 8);
             $profits['profits'][$symbol] = bcadd($amount, '0', 8);

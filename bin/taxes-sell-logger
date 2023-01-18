@@ -10,24 +10,17 @@ source $ENV_FILE
 
 for pair in "${SYMBOLS[@]}"
 do
-    ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini taxes:pre-2022:buy-logger -s $pair"
-    if [ $? -eq 1 ]
-    then
-        php -n $(realpath $(dirname $BASH_SOURCE))/gemini taxes:pre-2022:buy-logger -s $pair
-        if [ $? -ne 0 ]
-        then
-            exit 1
-        fi 
-    fi
 
     ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini taxes:pre-2022:sell-logger $pair"
     if [ $? -eq 1 ]
     then
+        echo WORKING ON $pair
         php -n $(realpath $(dirname $BASH_SOURCE))/gemini taxes:pre-2022:sell-logger $pair
         if [ $? -ne 0 ]
         then
             exit 1
         fi
+        echo $pair COMPLETE
     fi
 done
 

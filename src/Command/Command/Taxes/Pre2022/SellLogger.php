@@ -65,12 +65,16 @@ final class SellLogger extends Command
                 try {
                     $conn->beginTransaction();
                     do {
-                        $buy = $this->getNextBuyForSale();
+                        $buy = $this->getNextBuyForSale(
+                            $sell['trade_date'],
+                            $sell['tid'],
+                            $sell['price']
+                        );
                         if ($buy === []) {
                             throw new \Exception('missing buy order to match with sell.');
                         }
 
-                        $meta = $this->saleMetaFactory->get($sellRemaining, $buy, (array) $sell);
+                        $meta = $this->saleMetaFactory->get($sellRemaining, (array) $buy, (array) $sell);
 
                         $this->getBuyLogTable()->update(
                             ['amount_remaining' => $meta->getBuyRemaining()],
@@ -104,7 +108,108 @@ final class SellLogger extends Command
         return 0;
     }
 
-    private function getNextBuyForSale(): array
+    private function getNextBuyForSale(string $sellDate, string $currentSellTransactionId, string $sellPrice): array
+    {
+        $useOptimized = [
+            'AMPUSD',
+            'ANKRUSD',
+            'API3',
+            'ASH','BAT','BCH','BTC',
+            // CRV CTX  ENJ ETH FTM LINK LRC LTC LUNA MANA  MASK MATIC MCO2 QNT  SAND SKL  STORJ SUSHI XTZ YFI
+        ];
+        // TODO: need to also check a config flag, mom and ryan used FIFO for 2021
+        if ((int) substr($sellDate, 0, 4) === 2021) {
+            $data = $this->getNextBuyForSaleLookupShortTermLoss($sellDate, $currentSellTransactionId, $sellPrice);
+            if ($data === null) {
+                $data = $this->getNextBuyForSaleLookupLastInFirstOut($sellDate, $currentSellTransactionId);
+            }
+        } else {
+            $data = $this->getNextBuyForSaleViaFirstInFirstOut();
+        }
+
+        return $data;
+    }
+
+    private function getNextBuyForSaleLookupLastInFirstOut(string $sellDate, string $currentSellTransactionId): ?array
+    {
+        $rows = $this->getTradeHistoryTable()->select(function (Select $select) use ($sellDate, $currentSellTransactionId) {
+            $notInSelect = new Select('taxes_' . $this->symbol . '_buy_log');
+            $notInSelect->columns(['tid']);
+            $notInSelect->where->equalTo('amount_remaining', '0');
+
+            $select->where->equalTo('type', 'buy');
+            $select->where->lessThan('trade_date', $sellDate);
+            $select->where->lessThan('tid', $currentSellTransactionId);
+            $select->where->notIn(
+                'tid',
+                $notInSelect
+            );
+            $select->order('trade_date DESC');
+        });
+        $data = null;
+        foreach ($rows as $row) {
+            $data = (array) $row;
+            break;
+        }
+        if ($data !== null) {
+            $rows = $this->getBuyLogTable()->select(function (Select $select) use ($data) {
+                $select->where->equalTo('tid', $data['tid']);
+                $select->order('tid ASC');
+                $select->limit(1);
+            });
+            if ($rows->count() === 1) {
+                foreach ($rows as $row) {
+                    $data = \array_merge($data, (array) $row);
+                    break;
+                }
+            }
+            \ksort($data);
+        }
+        return $data;
+    }
+
+    // FIXME: Add check for term length
+    private function getNextBuyForSaleLookupShortTermLoss(string $sellDate, string $currentSellTransactionId, string $sellPrice): ?array
+    {
+        $rows = $this->getTradeHistoryTable()->select(function (Select $select) use ($sellDate, $currentSellTransactionId) {
+            $notInSelect = new Select('taxes_' . $this->symbol . '_buy_log');
+            $notInSelect->columns(['tid']);
+            $notInSelect->where->equalTo('amount_remaining', '0');
+
+            $select->where->equalTo('type', 'buy');
+            $select->where->lessThan('trade_date', $sellDate);
+            $select->where->lessThan('tid', $currentSellTransactionId);
+            $select->where->notIn(
+                'tid',
+                $notInSelect
+            );
+            $select->order('trade_date DESC');
+        });
+        $data = null;
+        foreach ($rows as $row) {
+            if (Compare::getResult($row['price'], $sellPrice) === Compare::LEFT_GREATER_THAN) {
+                $data = (array) $row;
+                break;
+            }
+        }
+        if ($data !== null) {
+            $rows = $this->getBuyLogTable()->select(function (Select $select) use ($data) {
+                $select->where->equalTo('tid', $data['tid']);
+                $select->order('tid ASC');
+                $select->limit(1);
+            });
+            if ($rows->count() === 1) {
+                foreach ($rows as $row) {
+                    $data = \array_merge($data, (array) $row);
+                    break;
+                }
+            }
+            \ksort($data);
+        }
+        return $data;
+    }
+
+    private function getNextBuyForSaleViaFirstInFirstOut(): array
     {
         $rows = $this->getBuyLogTable()->select(function (Select $select) {
             $select->where->notEqualTo('amount_remaining', '0');
@@ -120,10 +225,10 @@ final class SellLogger extends Command
             $rows = $this->getTradeHistoryTable()->select(function (Select $select) use ($data) {
                 $select->where->equalTo('tid', $data['tid']);
             });
-            foreach ($rows as $row) {
-                $data = \array_merge($data, (array) $row);
-                break;
-            }
+                foreach ($rows as $row) {
+                    $data = \array_merge($data, (array) $row);
+                    break;
+                }
         }
         \ksort($data);
         return $data;

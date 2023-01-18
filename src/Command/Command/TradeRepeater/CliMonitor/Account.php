@@ -59,7 +59,7 @@ final class Account extends Command
         $this->addOption('amount-notional', null, InputOption::VALUE_OPTIONAL, 'Show balance(s) "Notional Amount".', true);
         $this->addOption('available', null, InputOption::VALUE_OPTIONAL, 'Show balance(s) "Amount Available".', true);
         $this->addOption('available-notional', null, InputOption::VALUE_OPTIONAL, 'Show balance(s) "Amount Available Notional"', true);
-        $this->addOption('disable-loop', 'd', InputOption::VALUE_OPTIONAL, 'Disable continuous output', false);
+        $this->addOption('disable-loop', 'd', InputOption::VALUE_OPTIONAL, 'Disable continuous output', true);
         $this->addOption(
             'refresh',
             'r',

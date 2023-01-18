@@ -1,67 +1,83 @@
 #!/bin/bash
 
+export PATH="/usr/local/php-7.4.22/bin:$PATH"
+
+GEMINI="$(realpath $(dirname $BASH_SOURCE))/gemini"
+
+KILL_SWITCH="$(realpath $(dirname $(dirname $BASH_SOURCE)))/var/emergency_shutdown"
+checkKillSwitch() {
+    [ -f $KILL_SWITCH ] && >&2 echo "Kill switch file '$KILL_SWITCH' detected." && exit 1
+}
+
 
 #
 # Trade Repeater
 #
-ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini repeater:fill-monitor-websocket"
+checkKillSwitch
+ps aux | grep -v grep | grep -q "$GEMINI repeater:fill-monitor-websocket"
 if [ $? -eq 1 ]; then
     echo Repeater - Starting Websocket Fill Monitor
-    php -n $(realpath $(dirname $BASH_SOURCE))/gemini repeater:fill-monitor-websocket &
+    php -n $GEMINI repeater:fill-monitor-websocket &
     sleep 0.25
 fi
 
-ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini repeater:buyer"
+checkKillSwitch
+ps aux | grep -v grep | grep -q "$GEMINI repeater:buyer"
 if [ $? -eq 1 ]; then
     echo Repeater - Starting Buyer
-    php -n $(realpath $(dirname $BASH_SOURCE))/gemini repeater:buyer &
+    php -n $GEMINI repeater:buyer &
     sleep 0.25
 fi
 
-ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini repeater:seller"
+checkKillSwitch
+ps aux | grep -v grep | grep -q "$GEMINI repeater:seller"
 if [ $? -eq 1 ]; then
     echo Repeater - Starting Seller
-    php -n $(realpath $(dirname $BASH_SOURCE))/gemini repeater:seller &
+    php -n $GEMINI repeater:seller &
     sleep 0.25
 fi
 
-ps aux | grep -v 'grep\|fill-time' | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini repeater:archiver"
+checkKillSwitch
+ps aux | grep -v 'grep\|fill-time' | grep -q "$GEMINI repeater:archiver"
 if [ $? -eq 1 ]; then
     echo 'Repeater - Starting Archiver (main)'
-    php -n $(realpath $(dirname $BASH_SOURCE))/gemini repeater:archiver &
+    php -n $GEMINI repeater:archiver &
     sleep 0.25
 fi
 
-ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini repeater:archiver:fill-time"
+checkKillSwitch
+ps aux | grep -v grep | grep -q "$GEMINI repeater:archiver:fill-time"
 if [ $? -eq 1 ]; then
     echo 'Repeater - Starting Archiver (Fill Timestamp)'
-    php -n $(realpath $(dirname $BASH_SOURCE))/gemini repeater:archiver:fill-time &
+    php -n $GEMINI repeater:archiver:fill-time &
     sleep 0.25
 fi
 
-ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini repeater:fill-monitor-rest"
+checkKillSwitch
+ps aux | grep -v grep | grep -q "$GEMINI repeater:fill-monitor-rest"
 if [ $? -eq 1 ]; then
     echo Repeater - Starting Rest Fill Monitor
-    php -n $(realpath $(dirname $BASH_SOURCE))/gemini repeater:fill-monitor-rest &
+    php -n $GEMINI repeater:fill-monitor-rest &
     sleep 0.25
 fi
 
 #
 # Statistics and Misc
 #
-ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini repeater:stats:daily-profit"
-if [ $? -eq 1 ]; then
-    echo Repeater - Starting Daily Profit Stats
-    php -n $(realpath $(dirname $BASH_SOURCE))/gemini repeater:stats:daily-profit &
-    sleep 0.25
-fi
+#checkKillSwitch
+#ps aux | grep -v grep | grep -q "$GEMINI repeater:stats:daily-profit"
+#if [ $? -eq 1 ]; then
+#    echo Repeater - Starting Daily Profit Stats
+#    php -n $GEMINI repeater:stats:daily-profit &
+#    sleep 0.25
+#fi
 
-ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini repeater:usd-profits-dist"
-if [ $? -eq 1 ]; then
-    echo Repeater - Starting USD Profits Distributor
-    php -n $(realpath $(dirname $BASH_SOURCE))/gemini repeater:usd-profits-dist &
-    sleep 0.25
-fi
+#ps aux | grep -v grep | grep -q "$GEMINI repeater:usd-profits-dist"
+#if [ $? -eq 1 ]; then
+#    echo Repeater - Starting USD Profits Distributor
+#    php -n $GEMINI repeater:usd-profits-dist &
+#    sleep 0.25
+#fi
 
 
 #

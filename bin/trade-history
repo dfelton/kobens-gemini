@@ -4,17 +4,27 @@
 # Trade History Processes
 #
 
+export PATH="/usr/local/php-7.4.22/bin:$PATH"
+
 ENV_FILE="$(realpath $(dirname $BASH_SOURCE))/.env"
 [ ! -f $ENV_FILE ] && echo >&2 "No \"$ENV_FILE\" file found" && exit 1
 source $ENV_FILE
 
+GEMINI="$(realpath $(dirname $BASH_SOURCE))/gemini"
+
+KILL_SWITCH="$(realpath $(dirname $(dirname $BASH_SOURCE)))/var/emergency_shutdown"
+checkKillSwitch() {
+    [ -f $KILL_SWITCH ] && >&2 echo "Kill switch file '$KILL_SWITCH' detected." && exit 1
+}
+
+
 for pair in "${SYMBOLS[@]}"
 do
-    ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history $pair"
+    checkKillSwitch 
+    ps aux | grep -v grep | grep -q "$GEMINI logger:trade-history $pair"
     if [ $? -eq 1 ]
     then
-        php -n $(realpath $(dirname $BASH_SOURCE))/gemini logger:trade-history $pair &
-        # by staggering the start time we reduce risk of running into rate limits
-        sleep 2
+        php -n $GEMINI logger:trade-history $pair &
+        sleep 0.25
     fi
 done

@@ -1,6 +1,5 @@
 {
     "name": "kobens/kobens-gemini",
-    "version": "0.0.1",
     "description": "For facilitating trades on the Gemini exchange.",
     "type": "project",
     "license": "BSD-3-Clause",
@@ -11,28 +10,32 @@
             "email": "darren_felton@hotmail.com"
         }
     ],
-    "repositories": [
-        {
+    "repositories": {
+        "coin-market-cap": {
+            "type": "path",
+            "url": "/home/dfelton/repos/dfelton/kobens-coin-market-cap"
+        },
+        "kobens-core": {
             "type": "vcs",
             "url": "https://github.com/dfelton/kobens-core"
         },
-        {
+        "kobens-currency": {
             "type": "vcs",
             "url": "https://github.com/dfelton/kobens-currency"
         },
-        {
+        "kobens-exchange": {
             "type": "vcs",
             "url": "https://github.com/dfelton/kobens-exchange"
         },
-        {
+        "kobens-math": {
             "type": "vcs",
             "url": "https://github.com/dfelton/kobens-math"
         },
-        {
+        "kobens-http": {
             "type": "vcs",
             "url": "https://github.com/dfelton/kobens-http"
         }
-    ],
+    },
     "require": {
         "php": "^7.4",
         "ext-bcmath": "*",
@@ -48,7 +51,8 @@
         "kobens/kobens-math": "^2.0",
         "symfony/console": "^4.2",
         "zendframework/zend-config": "^3.2",
-        "zendframework/zend-db": "^2.9"
+        "zendframework/zend-db": "^2.9",
+        "kobens/coin-market-cap": "dev-main"
     },
     "require-dev": {
         "zendframework/zend-debug": "^2.6",
@@ -69,20 +73,23 @@
         "platform": {
             "php": "7.4"
         },
-        "github-protocols": ["ssh"],
+        "github-protocols": [
+            "ssh"
+        ],
         "preferred-install": {
             "kobens/*": "source",
             "*": "dist"
-        }
+        },
+        "sort-packages": true
     },
     "scripts": {
-        "test": [
+        "phpunit": [
             "phpunit -v test/Unit"
         ],
-        "fmt-check": [
+        "phpcs": [
             "phpcs --standard=PSR12 --exclude=PSR12.Files.FileHeader,Generic.Files.LineLength --cache src"
         ],
-        "fmt": [
+        "phpcbf": [
             "phpcbf --standard=PSR12 src"
         ]
     }

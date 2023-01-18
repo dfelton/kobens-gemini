@@ -23,7 +23,7 @@ final class ReInvest
         $this->update = $update;
     }
 
-    public function execute(string $quoteAmount, Trade $trade, string $use = '0.50'): string
+    public function execute(string $quoteAmount, Trade $trade, string $use = '0.10'): string
     {
         $pair = Pair::getInstance($trade->getSymbol());
         $reinvestInSamePosition = Multiply::getResult($quoteAmount, $use);

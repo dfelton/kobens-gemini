@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a4929151688ddf43aa1113fb8463d4ee",
+    "content-hash": "28ac18c5ae52b00388d1af93b75fdfca",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1264,6 +1264,25 @@
                 "source": "https://github.com/kelunik/certificate/tree/master"
             },
             "time": "2020-01-29T20:07:08+00:00"
+        },
+        {
+            "name": "kobens/coin-market-cap",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "/home/dfelton/repos/dfelton/kobens-coin-market-cap",
+                "reference": "0ea7a5da6c9c9b9421e35fa80aed6cceebf1471c"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Kobens\\CoinMarketCap\\": "src/"
+                }
+            },
+            "description": "API Library for CoinMarketCap",
+            "transport-options": {
+                "relative": false
+            }
         },
         {
             "name": "kobens/kobens-core",
@@ -4866,7 +4885,8 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "kobens/kobens-core": 20,
-        "kobens/kobens-http": 20
+        "kobens/kobens-http": 20,
+        "kobens/coin-market-cap": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
@@ -4882,5 +4902,5 @@
     "platform-overrides": {
         "php": "7.4"
     },
-    "plugin-api-version": "2.0.0"
+    "plugin-api-version": "2.2.0"
 }
