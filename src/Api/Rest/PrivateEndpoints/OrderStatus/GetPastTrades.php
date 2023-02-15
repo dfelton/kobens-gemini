@@ -26,10 +26,10 @@ final class GetPastTrades implements GetPastTradesInterface
      * {@inheritDoc}
      * @see \Kobens\Gemini\Api\Rest\PrivateEndpoints\OrderStatus\GetPastTradesInterface::getTrades()
      */
-    public function getTrades(string $symbol, int $timestampms = null, int $limitTrades = null): array
+    public function getTrades(string $symbol, ?int $timestampms = null, ?int $sinceTransactionId = null, ?int $limitTrades = null): array
     {
         $response = null;
-        $payload = $this->getPayload($symbol, $timestampms, $limitTrades);
+        $payload = $this->getPayload($symbol, $timestampms, $sinceTransactionId, $limitTrades);
         $i = 0;
         while ($response === null && ++$i <= 15) {
             try {
@@ -47,18 +47,14 @@ final class GetPastTrades implements GetPastTradesInterface
         return \json_decode($response->getBody());
     }
 
-    /**
-     * @param string $symbol
-     * @param int $timestampms
-     * @param int $limitTrades
-     * @throws \LogicException
-     * @return array
-     */
-    private function getPayload(string $symbol, int $timestampms, int $limitTrades): array
+    private function getPayload(string $symbol, ?int $timestampms, ?int $sinceTransactionId, ?int $limitTrades = null): array
     {
         $payload = ['symbol' => $symbol];
         if ($timestampms !== null) {
-            $payload['timestamp'] = $timestampms;
+            $payload['timestamp_nanos'] = $timestampms;
+        }
+        if ($sinceTransactionId !== null) {
+            $payload['since_tid'] = $sinceTransactionId;
         }
         if ($limitTrades !== null) {
             if ($limitTrades < I::LIMIT_MIN || $limitTrades > I::LIMIT_MAX) {

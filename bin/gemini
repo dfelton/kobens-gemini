@@ -204,7 +204,7 @@ $addAmount = new AddAmount($cancelOrderInterface, $getPriceInterface, $orderStat
 
 $repeaterProfitsBucket = new Bucket($adapter);
 
-$app = new \Symfony\Component\Console\Application($composer->name, $composer->version);
+$app = new \Symfony\Component\Console\Application($composer->name);
 $app->add(new \Kobens\Gemini\Command\Command\Info\Pair());
 
 // TODO: All TradeRepeater classes will need to use Kobens\Gemini\Api\Rest\* objects that have their own KeyInterface per TradeRepeater to avoid Nonce clashing
@@ -404,10 +404,14 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\CliMonitor\Account($d
 $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\CliMonitor\Pair($data, $sleeperInterface));
 unset($data);
 
-// $app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2021\CapitalGains()); // @deprecated
-$app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2021\BuyLogger());
-$app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2021\SellLogger());
-$app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2021\Form8949());
+// $app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2022\CapitalGains()); // @deprecated
+$app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2022\BuyLogger());
+$app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2022\SellLogger(
+    new \Kobens\Gemini\Taxes\SaleMetaFactory(
+        \Kobens\Gemini\Exchange\Order\Fee\Trade\BPS::getInstance()
+    )
+));
+$app->add(new \Kobens\Gemini\Command\Command\Taxes\Pre2022\Form8949());
 
 $app->add(new \Kobens\Gemini\Command\Command\Market\BookKeeper(
     new BookKeeperFactory($exchangeInterface, Cache::getInstance()),

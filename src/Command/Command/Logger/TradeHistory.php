@@ -117,9 +117,8 @@ final class TradeHistory extends Command
     protected function main(InputInterface $input, OutputInterface $output): int
     {
         $exitCode = 0;
-        $timestampms = $this->getLastTradeTimestampMs();
         try {
-            $this->mainLoop($output, $timestampms);
+            $this->mainLoop($output, $this->getLastTradeTimestampMs());
         } catch (\Throwable $e) {
             $this->shutdown->enableShutdownMode($e);
             $exitCode = 1;
@@ -130,8 +129,6 @@ final class TradeHistory extends Command
     private function mainLoop(OutputInterface $output, int $timestampms): void
     {
         while (!$this->shutdown->isShutdownModeEnabled()) {
-            $pageFirstTimestampms = $timestampms;
-
             if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                 $output->writeln(\sprintf(
                     "\n%s\tFetching page %d (%s)",
@@ -142,7 +139,7 @@ final class TradeHistory extends Command
             }
 
             try {
-                $page = $this->pastTrades->getTrades($this->symbol, $timestampms, GetPastTradesInterface::LIMIT_MAX);
+                $page = $this->pastTrades->getTrades($this->symbol, $timestampms, $this->getLastTradeTransactionId());
             } catch (ConnectionException | GatewayTimeoutException | MaxIterationsException | MaintenanceException | SystemException $e) {
                 $this->writeWarning(
                     implode(
@@ -156,7 +153,7 @@ final class TradeHistory extends Command
                 );
 
                 $this->sleeper->sleep(
-                    $this->delay,
+                    $this->delay + rand(10, 60),
                     function (): bool {
                         return $this->shutdown->isShutdownModeEnabled();
                     }
@@ -190,21 +187,6 @@ final class TradeHistory extends Command
             if (!$this->shutdown->isShutdownModeEnabled()) {
                 if ($hadResults) {
                     $timestampms = $this->getLastTradeTimestampMs();
-                    if ($timestampms === $pageFirstTimestampms) {
-                        ++$timestampms;
-                        if (\count($page) === GetPastTradesInterface::LIMIT_MAX) {
-                            // TODO: Support ticket # 1385118
-                            // throw new \Exception(
-                            //     'Unable to ensure we can fetch the next page. Maximum results per page yielded trade all executing on the same timestamp. Timestamp Milliseconds: ' . $timestampms
-                            // );
-                            $this->logPageLimitError($pageFirstTimestampms);
-                            $output->writeln(sprintf(
-                                "%s\t<fg=red>SKIPPING POTENTIAL %d ORDERS DUE TO MAX PAGE SIZE LIMIT.</>",
-                                $this->getNow(),
-                                $timestampms
-                            ));
-                        }
-                    }
                 } else {
                     if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                         $output->write(\sprintf(
@@ -229,14 +211,6 @@ final class TradeHistory extends Command
         }
     }
 
-    private function logPageLimitError(int $timestampms): void
-    {
-        (new TableGateway('trade_history_pageLimitError', Db::getAdapter()))->insert([
-            'symbol' => $this->symbol,
-            'timestampms' => $timestampms,
-        ]);
-    }
-
     private function logTrade(\stdClass $trade): bool
     {
         if ($this->transactionExists($trade->tid)) {
@@ -255,31 +229,32 @@ final class TradeHistory extends Command
             'client_order_id' => \property_exists($trade, 'client_order_id') ? $trade->client_order_id : null,
             'trade_date' => \gmdate('Y-m-d H:i:s', $trade->timestamp),
         ]);
-        $this->lastInsertedTransactionId = $trade->tid;
         return true;
     }
 
     private function transactionExists(int $tid): bool
     {
-//         $exists = false;
-//         if ($this->lastInsertedTransactionId === null) {
-            $result = $this->getTable()->select(function (Select $select) use ($tid): void {
-                $select->where->equalTo('tid', $tid);
-            });
-            $exists = $result->count() === 1;
-//             if ($exists) {
-//                 $this->lastInsertedTransactionId = $tid;
-//             }
-//         } else {
-//             $exists = $tid === $this->lastInsertedTransactionId;
-//         }
-        return $exists;
+        $result = $this->getTable()->select(function (Select $select) use ($tid): void {
+            $select->where->equalTo('tid', $tid);
+        });
+        return $result->count() === 1;
     }
 
-    /**
-     * @param string $symbol
-     * @return int
-     */
+    private function getLastTradeTransactionId(): ?int
+    {
+        /** @var \Zend\Db\ResultSet\ResultSet $rows */
+        $rows = $this->getTable()->select(function (Select $select) {
+            $select->columns(['tid']);
+            $select->order('tid DESC');
+            $select->limit(1);
+        });
+        $transactionId = null;
+        if ($rows->count() === 1) {
+            $transactionId = (int) $rows->current()->tid;
+        }
+        return $transactionId;
+    }
+
     private function getLastTradeTimestampMs(): int
     {
         /** @var \Zend\Db\ResultSet\ResultSet $rows */

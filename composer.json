@@ -1,38 +1,41 @@
 {
     "name": "kobens/kobens-gemini",
-    "version": "0.0.1",
     "description": "For facilitating trades on the Gemini exchange.",
     "type": "project",
     "license": "BSD-3-Clause",
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "authors": [
         {
             "name": "Darren Felton",
             "email": "darren_felton@hotmail.com"
         }
     ],
-    "repositories": [
-        {
+    "repositories": {
+        "coin-market-cap": {
+            "type": "path",
+            "url": "/home/dfelton/repos/dfelton/kobens-coin-market-cap"
+        },
+        "kobens-core": {
             "type": "vcs",
             "url": "https://github.com/dfelton/kobens-core"
         },
-        {
+        "kobens-currency": {
             "type": "vcs",
             "url": "https://github.com/dfelton/kobens-currency"
         },
-        {
+        "kobens-exchange": {
             "type": "vcs",
             "url": "https://github.com/dfelton/kobens-exchange"
         },
-        {
+        "kobens-math": {
             "type": "vcs",
             "url": "https://github.com/dfelton/kobens-math"
         },
-        {
+        "kobens-http": {
             "type": "vcs",
             "url": "https://github.com/dfelton/kobens-http"
         }
-    ],
+    },
     "require": {
         "php": "^7.4",
         "ext-bcmath": "*",
@@ -41,10 +44,10 @@
         "ext-json": "*",
         "ext-mbstring": "*",
         "amphp/websocket-client": "^1.0",
-        "kobens/kobens-core": "dev-master",
-        "kobens/kobens-currency": "^4.0",
-        "kobens/kobens-exchange": "^1.0",
-        "kobens/kobens-http": "dev-master",
+        "kobens/coin-market-cap": "dev-main",
+        "kobens/kobens-core": "^3",
+        "kobens/kobens-currency": "^4.3",
+        "kobens/kobens-exchange": "^3",
         "kobens/kobens-math": "^2.0",
         "symfony/console": "^4.2",
         "zendframework/zend-config": "^3.2",
@@ -69,20 +72,23 @@
         "platform": {
             "php": "7.4"
         },
-        "github-protocols": ["ssh"],
+        "github-protocols": [
+            "ssh"
+        ],
         "preferred-install": {
             "kobens/*": "source",
             "*": "dist"
-        }
+        },
+        "sort-packages": true
     },
     "scripts": {
-        "test": [
+        "phpunit": [
             "phpunit -v test/Unit"
         ],
-        "fmt-check": [
+        "phpcs": [
             "phpcs --standard=PSR12 --exclude=PSR12.Files.FileHeader,Generic.Files.LineLength --cache src"
         ],
-        "fmt": [
+        "phpcbf": [
             "phpcbf --standard=PSR12 src"
         ]
     }
