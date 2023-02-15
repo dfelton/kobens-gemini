@@ -64,6 +64,7 @@ fi
 #
 # Statistics and Misc
 #
+
 #checkKillSwitch
 #ps aux | grep -v grep | grep -q "$GEMINI repeater:stats:daily-profit"
 #if [ $? -eq 1 ]; then
@@ -78,6 +79,7 @@ fi
 #    php -n $GEMINI repeater:usd-profits-dist &
 #    sleep 0.25
 #fi
+
 
 
 #

@@ -327,7 +327,10 @@ $app->add(new \Kobens\Gemini\Command\Command\TradeRepeater\Archiver(
     $connectionInterface,
     $sleeperInterface,
     new Processor(
-        new ReInvest($updateTrade),
+        new ReInvest(
+            $updateTrade,
+            (string) $config->get('gemini')->config->profit_distribution->reinvest_percentage
+        ),
         $repeaterProfitsBucket
 //         new TopWeekly($addAmount, $adapter, new RequiredQuote($apiMakerHoldBps), $shutdownInterface)
     )

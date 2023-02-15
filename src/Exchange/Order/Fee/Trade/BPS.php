@@ -19,6 +19,8 @@ final class BPS
         '0.00125', // 0.125%
         '0.00075', // 0.075%
         '0.0005',  // 0.050%
+        '0.0004',  // 0.040%
+        '0.0003',  // 0.030%
         '0',       // 0.000%
 
         // Deprecated Rate(s)
@@ -60,6 +62,12 @@ final class BPS
                 return $rate;
             }
         }
-        throw new \LogicException(\sprintf("Unhandled Fee. Amount '%s', Fee '%s'", $feeAmount, $feeAmount));
+        throw new \LogicException(
+            \sprintf(
+                "Unhandled Fee. Amount '%s', Fee '%s'",
+                $baseAmount,
+                $feeAmount
+            )
+        );
     }
 }
