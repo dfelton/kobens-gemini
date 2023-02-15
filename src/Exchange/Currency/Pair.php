@@ -15,7 +15,6 @@ final class Pair extends CurrencyPair implements PairInterface
     private string $minPriceIncrement;
 
     private static array $pairs = [
-
         // 1inch - https://1inch.exchange/
         '1inchusd' => ['base' => '1inch', 'quote' => 'usd', 'minOrderSize' => '0.01',    'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.0001'],
 
@@ -199,6 +198,54 @@ final class Pair extends CurrencyPair implements PairInterface
 
         // 0x - https://0x.org/
         'zrxusd'  => ['base' => 'zrx',    'quote' => 'usd', 'minOrderSize' => '0.1',     'minOrderIncrement' => '0.000001',   'minPriceIncrement' => '0.00001'],
+
+        // The Rest...
+        'rndrusd'  => ['base' => 'rndr', 'quote' => 'usd', 'minOrderSize' => '0.02',   'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.001'],
+        'mcusd'    => ['base' => 'mc',   'quote' => 'usd', 'minOrderSize' => '0.01',   'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.001'],
+        'galausd'  => ['base' => 'gala', 'quote' => 'usd', 'minOrderSize' => '0.4',    'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.00001'],
+        'ensusd'   => ['base' => 'ens',  'quote' => 'usd', 'minOrderSize' => '0.002',  'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.001'],
+        'kp3rusd'  => ['base' => 'kp3r', 'quote' => 'usd', 'minOrderSize' => '0.0001', 'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.01'],
+        'cvcusd'   => ['base' => 'cvc',  'quote' => 'usd', 'minOrderSize' => '0.2',    'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.00001'],
+        'elonusd'  => ['base' => 'elon', 'quote' => 'usd', 'minOrderSize' => '60000.0','minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.00000000001'],
+        'mimusd'   => ['base' => 'mim',  'quote' => 'usd', 'minOrderSize' => '0.1',    'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.0001'],
+        'spellusd' => ['base' => 'spell','quote' => 'usd', 'minOrderSize' => '5.0',    'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.0000001'],
+        'tokeusd'  => ['base' => 'toke', 'quote' => 'usd', 'minOrderSize' => '0.002',  'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.001'],
+        'ldousd'   => ['base' => 'ldo',  'quote' => 'usd', 'minOrderSize' => '0.02',   'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.001'],
+        'rlyusd'   => ['base' => 'rly',  'quote' => 'usd', 'minOrderSize' => '0.2',    'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.00001'],
+        'solusd'   => ['base' => 'sol',  'quote' => 'usd', 'minOrderSize' => '0.001',  'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.001'],
+        'rayusd'   => ['base' => 'ray',  'quote' => 'usd', 'minOrderSize' => '0.03',   'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.001'],
+        'sbrusd'   => ['base' => 'sbr',  'quote' => 'usd', 'minOrderSize' => '1.0',    'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.000001'],
+        'apeusd'   => ['base' => 'ape',  'quote' => 'usd', 'minOrderSize' => '0.02',   'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.001'],
+        'rbnusd'   => ['base' => 'rbn',  'quote' => 'usd', 'minOrderSize' => '0.07',   'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.00001'],
+        'fxsusd'   => ['base' => 'fxs',  'quote' => 'usd', 'minOrderSize' => '0.006',  'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.001'],
+        'dpiusd'   => ['base' => 'dpi',  'quote' => 'usd', 'minOrderSize' => '0.0006', 'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.01'],
+        'lqtyusd'  => ['base' => 'lqty', 'quote' => 'usd', 'minOrderSize' => '0.03',   'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.001'],
+        'fraxusd'  => ['base' => 'frax', 'quote' => 'usd', 'minOrderSize' => '0.1',    'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.001'],
+        'indexusd' => ['base' => 'index','quote' => 'usd', 'minOrderSize' => '0.02',   'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.001'],
+        'mplusd'   => ['base' => 'mpl',  'quote' => 'usd', 'minOrderSize' => '0.007',  'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.001'],
+        'metisusd' => ['base' => 'metis','quote' => 'usd', 'minOrderSize' => '0.0007', 'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.01'],
+        'qrdousd'  => ['base' => 'qrdo', 'quote' => 'usd', 'minOrderSize' => '0.04',   'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.00001'],
+        'zbcusd'   => ['base' => 'zbc',  'quote' => 'usd', 'minOrderSize' => '3.0',    'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.00001'],
+        'chzusd'   => ['base' => 'chz',  'quote' => 'usd', 'minOrderSize' => '0.5',    'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.00001'],
+        'revvusd'  => ['base' => 'revv', 'quote' => 'usd', 'minOrderSize' => '1.0',    'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.00001'],
+        'jamusd'   => ['base' => 'jam',  'quote' => 'usd', 'minOrderSize' => '10.0',   'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.0000001'],
+        'fidausd'  => ['base' => 'fida', 'quote' => 'usd', 'minOrderSize' => '0.06',   'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.00001'],
+        'gmtusd'   => ['base' => 'gmt',  'quote' => 'usd', 'minOrderSize' => '0.1',    'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.00001'],
+        'gfiusd'   => ['base' => 'gfi',  'quote' => 'usd', 'minOrderSize' => '0.04',   'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.001'],
+        'orcausd'  => ['base' => 'orca', 'quote' => 'usd', 'minOrderSize' => '0.05',   'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.001'],
+        'aliusd'   => ['base' => 'ali',  'quote' => 'usd', 'minOrderSize' => '2.0',    'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.000001'],
+        'truusd'   => ['base' => 'tru',  'quote' => 'usd', 'minOrderSize' => '0.8',    'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.00001'],
+        'dotusd'   => ['base' => 'dot',  'quote' => 'usd', 'minOrderSize' => '0.01',   'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.0001'],
+        'ernusd'   => ['base' => 'ern',  'quote' => 'usd', 'minOrderSize' => '0.05',   'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.0001'],
+        'galusd'   => ['base' => 'gal',  'quote' => 'usd', 'minOrderSize' => '0.04',   'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.0001'],
+        'eulusd'   => ['base' => 'eul',  'quote' => 'usd', 'minOrderSize' => '0.03',   'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.0001'],
+        'samousd'  => ['base' => 'samo', 'quote' => 'usd', 'minOrderSize' => '10.0',   'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.0000001'],
+        'bicousd'  => ['base' => 'bico', 'quote' => 'usd', 'minOrderSize' => '0.2',    'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.00001'],
+        'imxusd'   => ['base' => 'imx',  'quote' => 'usd', 'minOrderSize' => '0.1',    'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.00001'],
+        'plausd'   => ['base' => 'pla',  'quote' => 'usd', 'minOrderSize' => '0.3',    'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.00001'],
+        'iotxusd'  => ['base' => 'iotx', 'quote' => 'usd', 'minOrderSize' => '3.0',    'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.000001'],
+        'avaxusd'  => ['base' => 'avax', 'quote' => 'usd', 'minOrderSize' => '0.005',  'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.001'],
+        'atomusd'  => ['base' => 'atom', 'quote' => 'usd', 'minOrderSize' => '0.01',   'minOrderIncrement' => '0.000001', 'minPriceIncrement' => '0.001'],
     ];
 
     /**
@@ -236,6 +283,7 @@ final class Pair extends CurrencyPair implements PairInterface
         foreach (\array_diff(\array_keys(self::$pairs), \array_keys(self::$instances)) as $symbol) {
             self::getInstance($symbol);
         }
+        ksort(self::$instances);
         return self::$instances;
     }
 

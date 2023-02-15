@@ -32,7 +32,7 @@ final class ResponseHandler
                     $className = \Kobens\Gemini\Exception::class;
                 }
                 throw new $className(
-                    $body->message,
+                    $body->message ?? $body->reason,
                     $response->getResponseCode(),
                     new \Exception(\json_encode($response))
                 );
