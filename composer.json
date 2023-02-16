@@ -11,10 +11,6 @@
         }
     ],
     "repositories": {
-        "coin-market-cap": {
-            "type": "path",
-            "url": "/home/dfelton/repos/dfelton/kobens-coin-market-cap"
-        },
         "kobens-core": {
             "type": "vcs",
             "url": "https://github.com/dfelton/kobens-core"
@@ -44,7 +40,6 @@
         "ext-json": "*",
         "ext-mbstring": "*",
         "amphp/websocket-client": "^1.0",
-        "kobens/coin-market-cap": "dev-main",
         "kobens/kobens-core": "^3",
         "kobens/kobens-currency": "^4.3",
         "kobens/kobens-exchange": "^3",
