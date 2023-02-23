@@ -228,8 +228,6 @@ final class AddAmount
         $spread = Subtract::getResult($marketBid, $trade->getBuyPrice());
         $safeToAdd = false;
 
-        var_dump($marketBid);
-
         if (Compare::getResult($trade->getBuyPrice(), $spread) === Compare::LEFT_LESS_THAN) {
             // If the spread is higher than the bid price,
             // then the market already over 100% higher than original bid
