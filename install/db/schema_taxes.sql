@@ -1,3 +1,20 @@
+
+CREATE TABLE IF NOT EXISTS `taxes_lqtyusd_buy_log` (
+    `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
+    `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
+    PRIMARY KEY (`tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - LQTYUSD Buy Log';
+
+CREATE TABLE IF NOT EXISTS `taxes_lqtyusd_sell_log` (
+    `sell_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Sell Transaction ID',
+    `buy_tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Buy Transaction ID',
+    `amount` VARCHAR(50) NOT NULL COMMENT 'Amount',
+    `cost_basis` VARCHAR(50) NOT NULL COMMENT 'Cost Basis',
+    `proceeds` VARCHAR(50) NOT NULL COMMENT 'Proceeds',
+    `capital_gain` VARCHAR(50) NOT NULL COMMENT 'Capital Gain',
+    PRIMARY KEY (`sell_tid`, `buy_tid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Taxes - LQTYUSD Sell Log';
+
 CREATE TABLE IF NOT EXISTS `taxes_mcusd_buy_log` (
     `tid` BIGINT(13) UNSIGNED NOT NULL COMMENT 'Transaction ID',
     `amount_remaining` VARCHAR(50) NOT NULL COMMENT 'Amount Remaining',
