@@ -46,13 +46,23 @@ final class Profits
         $table->setHeaders([
             [
                 '',
-                new TableCell(sprintf('All Time Since %s', $data['all_time']['date']), ['colspan' => 2]),
+//                new TableCell(sprintf('All Time Since %s', $data['all_time']['date']), ['colspan' => 2]),
                 new TableCell('Past 90 Days', ['colspan' => 2]),
                 new TableCell('Past 30 Days', ['colspan' => 2]),
                 new TableCell('Past 7 Days', ['colspan' => 2]),
                 new TableCell('Past 24 Hours', ['colspan' => 2]),
             ],
-            ['Asset', 'Amount', 'Amount Notional', 'Amount', 'Amount Notional', 'Amount', 'Amount Notional', 'Amount', 'Amount Notional'],
+            [
+                'Asset',
+//                'Amount',
+//                'Amount Notional',
+                'Amount',
+                'Amount Notional',
+                'Amount',
+                'Amount Notional',
+                'Amount',
+                'Amount Notional'
+            ],
         ]);
         $cellsAllTime = $this->getCells($data['all_time']);
         $cellsPast90d = $this->getCells($data['90d']);
@@ -62,7 +72,7 @@ final class Profits
         foreach ($cellsAllTime['cells'] as $symbol => $cellData) {
             $row = array_merge(
                 [strtoupper($symbol)],
-                $cellData,
+//                $cellData,
                 $cellsPast90d['cells'][$symbol] ?? [],
                 $cellsPast30d['cells'][$symbol] ?? [],
                 $cellsPast7d['cells'][$symbol] ?? [],
@@ -70,11 +80,21 @@ final class Profits
             );
             $table->addRow($row);
         }
-        $table->addRow(['', '', '', '', '', '', '', '', '']);
+        $table->addRow([
+            '',
+//            '',
+//            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            ''
+        ]);
         $table->addRow([
             new TableCell('Total Notional', ['colspan' => 2]),
-            $cellsAllTime['total_notional'],
-            '',
+//            $cellsAllTime['total_notional'],
+//            '',
             $cellsPast90d['total_notional'],
             '',
             $cellsPast30d['total_notional'],
@@ -85,8 +105,8 @@ final class Profits
         ]);
         $table->addRow([
             new TableCell('Daily Average', ['colspan' => 2]),
-            $cellsAllTime['daily_average'],
-            '',
+//            $cellsAllTime['daily_average'],
+//            '',
             $cellsPast90d['daily_average'],
             '',
             $cellsPast30d['daily_average'],
@@ -97,8 +117,8 @@ final class Profits
         ]);
         $table->addRow([
             new TableCell('Projected Yearly', ['colspan' => 2]),
-            $cellsAllTime['projected_yearly'],
-            '',
+//            $cellsAllTime['projected_yearly'],
+//            '',
             $cellsPast90d['projected_yearly'],
             '',
             $cellsPast30d['projected_yearly'],
