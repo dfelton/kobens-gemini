@@ -18,8 +18,9 @@ checkKillSwitch() {
 sleepSeconds() {
     [[ "$1" == "" ]] && declare -i TIMER=5 || declare -i TIMER=$1
 
-    while [ $((--TIMER)) -ge 1 ]
+    while [ $TIMER -ge 1 ]
     do
+        ((--TIMER))
         sleep 1
         checkKillSwitch
     done
@@ -30,22 +31,26 @@ iteratePairs() {
 
     for pair in "${SYMBOLS[@]}"
     do
-        ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini market:book-keeper $pair"
-        if [ $? -eq 1 ]
+        declare -i RECORDS="$(sudo mysql gemini_prod -Ne "select count(*) from trade_repeater where symbol = '$pair' and is_enabled=1")"
+
+        if [ $RECORDS -gt 0 ]
         then
-            php -n $(realpath $(dirname $BASH_SOURCE))/gemini market:book-keeper $pair &
-            sleepSeconds $SLEEPTIME
+            ps aux | grep -v grep | grep -q "$(realpath $(dirname $BASH_SOURCE))/gemini market:book-keeper $pair"
+            if [ $? -eq 1 ]
+            then
+                php -n $(realpath $(dirname $BASH_SOURCE))/gemini market:book-keeper $pair &
+                sleepSeconds $SLEEP_TIME
+            fi
         fi
     done
 }
 
-iteratePairs 1
 
+checkKillSwitch
 
 while true
 do
-    sleepSeconds 5
-    iteratePairs 5
-    sleepSeconds 600
+    iteratePairs 1
+    sleepSeconds 60
 done
 
