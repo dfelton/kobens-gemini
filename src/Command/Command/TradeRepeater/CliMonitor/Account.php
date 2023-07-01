@@ -189,11 +189,11 @@ final class Account extends Command
     ): array {
         $data = [];
         try {
-            $data[] = AccountNotionalBalance::getTable($output, $this->data, Config::getInstance());
             if ($amount || $amountNotional || $amountAvailable || $amountAvailableNotional) {
                 $data[] = Balances::getTable($output, $this->data, $amount, $amountNotional, $amountAvailable, $amountAvailableNotional);
             }
             $data[] = $this->profits->get($output);
+            $data[] = AccountNotionalBalance::getTable($output, $this->data, Config::getInstance());
         } catch (\Kobens\Gemini\Exception $e) {
             $data[] = (new Table($output))->addRow([$e->getMessage()]);
         }
