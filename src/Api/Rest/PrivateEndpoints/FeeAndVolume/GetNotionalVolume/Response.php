@@ -21,15 +21,12 @@ final class Response implements ResponseInterface
      * @var int[]
      */
     private $bps = [
-        'api_auction_fee_bps' => null,
         'api_maker_fee_bps' => null,
         'api_taker_fee_bps' => null,
         'block_maker_fee_bps' => null,
         'block_taker_fee_bps' => null,
-        'fix_auction_fee_bps' => null,
         'fix_maker_fee_bps' => null,
         'fix_taker_fee_bps' => null,
-        'web_auction_fee_bps' => null,
         'web_maker_fee_bps' => null,
         'web_taker_fee_bps' => null,
     ];
@@ -71,11 +68,6 @@ final class Response implements ResponseInterface
         return $this->lastUpdatedMs;
     }
 
-    public function getApiAuctionFeeBPS(): int
-    {
-        return $this->bps['api_auction_fee_bps'];
-    }
-
     public function getApiMakerFeeBPS(): int
     {
         return $this->bps['api_maker_fee_bps'];
@@ -96,11 +88,6 @@ final class Response implements ResponseInterface
         return $this->bps['block_taker_fee_bps'];
     }
 
-    public function getFixAuctionFeeBPS(): int
-    {
-        return $this->bps['fix_auction_fee_bps'];
-    }
-
     public function getFixMakerFeeBPS(): int
     {
         return $this->bps['fix_maker_fee_bps'];
@@ -109,11 +96,6 @@ final class Response implements ResponseInterface
     public function getFixTakerFeeBPS(): int
     {
         return $this->bps['fix_taker_fee_bps'];
-    }
-
-    public function getWebAuctionFeeBPS(): int
-    {
-        return $this->bps['web_auction_fee_bps'];
     }
 
     public function getWebMakerFeeBPS(): int
