@@ -170,9 +170,9 @@ final class Rest extends Command
                 break;
             }
             if (
-                ($pair !== null && $pair->getSymbol() !== $row->getSymbol()) ||
-                ($activeIds[$row->getBuyOrderId()] ?? null) ||
-                $this->isStillHealthy($this->buyPlaced, $row->getId()) === false
+                ($pair !== null && $pair->getSymbol() !== $row->getSymbol()) || // it is not the symbol we are auditing
+                ($activeIds[$row->getBuyOrderId()] ?? null) || // there is still and active order for it, so it is not filled
+                $this->isStillHealthy($this->buyPlaced, $row->getId()) === false // it is in an unhealthy state
             ) {
                 continue;
             }
@@ -214,9 +214,9 @@ final class Rest extends Command
             if ($this->shutdown->isShutdownModeEnabled()) {
                 break;
             } elseif (
-                ($pair !== null && $pair->getSymbol() !== $row->getSymbol()) ||
-                ($activeIds[$row->getSellOrderId()] ?? null) ||
-                $this->isStillHealthy($this->sellPlaced, $row->getId()) === false
+                ($pair !== null && $pair->getSymbol() !== $row->getSymbol()) || // it is not the symbol we are auditing
+                ($activeIds[$row->getSellOrderId()] ?? null) || // there is still and active order for it, so it is not filled
+                $this->isStillHealthy($this->sellPlaced, $row->getId()) === false // it is in an unhealthy state
             ) {
                 continue;
             }
