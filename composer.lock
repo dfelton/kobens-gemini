@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "405428099fcdcb004947cc026e9bf577",
+    "content-hash": "acb904dabc7ae58d88162a0db9cccddc",
     "packages": [
         {
             "name": "amphp/amp",
@@ -1441,6 +1441,41 @@
                 "issues": "https://github.com/dfelton/kobens-exchange/issues"
             },
             "time": "2023-02-14T20:50:52+00:00"
+        },
+        {
+            "name": "kobens/kobens-http",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dfelton/kobens-http.git",
+                "reference": "3c328fab84e09fe65d55f0ea4b2c6a1213aa6d8d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dfelton/kobens-http/zipball/3c328fab84e09fe65d55f0ea4b2c6a1213aa6d8d",
+                "reference": "3c328fab84e09fe65d55f0ea4b2c6a1213aa6d8d",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Kobens\\Http\\": "src"
+                }
+            },
+            "license": [
+                "GNU GPLv3"
+            ],
+            "authors": [
+                {
+                    "name": "Darren Felton",
+                    "email": "darren_felton@hotmail.com"
+                }
+            ],
+            "support": {
+                "source": "https://github.com/dfelton/kobens-http/tree/1.0.1",
+                "issues": "https://github.com/dfelton/kobens-http/issues"
+            },
+            "time": "2024-02-28T18:29:30+00:00"
         },
         {
             "name": "kobens/kobens-math",
@@ -4587,5 +4622,5 @@
     "platform-overrides": {
         "php": "7.4"
     },
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }

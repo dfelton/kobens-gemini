@@ -43,6 +43,7 @@
         "kobens/kobens-core": "^3",
         "kobens/kobens-currency": "^4.3",
         "kobens/kobens-exchange": "^3",
+        "kobens/kobens-http": "^1",
         "kobens/kobens-math": "^2.0",
         "symfony/console": "^4.2",
         "zendframework/zend-config": "^3.2",
