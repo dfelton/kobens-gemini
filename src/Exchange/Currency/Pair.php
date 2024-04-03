@@ -256,6 +256,7 @@ final class Pair extends CurrencyPair implements PairInterface
 
     private function __construct(string $symbol)
     {
+        $symbol= strtolower($symbol);
         if (!\array_key_exists($symbol, self::$pairs)) {
             throw new \InvalidArgumentException("Unknown trading pair \"$symbol\"");
         }
